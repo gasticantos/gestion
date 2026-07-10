@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import BuscadorProducto, { ProductoBusqueda } from "@/components/BuscadorProducto";
+import dynamic from "next/dynamic";
+import type { ProductoBusqueda } from "@/components/BuscadorProducto";
 import PagoSelector, {
   PagoLinea,
   ClienteOpcion,
@@ -16,6 +17,10 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
+
+const BuscadorProducto = dynamic(() => import("@/components/BuscadorProducto"), {
+  loading: () => <div className="h-64 bg-neutral-800 rounded-lg animate-pulse" />
+});
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -41,12 +46,10 @@ export default function VentaPage() {
   const [recargoMesaPct, setRecargoMesaPct] = useState(0);
 
   async function cargar() {
-    const [prodRes, cliRes, configRes] = await Promise.all([
-      fetch("/api/productos"),
+    const [cliRes, configRes] = await Promise.all([
       fetch("/api/clientes"),
       fetch("/api/configuracion"),
     ]);
-    setProductos((await prodRes.json()).filter((p: { activo: boolean }) => p.activo));
     setClientes(await cliRes.json());
     setRecargoMesaPct((await configRes.json()).recargoMesaPct);
   }
@@ -54,6 +57,13 @@ export default function VentaPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
     cargar();
+  }, []);
+
+  // Carga productos después de que se montó la página para no bloquear la renderización
+  useEffect(() => {
+    fetch("/api/productos")
+      .then((res) => res.json())
+      .then((data) => setProductos(data.filter((p: { activo: boolean }) => p.activo)));
   }, []);
 
   // Restaura un carrito sin cobrar si volviste a esta pantalla sin haber tocado "Cobrar".

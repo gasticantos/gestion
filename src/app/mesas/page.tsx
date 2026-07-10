@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, Suspense, lazy } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
 import { input } from "@/components/ui/styles";
-import MapaMesas from "@/components/MapaMesas";
 import { formatearMoneda } from "@/lib/formato";
+
+const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () => <div className="h-96 bg-neutral-800 rounded-lg animate-pulse" /> });
 
 type Mesa = {
   id: number;

@@ -3,7 +3,12 @@
 import { Fragment, useEffect, useMemo, useRef, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import BuscadorProducto, { ProductoBusqueda } from "@/components/BuscadorProducto";
+import dynamic from "next/dynamic";
+import type { ProductoBusqueda } from "@/components/BuscadorProducto";
+
+const BuscadorProducto = dynamic(() => import("@/components/BuscadorProducto"), {
+  loading: () => <div className="h-64 bg-neutral-800 rounded-lg animate-pulse" />
+});
 import PagoSelector, {
   PagoLinea,
   ClienteOpcion,
@@ -74,21 +79,26 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   }, []);
 
   async function cargar() {
-    const [mesaRes, prodRes, cliRes, configRes] = await Promise.all([
+    const [mesaRes, cliRes, configRes] = await Promise.all([
       fetch(`/api/mesas/${id}`),
-      fetch("/api/productos"),
       fetch("/api/clientes"),
       fetch("/api/configuracion"),
     ]);
     setMesa(await mesaRes.json());
-    setProductos((await prodRes.json()).filter((p: { activo: boolean }) => p.activo));
     setClientes(await cliRes.json());
     setRecargoMesaPct((await configRes.json()).recargoMesaPct);
   }
 
+  // Carga productos después de los datos críticos
+  const cargarProductos = async () => {
+    const prodRes = await fetch("/api/productos");
+    setProductos((await prodRes.json()).filter((p: { activo: boolean }) => p.activo));
+  };
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- recarga al cambiar de mesa
     cargar();
+    cargarProductos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 

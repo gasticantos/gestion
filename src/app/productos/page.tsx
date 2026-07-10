@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState, FormEvent } from "react";
+import dynamic from "next/dynamic";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import ImportarProductos from "@/components/ImportarProductos";
 import Plegable from "@/components/ui/Plegable";
 import { input, label, th, td, trHover } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
+
+const ImportarProductos = dynamic(() => import("@/components/ImportarProductos"), {
+  loading: () => <div className="h-48 bg-neutral-800 rounded-lg animate-pulse" />
+});
 
 type Categoria = { id: number; nombre: string; activo: boolean };
 
