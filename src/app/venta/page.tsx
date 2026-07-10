@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import type { ProductoBusqueda } from "@/components/BuscadorProducto";
+import BuscadorProducto, { ProductoBusqueda } from "@/components/BuscadorProducto";
 import PagoSelector, {
   PagoLinea,
   ClienteOpcion,
@@ -17,10 +16,6 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-
-const BuscadorProducto = dynamic(() => import("@/components/BuscadorProducto"), {
-  loading: () => <div className="h-64 bg-neutral-800 rounded-lg animate-pulse" />
-});
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -45,25 +40,17 @@ export default function VentaPage() {
   const [enviando, setEnviando] = useState(false);
   const [recargoMesaPct, setRecargoMesaPct] = useState(0);
 
-  async function cargar() {
-    const [cliRes, configRes] = await Promise.all([
-      fetch("/api/clientes"),
-      fetch("/api/configuracion"),
-    ]);
-    setClientes(await cliRes.json());
-    setRecargoMesaPct((await configRes.json()).recargoMesaPct);
-  }
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
-    cargar();
-  }, []);
-
-  // Carga productos después de que se montó la página para no bloquear la renderización
-  useEffect(() => {
-    fetch("/api/productos")
-      .then((res) => res.json())
-      .then((data) => setProductos(data.filter((p: { activo: boolean }) => p.activo)));
+    // Carga productos primero (crítico para búsqueda)
+    Promise.all([
+      fetch("/api/productos").then((res) => res.json()),
+      fetch("/api/clientes").then((res) => res.json()),
+      fetch("/api/configuracion").then((res) => res.json()),
+    ]).then(([productos, clientes, config]) => {
+      setProductos(productos.filter((p: { activo: boolean }) => p.activo));
+      setClientes(clientes);
+      setRecargoMesaPct(config.recargoMesaPct);
+    });
   }, []);
 
   // Restaura un carrito sin cobrar si volviste a esta pantalla sin haber tocado "Cobrar".
@@ -177,7 +164,7 @@ export default function VentaPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Venta (mostrador)</h1>
         <BuscadorProducto productos={productos} onSeleccionar={agregar} recargoMesaPct={recargoMesaPct} />

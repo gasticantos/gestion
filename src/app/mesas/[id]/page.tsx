@@ -3,12 +3,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-import type { ProductoBusqueda } from "@/components/BuscadorProducto";
-
-const BuscadorProducto = dynamic(() => import("@/components/BuscadorProducto"), {
-  loading: () => <div className="h-64 bg-neutral-800 rounded-lg animate-pulse" />
-});
+import BuscadorProducto, { ProductoBusqueda } from "@/components/BuscadorProducto";
 import PagoSelector, {
   PagoLinea,
   ClienteOpcion,

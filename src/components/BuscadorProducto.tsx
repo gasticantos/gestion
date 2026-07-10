@@ -4,6 +4,7 @@ import { useMemo, useRef, useState, KeyboardEvent, memo } from "react";
 import { input } from "@/components/ui/styles";
 import { calcularPrecio, Tarifa } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
+import VirtualKeyboard from "@/components/VirtualKeyboard";
 
 export type ProductoBusqueda = {
   id: number;
@@ -63,6 +64,27 @@ function BuscadorProductoBase({
     inputRef.current?.focus();
   }
 
+  const handleVirtualKeyboardInput = (char: string) => {
+    if (char === "\b") {
+      // Backspace
+      setQuery((q) => q.slice(0, -1));
+    } else if (char === "\n") {
+      // Enter
+      const q = query.trim();
+      if (!q) return;
+      const exacto = productos.find((p) => p.codigoBarras === q);
+      if (exacto) {
+        elegirProducto(exacto);
+        return;
+      }
+      if (resultados.length === 1) {
+        elegirProducto(resultados[0]);
+      }
+    } else {
+      setQuery((q) => q + char);
+    }
+  };
+
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -119,7 +141,7 @@ function BuscadorProductoBase({
       <input
         ref={inputRef}
         type="text"
-        inputMode="text"
+        inputMode="none"
         autoFocus
         autoComplete="off"
         autoCorrect="off"
@@ -128,14 +150,14 @@ function BuscadorProductoBase({
         data-lpignore="true"
         data-1p-ignore
         data-form-type="other"
-        className={`${input} py-2.5`}
+        className={`${input} py-3 text-lg sm:text-base`}
         placeholder={placeholder || "Escanear código de barras o escribir para buscar..."}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
       />
       {resultados.length > 0 && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto">
           {resultados.map((p) => (
             <button
               key={p.id}
@@ -149,6 +171,7 @@ function BuscadorProductoBase({
           ))}
         </div>
       )}
+      <VirtualKeyboard onInput={handleVirtualKeyboardInput} />
     </div>
   );
 }
