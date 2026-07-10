@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { input, label } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 
@@ -35,7 +36,7 @@ export function requiereCliente(pagos: PagoLinea[]) {
   return pagos.some((p) => p.metodo === "FIADO");
 }
 
-export default function PagoSelector({
+function PagoSelectorBase({
   total,
   pagos,
   setPagos,
@@ -135,3 +136,5 @@ export default function PagoSelector({
     </div>
   );
 }
+
+export default memo(PagoSelectorBase);

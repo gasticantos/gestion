@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, KeyboardEvent } from "react";
+import { useMemo, useRef, useState, KeyboardEvent, memo } from "react";
 import { input } from "@/components/ui/styles";
 import { calcularPrecio, Tarifa } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
@@ -14,7 +14,7 @@ export type ProductoBusqueda = {
   precioVenta: number;
 };
 
-export default function BuscadorProducto({
+function BuscadorProductoBase({
   productos,
   onSeleccionar,
   recargoMesaPct = 0,
@@ -152,3 +152,5 @@ export default function BuscadorProducto({
     </div>
   );
 }
+
+export default memo(BuscadorProductoBase);
