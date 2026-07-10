@@ -69,6 +69,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={true}
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
                 active
                   ? "bg-blue-600 dark:bg-blue-600 text-white border-blue-600"
