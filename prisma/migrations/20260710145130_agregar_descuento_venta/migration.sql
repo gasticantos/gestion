@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Venta" ADD COLUMN     "descuentoPct" DOUBLE PRECISION NOT NULL DEFAULT 0;

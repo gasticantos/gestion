@@ -1,0 +1,258 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Categoria {
+  id        Int        @id @default(autoincrement())
+  nombre    String     @unique
+  activo    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  productos Producto[]
+}
+
+enum Rol {
+  DUENIO
+  CAJERO
+  MOZO
+}
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nombre       String
+  email        String   @unique
+  passwordHash String
+  rol          Rol      @default(MOZO)
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+enum TipoStockEntry {
+  ENTRADA
+  AJUSTE
+}
+
+enum EstadoMesa {
+  LIBRE
+  OCUPADA
+}
+
+enum TipoVenta {
+  MOSTRADOR
+  MESA
+}
+
+enum EstadoVenta {
+  ABIERTA
+  CERRADA
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  FIADO
+}
+
+enum TipoMovimientoCC {
+  CARGO
+  PAGO
+  INTERES
+}
+
+enum TarifaPrecio {
+  PARTICULAR
+  MESA
+}
+
+model Configuracion {
+  id             Int   @id @default(1)
+  recargoMesaPct Float @default(0)
+}
+
+model Proveedor {
+  id          Int          @id @default(autoincrement())
+  nombre      String
+  telefono    String?
+  contacto    String?
+  notas       String?
+  activo      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  productos   Producto[]
+  stockEntries StockEntry[]
+}
+
+model Producto {
+  id            Int               @id @default(autoincrement())
+  nombre        String
+  codigoInterno String?           @unique
+  codigoBarras  String?           @unique
+  marca         String?
+  categoriaId   Int?
+  categoria     Categoria?        @relation(fields: [categoriaId], references: [id])
+  precioVenta   Float
+  precioCosto   Float             @default(0)
+  stock         Float             @default(0)
+  unidad        String            @default("unidad")
+  activo        Boolean           @default(true)
+  proveedorId   Int?
+  proveedor     Proveedor?        @relation(fields: [proveedorId], references: [id])
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  stockEntryItems StockEntryItem[]
+  pedidoItems   PedidoItem[]
+
+  @@index([proveedorId])
+  @@index([categoriaId])
+}
+
+model StockEntry {
+  id          Int              @id @default(autoincrement())
+  proveedorId Int?
+  proveedor   Proveedor?       @relation(fields: [proveedorId], references: [id])
+  tipo        TipoStockEntry   @default(ENTRADA)
+  notas       String?
+  createdAt   DateTime         @default(now())
+  items       StockEntryItem[]
+
+  @@index([proveedorId])
+}
+
+model StockEntryItem {
+  id            Int        @id @default(autoincrement())
+  stockEntryId  Int
+  stockEntry    StockEntry @relation(fields: [stockEntryId], references: [id], onDelete: Cascade)
+  productoId    Int
+  producto      Producto   @relation(fields: [productoId], references: [id])
+  cantidad      Float
+  costoUnitario Float
+
+  @@index([stockEntryId])
+  @@index([productoId])
+}
+
+model Mesa {
+  id       Int        @id @default(autoincrement())
+  nombre   String     @unique
+  estado   EstadoMesa @default(LIBRE)
+  posX     Float      @default(0)
+  posY     Float      @default(0)
+  ventas   Venta[]
+  reservas Reserva[]
+}
+
+enum EstadoReserva {
+  PENDIENTE
+  CUMPLIDA
+  CANCELADA
+}
+
+model Reserva {
+  id        Int           @id @default(autoincrement())
+  nombre    String
+  telefono  String?
+  personas  Int
+  fecha     DateTime
+  mesaId    Int?
+  mesa      Mesa?         @relation(fields: [mesaId], references: [id])
+  notas     String?
+  estado    EstadoReserva @default(PENDIENTE)
+  createdAt DateTime      @default(now())
+
+  @@index([fecha])
+  @@index([mesaId])
+}
+
+model Venta {
+  id         Int         @id @default(autoincrement())
+  tipo       TipoVenta
+  mesaId     Int?
+  mesa       Mesa?       @relation(fields: [mesaId], references: [id])
+  clienteId  Int?
+  cliente    Cliente?    @relation(fields: [clienteId], references: [id])
+  estado     EstadoVenta @default(ABIERTA)
+  tarifa     TarifaPrecio @default(PARTICULAR)
+  total      Float       @default(0)
+  descuentoPct Float     @default(0)
+  borradorRonda Json?
+  createdAt  DateTime    @default(now())
+  closedAt   DateTime?
+  pedidos    Pedido[]
+  pagos      Pago[]
+  movimientosCC MovimientoCuentaCorriente[]
+
+  @@index([mesaId])
+  @@index([clienteId])
+  @@index([estado])
+}
+
+model Pedido {
+  id              Int          @id @default(autoincrement())
+  ventaId         Int
+  venta           Venta        @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  comandaImpresa  Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  items           PedidoItem[]
+
+  @@index([ventaId])
+}
+
+model PedidoItem {
+  id             Int      @id @default(autoincrement())
+  pedidoId       Int
+  pedido         Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  productoId     Int
+  producto       Producto @relation(fields: [productoId], references: [id])
+  cantidad       Float
+  precioUnitario Float
+  subtotal       Float
+  notas          String?
+
+  @@index([pedidoId])
+  @@index([productoId])
+}
+
+model Pago {
+  id        Int        @id @default(autoincrement())
+  ventaId   Int
+  venta     Venta      @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  metodo    MetodoPago
+  monto     Float
+  createdAt DateTime   @default(now())
+
+  @@index([ventaId])
+}
+
+model Cliente {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  telefono  String?
+  saldo     Float    @default(0)
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  ventas    Venta[]
+  movimientos MovimientoCuentaCorriente[]
+}
+
+model MovimientoCuentaCorriente {
+  id        Int              @id @default(autoincrement())
+  clienteId Int
+  cliente   Cliente          @relation(fields: [clienteId], references: [id])
+  tipo      TipoMovimientoCC
+  monto     Float
+  metodo    MetodoPago?
+  ventaId   Int?
+  venta     Venta?           @relation(fields: [ventaId], references: [id])
+  notas     String?
+  createdAt DateTime         @default(now())
+
+  @@index([clienteId])
+  @@index([ventaId])
+}

@@ -1,0 +1,145 @@
+"use client";
+
+import { useEffect, useState, FormEvent } from "react";
+import Link from "next/link";
+import Button from "@/components/ui/Button";
+import { input } from "@/components/ui/styles";
+import MapaMesas from "@/components/MapaMesas";
+import { formatearMoneda } from "@/lib/formato";
+
+type Mesa = {
+  id: number;
+  nombre: string;
+  estado: "LIBRE" | "OCUPADA";
+  posX: number;
+  posY: number;
+  ventas: { total: number }[];
+};
+
+export default function MesasPage() {
+  const [mesas, setMesas] = useState<Mesa[]>([]);
+  const [nombre, setNombre] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [vista, setVista] = useState<"mapa" | "lista">("mapa");
+
+  async function cargar() {
+    setLoading(true);
+    const mesasRes = await fetch("/api/mesas");
+    setMesas(await mesasRes.json());
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
+    cargar();
+  }, []);
+
+  async function agregarMesa(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    const res = await fetch("/api/mesas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "Ocurrió un error");
+      return;
+    }
+    setNombre("");
+    await cargar();
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto flex flex-col gap-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Mesas</h1>
+        <div className="flex gap-1 bg-neutral-900 border border-neutral-800 rounded-lg p-1">
+          <button
+            onClick={() => setVista("mapa")}
+            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+              vista === "mapa" ? "bg-blue-600 text-neutral-950" : "text-neutral-400 hover:text-neutral-200"
+            }`}
+          >
+            Mapa
+          </button>
+          <button
+            onClick={() => setVista("lista")}
+            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+              vista === "lista" ? "bg-blue-600 text-neutral-950" : "text-neutral-400 hover:text-neutral-200"
+            }`}
+          >
+            Lista
+          </button>
+        </div>
+      </div>
+
+      <form onSubmit={agregarMesa} className="flex items-center gap-2">
+        <input
+          className={`${input} max-w-xs`}
+          placeholder="Nombre o número de mesa"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
+        <Button type="submit" variant="primary">
+          Agregar mesa
+        </Button>
+        {error && <span className="text-sm text-red-400">{error}</span>}
+      </form>
+
+      {loading ? (
+        <div className="text-sm text-neutral-500">Cargando...</div>
+      ) : vista === "mapa" ? (
+        <>
+          <p className="text-xs text-neutral-500 -mt-2">
+            Arrastrá las mesas para acomodarlas como están en el local. Un click simple sobre una mesa la
+            abre. El mostrador y la puerta quedan siempre fijos.
+          </p>
+          <MapaMesas
+            mesas={mesas.map((m) => ({
+              id: m.id,
+              nombre: m.nombre,
+              estado: m.estado,
+              posX: m.posX,
+              posY: m.posY,
+              total: m.ventas[0]?.total ?? 0,
+            }))}
+          />
+        </>
+      ) : mesas.length === 0 ? (
+        <div className="text-sm text-neutral-500">Todavía no hay mesas cargadas</div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {mesas.map((mesa) => (
+            <Link
+              key={mesa.id}
+              href={`/mesas/${mesa.id}`}
+              className={`rounded-xl p-4 border text-center transition-colors ${
+                mesa.estado === "OCUPADA"
+                  ? "bg-red-500/10 border-red-500/30 hover:border-red-500/60"
+                  : "bg-neutral-900 border-neutral-800 hover:border-emerald-500/50"
+              }`}
+            >
+              <div className="font-medium text-neutral-100">{mesa.nombre}</div>
+              <div
+                className={`text-xs mt-1 font-medium ${
+                  mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
+                }`}
+              >
+                {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
+              </div>
+              {mesa.ventas[0] && (
+                <div className="text-sm font-semibold mt-2 text-neutral-100">
+                  ${formatearMoneda(mesa.ventas[0].total)}
+                </div>
+              )}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
