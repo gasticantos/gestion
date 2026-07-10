@@ -397,13 +397,28 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                               {i.tarifa === "MESA" ? "Mesa" : "Mostrador"}
                             </Badge>
                           </td>
-                          <td className={td}>
-                            <input
-                              type="number"
-                              className="w-12 rounded border border-neutral-700 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
-                              value={i.cantidad}
-                              onChange={(e) => cambiarCantidad(i.productoId, i.tarifa, Number(e.target.value))}
-                            />
+                          <td className={`${td} text-center`}>
+                            <div className="flex items-center justify-center gap-1">
+                              <button
+                                className="w-6 h-6 text-xs rounded border border-neutral-700 hover:bg-neutral-800"
+                                onClick={() => cambiarCantidad(i.productoId, i.tarifa, Math.max(1, i.cantidad - 1))}
+                              >
+                                −
+                              </button>
+                              <input
+                                type="number"
+                                inputMode="numeric"
+                                className="w-12 text-center rounded border border-neutral-700 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                value={i.cantidad}
+                                onChange={(e) => cambiarCantidad(i.productoId, i.tarifa, Number(e.target.value) || 1)}
+                              />
+                              <button
+                                className="w-6 h-6 text-xs rounded border border-neutral-700 hover:bg-neutral-800"
+                                onClick={() => cambiarCantidad(i.productoId, i.tarifa, i.cantidad + 1)}
+                              >
+                                +
+                              </button>
+                            </div>
                           </td>
                           <td className={td}>${formatearMoneda(i.precioUnitario)}</td>
                           <td className={td}>${formatearMoneda(i.precioUnitario * i.cantidad)}</td>
