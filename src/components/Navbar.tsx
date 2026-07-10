@@ -54,15 +54,15 @@ export default function Navbar() {
   const linksVisibles = usuario ? links.filter((l) => puedeAcceder(l.href, usuario.rol)) : [];
 
   return (
-    <nav className="print:hidden sticky top-0 z-20 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3 flex items-center gap-4 flex-wrap transition-colors">
-      <Link href="/" className="flex items-center gap-2 mr-4 shrink-0">
-        <span className="grid place-items-center w-8 h-8 rounded-lg bg-blue-600 dark:bg-blue-500 text-white font-bold text-sm">
+    <nav className="print:hidden sticky top-0 z-20 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-3 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 flex-wrap transition-colors text-sm sm:text-base">
+      <Link href="/" className="flex items-center gap-1.5 sm:gap-2 mr-2 sm:mr-4 shrink-0">
+        <span className="grid place-items-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-600 dark:bg-blue-500 text-white font-bold text-xs sm:text-sm">
           G
         </span>
-        <span className="font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Gestión</span>
+        <span className="hidden sm:inline font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Gestión</span>
       </Link>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto">
         {linksVisibles.map((link) => {
           const active = pathname.startsWith(link.href);
           return (
@@ -70,7 +70,7 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               prefetch={true}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
+              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors border whitespace-nowrap ${
                 active
                   ? "bg-blue-600 dark:bg-blue-600 text-white border-blue-600"
                   : "text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800"
