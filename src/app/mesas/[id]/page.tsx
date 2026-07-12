@@ -66,6 +66,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [editandoItemId, setEditandoItemId] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [itemsActualizados, setItemsActualizados] = useState<Map<number, number>>(new Map());
+  const [ticketImpreso, setTicketImpreso] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -300,6 +301,16 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     await cargar();
   }
 
+  async function imprimirTicket() {
+    setError("");
+    if (!venta) return;
+    setEnviando(true);
+    // Imprimir ticket de la venta completa
+    await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
+    setTicketImpreso(true);
+    setEnviando(false);
+  }
+
   async function cerrarMesa() {
     setError("");
     if (!pagosCuadran(pagos, totalFinal)) {
@@ -494,22 +505,48 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 <span className="text-neutral-400">Total a cobrar</span>
                 <span className="text-2xl font-semibold text-neutral-50">${formatearMoneda(totalFinal)}</span>
               </div>
-              <PagoSelector
-                total={totalFinal}
-                pagos={pagos}
-                setPagos={setPagos}
-                clientes={clientes}
-                clienteId={clienteId}
-                setClienteId={setClienteId}
-              />
-              <Button
-                onClick={cerrarMesa}
-                disabled={enviando || totalFinal <= 0}
-                variant="primary"
-                className="w-full py-2.5"
-              >
-                Cobrar y cerrar mesa
-              </Button>
+              {!ticketImpreso ? (
+                <Button
+                  onClick={imprimirTicket}
+                  disabled={enviando || totalFinal <= 0}
+                  variant="primary"
+                  className="w-full py-2.5"
+                >
+                  Imprimir ticket
+                </Button>
+              ) : (
+                <>
+                  <div className="text-sm text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">
+                    ✓ Ticket impreso - Ahora selecciona cómo cobrar
+                  </div>
+                  <PagoSelector
+                    total={totalFinal}
+                    pagos={pagos}
+                    setPagos={setPagos}
+                    clientes={clientes}
+                    clienteId={clienteId}
+                    setClienteId={setClienteId}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setTicketImpreso(false)}
+                      disabled={enviando}
+                      variant="secondary"
+                      className="flex-1"
+                    >
+                      Volver
+                    </Button>
+                    <Button
+                      onClick={cerrarMesa}
+                      disabled={enviando || totalFinal <= 0 || !pagosCuadran(pagos, totalFinal)}
+                      variant="primary"
+                      className="flex-1"
+                    >
+                      Cobrar y cerrar
+                    </Button>
+                  </div>
+                </>
+              )}
             </Card>
           )}
         </div>
