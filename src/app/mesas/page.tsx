@@ -54,6 +54,17 @@ export default function MesasPage() {
     await cargar();
   }
 
+  async function borrarMesa(id: number) {
+    if (!confirm("¿Estás seguro? Se devolverá el stock de todas las ventas")) return;
+    const res = await fetch(`/api/mesas/${id}/delete`, { method: "DELETE" });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "Ocurrió un error");
+      return;
+    }
+    await cargar();
+  }
+
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -116,29 +127,39 @@ export default function MesasPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {mesas.map((mesa) => (
-            <Link
+            <div
               key={mesa.id}
-              href={`/mesas/${mesa.id}`}
               className={`rounded-xl p-4 border text-center transition-colors ${
                 mesa.estado === "OCUPADA"
-                  ? "bg-red-500/10 border-red-500/30 hover:border-red-500/60"
+                  ? "bg-red-500/10 border-red-500/30"
                   : "bg-neutral-900 border-neutral-800 hover:border-emerald-500/50"
               }`}
             >
-              <div className="font-medium text-neutral-100">{mesa.nombre}</div>
-              <div
-                className={`text-xs mt-1 font-medium ${
-                  mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
-                }`}
+              <Link
+                href={`/mesas/${mesa.id}`}
+                className="block hover:opacity-70 transition-opacity"
               >
-                {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
-              </div>
-              {mesa.ventas[0] && (
-                <div className="text-sm font-semibold mt-2 text-neutral-100">
-                  ${formatearMoneda(mesa.ventas[0].total)}
+                <div className="font-medium text-neutral-100">{mesa.nombre}</div>
+                <div
+                  className={`text-xs mt-1 font-medium ${
+                    mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
+                  }`}
+                >
+                  {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
                 </div>
-              )}
-            </Link>
+                {mesa.ventas[0] && (
+                  <div className="text-sm font-semibold mt-2 text-neutral-100">
+                    ${formatearMoneda(mesa.ventas[0].total)}
+                  </div>
+                )}
+              </Link>
+              <button
+                onClick={() => borrarMesa(mesa.id)}
+                className="mt-3 w-full text-xs px-2 py-1 rounded border border-red-600/50 text-red-400 hover:bg-red-600/10 transition-colors"
+              >
+                Borrar
+              </button>
+            </div>
           ))}
         </div>
       )}
