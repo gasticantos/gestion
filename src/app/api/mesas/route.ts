@@ -33,6 +33,6 @@ export async function POST(req: NextRequest) {
   const posX = 40 + (cantidad % columnas) * espaciado;
   const posY = 40 + Math.floor(cantidad / columnas) * espaciado;
 
-  const mesa = await prisma.mesa.create({ data: { nombre, posX, posY } });
+  const mesa = await prisma.mesa.create({ data: { nombre, numero: siguienteNumero, posX, posY } });
   return NextResponse.json(mesa, { status: 201 });
 }

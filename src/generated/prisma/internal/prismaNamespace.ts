@@ -1656,9 +1656,13 @@ export type StockEntryItemScalarFieldEnum = (typeof StockEntryItemScalarFieldEnu
 export const MesaScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
+  numero: 'numero',
+  apodo: 'apodo',
   estado: 'estado',
   posX: 'posX',
-  posY: 'posY'
+  posY: 'posY',
+  ancho: 'ancho',
+  alto: 'alto'
 } as const
 
 export type MesaScalarFieldEnum = (typeof MesaScalarFieldEnum)[keyof typeof MesaScalarFieldEnum]

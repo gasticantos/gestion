@@ -28,76 +28,112 @@ export type AggregateMesa = {
 
 export type MesaAvgAggregateOutputType = {
   id: number | null
+  numero: number | null
   posX: number | null
   posY: number | null
+  ancho: number | null
+  alto: number | null
 }
 
 export type MesaSumAggregateOutputType = {
   id: number | null
+  numero: number | null
   posX: number | null
   posY: number | null
+  ancho: number | null
+  alto: number | null
 }
 
 export type MesaMinAggregateOutputType = {
   id: number | null
   nombre: string | null
+  numero: number | null
+  apodo: string | null
   estado: $Enums.EstadoMesa | null
   posX: number | null
   posY: number | null
+  ancho: number | null
+  alto: number | null
 }
 
 export type MesaMaxAggregateOutputType = {
   id: number | null
   nombre: string | null
+  numero: number | null
+  apodo: string | null
   estado: $Enums.EstadoMesa | null
   posX: number | null
   posY: number | null
+  ancho: number | null
+  alto: number | null
 }
 
 export type MesaCountAggregateOutputType = {
   id: number
   nombre: number
+  numero: number
+  apodo: number
   estado: number
   posX: number
   posY: number
+  ancho: number
+  alto: number
   _all: number
 }
 
 
 export type MesaAvgAggregateInputType = {
   id?: true
+  numero?: true
   posX?: true
   posY?: true
+  ancho?: true
+  alto?: true
 }
 
 export type MesaSumAggregateInputType = {
   id?: true
+  numero?: true
   posX?: true
   posY?: true
+  ancho?: true
+  alto?: true
 }
 
 export type MesaMinAggregateInputType = {
   id?: true
   nombre?: true
+  numero?: true
+  apodo?: true
   estado?: true
   posX?: true
   posY?: true
+  ancho?: true
+  alto?: true
 }
 
 export type MesaMaxAggregateInputType = {
   id?: true
   nombre?: true
+  numero?: true
+  apodo?: true
   estado?: true
   posX?: true
   posY?: true
+  ancho?: true
+  alto?: true
 }
 
 export type MesaCountAggregateInputType = {
   id?: true
   nombre?: true
+  numero?: true
+  apodo?: true
   estado?: true
   posX?: true
   posY?: true
+  ancho?: true
+  alto?: true
   _all?: true
 }
 
@@ -190,9 +226,13 @@ export type MesaGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type MesaGroupByOutputType = {
   id: number
   nombre: string
+  numero: number
+  apodo: string | null
   estado: $Enums.EstadoMesa
   posX: number
   posY: number
+  ancho: number
+  alto: number
   _count: MesaCountAggregateOutputType | null
   _avg: MesaAvgAggregateOutputType | null
   _sum: MesaSumAggregateOutputType | null
@@ -221,9 +261,13 @@ export type MesaWhereInput = {
   NOT?: Prisma.MesaWhereInput | Prisma.MesaWhereInput[]
   id?: Prisma.IntFilter<"Mesa"> | number
   nombre?: Prisma.StringFilter<"Mesa"> | string
+  numero?: Prisma.IntFilter<"Mesa"> | number
+  apodo?: Prisma.StringNullableFilter<"Mesa"> | string | null
   estado?: Prisma.EnumEstadoMesaFilter<"Mesa"> | $Enums.EstadoMesa
   posX?: Prisma.FloatFilter<"Mesa"> | number
   posY?: Prisma.FloatFilter<"Mesa"> | number
+  ancho?: Prisma.FloatFilter<"Mesa"> | number
+  alto?: Prisma.FloatFilter<"Mesa"> | number
   ventas?: Prisma.VentaListRelationFilter
   reservas?: Prisma.ReservaListRelationFilter
 }
@@ -231,9 +275,13 @@ export type MesaWhereInput = {
 export type MesaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
+  apodo?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
   ventas?: Prisma.VentaOrderByRelationAggregateInput
   reservas?: Prisma.ReservaOrderByRelationAggregateInput
 }
@@ -241,22 +289,30 @@ export type MesaOrderByWithRelationInput = {
 export type MesaWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   nombre?: string
+  numero?: number
   AND?: Prisma.MesaWhereInput | Prisma.MesaWhereInput[]
   OR?: Prisma.MesaWhereInput[]
   NOT?: Prisma.MesaWhereInput | Prisma.MesaWhereInput[]
+  apodo?: Prisma.StringNullableFilter<"Mesa"> | string | null
   estado?: Prisma.EnumEstadoMesaFilter<"Mesa"> | $Enums.EstadoMesa
   posX?: Prisma.FloatFilter<"Mesa"> | number
   posY?: Prisma.FloatFilter<"Mesa"> | number
+  ancho?: Prisma.FloatFilter<"Mesa"> | number
+  alto?: Prisma.FloatFilter<"Mesa"> | number
   ventas?: Prisma.VentaListRelationFilter
   reservas?: Prisma.ReservaListRelationFilter
-}, "id" | "nombre">
+}, "id" | "nombre" | "numero">
 
 export type MesaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
+  apodo?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
   _count?: Prisma.MesaCountOrderByAggregateInput
   _avg?: Prisma.MesaAvgOrderByAggregateInput
   _max?: Prisma.MesaMaxOrderByAggregateInput
@@ -270,16 +326,24 @@ export type MesaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MesaScalarWhereWithAggregatesInput | Prisma.MesaScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Mesa"> | number
   nombre?: Prisma.StringWithAggregatesFilter<"Mesa"> | string
+  numero?: Prisma.IntWithAggregatesFilter<"Mesa"> | number
+  apodo?: Prisma.StringNullableWithAggregatesFilter<"Mesa"> | string | null
   estado?: Prisma.EnumEstadoMesaWithAggregatesFilter<"Mesa"> | $Enums.EstadoMesa
   posX?: Prisma.FloatWithAggregatesFilter<"Mesa"> | number
   posY?: Prisma.FloatWithAggregatesFilter<"Mesa"> | number
+  ancho?: Prisma.FloatWithAggregatesFilter<"Mesa"> | number
+  alto?: Prisma.FloatWithAggregatesFilter<"Mesa"> | number
 }
 
 export type MesaCreateInput = {
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
   ventas?: Prisma.VentaCreateNestedManyWithoutMesaInput
   reservas?: Prisma.ReservaCreateNestedManyWithoutMesaInput
 }
@@ -287,18 +351,26 @@ export type MesaCreateInput = {
 export type MesaUncheckedCreateInput = {
   id?: number
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutMesaInput
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutMesaInput
 }
 
 export type MesaUpdateInput = {
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
   ventas?: Prisma.VentaUpdateManyWithoutMesaNestedInput
   reservas?: Prisma.ReservaUpdateManyWithoutMesaNestedInput
 }
@@ -306,9 +378,13 @@ export type MesaUpdateInput = {
 export type MesaUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutMesaNestedInput
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutMesaNestedInput
 }
@@ -316,60 +392,90 @@ export type MesaUncheckedUpdateInput = {
 export type MesaCreateManyInput = {
   id?: number
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
 }
 
 export type MesaUpdateManyMutationInput = {
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type MesaUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type MesaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
+  apodo?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
 }
 
 export type MesaAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
 }
 
 export type MesaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
+  apodo?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
 }
 
 export type MesaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
+  apodo?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
 }
 
 export type MesaSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  numero?: Prisma.SortOrder
   posX?: Prisma.SortOrder
   posY?: Prisma.SortOrder
+  ancho?: Prisma.SortOrder
+  alto?: Prisma.SortOrder
 }
 
 export type MesaNullableScalarRelationFilter = {
@@ -415,18 +521,26 @@ export type MesaUpdateOneWithoutVentasNestedInput = {
 
 export type MesaCreateWithoutReservasInput = {
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
   ventas?: Prisma.VentaCreateNestedManyWithoutMesaInput
 }
 
 export type MesaUncheckedCreateWithoutReservasInput = {
   id?: number
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutMesaInput
 }
 
@@ -448,35 +562,51 @@ export type MesaUpdateToOneWithWhereWithoutReservasInput = {
 
 export type MesaUpdateWithoutReservasInput = {
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
   ventas?: Prisma.VentaUpdateManyWithoutMesaNestedInput
 }
 
 export type MesaUncheckedUpdateWithoutReservasInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutMesaNestedInput
 }
 
 export type MesaCreateWithoutVentasInput = {
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
   reservas?: Prisma.ReservaCreateNestedManyWithoutMesaInput
 }
 
 export type MesaUncheckedCreateWithoutVentasInput = {
   id?: number
   nombre: string
+  numero: number
+  apodo?: string | null
   estado?: $Enums.EstadoMesa
   posX?: number
   posY?: number
+  ancho?: number
+  alto?: number
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutMesaInput
 }
 
@@ -498,18 +628,26 @@ export type MesaUpdateToOneWithWhereWithoutVentasInput = {
 
 export type MesaUpdateWithoutVentasInput = {
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
   reservas?: Prisma.ReservaUpdateManyWithoutMesaNestedInput
 }
 
 export type MesaUncheckedUpdateWithoutVentasInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  apodo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoMesaFieldUpdateOperationsInput | $Enums.EstadoMesa
   posX?: Prisma.FloatFieldUpdateOperationsInput | number
   posY?: Prisma.FloatFieldUpdateOperationsInput | number
+  ancho?: Prisma.FloatFieldUpdateOperationsInput | number
+  alto?: Prisma.FloatFieldUpdateOperationsInput | number
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutMesaNestedInput
 }
 
@@ -556,9 +694,13 @@ export type MesaCountOutputTypeCountReservasArgs<ExtArgs extends runtime.Types.E
 export type MesaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nombre?: boolean
+  numero?: boolean
+  apodo?: boolean
   estado?: boolean
   posX?: boolean
   posY?: boolean
+  ancho?: boolean
+  alto?: boolean
   ventas?: boolean | Prisma.Mesa$ventasArgs<ExtArgs>
   reservas?: boolean | Prisma.Mesa$reservasArgs<ExtArgs>
   _count?: boolean | Prisma.MesaCountOutputTypeDefaultArgs<ExtArgs>
@@ -567,28 +709,40 @@ export type MesaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type MesaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nombre?: boolean
+  numero?: boolean
+  apodo?: boolean
   estado?: boolean
   posX?: boolean
   posY?: boolean
+  ancho?: boolean
+  alto?: boolean
 }, ExtArgs["result"]["mesa"]>
 
 export type MesaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nombre?: boolean
+  numero?: boolean
+  apodo?: boolean
   estado?: boolean
   posX?: boolean
   posY?: boolean
+  ancho?: boolean
+  alto?: boolean
 }, ExtArgs["result"]["mesa"]>
 
 export type MesaSelectScalar = {
   id?: boolean
   nombre?: boolean
+  numero?: boolean
+  apodo?: boolean
   estado?: boolean
   posX?: boolean
   posY?: boolean
+  ancho?: boolean
+  alto?: boolean
 }
 
-export type MesaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "estado" | "posX" | "posY", ExtArgs["result"]["mesa"]>
+export type MesaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "numero" | "apodo" | "estado" | "posX" | "posY" | "ancho" | "alto", ExtArgs["result"]["mesa"]>
 export type MesaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ventas?: boolean | Prisma.Mesa$ventasArgs<ExtArgs>
   reservas?: boolean | Prisma.Mesa$reservasArgs<ExtArgs>
@@ -606,9 +760,13 @@ export type $MesaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     nombre: string
+    numero: number
+    apodo: string | null
     estado: $Enums.EstadoMesa
     posX: number
     posY: number
+    ancho: number
+    alto: number
   }, ExtArgs["result"]["mesa"]>
   composites: {}
 }
@@ -1036,9 +1194,13 @@ export interface Prisma__MesaClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface MesaFieldRefs {
   readonly id: Prisma.FieldRef<"Mesa", 'Int'>
   readonly nombre: Prisma.FieldRef<"Mesa", 'String'>
+  readonly numero: Prisma.FieldRef<"Mesa", 'Int'>
+  readonly apodo: Prisma.FieldRef<"Mesa", 'String'>
   readonly estado: Prisma.FieldRef<"Mesa", 'EstadoMesa'>
   readonly posX: Prisma.FieldRef<"Mesa", 'Float'>
   readonly posY: Prisma.FieldRef<"Mesa", 'Float'>
+  readonly ancho: Prisma.FieldRef<"Mesa", 'Float'>
+  readonly alto: Prisma.FieldRef<"Mesa", 'Float'>
 }
     
 

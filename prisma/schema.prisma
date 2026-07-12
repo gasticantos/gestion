@@ -141,9 +141,13 @@ model StockEntryItem {
 model Mesa {
   id       Int        @id @default(autoincrement())
   nombre   String     @unique
+  numero   Int        @unique
+  apodo    String?
   estado   EstadoMesa @default(LIBRE)
   posX     Float      @default(0)
   posY     Float      @default(0)
+  ancho    Float      @default(70)
+  alto     Float      @default(70)
   ventas   Venta[]
   reservas Reserva[]
 }
