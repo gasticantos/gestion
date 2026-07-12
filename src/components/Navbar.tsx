@@ -47,6 +47,8 @@ export default function Navbar() {
 
   async function cerrarSesion() {
     await fetch("/api/auth/logout", { method: "POST" });
+    // Limpiar todo localStorage
+    localStorage.clear();
     router.push("/login");
     router.refresh();
   }
