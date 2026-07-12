@@ -23,6 +23,9 @@ export default function ClientesPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [editNombre, setEditNombre] = useState("");
+  const [editTelefono, setEditTelefono] = useState("");
 
   async function cargar() {
     setLoading(true);
@@ -51,6 +54,50 @@ export default function ClientesPage() {
     }
     setNombre("");
     setTelefono("");
+    await cargar();
+  }
+
+  function iniciarEdicion(c: Cliente) {
+    setEditandoId(c.id);
+    setEditNombre(c.nombre);
+    setEditTelefono(c.telefono || "");
+  }
+
+  function cancelarEdicion() {
+    setEditandoId(null);
+    setEditNombre("");
+    setEditTelefono("");
+  }
+
+  async function guardarEdicion(clienteId: number) {
+    setError("");
+    if (!editNombre.trim()) {
+      setError("El nombre es obligatorio");
+      return;
+    }
+    const res = await fetch(`/api/clientes/${clienteId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre: editNombre, telefono: editTelefono || null }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "Ocurrió un error");
+      return;
+    }
+    cancelarEdicion();
+    await cargar();
+  }
+
+  async function eliminarCliente(clienteId: number) {
+    if (!confirm("¿Eliminar este cliente? Se marcará como inactivo.")) return;
+    setError("");
+    const res = await fetch(`/api/clientes/${clienteId}`, { method: "DELETE" });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "Ocurrió un error");
+      return;
+    }
     await cargar();
   }
 
@@ -104,27 +151,66 @@ export default function ClientesPage() {
                 </tr>
               </thead>
               <tbody>
-                {listado.map((c) => (
-                  <tr key={c.id} className={`${trHover} ${!c.activo ? "opacity-40" : ""}`}>
-                    <td className={td}>{c.nombre}</td>
-                    <td className={td}>{c.telefono || "-"}</td>
-                    <td className={td}>
-                      {c.saldo > 0 ? (
-                        <Badge variant="danger">DEBE</Badge>
-                      ) : (
-                        <Badge variant="success">Al día</Badge>
-                      )}
-                    </td>
-                    <td className={`${td} font-medium ${c.saldo > 0 ? "text-red-400" : ""}`}>
-                      ${formatearMoneda(c.saldo)}
-                    </td>
-                    <td className={`${td} text-right`}>
-                      <Link href={`/clientes/${c.id}`} className="text-blue-500 hover:text-blue-400">
-                        Ver cuenta
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {listado.map((c) =>
+                  editandoId === c.id ? (
+                    <tr key={c.id} className={trHover}>
+                      <td className={td}>
+                        <input
+                          className={input}
+                          value={editNombre}
+                          onChange={(e) => setEditNombre(e.target.value)}
+                          autoFocus
+                        />
+                      </td>
+                      <td className={td}>
+                        <input className={input} value={editTelefono} onChange={(e) => setEditTelefono(e.target.value)} />
+                      </td>
+                      <td colSpan={3} className={`${td} text-right whitespace-nowrap gap-2`}>
+                        <button
+                          className="text-blue-500 hover:text-blue-400 mr-3"
+                          onClick={() => guardarEdicion(c.id)}
+                        >
+                          Guardar
+                        </button>
+                        <button className="text-neutral-400 hover:text-neutral-200" onClick={cancelarEdicion}>
+                          Cancelar
+                        </button>
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={c.id} className={`${trHover} ${!c.activo ? "opacity-40" : ""}`}>
+                      <td className={td}>{c.nombre}</td>
+                      <td className={td}>{c.telefono || "-"}</td>
+                      <td className={td}>
+                        {c.saldo > 0 ? (
+                          <Badge variant="danger">DEBE</Badge>
+                        ) : (
+                          <Badge variant="success">Al día</Badge>
+                        )}
+                      </td>
+                      <td className={`${td} font-medium ${c.saldo > 0 ? "text-red-400" : ""}`}>
+                        ${formatearMoneda(c.saldo)}
+                      </td>
+                      <td className={`${td} text-right whitespace-nowrap`}>
+                        <Link href={`/clientes/${c.id}`} className="text-blue-500 hover:text-blue-400 mr-3">
+                          Ver cuenta
+                        </Link>
+                        <button
+                          className="text-amber-500 hover:text-amber-400 mr-3"
+                          onClick={() => iniciarEdicion(c)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="text-red-400 hover:text-red-300"
+                          onClick={() => eliminarCliente(c.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
