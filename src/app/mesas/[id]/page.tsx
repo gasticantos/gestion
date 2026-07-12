@@ -67,6 +67,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [itemsActualizados, setItemsActualizados] = useState<Map<number, number>>(new Map());
   const [ticketImpreso, setTicketImpreso] = useState(false);
+  const [editandoItems, setEditandoItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -393,12 +394,26 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                             <tr key={item.id} className={trHover}>
                               <td className={td}>{item.producto.nombre}</td>
                               <td className={td}>
-                                <input
-                                  type="number"
-                                  className="w-12 rounded border border-neutral-700 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
-                                  value={cantidadActual}
-                                  onChange={(e) => actualizarItemPedido(item.id, Number(e.target.value))}
-                                />
+                                {editandoItems.has(item.id) ? (
+                                  <input
+                                    type="number"
+                                    autoFocus
+                                    className="w-12 rounded border border-blue-600 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                    value={cantidadActual}
+                                    onChange={(e) => actualizarItemPedido(item.id, Number(e.target.value) || 1)}
+                                    onBlur={() => setEditandoItems((s) => { const n = new Set(s); n.delete(item.id); return n; })}
+                                  />
+                                ) : (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-sm font-medium">{cantidadActual}x</span>
+                                    <button
+                                      className="text-xs px-2 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10"
+                                      onClick={() => setEditandoItems((s) => new Set(s).add(item.id))}
+                                    >
+                                      Editar
+                                    </button>
+                                  </div>
+                                )}
                               </td>
                               <td className={td}>${formatearMoneda(item.precioUnitario)}</td>
                               <td className={td}>${formatearMoneda(item.precioUnitario * cantidadActual)}</td>
