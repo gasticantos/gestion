@@ -13,7 +13,7 @@ export type MesaMapa = {
   total: number;
 };
 
-const TILE = 110;
+const TILE = 70;
 const UMBRAL_DRAG = 6;
 
 export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
@@ -112,21 +112,21 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
             onPointerMove={onPointerMove}
             onPointerUp={() => onPointerUp(mesa)}
             style={{ left: pos.x, top: pos.y, width: TILE, height: TILE, touchAction: "none" }}
-            className={`absolute select-none cursor-grab active:cursor-grabbing rounded-xl border-2 flex flex-col items-center justify-center gap-0.5 shadow-lg transition-colors ${
+            className={`absolute select-none cursor-grab active:cursor-grabbing rounded-lg border-2 flex flex-col items-center justify-center gap-0 shadow-lg transition-colors p-1 ${
               mesa.estado === "OCUPADA"
                 ? "bg-red-500/15 border-red-500/60"
                 : "bg-emerald-500/10 border-emerald-500/50"
             }`}
           >
-            <span className="text-lg font-bold text-neutral-50">{mesa.nombre}</span>
+            <span className="text-sm font-bold text-neutral-50 leading-none">{mesa.nombre}</span>
             <span
-              className={`text-xs font-medium ${
+              className={`text-[10px] font-medium leading-none ${
                 mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
               }`}
             >
               {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
             </span>
-            {mesa.total > 0 && <span className="text-xs text-neutral-300">${formatearMoneda(mesa.total)}</span>}
+            {mesa.total > 0 && <span className="text-[9px] text-neutral-300 leading-none">${formatearMoneda(mesa.total)}</span>}
           </div>
         );
       })}
