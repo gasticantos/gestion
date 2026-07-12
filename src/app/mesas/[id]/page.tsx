@@ -152,7 +152,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   const totalRonda = useMemo(() => ronda.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [ronda]);
 
-  function agregarARonda(p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) {
+  async function agregarARonda(p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) {
     const producto = productos.find((x) => x.id === p.id);
     if (!producto) return;
     ultimoCambioLocalRef.current = Date.now();
@@ -169,24 +169,38 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       }
     }
 
-    // Si no existe en pedidos, agregar o sumar a ronda actual
-    setRonda((prev) => {
-      const existe = prev.find((i) => i.productoId === p.id && i.tarifa === tarifa);
-      if (existe) {
-        return prev.map((i) => (i === existe ? { ...i, cantidad: i.cantidad + 1 } : i));
-      }
-      return [
-        ...prev,
-        {
-          productoId: producto.id,
-          nombre: producto.nombre,
-          tarifa,
-          precioUnitario,
-          cantidad: 1,
-          stockDisponible: producto.stock,
-        },
-      ];
+    // Agregar a ronda temporal y enviar inmediatamente
+    const itemRonda = {
+      productoId: producto.id,
+      nombre: producto.nombre,
+      tarifa,
+      precioUnitario,
+      cantidad: 1,
+      stockDisponible: producto.stock,
+    };
+
+    const rondaActual = ronda.find((i) => i.productoId === p.id && i.tarifa === tarifa)
+      ? ronda.map((i) => (i.productoId === p.id && i.tarifa === tarifa ? { ...i, cantidad: i.cantidad + 1 } : i))
+      : [...ronda, itemRonda];
+
+    // Enviar inmediatamente (sin ronda temporal)
+    setError("");
+    setEnviando(true);
+    const res = await fetch(`/api/mesas/${id}/pedido`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: rondaActual.map((i) => ({ productoId: i.productoId, cantidad: i.cantidad, tarifa: i.tarifa })),
+      }),
     });
+    setEnviando(false);
+    if (!res.ok) {
+      setError("Error al agregar producto");
+      return;
+    }
+    ultimoSincronizadoRef.current = "[]";
+    setRonda([]);
+    await cargar();
   }
 
   function cambiarCantidad(productoId: number, tarifa: Tarifa, cantidad: number) {
@@ -449,24 +463,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 onSeleccionar={agregarARonda}
                 recargoMesaPct={recargoMesaPct}
               />
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => enviarPedido(false)}
-                  disabled={ronda.length === 0 || enviando}
-                  variant="secondary"
-                  className="self-start"
-                >
-                  Cargar pedido
-                </Button>
-                <Button
-                  onClick={() => enviarPedido(true)}
-                  disabled={ronda.length === 0 || enviando}
-                  variant="primary"
-                  className="self-start"
-                >
-                  Cargar e imprimir comanda
-                </Button>
-              </div>
             </Card>
           </div>
 
