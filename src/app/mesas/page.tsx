@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState, FormEvent, Suspense, lazy } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
-import { input } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 
 const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () => <div className="h-96 bg-neutral-800 rounded-lg animate-pulse" /> });
@@ -20,10 +19,10 @@ type Mesa = {
 
 export default function MesasPage() {
   const [mesas, setMesas] = useState<Mesa[]>([]);
-  const [nombre, setNombre] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [vista, setVista] = useState<"mapa" | "lista">("mapa");
+  const [agragando, setAgregando] = useState(false);
 
   async function cargar() {
     setLoading(true);
@@ -37,20 +36,20 @@ export default function MesasPage() {
     cargar();
   }, []);
 
-  async function agregarMesa(e: FormEvent) {
-    e.preventDefault();
+  async function agregarMesa() {
     setError("");
+    setAgregando(true);
     const res = await fetch("/api/mesas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre }),
+      body: JSON.stringify({}),
     });
+    setAgregando(false);
     if (!res.ok) {
       const data = await res.json();
       setError(data.error || "Ocurrió un error");
       return;
     }
-    setNombre("");
     await cargar();
   }
 
@@ -89,19 +88,12 @@ export default function MesasPage() {
         </div>
       </div>
 
-      <form onSubmit={agregarMesa} className="flex items-center gap-2">
-        <input
-          className={`${input} max-w-xs`}
-          placeholder="Nombre o número de mesa"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required
-        />
-        <Button type="submit" variant="primary">
-          Agregar mesa
+      <div className="flex items-center gap-2">
+        <Button onClick={agregarMesa} variant="primary" disabled={agragando}>
+          {agragando ? "Creando..." : "Agregar mesa"}
         </Button>
         {error && <span className="text-sm text-red-400">{error}</span>}
-      </form>
+      </div>
 
       {loading ? (
         <div className="text-sm text-neutral-500">Cargando...</div>
