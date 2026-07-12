@@ -66,6 +66,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [editandoItemId, setEditandoItemId] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [itemsActualizados, setItemsActualizados] = useState<Map<number, number>>(new Map());
+  const [preciosActualizados, setPreciosActualizados] = useState<Map<number, number>>(new Map());
   const [ticketImpreso, setTicketImpreso] = useState(false);
   const [editandoItems, setEditandoItems] = useState<Set<number>>(new Set());
 
@@ -219,20 +220,24 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     setRonda((prev) => prev.filter((i) => !(i.productoId === productoId && i.tarifa === tarifa)));
   }
 
-  function actualizarItemPedido(itemId: number, cantidad: number) {
-    if (cantidad <= 0) return;
+  function actualizarItemPedido(itemId: number, cantidad?: number, precioUnitario?: number) {
+    if (cantidad !== undefined && cantidad <= 0) return;
     // Actualizar local inmediatamente (sin esperar)
-    setItemsActualizados((prev) => new Map(prev).set(itemId, cantidad));
+    if (cantidad !== undefined) setItemsActualizados((prev) => new Map(prev).set(itemId, cantidad));
+    if (precioUnitario !== undefined) setPreciosActualizados((prev) => new Map(prev).set(itemId, precioUnitario));
 
     // Cancelar timer anterior
     if (timerRef.current) clearTimeout(timerRef.current);
 
     // Enviar al servidor sin esperar (debounce 500ms)
     timerRef.current = setTimeout(() => {
+      const body: { cantidad?: number; precioUnitario?: number } = {};
+      if (cantidad !== undefined) body.cantidad = cantidad;
+      if (precioUnitario !== undefined) body.precioUnitario = precioUnitario;
       fetch(`/api/pedidos/item/${itemId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cantidad }),
+        body: JSON.stringify(body),
       }).catch(() => {
         // Si falla, no importa por ahora
       });
@@ -390,6 +395,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       {venta?.pedidos.flatMap((pedido) =>
                         pedido.items.map((item) => {
                           const cantidadActual = itemsActualizados.get(item.id) ?? item.cantidad;
+                          const precioActual = preciosActualizados.get(item.id) ?? item.precioUnitario;
                           return (
                             <tr key={item.id} className={trHover}>
                               <td className={td}>{item.producto.nombre}</td>
@@ -415,8 +421,20 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                   </div>
                                 )}
                               </td>
-                              <td className={td}>${formatearMoneda(item.precioUnitario)}</td>
-                              <td className={td}>${formatearMoneda(item.precioUnitario * cantidadActual)}</td>
+                              <td className={td}>
+                                {editandoItems.has(item.id) ? (
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    className="w-20 rounded border border-blue-600 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                    value={precioActual}
+                                    onChange={(e) => actualizarItemPedido(item.id, undefined, Number(e.target.value) || 0)}
+                                  />
+                                ) : (
+                                  <span>${formatearMoneda(precioActual)}</span>
+                                )}
+                              </td>
+                              <td className={td}>${formatearMoneda(precioActual * cantidadActual)}</td>
                               <td className={`${td} text-right`}>
                                 <button
                                   className="text-red-400 hover:text-red-300 text-xs"
