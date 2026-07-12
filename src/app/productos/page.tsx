@@ -330,7 +330,7 @@ export default function ProductosPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
+              <thead className="sticky top-0 z-10 bg-neutral-900 border-b border-neutral-800">
                 <tr>
                   <th className={th}>Nombre</th>
                   <th className={th}>Costo</th>
