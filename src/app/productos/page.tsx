@@ -427,13 +427,14 @@ export default function ProductosPage() {
                       <td className={`${td} text-xs text-neutral-500`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
-                      <td className={`${td} text-right whitespace-nowrap`}>
+                      <td className={`${td} text-right whitespace-nowrap gap-3`}>
                         <button
-                          className="text-blue-500 hover:text-blue-400 mr-3"
+                          className="text-blue-500 hover:text-blue-400"
                           onClick={() => guardarEdicion(p.id)}
                         >
                           Guardar
                         </button>
+                        <span className="mx-2">|</span>
                         <button className="text-neutral-400 hover:text-neutral-200" onClick={cancelarEdicion}>
                           Cancelar
                         </button>
