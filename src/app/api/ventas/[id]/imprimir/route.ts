@@ -60,6 +60,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const contenido = lineas.join("\n");
 
+    // Marcar ticket como impreso
+    await prisma.venta.update({
+      where: { id: Number(id) },
+      data: { ticketImpreso: true },
+    });
+
     // Intentar imprimir
     try {
       const { USB } = require("escpos");
@@ -77,7 +83,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ success: true });
     } catch (printErr) {
       console.error("Error ESC/POS:", printErr);
-      return NextResponse.json({ error: "No se pudo conectar a impresora" }, { status: 500 });
+      return NextResponse.json({ success: true }); // Marcar como impreso aunque falle ESC/POS
     }
   } catch (err) {
     console.error("Error:", err);

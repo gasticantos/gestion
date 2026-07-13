@@ -51,6 +51,7 @@ export type VentaMinAggregateOutputType = {
   tarifa: $Enums.TarifaPrecio | null
   total: number | null
   descuentoPct: number | null
+  ticketImpreso: boolean | null
   createdAt: Date | null
   closedAt: Date | null
 }
@@ -64,6 +65,7 @@ export type VentaMaxAggregateOutputType = {
   tarifa: $Enums.TarifaPrecio | null
   total: number | null
   descuentoPct: number | null
+  ticketImpreso: boolean | null
   createdAt: Date | null
   closedAt: Date | null
 }
@@ -78,6 +80,7 @@ export type VentaCountAggregateOutputType = {
   total: number
   descuentoPct: number
   borradorRonda: number
+  ticketImpreso: number
   createdAt: number
   closedAt: number
   _all: number
@@ -109,6 +112,7 @@ export type VentaMinAggregateInputType = {
   tarifa?: true
   total?: true
   descuentoPct?: true
+  ticketImpreso?: true
   createdAt?: true
   closedAt?: true
 }
@@ -122,6 +126,7 @@ export type VentaMaxAggregateInputType = {
   tarifa?: true
   total?: true
   descuentoPct?: true
+  ticketImpreso?: true
   createdAt?: true
   closedAt?: true
 }
@@ -136,6 +141,7 @@ export type VentaCountAggregateInputType = {
   total?: true
   descuentoPct?: true
   borradorRonda?: true
+  ticketImpreso?: true
   createdAt?: true
   closedAt?: true
   _all?: true
@@ -237,6 +243,7 @@ export type VentaGroupByOutputType = {
   total: number
   descuentoPct: number
   borradorRonda: runtime.JsonValue | null
+  ticketImpreso: boolean
   createdAt: Date
   closedAt: Date | null
   _count: VentaCountAggregateOutputType | null
@@ -274,6 +281,7 @@ export type VentaWhereInput = {
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
+  ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
@@ -293,6 +301,7 @@ export type VentaOrderByWithRelationInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrderInput | Prisma.SortOrder
+  ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   mesa?: Prisma.MesaOrderByWithRelationInput
@@ -315,6 +324,7 @@ export type VentaWhereUniqueInput = Prisma.AtLeast<{
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
+  ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
@@ -334,6 +344,7 @@ export type VentaOrderByWithAggregationInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrderInput | Prisma.SortOrder
+  ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.VentaCountOrderByAggregateInput
@@ -356,6 +367,7 @@ export type VentaScalarWhereWithAggregatesInput = {
   total?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableWithAggregatesFilter<"Venta">
+  ticketImpreso?: Prisma.BoolWithAggregatesFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Venta"> | Date | string | null
 }
@@ -367,6 +379,7 @@ export type VentaCreateInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
@@ -386,6 +399,7 @@ export type VentaUncheckedCreateInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
@@ -400,6 +414,7 @@ export type VentaUpdateInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
@@ -419,6 +434,7 @@ export type VentaUncheckedUpdateInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
@@ -436,6 +452,7 @@ export type VentaCreateManyInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
 }
@@ -447,6 +464,7 @@ export type VentaUpdateManyMutationInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -461,6 +479,7 @@ export type VentaUncheckedUpdateManyInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -485,6 +504,7 @@ export type VentaCountOrderByAggregateInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrder
+  ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
 }
@@ -506,6 +526,7 @@ export type VentaMaxOrderByAggregateInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
 }
@@ -519,6 +540,7 @@ export type VentaMinOrderByAggregateInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
 }
@@ -692,6 +714,7 @@ export type VentaCreateWithoutMesaInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
@@ -709,6 +732,7 @@ export type VentaUncheckedCreateWithoutMesaInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
@@ -755,6 +779,7 @@ export type VentaScalarWhereInput = {
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
+  ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
 }
@@ -766,6 +791,7 @@ export type VentaCreateWithoutPedidosInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
@@ -784,6 +810,7 @@ export type VentaUncheckedCreateWithoutPedidosInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
@@ -813,6 +840,7 @@ export type VentaUpdateWithoutPedidosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
@@ -831,6 +859,7 @@ export type VentaUncheckedUpdateWithoutPedidosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
@@ -844,6 +873,7 @@ export type VentaCreateWithoutPagosInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
@@ -862,6 +892,7 @@ export type VentaUncheckedCreateWithoutPagosInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
@@ -891,6 +922,7 @@ export type VentaUpdateWithoutPagosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
@@ -909,6 +941,7 @@ export type VentaUncheckedUpdateWithoutPagosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
@@ -922,6 +955,7 @@ export type VentaCreateWithoutClienteInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
@@ -939,6 +973,7 @@ export type VentaUncheckedCreateWithoutClienteInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
@@ -979,6 +1014,7 @@ export type VentaCreateWithoutMovimientosCCInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
@@ -997,6 +1033,7 @@ export type VentaUncheckedCreateWithoutMovimientosCCInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
@@ -1026,6 +1063,7 @@ export type VentaUpdateWithoutMovimientosCCInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
@@ -1044,6 +1082,7 @@ export type VentaUncheckedUpdateWithoutMovimientosCCInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
@@ -1059,6 +1098,7 @@ export type VentaCreateManyMesaInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
 }
@@ -1070,6 +1110,7 @@ export type VentaUpdateWithoutMesaInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
@@ -1087,6 +1128,7 @@ export type VentaUncheckedUpdateWithoutMesaInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
@@ -1103,6 +1145,7 @@ export type VentaUncheckedUpdateManyWithoutMesaInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -1116,6 +1159,7 @@ export type VentaCreateManyClienteInput = {
   total?: number
   descuentoPct?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
 }
@@ -1127,6 +1171,7 @@ export type VentaUpdateWithoutClienteInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
@@ -1144,6 +1189,7 @@ export type VentaUncheckedUpdateWithoutClienteInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
@@ -1160,6 +1206,7 @@ export type VentaUncheckedUpdateManyWithoutClienteInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -1223,6 +1270,7 @@ export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   total?: boolean
   descuentoPct?: boolean
   borradorRonda?: boolean
+  ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
@@ -1243,6 +1291,7 @@ export type VentaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   total?: boolean
   descuentoPct?: boolean
   borradorRonda?: boolean
+  ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
@@ -1259,6 +1308,7 @@ export type VentaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   total?: boolean
   descuentoPct?: boolean
   borradorRonda?: boolean
+  ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
@@ -1275,11 +1325,12 @@ export type VentaSelectScalar = {
   total?: boolean
   descuentoPct?: boolean
   borradorRonda?: boolean
+  ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
 }
 
-export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "borradorRonda" | "createdAt" | "closedAt", ExtArgs["result"]["venta"]>
+export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt", ExtArgs["result"]["venta"]>
 export type VentaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
@@ -1316,6 +1367,7 @@ export type $VentaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     total: number
     descuentoPct: number
     borradorRonda: runtime.JsonValue | null
+    ticketImpreso: boolean
     createdAt: Date
     closedAt: Date | null
   }, ExtArgs["result"]["venta"]>
@@ -1755,6 +1807,7 @@ export interface VentaFieldRefs {
   readonly total: Prisma.FieldRef<"Venta", 'Float'>
   readonly descuentoPct: Prisma.FieldRef<"Venta", 'Float'>
   readonly borradorRonda: Prisma.FieldRef<"Venta", 'Json'>
+  readonly ticketImpreso: Prisma.FieldRef<"Venta", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Venta", 'DateTime'>
   readonly closedAt: Prisma.FieldRef<"Venta", 'DateTime'>
 }

@@ -210,6 +210,7 @@ export const VentaScalarFieldEnum = {
   total: 'total',
   descuentoPct: 'descuentoPct',
   borradorRonda: 'borradorRonda',
+  ticketImpreso: 'ticketImpreso',
   createdAt: 'createdAt',
   closedAt: 'closedAt'
 } as const

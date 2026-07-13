@@ -186,6 +186,7 @@ model Venta {
   total      Float       @default(0)
   descuentoPct Float     @default(0)
   borradorRonda Json?
+  ticketImpreso Boolean   @default(false)
   createdAt  DateTime    @default(now())
   closedAt   DateTime?
   pedidos    Pedido[]
