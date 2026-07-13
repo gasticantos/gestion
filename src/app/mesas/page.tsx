@@ -11,9 +11,13 @@ const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () 
 type Mesa = {
   id: number;
   nombre: string;
+  numero: number;
+  apodo: string | null;
   estado: "LIBRE" | "OCUPADA";
   posX: number;
   posY: number;
+  ancho: number;
+  alto: number;
   ventas: { total: number }[];
 };
 
@@ -110,6 +114,8 @@ export default function MesasPage() {
               estado: m.estado,
               posX: m.posX,
               posY: m.posY,
+              ancho: m.ancho,
+              alto: m.alto,
               total: m.ventas[0]?.total ?? 0,
             }))}
           />
