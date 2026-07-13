@@ -35,6 +35,7 @@ export default function StockPage() {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [loading, setLoading] = useState(true);
+  const [filtroStock, setFiltroStock] = useState("");
 
   async function cargar() {
     setLoading(true);
@@ -113,6 +114,11 @@ export default function StockPage() {
 
   const stockOrdenado = [...productos]
     .filter((p) => p.activo)
+    .filter((p) => {
+      if (!filtroStock.trim()) return true;
+      const q = filtroStock.toLowerCase();
+      return p.nombre.toLowerCase().includes(q);
+    })
     .sort((a, b) => (a.stock ?? 0) - (b.stock ?? 0));
 
   return (
@@ -202,13 +208,22 @@ export default function StockPage() {
       </Card>
 
       <Card>
-        <div className="p-3 border-b border-neutral-800 text-sm text-neutral-400">Stock actual</div>
+        <div className="p-3 border-b border-neutral-800 flex items-center justify-between">
+          <span className="text-sm text-neutral-400">Stock actual</span>
+          <input
+            type="text"
+            placeholder="Buscar producto..."
+            value={filtroStock}
+            onChange={(e) => setFiltroStock(e.target.value)}
+            className={`${input} w-48`}
+          />
+        </div>
         {loading ? (
           <div className="p-4 text-sm text-neutral-500">Cargando...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
+              <thead className="sticky top-0 z-10 bg-neutral-900 border-b border-neutral-800">
                 <tr>
                   <th className={th}>Producto</th>
                   <th className={th}>Stock</th>
