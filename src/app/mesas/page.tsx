@@ -39,12 +39,15 @@ export default function MesasPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
     cargar();
 
-    // Polling cada 3 segundos para sincronizar cambios desde otras pestañas/páginas
-    const interval = setInterval(() => {
-      cargar();
-    }, 3000);
+    // Recargar cuando el usuario vuelve a la pestaña (tab activo)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        cargar();
+      }
+    };
 
-    return () => clearInterval(interval);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   async function agregarMesa() {

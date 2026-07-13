@@ -31,6 +31,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') || 'light';
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <ThemeWrapper>
         <body className="min-h-full flex flex-col bg-white text-neutral-950 dark:bg-neutral-950 dark:text-neutral-100 transition-colors">
           <Navbar />

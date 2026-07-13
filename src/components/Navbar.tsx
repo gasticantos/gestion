@@ -31,7 +31,18 @@ export default function Navbar() {
   // Inicializar tema desde localStorage al montar
   useEffect(() => {
     const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    setTheme(saved || "light");
+    const initialTheme = saved || "light";
+    setTheme(initialTheme);
+
+    // Aplicar tema al HTML
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
     setMounted(true);
   }, []);
 
@@ -93,13 +104,16 @@ export default function Navbar() {
             <button
               onClick={() => {
                 const newTheme = theme === "light" ? "dark" : "light";
-                setTheme(newTheme);
                 localStorage.setItem("theme", newTheme);
-                // Actualizar DOM inmediatamente
+                setTheme(newTheme);
+
+                // Actualizar clase dark en el html
                 if (newTheme === "dark") {
                   document.documentElement.classList.add("dark");
+                  document.documentElement.setAttribute("data-theme", "dark");
                 } else {
                   document.documentElement.classList.remove("dark");
+                  document.documentElement.setAttribute("data-theme", "light");
                 }
               }}
               className="px-2.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm"
