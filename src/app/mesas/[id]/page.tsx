@@ -385,7 +385,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
           <div className="flex items-center gap-2">
             <input
               autoFocus
-              className="text-2xl font-semibold tracking-tight text-neutral-50 bg-neutral-900 border border-blue-600 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+              className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 bg-white dark:bg-neutral-900 border border-blue-600 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
               value={apodoInput}
               onChange={(e) => setApodoInput(e.target.value)}
               placeholder={mesa.nombre}
@@ -401,7 +401,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
               Guardar
             </button>
             <button
-              className="text-xs px-2 py-1 rounded border border-neutral-700 text-neutral-400 hover:bg-neutral-800"
+              className="text-xs px-2 py-1 rounded border border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
               onClick={() => setEditandoApodo(false)}
             >
               Cancelar
@@ -409,11 +409,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">
+            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
               {mesa.apodo || mesa.nombre}
             </h1>
             <button
-              className="text-xs px-2 py-1 rounded border border-neutral-700 text-neutral-400 hover:bg-neutral-800"
+              className="text-xs px-2 py-1 rounded border border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
               onClick={() => {
                 setApodoInput(mesa.apodo || "");
                 setEditandoApodo(true);
@@ -423,7 +423,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
             </button>
           </div>
         )}
-        <Link href="/mesas" className="text-sm text-neutral-400 hover:text-neutral-200">
+        <Link href="/mesas" className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200">
           Volver a mesas
         </Link>
       </div>
@@ -438,7 +438,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-3">
             <Card>
-              <div className="p-3 border-b border-neutral-800 text-sm text-neutral-400">
+              <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400">
                 Productos cargados ({venta?.pedidos.reduce((acc, p) => acc + p.items.length, 0) ?? 0})
               </div>
               {!venta?.pedidos.length && ronda.length === 0 ? (
@@ -468,7 +468,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                   <input
                                     type="number"
                                     autoFocus
-                                    className="w-12 rounded border border-blue-600 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                    className="w-12 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                     value={cantidadActual}
                                     onChange={(e) => {
                                       const val = e.target.value;
@@ -505,7 +505,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                   <input
                                     type="number"
                                     step="0.01"
-                                    className="w-20 rounded border border-blue-600 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                    className="w-20 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                     value={precioActual}
                                     onChange={(e) => actualizarItemPedido(item.id, undefined, Number(e.target.value) || 0)}
                                   />
@@ -537,7 +537,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                           <td className={`${td} text-center`}>
                             <div className="flex items-center justify-center gap-1">
                               <button
-                                className="w-6 h-6 text-xs rounded border border-neutral-700 hover:bg-neutral-800"
+                                className="w-6 h-6 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                 onClick={() => cambiarCantidad(i.productoId, i.tarifa, Math.max(1, i.cantidad - 1))}
                               >
                                 −
@@ -545,12 +545,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                               <input
                                 type="number"
                                 inputMode="numeric"
-                                className="w-12 text-center rounded border border-neutral-700 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                className="w-12 text-center rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                 value={i.cantidad}
                                 onChange={(e) => cambiarCantidad(i.productoId, i.tarifa, Number(e.target.value) || 1)}
                               />
                               <button
-                                className="w-6 h-6 text-xs rounded border border-neutral-700 hover:bg-neutral-800"
+                                className="w-6 h-6 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                 onClick={() => cambiarCantidad(i.productoId, i.tarifa, i.cantidad + 1)}
                               >
                                 +
@@ -573,14 +573,14 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                   </table>
                 </div>
               )}
-              <div className="p-3 border-t border-neutral-800 flex justify-between font-semibold text-neutral-100">
+              <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-between font-semibold text-neutral-800 dark:text-neutral-100">
                 <span>Total</span>
                 <span>${formatearMoneda(total)}</span>
               </div>
             </Card>
 
             <Card className="p-4 flex flex-col gap-3">
-              <div className="text-sm text-neutral-400">Agregar más productos</div>
+              <div className="text-sm text-neutral-500 dark:text-neutral-400">Agregar más productos</div>
               <BuscadorProducto
                 productos={productos}
                 onSeleccionar={agregarARonda}
@@ -593,7 +593,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
             <Card className="p-4 flex flex-col gap-3 self-start">
               <div className="flex justify-between items-baseline text-sm">
                 <span className="text-neutral-500">Subtotal</span>
-                <span className="text-neutral-300">${formatearMoneda(total)}</span>
+                <span className="text-neutral-700 dark:text-neutral-300">${formatearMoneda(total)}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <label className="text-xs text-neutral-500 flex items-center gap-1.5">
@@ -605,7 +605,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                     step="0.1"
                     value={descuentoPct}
                     onChange={(e) => setDescuentoPct(e.target.value)}
-                    className="w-14 rounded border border-neutral-700 bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
+                    className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
                   />
                   %
                 </label>
@@ -613,9 +613,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                   <span className="text-xs font-medium text-red-400">-${formatearMoneda(descuento.monto)}</span>
                 )}
               </div>
-              <div className="flex justify-between items-baseline pt-1 border-t border-neutral-800">
-                <span className="text-neutral-400">Total a cobrar</span>
-                <span className="text-2xl font-semibold text-neutral-50">${formatearMoneda(totalFinal)}</span>
+              <div className="flex justify-between items-baseline pt-1 border-t border-neutral-200 dark:border-neutral-800">
+                <span className="text-neutral-500 dark:text-neutral-400">Total a cobrar</span>
+                <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalFinal)}</span>
               </div>
               {!ticketImpreso ? (
                 <Button

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { puedeAcceder, ROL_LABEL } from "@/lib/permisos";
 import { Rol } from "@/generated/prisma/enums";
-import { useTheme } from "@/lib/themeContext";
 
 const links = [
   { href: "/venta", label: "Vender" },

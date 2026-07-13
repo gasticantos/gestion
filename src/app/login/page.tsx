@@ -76,12 +76,12 @@ export default function LoginPage() {
           <span className="grid place-items-center w-8 h-8 rounded-md bg-blue-600 text-neutral-950 font-bold text-sm">
             G
           </span>
-          <span className="font-semibold tracking-tight text-neutral-100 text-lg">Gestión</span>
+          <span className="font-semibold tracking-tight text-neutral-800 dark:text-neutral-100 text-lg">Gestión</span>
         </div>
 
         {requiereBootstrap ? (
           <>
-            <p className="text-sm text-neutral-400 text-center">
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 text-center">
               Todavía no hay usuarios. Creá la cuenta del dueño para empezar.
             </p>
             <form onSubmit={crearCuentaInicial} className="flex flex-col gap-3">

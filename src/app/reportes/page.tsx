@@ -130,7 +130,7 @@ export default function ReportesPage() {
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Reportes de ventas</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reportes de ventas</h1>
         <a
           href={`/reportes/ticket?desde=${rango.desde}&hasta=${rango.hasta}`}
           target="_blank"
@@ -149,7 +149,7 @@ export default function ReportesPage() {
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                 preset === p.value
                   ? "bg-blue-600 border-blue-600 text-neutral-950"
-                  : "border-neutral-700 text-neutral-300 hover:border-neutral-500"
+                  : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-500"
               }`}
             >
               {p.label}
@@ -182,25 +182,25 @@ export default function ReportesPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Card className="p-4">
               <div className="text-xs text-neutral-500">Total combinado</div>
-              <div className="text-2xl font-semibold text-neutral-50 mt-1">
+              <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50 mt-1">
                 ${formatearMoneda(reporte.combinado.total)}
               </div>
             </Card>
             <Card className="p-4">
               <div className="text-xs text-neutral-500">Mostrador</div>
-              <div className="text-2xl font-semibold text-neutral-50 mt-1">
+              <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50 mt-1">
                 ${formatearMoneda(reporte.porCanal.MOSTRADOR.total)}
               </div>
             </Card>
             <Card className="p-4">
               <div className="text-xs text-neutral-500">Mesas</div>
-              <div className="text-2xl font-semibold text-neutral-50 mt-1">
+              <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50 mt-1">
                 ${formatearMoneda(reporte.porCanal.MESA.total)}
               </div>
             </Card>
             <Card className="p-4">
               <div className="text-xs text-neutral-500">Cantidad de ventas</div>
-              <div className="text-2xl font-semibold text-neutral-50 mt-1">{reporte.cantidadVentas}</div>
+              <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50 mt-1">{reporte.cantidadVentas}</div>
             </Card>
           </div>
 
@@ -213,17 +213,17 @@ export default function ReportesPage() {
               ] as const
             ).map(([titulo, datos]) => (
               <Card key={titulo} className="p-4">
-                <div className="text-sm font-medium text-neutral-200 mb-2">{titulo}</div>
+                <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">{titulo}</div>
                 <div className="flex flex-col gap-1.5">
                   {(Object.keys(METODO_LABEL) as Metodo[]).map((m) => (
                     <div key={m} className="flex justify-between text-sm">
-                      <span className="text-neutral-400">{METODO_LABEL[m]}</span>
-                      <span className="text-neutral-100">${formatearMoneda(datos.pagos[m])}</span>
+                      <span className="text-neutral-500 dark:text-neutral-400">{METODO_LABEL[m]}</span>
+                      <span className="text-neutral-800 dark:text-neutral-100">${formatearMoneda(datos.pagos[m])}</span>
                     </div>
                   ))}
-                  <div className="flex justify-between text-sm font-semibold border-t border-neutral-800 pt-1.5 mt-1">
-                    <span className="text-neutral-300">Total</span>
-                    <span className="text-neutral-50">${formatearMoneda(datos.total)}</span>
+                  <div className="flex justify-between text-sm font-semibold border-t border-neutral-200 dark:border-neutral-800 pt-1.5 mt-1">
+                    <span className="text-neutral-700 dark:text-neutral-300">Total</span>
+                    <span className="text-neutral-900 dark:text-neutral-50">${formatearMoneda(datos.total)}</span>
                   </div>
                 </div>
               </Card>
@@ -232,14 +232,14 @@ export default function ReportesPage() {
 
           {reporte.serieDiaria.length > 1 && (
             <Card className="p-4">
-              <div className="text-sm font-medium text-neutral-200 mb-2">Evolución de ventas</div>
+              <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">Evolución de ventas</div>
               <TrendArea data={reporte.serieDiaria} />
             </Card>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Card className="p-4">
-              <div className="text-sm font-medium text-neutral-200 mb-2">Métodos de pago</div>
+              <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">Métodos de pago</div>
               {pagosChart.length === 0 ? (
                 <div className="text-sm text-neutral-500">Sin datos en el período</div>
               ) : (
@@ -247,7 +247,7 @@ export default function ReportesPage() {
               )}
             </Card>
             <Card className="p-4">
-              <div className="text-sm font-medium text-neutral-200 mb-2">Más vendido por categoría</div>
+              <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">Más vendido por categoría</div>
               {categoriasChart.length === 0 ? (
                 <div className="text-sm text-neutral-500">Sin datos en el período</div>
               ) : (
@@ -257,7 +257,7 @@ export default function ReportesPage() {
           </div>
 
           <Card>
-            <div className="p-3 border-b border-neutral-800 text-sm text-neutral-400">Top productos</div>
+            <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400">Top productos</div>
             {reporte.productos.length === 0 ? (
               <div className="p-4 text-sm text-neutral-500">Sin datos en el período</div>
             ) : (

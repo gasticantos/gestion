@@ -10,7 +10,7 @@ import { input, label, th, td, trHover } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 
 const ImportarProductos = dynamic(() => import("@/components/ImportarProductos"), {
-  loading: () => <div className="h-48 bg-neutral-800 rounded-lg animate-pulse" />
+  loading: () => <div className="h-48 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
 });
 
 type Categoria = { id: number; nombre: string; activo: boolean };
@@ -185,7 +185,7 @@ export default function ProductosPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Productos</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Productos</h1>
 
       <ImportarProductos onImportado={cargar} />
 
@@ -291,7 +291,7 @@ export default function ProductosPage() {
       </Plegable>
 
       <Card>
-        <div className="flex flex-col gap-3 p-3 border-b border-neutral-800">
+        <div className="flex flex-col gap-3 p-3 border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex flex-col sm:flex-row gap-2">
             <input
               className={`${input} flex-1`}
@@ -313,8 +313,8 @@ export default function ProductosPage() {
             </select>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-400">{listado.length} producto(s)</span>
-            <label className="flex items-center gap-2 text-sm text-neutral-400">
+            <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} producto(s)</span>
+            <label className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
               <input
                 type="checkbox"
                 checked={mostrarInactivos}
@@ -435,27 +435,27 @@ export default function ProductosPage() {
                           Guardar
                         </button>
                         <span className="mx-2">|</span>
-                        <button className="text-neutral-400 hover:text-neutral-200" onClick={cancelarEdicion}>
+                        <button className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" onClick={cancelarEdicion}>
                           Cancelar
                         </button>
                       </td>
                     </tr>
                   ) : (
                     <tr key={p.id} className={`${trHover} ${!p.activo ? "opacity-40" : ""}`}>
-                      <td className={`${td} text-neutral-50 font-medium`}>{p.nombre}</td>
-                      <td className={`${td} text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
+                      <td className={`${td} text-neutral-900 dark:text-neutral-50 font-medium`}>{p.nombre}</td>
+                      <td className={`${td} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
                       <td className={`${td} text-emerald-400 font-medium`}>${formatearMoneda(p.precioVenta)}</td>
                       <td
                         className={`${td} font-medium ${
-                          p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-200"
+                          p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-700 dark:text-neutral-200"
                         }`}
                       >
                         {p.stock}
                       </td>
                       <td className={`${td} font-mono text-xs text-neutral-500`}>{p.codigoBarras || "-"}</td>
-                      <td className={`${td} text-neutral-400`}>{p.categoria?.nombre || "-"}</td>
+                      <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.categoria?.nombre || "-"}</td>
                       <td className={`${td} text-neutral-500`}>{p.unidad}</td>
-                      <td className={`${td} text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
+                      <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
                       <td className={`${td} text-xs text-neutral-500 whitespace-nowrap`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>

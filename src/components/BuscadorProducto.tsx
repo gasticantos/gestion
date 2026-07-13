@@ -103,28 +103,28 @@ function BuscadorProductoBase({
     const precioMesa = calcularPrecio(elegido.precioVenta, "MESA", recargoMesaPct);
     return (
       <div className="flex flex-col gap-2">
-        <div className="text-sm text-neutral-300">
+        <div className="text-sm text-neutral-700 dark:text-neutral-300">
           <span className="font-medium">{elegido.nombre}</span> · elegí el precio
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => elegirPrecio("PARTICULAR")}
-            className="rounded-lg border-2 border-neutral-700 hover:border-blue-600/70 bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
+            className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
           >
-            <span className="text-xs font-medium text-neutral-400">Precio mostrador</span>
-            <span className="text-lg font-bold text-neutral-50">${formatearMoneda(precioMostrador)}</span>
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mostrador</span>
+            <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMostrador)}</span>
           </button>
           <button
             type="button"
             onClick={() => elegirPrecio("MESA")}
-            className="rounded-lg border-2 border-neutral-700 hover:border-blue-600/70 bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
+            className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
           >
-            <span className="text-xs font-medium text-neutral-400">Precio mesa</span>
-            <span className="text-lg font-bold text-neutral-50">${formatearMoneda(precioMesa)}</span>
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mesa</span>
+            <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMesa)}</span>
           </button>
         </div>
-        <button type="button" onClick={cancelarEleccion} className="text-xs text-neutral-500 hover:text-neutral-300 self-start">
+        <button type="button" onClick={cancelarEleccion} className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 self-start">
           ‹ Volver a buscar
         </button>
       </div>
@@ -157,9 +157,9 @@ function BuscadorProductoBase({
               key={p.id}
               type="button"
               onClick={() => elegirProducto(p)}
-              className="rounded-lg border border-neutral-700 bg-neutral-900 hover:border-blue-600/60 hover:bg-neutral-800 px-3 py-2 text-left transition-colors"
+              className="rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-blue-600/60 hover:bg-neutral-100 dark:hover:bg-neutral-800 px-3 py-2 text-left transition-colors"
             >
-              <div className="text-sm font-medium text-neutral-100 line-clamp-2">{p.nombre}</div>
+              <div className="text-sm font-medium text-neutral-800 dark:text-neutral-100 line-clamp-2">{p.nombre}</div>
               {p.codigoBarras && <div className="text-xs text-neutral-500 mt-0.5">{p.codigoBarras}</div>}
             </button>
           ))}

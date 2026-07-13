@@ -182,28 +182,28 @@ export default function ClienteDetallePage({ params }: { params: Promise<{ id: s
   return (
     <div className="max-w-3xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">{cliente.nombre}</h1>
-        <Link href="/clientes" className="text-sm text-neutral-400 hover:text-neutral-200">
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">{cliente.nombre}</h1>
+        <Link href="/clientes" className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200">
           Volver a clientes
         </Link>
       </div>
 
       <Card className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-neutral-400">Saldo actual</span>
+          <span className="text-neutral-500 dark:text-neutral-400">Saldo actual</span>
           {cliente.saldo > 0 ? (
             <Badge variant="danger">DEBE</Badge>
           ) : (
             <Badge variant="success">Al día</Badge>
           )}
         </div>
-        <span className={`text-2xl font-semibold ${cliente.saldo > 0 ? "text-red-400" : "text-neutral-50"}`}>
+        <span className={`text-2xl font-semibold ${cliente.saldo > 0 ? "text-red-400" : "text-neutral-900 dark:text-neutral-50"}`}>
           ${formatearMoneda(cliente.saldo)}
         </span>
       </Card>
 
       <Card className="p-4 flex flex-col gap-3">
-        <div className="text-sm font-medium text-neutral-200">Registrar pago (cobrar)</div>
+        <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Registrar pago (cobrar)</div>
         <form onSubmit={registrarPago} className="flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
             {METODOS.map((m) => (
@@ -214,7 +214,7 @@ export default function ClienteDetallePage({ params }: { params: Promise<{ id: s
                 className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                   metodo === m.value
                     ? "bg-blue-600 border-blue-600 text-neutral-950"
-                    : "border-neutral-700 text-neutral-300 hover:border-neutral-500"
+                    : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-500"
                 }`}
               >
                 {m.label}
@@ -245,7 +245,7 @@ export default function ClienteDetallePage({ params }: { params: Promise<{ id: s
       </Card>
 
       <Card className="p-4 flex flex-col gap-3">
-        <div className="text-sm font-medium text-neutral-200">Agregar interés</div>
+        <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Agregar interés</div>
         <form onSubmit={agregarInteres} className="flex items-end gap-3">
           <div className="flex-1">
             <label className={label}>Monto del interés</label>
@@ -276,7 +276,7 @@ export default function ClienteDetallePage({ params }: { params: Promise<{ id: s
       {error && <span className="text-sm text-red-400">{error}</span>}
 
       <Card>
-        <div className="p-3 border-b border-neutral-800 text-sm text-neutral-400">Historial de movimientos</div>
+        <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400">Historial de movimientos</div>
         {cliente.movimientos.length === 0 ? (
           <div className="p-4 text-sm text-neutral-500">Sin movimientos todavía</div>
         ) : (
@@ -350,7 +350,7 @@ export default function ClienteDetallePage({ params }: { params: Promise<{ id: s
                         >
                           Guardar
                         </button>
-                        <button className="text-neutral-400 hover:text-neutral-200" onClick={cancelarEdicion}>
+                        <button className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" onClick={cancelarEdicion}>
                           Cancelar
                         </button>
                       </td>

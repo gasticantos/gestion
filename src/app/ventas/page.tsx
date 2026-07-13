@@ -49,17 +49,17 @@ export default function VentasPage() {
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Ventas del día</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Ventas del día</h1>
 
       <Card className="p-4">
         <div className="grid grid-cols-3 gap-4">
           <div>
             <div className="text-xs text-neutral-500">Total de ventas</div>
-            <div className="text-2xl font-semibold text-neutral-50">${formatearMoneda(totalHoy)}</div>
+            <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalHoy)}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500">Cantidad</div>
-            <div className="text-2xl font-semibold text-neutral-50">{ventasHoy.length}</div>
+            <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">{ventasHoy.length}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500">Descuentos aplicados</div>
@@ -146,7 +146,7 @@ export default function VentasPage() {
                       )}
                     </tbody>
                   </table>
-                  <div className="pt-2 border-t border-neutral-800 flex justify-between text-sm font-semibold">
+                  <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800 flex justify-between text-sm font-semibold">
                     <span>Total</span>
                     <div>
                       <span>${formatearMoneda(v.total)}</span>

@@ -95,7 +95,7 @@ export default function ReservasPage() {
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Reservas</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reservas</h1>
 
       <Card className="p-4">
         <form onSubmit={guardar} className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -168,9 +168,9 @@ export default function ReservasPage() {
       </Card>
 
       <Card>
-        <div className="flex items-center justify-between p-3 border-b border-neutral-800">
-          <span className="text-sm text-neutral-400">{listado.length} reserva(s)</span>
-          <label className="flex items-center gap-2 text-sm text-neutral-400">
+        <div className="flex items-center justify-between p-3 border-b border-neutral-200 dark:border-neutral-800">
+          <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} reserva(s)</span>
+          <label className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
             <input type="checkbox" checked={mostrarTodas} onChange={(e) => setMostrarTodas(e.target.checked)} />
             Mostrar todas (incluye cumplidas y canceladas)
           </label>

@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
 import { formatearMoneda } from "@/lib/formato";
 
-const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () => <div className="h-96 bg-neutral-800 rounded-lg animate-pulse" /> });
+const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () => <div className="h-96 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" /> });
 
 type Mesa = {
   id: number;
@@ -81,12 +81,12 @@ export default function MesasPage() {
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Mesas</h1>
-        <div className="flex gap-1 bg-neutral-900 border border-neutral-800 rounded-lg p-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Mesas</h1>
+        <div className="flex gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-1">
           <button
             onClick={() => setVista("mapa")}
             className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-              vista === "mapa" ? "bg-blue-600 text-neutral-950" : "text-neutral-400 hover:text-neutral-200"
+              vista === "mapa" ? "bg-blue-600 text-neutral-950" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
             }`}
           >
             Mapa
@@ -94,7 +94,7 @@ export default function MesasPage() {
           <button
             onClick={() => setVista("lista")}
             className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-              vista === "lista" ? "bg-blue-600 text-neutral-950" : "text-neutral-400 hover:text-neutral-200"
+              vista === "lista" ? "bg-blue-600 text-neutral-950" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
             }`}
           >
             Lista
@@ -145,14 +145,14 @@ export default function MesasPage() {
                   ? "bg-amber-500/10 border-amber-500/30"
                   : mesa.estado === "OCUPADA"
                     ? "bg-red-500/10 border-red-500/30"
-                    : "bg-neutral-900 border-neutral-800 hover:border-emerald-500/50"
+                    : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/50"
               }`}
             >
               <Link
                 href={`/mesas/${mesa.id}`}
                 className="block hover:opacity-70 transition-opacity"
               >
-                <div className="font-medium text-neutral-100">{mesa.apodo || mesa.nombre}</div>
+                <div className="font-medium text-neutral-800 dark:text-neutral-100">{mesa.apodo || mesa.nombre}</div>
                 <div
                   className={`text-xs mt-1 font-medium ${
                     ticketImpreso ? "text-amber-400" : mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
@@ -161,7 +161,7 @@ export default function MesasPage() {
                   {ticketImpreso ? "Esperando pago" : mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
                 </div>
                 {mesa.ventas[0] && (
-                  <div className="text-sm font-semibold mt-2 text-neutral-100">
+                  <div className="text-sm font-semibold mt-2 text-neutral-800 dark:text-neutral-100">
                     ${formatearMoneda(mesa.ventas[0].total)}
                   </div>
                 )}

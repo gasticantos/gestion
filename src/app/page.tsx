@@ -25,7 +25,7 @@ export default async function Home() {
   return (
     <div className="max-w-3xl mx-auto flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Gestión del negocio</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Gestión del negocio</h1>
         <p className="text-sm text-neutral-500 mt-1">Elegí una sección para empezar</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -33,9 +33,9 @@ export default async function Home() {
           <Link
             key={s.href}
             href={s.href}
-            className="group bg-neutral-900 border border-neutral-800 rounded-xl p-4 hover:border-blue-600/50 hover:bg-neutral-800/60 transition-colors"
+            className="group bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 hover:border-blue-600/50 hover:bg-neutral-100/60 dark:hover:bg-neutral-800/60 transition-colors"
           >
-            <div className="font-medium text-neutral-100 group-hover:text-blue-500 transition-colors">
+            <div className="font-medium text-neutral-800 dark:text-neutral-100 group-hover:text-blue-500 transition-colors">
               {s.label}
             </div>
             <div className="text-sm text-neutral-500 mt-0.5">{s.desc}</div>

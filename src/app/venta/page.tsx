@@ -166,7 +166,7 @@ export default function VentaPage() {
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Venta (mostrador)</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Venta (mostrador)</h1>
         <BuscadorProducto productos={productos} onSeleccionar={agregar} recargoMesaPct={recargoMesaPct} />
 
         {carrito.length > 0 && (
@@ -200,7 +200,7 @@ export default function VentaPage() {
                     <td className={`${td} text-center`}>
                       <div className="flex items-center justify-center gap-1">
                         <button
-                          className="w-6 h-6 text-xs rounded border border-neutral-700 hover:bg-neutral-800"
+                          className="w-6 h-6 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                           onClick={() => cambiarCantidad(i.productoId, i.tarifa, Math.max(1, i.cantidad - 1))}
                         >
                           −
@@ -208,12 +208,12 @@ export default function VentaPage() {
                         <input
                           type="number"
                           inputMode="numeric"
-                          className="w-12 text-center rounded border border-neutral-700 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
+                          className="w-12 text-center rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
                           value={i.cantidad}
                           onChange={(e) => cambiarCantidad(i.productoId, i.tarifa, Number(e.target.value) || 1)}
                         />
                         <button
-                          className="w-6 h-6 text-xs rounded border border-neutral-700 hover:bg-neutral-800"
+                          className="w-6 h-6 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                           onClick={() => cambiarCantidad(i.productoId, i.tarifa, i.cantidad + 1)}
                         >
                           +
@@ -241,7 +241,7 @@ export default function VentaPage() {
         <Card className="p-4 flex flex-col gap-3">
           <div className="flex justify-between items-baseline text-sm">
             <span className="text-neutral-500">Subtotal</span>
-            <span className="text-neutral-300">${formatearMoneda(subtotal)}</span>
+            <span className="text-neutral-700 dark:text-neutral-300">${formatearMoneda(subtotal)}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
             <label className="text-xs text-neutral-500 flex items-center gap-1.5">
@@ -253,7 +253,7 @@ export default function VentaPage() {
                 step="0.1"
                 value={descuentoPct}
                 onChange={(e) => setDescuentoPct(e.target.value)}
-                className="w-14 rounded border border-neutral-700 bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
+                className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
               />
               %
             </label>
@@ -261,9 +261,9 @@ export default function VentaPage() {
               <span className="text-xs font-medium text-red-400">-${formatearMoneda(descuento.monto)}</span>
             )}
           </div>
-          <div className="flex justify-between items-baseline pt-1 border-t border-neutral-800">
-            <span className="text-neutral-400">Total</span>
-            <span className="text-2xl font-semibold text-neutral-50">${formatearMoneda(total)}</span>
+          <div className="flex justify-between items-baseline pt-1 border-t border-neutral-200 dark:border-neutral-800">
+            <span className="text-neutral-500 dark:text-neutral-400">Total</span>
+            <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(total)}</span>
           </div>
 
           <PagoSelector

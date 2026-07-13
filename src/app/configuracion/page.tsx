@@ -146,7 +146,7 @@ export default function ConfiguracionPage() {
 
   return (
     <div className="max-w-md mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Configuración</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Configuración</h1>
 
       <Card className="p-4">
         <form onSubmit={guardar} className="flex flex-col gap-3">
@@ -176,7 +176,7 @@ export default function ConfiguracionPage() {
       </Card>
 
       <Card className="p-4 flex flex-col gap-3">
-        <div className="text-sm font-medium text-neutral-200">Categorías de productos</div>
+        <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Categorías de productos</div>
         <form onSubmit={guardarCategoria} className="flex items-center gap-2">
           <input
             className={input}
@@ -262,7 +262,7 @@ export default function ConfiguracionPage() {
         </p>
         <div>
           <label className={label}>
-            Escribí <span className="font-mono text-neutral-300">BORRAR TODO</span> para habilitar el botón
+            Escribí <span className="font-mono text-neutral-700 dark:text-neutral-300">BORRAR TODO</span> para habilitar el botón
           </label>
           <input
             className={input}
@@ -287,7 +287,7 @@ export default function ConfiguracionPage() {
 
       <Card className="p-4 flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-neutral-200">Consola de auditoría</div>
+          <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Consola de auditoría</div>
           <Button
             type="button"
             variant="ghost"
@@ -319,7 +319,7 @@ export default function ConfiguracionPage() {
               ) : (
                 logs.map((log) => (
                   <tr key={log.id} className={trHover}>
-                    <td className={`${td} text-xs text-neutral-400 whitespace-nowrap`}>
+                    <td className={`${td} text-xs text-neutral-500 dark:text-neutral-400 whitespace-nowrap`}>
                       {new Date(log.createdAt).toLocaleString("es-AR")}
                     </td>
                     <td className={`${td} text-xs`}>
@@ -329,7 +329,7 @@ export default function ConfiguracionPage() {
                       </Badge>
                     </td>
                     <td className={`${td} text-xs font-mono text-blue-400`}>{log.accion}</td>
-                    <td className={`${td} text-xs text-neutral-400`}>{log.descripcion || "—"}</td>
+                    <td className={`${td} text-xs text-neutral-500 dark:text-neutral-400`}>{log.descripcion || "—"}</td>
                   </tr>
                 ))
               )}

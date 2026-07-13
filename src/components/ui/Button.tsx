@@ -12,9 +12,10 @@ const sizes = {
 
 const variants: Record<Variant, string> = {
   primary: "bg-blue-600 text-white hover:bg-blue-700 font-semibold",
-  secondary: "bg-neutral-800 text-neutral-100 border border-neutral-700 hover:bg-neutral-700",
+  secondary:
+    "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700",
   danger: "bg-red-600/90 text-white hover:bg-red-600",
-  ghost: "text-neutral-400 hover:text-neutral-100",
+  ghost: "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100",
 };
 
 export default function Button({

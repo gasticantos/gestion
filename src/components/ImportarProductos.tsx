@@ -82,7 +82,7 @@ export default function ImportarProductos({ onImportado }: { onImportado: () => 
               setArchivo(e.target.files?.[0] ?? null);
               setResumen(null);
             }}
-            className="text-sm text-neutral-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-neutral-700 file:bg-neutral-800 file:text-neutral-200 file:text-sm"
+            className="text-sm text-neutral-700 dark:text-neutral-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-neutral-300 dark:file:border-neutral-700 file:bg-neutral-100 dark:file:bg-neutral-800 file:text-neutral-800 dark:file:text-neutral-200 file:text-sm"
           />
           <Button variant="secondary" disabled={!archivo || cargando} onClick={previsualizar}>
             {cargando ? "Leyendo..." : "Vista previa"}
@@ -106,21 +106,21 @@ export default function ImportarProductos({ onImportado }: { onImportado: () => 
           )}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <div className="bg-neutral-800/50 rounded-lg p-2">
+            <div className="bg-neutral-100 dark:bg-neutral-800/50 rounded-lg p-2">
               <div className="text-xs text-neutral-500">Filas leídas</div>
-              <div className="font-semibold text-neutral-100">{resumen.totalFilas}</div>
+              <div className="font-semibold text-neutral-800 dark:text-neutral-100">{resumen.totalFilas}</div>
             </div>
-            <div className="bg-neutral-800/50 rounded-lg p-2">
+            <div className="bg-neutral-100 dark:bg-neutral-800/50 rounded-lg p-2">
               <div className="text-xs text-neutral-500">Nuevos</div>
-              <div className="font-semibold text-neutral-100">{resumen.nuevos}</div>
+              <div className="font-semibold text-neutral-800 dark:text-neutral-100">{resumen.nuevos}</div>
             </div>
-            <div className="bg-neutral-800/50 rounded-lg p-2">
+            <div className="bg-neutral-100 dark:bg-neutral-800/50 rounded-lg p-2">
               <div className="text-xs text-neutral-500">Actualizados</div>
-              <div className="font-semibold text-neutral-100">{resumen.actualizados}</div>
+              <div className="font-semibold text-neutral-800 dark:text-neutral-100">{resumen.actualizados}</div>
             </div>
-            <div className="bg-neutral-800/50 rounded-lg p-2">
+            <div className="bg-neutral-100 dark:bg-neutral-800/50 rounded-lg p-2">
               <div className="text-xs text-neutral-500">Sin código de barras</div>
-              <div className="font-semibold text-neutral-100">{resumen.sinCodigoBarras}</div>
+              <div className="font-semibold text-neutral-800 dark:text-neutral-100">{resumen.sinCodigoBarras}</div>
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export default function ImportarProductos({ onImportado }: { onImportado: () => 
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {resumen.categoriasNuevas.map((c) => (
-                  <span key={c} className="px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300 text-xs">
+                  <span key={c} className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs">
                     {c}
                   </span>
                 ))}
@@ -143,7 +143,7 @@ export default function ImportarProductos({ onImportado }: { onImportado: () => 
             <div className="text-xs text-neutral-500 mb-1">Por categoría</div>
             <div className="flex flex-wrap gap-1.5">
               {resumen.porCategoria.map((c) => (
-                <span key={c.categoria} className="px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300 text-xs">
+                <span key={c.categoria} className="px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs">
                   {c.categoria}: {c.cantidad}
                 </span>
               ))}

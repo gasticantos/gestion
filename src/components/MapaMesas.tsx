@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatearMoneda } from "@/lib/formato";
 
@@ -22,6 +22,15 @@ const UMBRAL_DRAG = 6;
 export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    setIsDark(html.classList.contains("dark"));
+    const observer = new MutationObserver(() => setIsDark(html.classList.contains("dark")));
+    observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
   const [posiciones, setPosiciones] = useState<Record<number, { x: number; y: number }>>(() =>
     Object.fromEntries(mesas.map((m) => [m.id, { x: m.posX, y: m.posY }]))
   );
@@ -153,14 +162,14 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-xl border border-neutral-800 overflow-hidden"
+      className="relative w-full rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden bg-neutral-100 dark:bg-[#141414]"
       style={{
         height: "calc(100vh - 300px)",
         minHeight: 420,
-        backgroundImage:
-          "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundImage: isDark
+          ? "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)"
+          : "linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)",
         backgroundSize: "28px 28px",
-        backgroundColor: "#141414",
       }}
     >
       {/* Mostrador: punto de referencia fijo, no se arrastra */}
@@ -170,7 +179,7 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
 
       {/* Puerta: línea fija que separa adentro/afuera, ya no se arrastra */}
       <div className="absolute left-0 right-0 border-t-2 border-dashed border-neutral-500" style={{ top: "32%" }}>
-        <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-[#141414] px-3 text-xs font-semibold tracking-widest text-neutral-400">
+        <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-neutral-100 dark:bg-[#141414] px-3 text-xs font-semibold tracking-widest text-neutral-500 dark:text-neutral-400">
           PUERTA
         </span>
       </div>
@@ -193,7 +202,7 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
                   : "bg-emerald-500/10 border-emerald-500/50"
             }`}
           >
-            <span className="text-sm font-bold text-neutral-50 leading-none">{mesa.nombre}</span>
+            <span className="text-sm font-bold text-neutral-900 dark:text-neutral-50 leading-none">{mesa.nombre}</span>
             <span
               className={`text-[10px] font-medium leading-none ${
                 mesa.ticketImpreso ? "text-amber-400" : mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
@@ -201,7 +210,7 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
             >
               {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
             </span>
-            {mesa.total > 0 && <span className="text-[9px] text-neutral-300 leading-none">${formatearMoneda(mesa.total)}</span>}
+            {mesa.total > 0 && <span className="text-[9px] text-neutral-700 dark:text-neutral-300 leading-none">${formatearMoneda(mesa.total)}</span>}
 
             {/* Resize corners */}
             <div className="absolute top-0 left-0 w-3 h-3 cursor-nwse-resize"></div>

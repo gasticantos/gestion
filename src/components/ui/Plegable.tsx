@@ -28,12 +28,14 @@ export default function Plegable({
       <button
         type="button"
         onClick={alternar}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-neutral-200 hover:bg-neutral-800/40 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100/60 dark:hover:bg-neutral-800/40 transition-colors"
       >
         <span>{titulo}</span>
         <span className="text-xs text-neutral-500">{estaAbierto ? "Ocultar ▲" : "Mostrar ▼"}</span>
       </button>
-      {estaAbierto && <div className="p-4 border-t border-neutral-800 flex flex-col gap-3">{children}</div>}
+      {estaAbierto && (
+        <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 flex flex-col gap-3">{children}</div>
+      )}
     </Card>
   );
 }

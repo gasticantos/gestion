@@ -88,7 +88,7 @@ export default function UsuariosPage() {
 
   return (
     <div className="max-w-3xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Usuarios</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Usuarios</h1>
 
       <Card className="p-4">
         <form onSubmit={guardar} className="grid grid-cols-2 gap-3">
@@ -146,9 +146,9 @@ export default function UsuariosPage() {
       </Card>
 
       <Card>
-        <div className="flex items-center justify-between p-3 border-b border-neutral-800">
-          <span className="text-sm text-neutral-400">{listado.length} usuario(s)</span>
-          <label className="flex items-center gap-2 text-sm text-neutral-400">
+        <div className="flex items-center justify-between p-3 border-b border-neutral-200 dark:border-neutral-800">
+          <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} usuario(s)</span>
+          <label className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
             <input
               type="checkbox"
               checked={mostrarInactivos}

@@ -123,7 +123,7 @@ export default function StockPage() {
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Carga de stock</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Carga de stock</h1>
 
       <Card className="p-4 flex flex-col gap-3">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -208,8 +208,8 @@ export default function StockPage() {
       </Card>
 
       <Card>
-        <div className="p-3 border-b border-neutral-800 flex items-center justify-between">
-          <span className="text-sm text-neutral-400">Stock actual</span>
+        <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+          <span className="text-sm text-neutral-500 dark:text-neutral-400">Stock actual</span>
           <input
             type="text"
             placeholder="Buscar producto..."
