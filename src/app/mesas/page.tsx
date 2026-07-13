@@ -18,7 +18,7 @@ type Mesa = {
   posY: number;
   ancho: number;
   alto: number;
-  ventas: { total: number }[];
+  ventas: { total: number; ticketImpreso: boolean }[];
 };
 
 export default function MesasPage() {
@@ -38,6 +38,13 @@ export default function MesasPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
     cargar();
+
+    // Polling cada 3 segundos para sincronizar cambios desde otras pestañas/páginas
+    const interval = setInterval(() => {
+      cargar();
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   async function agregarMesa() {
@@ -117,6 +124,7 @@ export default function MesasPage() {
               ancho: m.ancho,
               alto: m.alto,
               total: m.ventas[0]?.total ?? 0,
+              ticketImpreso: m.ventas[0]?.ticketImpreso ?? false,
             }))}
           />
         </>

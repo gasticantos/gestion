@@ -26,10 +26,12 @@ export default function Navbar() {
   const router = useRouter();
   const [usuario, setUsuario] = useState<{ nombre: string; rol: Rol } | null>(null);
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  // Esperar a que se monte para evitar problemas de hidratación
+  // Inicializar tema desde localStorage al montar
   useEffect(() => {
+    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
+    setTheme(saved || "light");
     setMounted(true);
   }, []);
 
@@ -89,7 +91,17 @@ export default function Navbar() {
 
           {mounted && (
             <button
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              onClick={() => {
+                const newTheme = theme === "light" ? "dark" : "light";
+                setTheme(newTheme);
+                localStorage.setItem("theme", newTheme);
+                // Actualizar DOM inmediatamente
+                if (newTheme === "dark") {
+                  document.documentElement.classList.add("dark");
+                } else {
+                  document.documentElement.classList.remove("dark");
+                }
+              }}
               className="px-2.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm"
               title={`Cambiar a modo ${theme === "light" ? "oscuro" : "claro"}`}
             >
