@@ -77,9 +77,35 @@ function PagoSelectorBase({
           {pagos.length > 1 && (
             <span className="text-xs text-neutral-500">Pago {idx + 1}</span>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex flex-wrap gap-1.5 flex-1">
-              {METODOS.map((m) => (
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap gap-1.5">
+                {METODOS.slice(0, 3).map((m) => (
+                  <button
+                    key={m.value}
+                    type="button"
+                    onClick={() => actualizarPago(idx, "metodo", m.value)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                      p.metodo === m.value
+                        ? "bg-blue-600 border-blue-600 text-neutral-950"
+                        : "border-neutral-700 text-neutral-300 hover:border-neutral-500"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="number"
+                step="0.01"
+                className={`${input} w-28 md:w-32`}
+                value={pagos.length === 1 ? total.toFixed(2) : p.monto}
+                disabled={pagos.length === 1}
+                onChange={(e) => actualizarPago(idx, "monto", e.target.value)}
+              />
+            </div>
+            <div className="flex gap-1.5">
+              {METODOS.slice(3).map((m) => (
                 <button
                   key={m.value}
                   type="button"
@@ -94,14 +120,6 @@ function PagoSelectorBase({
                 </button>
               ))}
             </div>
-            <input
-              type="number"
-              step="0.01"
-              className={`${input} w-28`}
-              value={pagos.length === 1 ? total.toFixed(2) : p.monto}
-              disabled={pagos.length === 1}
-              onChange={(e) => actualizarPago(idx, "monto", e.target.value)}
-            />
           </div>
         </div>
       ))}
