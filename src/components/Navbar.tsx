@@ -26,16 +26,7 @@ export default function Navbar() {
   const router = useRouter();
   const [usuario, setUsuario] = useState<{ nombre: string; rol: Rol } | null>(null);
   const [mounted, setMounted] = useState(false);
-
-  let theme: "light" | "dark" = "light";
-  let setTheme: (t: "light" | "dark") => void = () => {};
-  try {
-    const themeContext = useTheme();
-    theme = themeContext.theme;
-    setTheme = themeContext.setTheme;
-  } catch {
-    // Fallback si no está dentro de ThemeProvider
-  }
+  const { theme, setTheme } = useTheme();
 
   // Esperar a que se monte para evitar problemas de hidratación
   useEffect(() => {

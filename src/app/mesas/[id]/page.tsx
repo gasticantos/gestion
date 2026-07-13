@@ -320,7 +320,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     setEnviando(true);
     // Imprimir ticket de la venta completa
     await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
-    setTicketImpreso(true);
+    // Recargar mesa para sincronizar ticketImpreso desde la BD
+    await cargar();
     setEnviando(false);
   }
 
