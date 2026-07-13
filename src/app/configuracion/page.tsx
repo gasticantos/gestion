@@ -299,17 +299,17 @@ export default function ConfiguracionPage() {
           </Button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-96">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="sticky top-0 z-10 bg-neutral-900 border-b border-neutral-800">
+            <thead className="sticky top-0 z-10 bg-white dark:bg-neutral-900">
+              <tr className="border-b border-neutral-200 dark:border-neutral-800">
                 <th className={`${th} text-left`}>Fecha y hora</th>
                 <th className={`${th} text-left`}>Usuario</th>
                 <th className={`${th} text-left`}>Acción</th>
                 <th className={`${th} text-left`}>Detalles</th>
               </tr>
             </thead>
-            <tbody className="max-h-96 overflow-y-auto block w-full">
+            <tbody>
               {logs.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="p-3 text-center text-neutral-500 text-sm">

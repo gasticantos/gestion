@@ -328,9 +328,9 @@ export default function ProductosPage() {
         {loading ? (
           <div className="p-4 text-sm text-neutral-500">Cargando...</div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-auto max-h-[70vh]">
             <table className="w-full">
-              <thead className="sticky top-0 z-10 bg-neutral-900 border-b border-neutral-800">
+              <thead className="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
                 <tr>
                   <th className={th}>Nombre</th>
                   <th className={th}>Costo</th>
