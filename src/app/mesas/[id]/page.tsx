@@ -489,15 +489,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                     }}
                                   />
                                 ) : (
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-sm font-medium">{cantidadActual}x</span>
-                                    <button
-                                      className="text-xs px-2 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10"
-                                      onClick={() => setEditandoItems((s) => new Set(s).add(item.id))}
-                                    >
-                                      Editar
-                                    </button>
-                                  </div>
+                                  <span className="text-sm font-medium">{cantidadActual}x</span>
                                 )}
                               </td>
                               <td className={td}>
@@ -514,7 +506,15 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                 )}
                               </td>
                               <td className={td}>${formatearMoneda(precioActual * cantidadActual)}</td>
-                              <td className={`${td} text-right`}>
+                              <td className={`${td} text-right whitespace-nowrap`}>
+                                {!editandoItems.has(item.id) && (
+                                  <button
+                                    className="text-xs px-2 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-2"
+                                    onClick={() => setEditandoItems((s) => new Set(s).add(item.id))}
+                                  >
+                                    Editar
+                                  </button>
+                                )}
                                 <button
                                   className="text-red-400 hover:text-red-300 text-xs"
                                   onClick={() => eliminarItemPedido(item.id)}

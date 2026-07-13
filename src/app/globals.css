@@ -1,20 +1,26 @@
 @import "tailwindcss";
 
+/* Tailwind v4: por defecto dark: sigue prefers-color-scheme del SO. Esta directiva hace
+   que siga la clase .dark en <html> en su lugar, que es lo que alterna el toggle de la Navbar. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  --background: #ffffff;
+  --foreground: #171717;
+  color-scheme: light;
+}
+
+.dark {
   --background: #0a0908;
   --foreground: #f2ede6;
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-}
-
-input,
-select,
-textarea {
-  color-scheme: dark;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* Saca las flechitas del input numérico: ocupaban espacio y tapaban los dígitos en tablas angostas. */
