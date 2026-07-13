@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatearMoneda } from "@/lib/formato";
+import { useIsDarkMode } from "@/lib/useIsDarkMode";
 
 export type MesaMapa = {
   id: number;
@@ -22,15 +23,7 @@ const UMBRAL_DRAG = 6;
 export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    setIsDark(html.classList.contains("dark"));
-    const observer = new MutationObserver(() => setIsDark(html.classList.contains("dark")));
-    observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
+  const isDark = useIsDarkMode();
   const [posiciones, setPosiciones] = useState<Record<number, { x: number; y: number }>>(() =>
     Object.fromEntries(mesas.map((m) => [m.id, { x: m.posX, y: m.posY }]))
   );
