@@ -406,8 +406,23 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                     autoFocus
                                     className="w-12 rounded border border-blue-600 bg-neutral-950 px-1 py-0.5 text-sm text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                     value={cantidadActual}
-                                    onChange={(e) => actualizarItemPedido(item.id, Number(e.target.value) || 1)}
-                                    onBlur={() => setEditandoItems((s) => { const n = new Set(s); n.delete(item.id); return n; })}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      if (val === "") {
+                                        setItemsActualizados((prev) => new Map(prev).set(item.id, 0));
+                                      } else {
+                                        const num = Number(val);
+                                        if (!isNaN(num) && num > 0) {
+                                          actualizarItemPedido(item.id, num);
+                                        }
+                                      }
+                                    }}
+                                    onBlur={() => {
+                                      if (cantidadActual === 0) {
+                                        actualizarItemPedido(item.id, item.cantidad);
+                                      }
+                                      setEditandoItems((s) => { const n = new Set(s); n.delete(item.id); return n; });
+                                    }}
                                   />
                                 ) : (
                                   <div className="flex items-center gap-1.5">
