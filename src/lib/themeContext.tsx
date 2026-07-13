@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 type Theme = "light" | "dark";
 
@@ -13,31 +13,40 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
+  // Inicializar tema en el cliente
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null;
     const initial = saved || "light";
+
     setThemeState(initial);
-    if (initial === "dark") {
-      document.documentElement.classList.add("dark");
-    }
+    updateDOMTheme(initial);
     setMounted(true);
   }, []);
 
-  const setTheme = (newTheme: Theme) => {
+  const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem("theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
-
-  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+    updateDOMTheme(newTheme);
+  }, []);
 
   if (!mounted) return <>{children}</>;
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+function updateDOMTheme(theme: Theme) {
+  if (typeof document === "undefined") return;
+
+  const html = document.documentElement;
+  if (theme === "dark") {
+    html.classList.add("dark");
+  } else {
+    html.classList.remove("dark");
+  }
 }
 
 export function useTheme() {
