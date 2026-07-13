@@ -20,24 +20,21 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const mesas = await prisma.mesa.findMany({ select: { nombre: true } });
+  try {
+    const cantidad = await prisma.mesa.count();
+    const maxNumero = await prisma.mesa.aggregate({ _max: { numero: true } });
+    const siguienteNumero = (maxNumero._max.numero ?? 0) + 1;
+    const nombre = `Mesa ${siguienteNumero}`;
 
-  const numeros = mesas
-    .map((m) => {
-      const match = m.nombre.match(/^Mesa (\d+)$/);
-      return match ? parseInt(match[1], 10) : 0;
-    })
-    .filter((n) => n > 0);
+    const columnas = 5;
+    const espaciado = 140;
+    const posX = 40 + (cantidad % columnas) * espaciado;
+    const posY = 40 + Math.floor(cantidad / columnas) * espaciado;
 
-  const siguienteNumero = numeros.length > 0 ? Math.max(...numeros) + 1 : 1;
-  const nombre = `Mesa ${siguienteNumero}`;
-
-  const cantidad = mesas.length;
-  const columnas = 5;
-  const espaciado = 140;
-  const posX = 40 + (cantidad % columnas) * espaciado;
-  const posY = 40 + Math.floor(cantidad / columnas) * espaciado;
-
-  const mesa = await prisma.mesa.create({ data: { nombre, numero: siguienteNumero, posX, posY } });
-  return NextResponse.json(mesa, { status: 201 });
+    const mesa = await prisma.mesa.create({ data: { nombre, numero: siguienteNumero, posX, posY } });
+    return NextResponse.json(mesa, { status: 201 });
+  } catch (error) {
+    console.error("Error creating mesa:", error);
+    return NextResponse.json({ error: "No se pudo crear la mesa" }, { status: 500 });
+  }
 }

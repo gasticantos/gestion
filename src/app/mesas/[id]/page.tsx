@@ -36,6 +36,7 @@ type Venta = { id: number; total: number; pedidos: Pedido[]; borradorRonda: Item
 type Mesa = {
   id: number;
   nombre: string;
+  apodo: string | null;
   estado: "LIBRE" | "OCUPADA";
   ventas: Venta[];
 };
@@ -69,6 +70,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [preciosActualizados, setPreciosActualizados] = useState<Map<number, number>>(new Map());
   const [ticketImpreso, setTicketImpreso] = useState(false);
   const [editandoItems, setEditandoItems] = useState<Set<number>>(new Set());
+  const [editandoApodo, setEditandoApodo] = useState(false);
+  const [apodoInput, setApodoInput] = useState("");
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -285,6 +288,18 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     await cargar();
   }
 
+  async function guardarApodo() {
+    const res = await fetch(`/api/mesas/${id}/apodo`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ apodo: apodoInput }),
+    });
+    if (res.ok) {
+      setEditandoApodo(false);
+      await cargar();
+    }
+  }
+
   async function enviarPedido(imprimirComanda: boolean) {
     setError("");
     if (ronda.length === 0) {
@@ -366,7 +381,48 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">Mesa {mesa.nombre}</h1>
+        {editandoApodo ? (
+          <div className="flex items-center gap-2">
+            <input
+              autoFocus
+              className="text-2xl font-semibold tracking-tight text-neutral-50 bg-neutral-900 border border-blue-600 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+              value={apodoInput}
+              onChange={(e) => setApodoInput(e.target.value)}
+              placeholder={mesa.nombre}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") guardarApodo();
+                if (e.key === "Escape") setEditandoApodo(false);
+              }}
+            />
+            <button
+              className="text-xs px-2 py-1 rounded border border-emerald-600/50 text-emerald-400 hover:bg-emerald-600/10"
+              onClick={guardarApodo}
+            >
+              Guardar
+            </button>
+            <button
+              className="text-xs px-2 py-1 rounded border border-neutral-700 text-neutral-400 hover:bg-neutral-800"
+              onClick={() => setEditandoApodo(false)}
+            >
+              Cancelar
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight text-neutral-50">
+              {mesa.apodo || mesa.nombre}
+            </h1>
+            <button
+              className="text-xs px-2 py-1 rounded border border-neutral-700 text-neutral-400 hover:bg-neutral-800"
+              onClick={() => {
+                setApodoInput(mesa.apodo || "");
+                setEditandoApodo(true);
+              }}
+            >
+              Editar apodo
+            </button>
+          </div>
+        )}
         <Link href="/mesas" className="text-sm text-neutral-400 hover:text-neutral-200">
           Volver a mesas
         </Link>

@@ -120,7 +120,7 @@ export default function MesasPage() {
           <MapaMesas
             mesas={mesas.map((m) => ({
               id: m.id,
-              nombre: m.nombre,
+              nombre: m.apodo || m.nombre,
               estado: m.estado,
               posX: m.posX,
               posY: m.posY,
@@ -135,26 +135,30 @@ export default function MesasPage() {
         <div className="text-sm text-neutral-500">Todavía no hay mesas cargadas</div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {mesas.map((mesa) => (
+          {mesas.map((mesa) => {
+            const ticketImpreso = mesa.ventas[0]?.ticketImpreso ?? false;
+            return (
             <div
               key={mesa.id}
               className={`rounded-xl p-4 border text-center transition-colors ${
-                mesa.estado === "OCUPADA"
-                  ? "bg-red-500/10 border-red-500/30"
-                  : "bg-neutral-900 border-neutral-800 hover:border-emerald-500/50"
+                ticketImpreso
+                  ? "bg-amber-500/10 border-amber-500/30"
+                  : mesa.estado === "OCUPADA"
+                    ? "bg-red-500/10 border-red-500/30"
+                    : "bg-neutral-900 border-neutral-800 hover:border-emerald-500/50"
               }`}
             >
               <Link
                 href={`/mesas/${mesa.id}`}
                 className="block hover:opacity-70 transition-opacity"
               >
-                <div className="font-medium text-neutral-100">{mesa.nombre}</div>
+                <div className="font-medium text-neutral-100">{mesa.apodo || mesa.nombre}</div>
                 <div
                   className={`text-xs mt-1 font-medium ${
-                    mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
+                    ticketImpreso ? "text-amber-400" : mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
                   }`}
                 >
-                  {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
+                  {ticketImpreso ? "Esperando pago" : mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
                 </div>
                 {mesa.ventas[0] && (
                   <div className="text-sm font-semibold mt-2 text-neutral-100">
@@ -169,7 +173,8 @@ export default function MesasPage() {
                 Borrar
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
