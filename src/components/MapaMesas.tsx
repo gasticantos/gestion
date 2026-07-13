@@ -36,6 +36,8 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
     corner?: "ne" | "nw" | "se" | "sw";
     origW?: number;
     origH?: number;
+    currentW?: number;
+    currentH?: number;
   } | null>(null);
 
   function getCorner(e: React.PointerEvent, mesa: MesaMapa): "ne" | "nw" | "se" | "sw" | null {
@@ -109,6 +111,8 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
       }
 
       setDimensiones((prev) => ({ ...prev, [d.id]: { w, h } }));
+      d.currentW = w;
+      d.currentH = h;
     } else {
       const maxX = bounds ? bounds.width - (dimensiones[d.id]?.w ?? TILE) : 2000;
       const maxY = bounds ? bounds.height - (dimensiones[d.id]?.h ?? TILE) : 2000;
@@ -127,14 +131,13 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
       return;
     }
 
-    if (d.isResize) {
-      const dim = dimensiones[mesa.id];
+    if (d.isResize && d.currentW && d.currentH) {
       await fetch(`/api/mesas/${mesa.id}/dimensiones`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ancho: dim.w, alto: dim.h }),
+        body: JSON.stringify({ ancho: d.currentW, alto: d.currentH }),
       });
-    } else {
+    } else if (!d.isResize) {
       const pos = posiciones[mesa.id];
       await fetch(`/api/mesas/${mesa.id}/posicion`, {
         method: "PUT",
