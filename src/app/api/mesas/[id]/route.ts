@@ -8,7 +8,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     include: {
       ventas: {
         where: { estado: "ABIERTA" },
-        include: {
+        select: {
+          id: true,
+          total: true,
+          ticketImpreso: true,
+          borradorRonda: true,
           pedidos: { include: { items: { include: { producto: true } } }, orderBy: { createdAt: "asc" } },
         },
       },

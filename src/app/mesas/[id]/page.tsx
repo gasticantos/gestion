@@ -31,7 +31,7 @@ type PedidoItem = {
 
 type Pedido = { id: number; createdAt: string; items: PedidoItem[] };
 
-type Venta = { id: number; total: number; pedidos: Pedido[]; borradorRonda: ItemRonda[] | null };
+type Venta = { id: number; total: number; pedidos: Pedido[]; borradorRonda: ItemRonda[] | null; ticketImpreso: boolean };
 
 type Mesa = {
   id: number;
@@ -154,6 +154,13 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const totalFinal = descuento.total;
 
   const totalRonda = useMemo(() => ronda.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [ronda]);
+
+  // Sincronizar ticketImpreso desde la venta
+  useEffect(() => {
+    if (venta?.ticketImpreso) {
+      setTicketImpreso(true);
+    }
+  }, [venta?.ticketImpreso]);
 
   async function agregarARonda(p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) {
     const producto = productos.find((x) => x.id === p.id);

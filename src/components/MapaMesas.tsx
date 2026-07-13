@@ -10,7 +10,10 @@ export type MesaMapa = {
   estado: "LIBRE" | "OCUPADA";
   posX: number;
   posY: number;
+  ancho: number;
+  alto: number;
   total: number;
+  ticketImpreso?: boolean;
 };
 
 const TILE = 70;
@@ -23,7 +26,7 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
     Object.fromEntries(mesas.map((m) => [m.id, { x: m.posX, y: m.posY }]))
   );
   const [dimensiones, setDimensiones] = useState<Record<number, { w: number; h: number }>>(() =>
-    Object.fromEntries(mesas.map((m) => [m.id, { w: TILE, h: TILE }]))
+    Object.fromEntries(mesas.map((m) => [m.id, { w: m.ancho || TILE, h: m.alto || TILE }]))
   );
   const drag = useRef<{
     id: number;
@@ -183,15 +186,17 @@ export default function MapaMesas({ mesas }: { mesas: MesaMapa[] }) {
             onPointerUp={() => onPointerUp(mesa)}
             style={{ left: pos.x, top: pos.y, width: dim.w, height: dim.h, touchAction: "none" }}
             className={`absolute select-none cursor-grab active:cursor-grabbing rounded-lg border-2 flex flex-col items-center justify-center gap-0 shadow-lg transition-colors p-1 ${
-              mesa.estado === "OCUPADA"
-                ? "bg-red-500/15 border-red-500/60"
-                : "bg-emerald-500/10 border-emerald-500/50"
+              mesa.ticketImpreso
+                ? "bg-amber-500/15 border-amber-500/60"
+                : mesa.estado === "OCUPADA"
+                  ? "bg-red-500/15 border-red-500/60"
+                  : "bg-emerald-500/10 border-emerald-500/50"
             }`}
           >
             <span className="text-sm font-bold text-neutral-50 leading-none">{mesa.nombre}</span>
             <span
               className={`text-[10px] font-medium leading-none ${
-                mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
+                mesa.ticketImpreso ? "text-amber-400" : mesa.estado === "OCUPADA" ? "text-red-400" : "text-emerald-400"
               }`}
             >
               {mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
