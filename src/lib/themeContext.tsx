@@ -14,25 +14,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Restaurar tema guardado o preferencia del sistema
     const saved = localStorage.getItem("theme") as Theme | null;
-    const initial = saved || "light";
-    setThemeState(initial);
-    if (initial === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+    let initial: Theme = saved || "light";
+
+    // Si no hay tema guardado, intentar usar preferencia del sistema
+    if (!saved && typeof window !== "undefined") {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      initial = prefersDark ? "dark" : "light";
     }
+
+    setThemeState(initial);
+    applyTheme(initial);
     setMounted(true);
   }, []);
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
+  function applyTheme(newTheme: Theme) {
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+  }
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    localStorage.setItem("theme", newTheme);
+    applyTheme(newTheme);
   };
 
   const value = useMemo(() => ({ theme, setTheme }), [theme]);
