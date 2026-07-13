@@ -3,7 +3,16 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const mesas = await prisma.mesa.findMany({
-    include: {
+    select: {
+      id: true,
+      nombre: true,
+      numero: true,
+      apodo: true,
+      estado: true,
+      posX: true,
+      posY: true,
+      ancho: true,
+      alto: true,
       ventas: {
         where: { estado: "ABIERTA" },
         select: { id: true, total: true, estado: true },
