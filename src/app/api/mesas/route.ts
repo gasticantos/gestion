@@ -2,15 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const mesas = await prisma.mesa.findMany({
-    include: {
-      ventas: {
-        where: { estado: "ABIERTA" },
+  try {
+    const mesas = await prisma.mesa.findMany({
+      include: {
+        ventas: {
+          where: { estado: "ABIERTA" },
+        },
       },
-    },
-    orderBy: { nombre: "asc" },
-  });
-  return NextResponse.json(mesas);
+      orderBy: { nombre: "asc" },
+    });
+    return NextResponse.json(mesas);
+  } catch (error) {
+    console.error("Error fetching mesas:", error);
+    return NextResponse.json({ error: "Error al cargar mesas" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
