@@ -6,7 +6,6 @@ export async function GET() {
     include: {
       ventas: {
         where: { estado: "ABIERTA" },
-        select: { id: true, total: true },
       },
     },
     orderBy: { nombre: "asc" },
