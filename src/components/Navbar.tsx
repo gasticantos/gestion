@@ -25,6 +25,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [usuario, setUsuario] = useState<{ nombre: string; rol: Rol } | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   let theme: "light" | "dark" = "light";
   let setTheme: (t: "light" | "dark") => void = () => {};
@@ -35,6 +36,11 @@ export default function Navbar() {
   } catch {
     // Fallback si no está dentro de ThemeProvider
   }
+
+  // Esperar a que se monte para evitar problemas de hidratación
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (pathname === "/login") return;
@@ -90,13 +96,15 @@ export default function Navbar() {
             {usuario.nombre} · {ROL_LABEL[usuario.rol]}
           </span>
 
-          <button
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="px-2.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm"
-            title={`Modo ${theme === "light" ? "oscuro" : "claro"}`}
-          >
-            {theme === "light" ? "🌙" : "☀️"}
-          </button>
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="px-2.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm"
+              title={`Cambiar a modo ${theme === "light" ? "oscuro" : "claro"}`}
+            >
+              {theme === "light" ? "🌙" : "☀️"}
+            </button>
+          )}
 
           <button
             onClick={cerrarSesion}
