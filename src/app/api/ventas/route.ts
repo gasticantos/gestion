@@ -8,10 +8,31 @@ type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; m
 export async function GET() {
   const ventas = await prisma.venta.findMany({
     where: { estado: "CERRADA" },
-    include: {
-      mesa: true,
-      pagos: true,
-      pedidos: { include: { items: { include: { producto: true } } } },
+    select: {
+      id: true,
+      tipo: true,
+      total: true,
+      descuentoPct: true,
+      closedAt: true,
+      createdAt: true,
+      clienteId: true,
+      mesa: { select: { id: true, nombre: true } },
+      pagos: { select: { metodo: true, monto: true } },
+      pedidos: {
+        select: {
+          id: true,
+          createdAt: true,
+          items: {
+            select: {
+              id: true,
+              cantidad: true,
+              precioUnitario: true,
+              subtotal: true,
+              producto: { select: { id: true, nombre: true } },
+            },
+          },
+        },
+      },
     },
     orderBy: { closedAt: "desc" },
     take: 100,
