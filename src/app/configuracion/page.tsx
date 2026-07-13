@@ -8,6 +8,14 @@ import { input, label, th, td, trHover } from "@/components/ui/styles";
 
 type Categoria = { id: number; nombre: string; activo: boolean };
 
+type AuditoriaLog = {
+  id: number;
+  accion: string;
+  descripcion: string | null;
+  createdAt: string;
+  usuario: { nombre: string; email: string; rol: string };
+};
+
 export default function ConfiguracionPage() {
   const [recargoMesaPct, setRecargoMesaPct] = useState("0");
   const [ok, setOk] = useState("");
@@ -25,6 +33,9 @@ export default function ConfiguracionPage() {
   const [errorBorrado, setErrorBorrado] = useState("");
   const [okBorrado, setOkBorrado] = useState("");
 
+  const [logs, setLogs] = useState<AuditoriaLog[]>([]);
+  const [cargandoLogs, setCargandoLogs] = useState(false);
+
   async function cargar() {
     const [configRes, catRes] = await Promise.all([fetch("/api/configuracion"), fetch("/api/categorias")]);
     const data = await configRes.json();
@@ -32,9 +43,20 @@ export default function ConfiguracionPage() {
     setCategorias(await catRes.json());
   }
 
+  async function cargarLogs() {
+    setCargandoLogs(true);
+    const res = await fetch("/api/auditoria?limit=50");
+    if (res.ok) {
+      const data = await res.json();
+      setLogs(data.logs);
+    }
+    setCargandoLogs(false);
+  }
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
     cargar();
+    cargarLogs();
   }, []);
 
   async function guardar(e: FormEvent) {
@@ -260,6 +282,59 @@ export default function ConfiguracionPage() {
           </Button>
           {okBorrado && <span className="text-sm text-emerald-400">{okBorrado}</span>}
           {errorBorrado && <span className="text-sm text-red-400">{errorBorrado}</span>}
+        </div>
+      </Card>
+
+      <Card className="p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-neutral-200">Consola de auditoría</div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={cargarLogs}
+            disabled={cargandoLogs}
+          >
+            {cargandoLogs ? "Cargando…" : "Actualizar"}
+          </Button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="sticky top-0 z-10 bg-neutral-900 border-b border-neutral-800">
+                <th className={`${th} text-left`}>Fecha y hora</th>
+                <th className={`${th} text-left`}>Usuario</th>
+                <th className={`${th} text-left`}>Acción</th>
+                <th className={`${th} text-left`}>Detalles</th>
+              </tr>
+            </thead>
+            <tbody className="max-h-96 overflow-y-auto block w-full">
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-3 text-center text-neutral-500 text-sm">
+                    No hay movimientos registrados
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log) => (
+                  <tr key={log.id} className={trHover}>
+                    <td className={`${td} text-xs text-neutral-400 whitespace-nowrap`}>
+                      {new Date(log.createdAt).toLocaleString("es-AR")}
+                    </td>
+                    <td className={`${td} text-xs`}>
+                      <span className="font-medium">{log.usuario.nombre}</span>
+                      <Badge variant="neutral" className="ml-1 text-[10px]">
+                        {log.usuario.rol}
+                      </Badge>
+                    </td>
+                    <td className={`${td} text-xs font-mono text-blue-400`}>{log.accion}</td>
+                    <td className={`${td} text-xs text-neutral-400`}>{log.descripcion || "—"}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </Card>
     </div>

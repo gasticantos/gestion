@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Tarifa } from "@/lib/precio";
+import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,6 +21,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     prisma.venta.create({ data: { tipo: "MESA", mesaId: mesa.id, estado: "ABIERTA", total: 0, tarifa } }),
     prisma.mesa.update({ where: { id: mesa.id }, data: { estado: "OCUPADA" } }),
   ]);
+
+  const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
+  await registrarAuditoria(usuarioId, "abrir_mesa", `Mesa ${mesa.nombre} (ID: ${mesa.id})`);
 
   return NextResponse.json(venta, { status: 201 });
 }

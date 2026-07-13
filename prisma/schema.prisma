@@ -32,6 +32,7 @@ model Usuario {
   rol          Rol      @default(MOZO)
   activo       Boolean  @default(true)
   createdAt    DateTime @default(now())
+  auditorias   AuditoriaLog[]
 }
 
 enum TipoStockEntry {
@@ -75,6 +76,18 @@ enum TarifaPrecio {
 model Configuracion {
   id             Int   @id @default(1)
   recargoMesaPct Float @default(0)
+}
+
+model AuditoriaLog {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  accion      String   // ej: "crear_venta", "editar_mesa", "imprimir_ticket"
+  descripcion String?  // detalles de qué se hizo
+  createdAt   DateTime @default(now())
+
+  @@index([usuarioId])
+  @@index([createdAt])
 }
 
 model Proveedor {

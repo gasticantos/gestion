@@ -409,10 +409,6 @@ export type ProveedorNullableScalarRelationFilter = {
   isNot?: Prisma.ProveedorWhereInput | null
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type ProveedorCreateNestedOneWithoutProductosInput = {
   create?: Prisma.XOR<Prisma.ProveedorCreateWithoutProductosInput, Prisma.ProveedorUncheckedCreateWithoutProductosInput>
   connectOrCreate?: Prisma.ProveedorCreateOrConnectWithoutProductosInput

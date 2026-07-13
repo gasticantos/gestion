@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
 import { aplicarDescuento } from "@/lib/precio";
+import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
@@ -74,6 +75,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return updated;
   });
+
+  const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
+  const detallesPago = pagos.map((p) => `${p.metodo}: $${p.monto}`).join(", ");
+  await registrarAuditoria(usuarioId, "cerrar_mesa", `Mesa ${mesa.nombre} - Total: $${total} - Pagos: ${detallesPago}`);
 
   return NextResponse.json(cerrada);
 }

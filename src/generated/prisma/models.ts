@@ -11,6 +11,7 @@
 export type * from './models/Categoria'
 export type * from './models/Usuario'
 export type * from './models/Configuracion'
+export type * from './models/AuditoriaLog'
 export type * from './models/Proveedor'
 export type * from './models/Producto'
 export type * from './models/StockEntry'

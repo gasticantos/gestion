@@ -33,6 +33,11 @@ export type Usuario = Prisma.UsuarioModel
  */
 export type Configuracion = Prisma.ConfiguracionModel
 /**
+ * Model AuditoriaLog
+ * 
+ */
+export type AuditoriaLog = Prisma.AuditoriaLogModel
+/**
  * Model Proveedor
  * 
  */

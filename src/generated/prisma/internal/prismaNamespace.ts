@@ -387,6 +387,7 @@ export const ModelName = {
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
+  AuditoriaLog: 'AuditoriaLog',
   Proveedor: 'Proveedor',
   Producto: 'Producto',
   StockEntry: 'StockEntry',
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "categoria" | "usuario" | "configuracion" | "proveedor" | "producto" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
+    modelProps: "categoria" | "usuario" | "configuracion" | "auditoriaLog" | "proveedor" | "producto" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -637,6 +638,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ConfiguracionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ConfiguracionCountAggregateOutputType> | number
+        }
+      }
+    }
+    AuditoriaLog: {
+      payload: Prisma.$AuditoriaLogPayload<ExtArgs>
+      fields: Prisma.AuditoriaLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AuditoriaLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AuditoriaLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>
+        }
+        findFirst: {
+          args: Prisma.AuditoriaLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AuditoriaLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>
+        }
+        findMany: {
+          args: Prisma.AuditoriaLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>[]
+        }
+        create: {
+          args: Prisma.AuditoriaLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>
+        }
+        createMany: {
+          args: Prisma.AuditoriaLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AuditoriaLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>[]
+        }
+        delete: {
+          args: Prisma.AuditoriaLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>
+        }
+        update: {
+          args: Prisma.AuditoriaLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.AuditoriaLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AuditoriaLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AuditoriaLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.AuditoriaLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditoriaLogPayload>
+        }
+        aggregate: {
+          args: Prisma.AuditoriaLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuditoriaLog>
+        }
+        groupBy: {
+          args: Prisma.AuditoriaLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditoriaLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AuditoriaLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditoriaLogCountAggregateOutputType> | number
         }
       }
     }
@@ -1598,6 +1673,17 @@ export const ConfiguracionScalarFieldEnum = {
 export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
 
 
+export const AuditoriaLogScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  accion: 'accion',
+  descripcion: 'descripcion',
+  createdAt: 'createdAt'
+} as const
+
+export type AuditoriaLogScalarFieldEnum = (typeof AuditoriaLogScalarFieldEnum)[keyof typeof AuditoriaLogScalarFieldEnum]
+
+
 export const ProveedorScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
@@ -2123,6 +2209,7 @@ export type GlobalOmitConfig = {
   categoria?: Prisma.CategoriaOmit
   usuario?: Prisma.UsuarioOmit
   configuracion?: Prisma.ConfiguracionOmit
+  auditoriaLog?: Prisma.AuditoriaLogOmit
   proveedor?: Prisma.ProveedorOmit
   producto?: Prisma.ProductoOmit
   stockEntry?: Prisma.StockEntryOmit

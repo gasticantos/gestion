@@ -54,6 +54,7 @@ export const ModelName = {
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
+  AuditoriaLog: 'AuditoriaLog',
   Proveedor: 'Proveedor',
   Producto: 'Producto',
   StockEntry: 'StockEntry',
@@ -113,6 +114,17 @@ export const ConfiguracionScalarFieldEnum = {
 } as const
 
 export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
+
+
+export const AuditoriaLogScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  accion: 'accion',
+  descripcion: 'descripcion',
+  createdAt: 'createdAt'
+} as const
+
+export type AuditoriaLogScalarFieldEnum = (typeof AuditoriaLogScalarFieldEnum)[keyof typeof AuditoriaLogScalarFieldEnum]
 
 
 export const ProveedorScalarFieldEnum = {
