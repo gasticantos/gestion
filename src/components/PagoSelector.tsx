@@ -77,10 +77,10 @@ function PagoSelectorBase({
           {pagos.length > 1 && (
             <span className="text-xs text-neutral-500">Pago {idx + 1}</span>
           )}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex flex-wrap gap-1.5">
-                {METODOS.slice(0, 3).map((m) => (
+                {METODOS.map((m) => (
                   <button
                     key={m.value}
                     type="button"
@@ -103,22 +103,6 @@ function PagoSelectorBase({
                 disabled={pagos.length === 1}
                 onChange={(e) => actualizarPago(idx, "monto", e.target.value)}
               />
-            </div>
-            <div className="flex gap-1.5">
-              {METODOS.slice(3).map((m) => (
-                <button
-                  key={m.value}
-                  type="button"
-                  onClick={() => actualizarPago(idx, "metodo", m.value)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                    p.metodo === m.value
-                      ? "bg-blue-600 border-blue-600 text-neutral-950"
-                      : "border-neutral-700 text-neutral-300 hover:border-neutral-500"
-                  }`}
-                >
-                  {m.label}
-                </button>
-              ))}
             </div>
           </div>
         </div>
