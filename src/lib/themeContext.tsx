@@ -9,17 +9,27 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function applyTheme(newTheme: Theme) {
+  if (typeof document === "undefined") return;
+  if (newTheme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
+  // Inicializar tema al montar
   useEffect(() => {
-    // Restaurar tema guardado o preferencia del sistema
     const saved = localStorage.getItem("theme") as Theme | null;
-    let initial: Theme = saved || "light";
+    let initial: Theme = "light";
 
-    // Si no hay tema guardado, intentar usar preferencia del sistema
-    if (!saved && typeof window !== "undefined") {
+    if (saved) {
+      initial = saved;
+    } else if (typeof window !== "undefined") {
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       initial = prefersDark ? "dark" : "light";
     }
@@ -29,21 +39,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  function applyTheme(newTheme: Theme) {
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+  // Aplicar tema cuando cambia
+  useEffect(() => {
+    if (mounted) {
+      applyTheme(theme);
+      localStorage.setItem("theme", theme);
     }
-  }
+  }, [theme, mounted]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
-    applyTheme(newTheme);
   };
 
-  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+  const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
 
   if (!mounted) return <>{children}</>;
 
