@@ -125,6 +125,9 @@ export default function VentaPage() {
     }
 
     const pagosFinales = resolvePagos(pagos, total);
+    // Abrir la ventana ya (de forma sincrónica al click) para que el navegador no la bloquee
+    // como popup; recién le asignamos la URL cuando sabemos el id de la venta.
+    const ventana = window.open("", "_blank");
     setEnviando(true);
     const res = await fetch("/api/ventas", {
       method: "POST",
@@ -139,6 +142,7 @@ export default function VentaPage() {
 
     setEnviando(false);
     if (!res.ok) {
+      ventana?.close();
       const data = await res.json();
       setError(data.error || "Ocurrió un error");
       return;
@@ -146,16 +150,9 @@ export default function VentaPage() {
 
     const venta = await res.json();
 
-    // Imprimir comanda automáticamente (sin abrir ventana)
-    await fetch("/api/imprimir/comanda", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contenido: `VENTA #${venta.id}\n${new Date().toLocaleString("es-AR")}\n$${total.toFixed(2)}`
-      }),
-    }).catch(() => {
-      // Si falla impresión, no importa
-    });
+    // Imprimir el ticket real vía el diálogo de impresión del navegador (corre en la máquina
+    // de la caja, no en el servidor, así que funciona sin importar dónde esté hosteada la app).
+    if (ventana) ventana.location.href = `/ventas/${venta.id}/ticket`;
 
     setCarrito([]);
     setPagos([{ metodo: "EFECTIVO", monto: "0" }]);

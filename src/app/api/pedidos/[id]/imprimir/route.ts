@@ -34,7 +34,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const contenido = lineas.join("\n");
 
-    // Intentar imprimir via ESC/POS
+    // Marcar comanda como impresa (la impresión real ocurre en el navegador vía /pedidos/[id]/comanda)
+    await prisma.pedido.update({
+      where: { id: Number(id) },
+      data: { comandaImpresa: true },
+    });
+
+    // Intentar ESC/POS como best-effort (solo funciona si el server corre en la misma
+    // máquina que la impresora USB; en Vercel esto siempre falla y no pasa nada).
     try {
       const { USB } = require("escpos");
       const device = new USB();
@@ -47,12 +54,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         printer.cut();
         printer.close();
       });
-
-      return NextResponse.json({ success: true, message: "Imprimiendo..." });
     } catch (printErr) {
-      console.error("Error de impresión ESC/POS:", printErr);
-      return NextResponse.json({ error: "No se pudo conectar a impresora" }, { status: 500 });
+      console.error("Error ESC/POS (ignorado, se usa el diálogo de impresión del navegador):", printErr);
     }
+
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Error al generar comanda:", err);
     return NextResponse.json({ error: "Error al generar comanda" }, { status: 500 });

@@ -27,7 +27,7 @@ export default async function ReporteTicketPage({
     <div className="max-w-md mx-auto flex flex-col gap-4">
       <div className="print:hidden flex items-center gap-3">
         <AutoPrint />
-        <Link href="/reportes" className="text-sm text-neutral-400 hover:text-neutral-200">
+        <Link href="/reportes" className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200">
           Volver a reportes
         </Link>
       </div>
