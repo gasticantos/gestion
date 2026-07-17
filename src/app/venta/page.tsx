@@ -16,6 +16,7 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
+import { imprimirEnSegundoPlano } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -125,9 +126,6 @@ export default function VentaPage() {
     }
 
     const pagosFinales = resolvePagos(pagos, total);
-    // Abrir la ventana ya (de forma sincrónica al click) para que el navegador no la bloquee
-    // como popup; recién le asignamos la URL cuando sabemos el id de la venta.
-    const ventana = window.open("", "_blank");
     setEnviando(true);
     const res = await fetch("/api/ventas", {
       method: "POST",
@@ -142,7 +140,6 @@ export default function VentaPage() {
 
     setEnviando(false);
     if (!res.ok) {
-      ventana?.close();
       const data = await res.json();
       setError(data.error || "Ocurrió un error");
       return;
@@ -152,7 +149,8 @@ export default function VentaPage() {
 
     // Imprimir el ticket real vía el diálogo de impresión del navegador (corre en la máquina
     // de la caja, no en el servidor, así que funciona sin importar dónde esté hosteada la app).
-    if (ventana) ventana.location.href = `/ventas/${venta.id}/ticket`;
+    // Se carga en un iframe oculto para no abrir pestaña ni navegar afuera de esta pantalla.
+    imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
 
     setCarrito([]);
     setPagos([{ metodo: "EFECTIVO", monto: "0" }]);

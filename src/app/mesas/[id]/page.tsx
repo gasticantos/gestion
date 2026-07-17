@@ -17,6 +17,7 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
+import { imprimirEnSegundoPlano } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -306,9 +307,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       setError("Agregá al menos un producto");
       return;
     }
-    // Abrir la ventana ya (de forma sincrónica al click) para que el navegador no la bloquee
-    // como popup; recién le asignamos la URL cuando sabemos el id del pedido.
-    const ventana = imprimirComanda ? window.open("", "_blank") : null;
     setEnviando(true);
     const res = await fetch(`/api/mesas/${id}/pedido`, {
       method: "POST",
@@ -319,7 +317,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     });
     setEnviando(false);
     if (!res.ok) {
-      ventana?.close();
       const data = await res.json();
       setError(data.error || "Ocurrió un error");
       return;
@@ -327,7 +324,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     const pedido = await res.json();
     if (imprimirComanda) {
       await fetch(`/api/pedidos/${pedido.id}/imprimir`, { method: "POST" }).catch(() => {});
-      if (ventana) ventana.location.href = `/pedidos/${pedido.id}/comanda`;
+      imprimirEnSegundoPlano(`/pedidos/${pedido.id}/comanda`);
     }
     ultimoSincronizadoRef.current = "[]";
     setRonda([]);
@@ -337,14 +334,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   async function imprimirTicket() {
     setError("");
     if (!venta) return;
-    // Igual que arriba: abrir la ventana sincrónicamente para no chocar con el bloqueador de popups.
-    const ventana = window.open("", "_blank");
     setEnviando(true);
     await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
     // Recargar mesa para sincronizar ticketImpreso desde la BD
     await cargar();
     setEnviando(false);
-    if (ventana) ventana.location.href = `/ventas/${venta.id}/ticket`;
+    imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
   }
 
   async function cerrarMesa() {
