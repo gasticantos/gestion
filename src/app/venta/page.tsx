@@ -39,18 +39,15 @@ export default function VentaPage() {
   const [descuentoPct, setDescuentoPct] = useState("0");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
-  const [recargoMesaPct, setRecargoMesaPct] = useState(0);
 
   useEffect(() => {
     // Carga productos primero (crítico para búsqueda)
     Promise.all([
       fetch("/api/productos").then((res) => res.json()),
       fetch("/api/clientes").then((res) => res.json()),
-      fetch("/api/configuracion").then((res) => res.json()),
-    ]).then(([productos, clientes, config]) => {
+    ]).then(([productos, clientes]) => {
       setProductos(productos.filter((p: { activo: boolean }) => p.activo));
       setClientes(clientes);
-      setRecargoMesaPct(config.recargoMesaPct);
     });
   }, []);
 
@@ -162,7 +159,7 @@ export default function VentaPage() {
     <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Venta (mostrador)</h1>
-        <BuscadorProducto productos={productos} onSeleccionar={agregar} recargoMesaPct={recargoMesaPct} />
+        <BuscadorProducto productos={productos} onSeleccionar={agregar} />
 
         {carrito.length > 0 && (
           <div className="text-xs text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">

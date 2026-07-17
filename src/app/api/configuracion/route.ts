@@ -23,5 +23,14 @@ export async function PUT(req: NextRequest) {
     update: { recargoMesaPct: Number(recargoMesaPct) },
     create: { id: 1, recargoMesaPct: Number(recargoMesaPct) },
   });
+
+  // Recalcular precioVentaMesa de todos los productos que NO fueron fijados a mano.
+  // Los fijados manualmente (precioVentaMesaManual = true) quedan tal cual el usuario los dejó.
+  await prisma.$executeRaw`
+    UPDATE "Producto"
+    SET "precioVentaMesa" = ROUND((("precioVenta" + "precioCosto" * ${Number(recargoMesaPct)} / 100))::numeric, 2)
+    WHERE "precioVentaMesaManual" = false
+  `;
+
   return NextResponse.json(config);
 }

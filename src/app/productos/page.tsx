@@ -29,6 +29,8 @@ type Producto = {
   categoriaId: number | null;
   categoria: Categoria | null;
   precioVenta: number;
+  precioVentaMesa: number;
+  precioVentaMesaManual: boolean;
   precioCosto: number;
   stock: number;
   unidad: string;
@@ -43,13 +45,14 @@ const emptyForm = {
   codigoBarras: "",
   categoriaId: "",
   precioVenta: "",
+  precioVentaMesa: "",
   precioCosto: "",
   stock: "",
   unidad: "unidad",
   proveedorId: "",
 };
 
-type EditForm = typeof emptyForm;
+type EditForm = typeof emptyForm & { precioVentaMesaManual: boolean };
 
 const MARGEN_SUGERIDO_PCT = 30;
 
@@ -58,9 +61,48 @@ function calcularVentaSugerida(costo: string) {
   return num > 0 ? (num * (1 + MARGEN_SUGERIDO_PCT / 100)).toFixed(2) : "";
 }
 
+// El precio de mesa sugerido = precio de venta normal + el % de recargo de mesa (Configuración)
+// calculado sobre el costo. Ej: costo 100, venta 130 (+30%), recargo mesa 30% -> mesa 160 (+60% sobre costo).
+function calcularVentaMesaSugerida(venta: string, costo: string, recargoMesaPct: number) {
+  const ventaNum = Number(venta);
+  const costoNum = Number(costo);
+  if (!ventaNum) return "";
+  return (ventaNum + costoNum * (recargoMesaPct / 100)).toFixed(2);
+}
+
 function margenPct(costo: number, venta: number): number | null {
   if (!costo || costo <= 0) return null;
   return ((venta - costo) / costo) * 100;
+}
+
+function MargenBadge({
+  costo,
+  venta,
+  sugerido,
+  small,
+  compacto,
+}: {
+  costo: number;
+  venta: number;
+  sugerido?: boolean;
+  small?: boolean;
+  /** true: solo "(+30%)" para celdas de tabla. false: "(+30% margen sugerido)" para labels de formulario. */
+  compacto?: boolean;
+}) {
+  const m = margenPct(costo, venta);
+  if (m === null) return null;
+  const color =
+    m < 0
+      ? "text-red-600/70 dark:text-red-400/70"
+      : m < 15
+        ? "text-amber-600/70 dark:text-amber-400/70"
+        : "text-emerald-600/70 dark:text-emerald-400/70";
+  return (
+    <span className={`${small ? "text-xs" : ""} font-normal ${color}`}>
+      ({m > 0 ? "+" : ""}
+      {m.toFixed(0)}%{compacto ? "" : ` margen${sugerido ? " sugerido" : ""}`})
+    </span>
+  );
 }
 
 export default function ProductosPage() {
@@ -69,25 +111,29 @@ export default function ProductosPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [ventaManual, setVentaManual] = useState(false);
+  const [ventaMesaManual, setVentaMesaManual] = useState(false);
+  const [recargoMesaPct, setRecargoMesaPct] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [edit, setEdit] = useState<EditForm>(emptyForm);
+  const [edit, setEdit] = useState<EditForm>({ ...emptyForm, precioVentaMesaManual: false });
   const [errorFila, setErrorFila] = useState("");
 
   async function cargar() {
     setLoading(true);
-    const [prodRes, provRes, catRes] = await Promise.all([
+    const [prodRes, provRes, catRes, configRes] = await Promise.all([
       fetch("/api/productos"),
       fetch("/api/proveedores"),
       fetch("/api/categorias"),
+      fetch("/api/configuracion"),
     ]);
     setProductos(await prodRes.json());
     setProveedores(await provRes.json());
     setCategorias(await catRes.json());
+    setRecargoMesaPct((await configRes.json()).recargoMesaPct);
     setLoading(false);
   }
 
@@ -108,6 +154,8 @@ export default function ProductosPage() {
         codigoBarras: form.codigoBarras || null,
         categoriaId: form.categoriaId || null,
         precioVenta: form.precioVenta,
+        precioVentaMesa: form.precioVentaMesa,
+        precioVentaMesaManual: ventaMesaManual,
         precioCosto: form.precioCosto,
         stock: form.stock,
         unidad: form.unidad,
@@ -123,20 +171,30 @@ export default function ProductosPage() {
 
     setForm(emptyForm);
     setVentaManual(false);
+    setVentaMesaManual(false);
     await cargar();
   }
 
   function cambiarCostoNuevo(valor: string) {
-    setForm((f) => ({
-      ...f,
-      precioCosto: valor,
-      precioVenta: ventaManual ? f.precioVenta : calcularVentaSugerida(valor),
-    }));
+    setForm((f) => {
+      const precioVenta = ventaManual ? f.precioVenta : calcularVentaSugerida(valor);
+      const precioVentaMesa = ventaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(precioVenta, valor, recargoMesaPct);
+      return { ...f, precioCosto: valor, precioVenta, precioVentaMesa };
+    });
   }
 
   function cambiarVentaNuevo(valor: string) {
     setVentaManual(true);
-    setForm((f) => ({ ...f, precioVenta: valor }));
+    setForm((f) => ({
+      ...f,
+      precioVenta: valor,
+      precioVentaMesa: ventaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(valor, f.precioCosto, recargoMesaPct),
+    }));
+  }
+
+  function cambiarVentaMesaNuevo(valor: string) {
+    setVentaMesaManual(true);
+    setForm((f) => ({ ...f, precioVentaMesa: valor }));
   }
 
   function iniciarEdicion(p: Producto) {
@@ -147,6 +205,8 @@ export default function ProductosPage() {
       codigoBarras: p.codigoBarras || "",
       categoriaId: p.categoriaId ? String(p.categoriaId) : "",
       precioVenta: String(p.precioVenta),
+      precioVentaMesa: String(p.precioVentaMesa),
+      precioVentaMesaManual: p.precioVentaMesaManual,
       precioCosto: String(p.precioCosto),
       stock: String(p.stock),
       unidad: p.unidad,
@@ -154,9 +214,29 @@ export default function ProductosPage() {
     });
   }
 
+  function cambiarCostoEdit(valor: string) {
+    setEdit((f) => ({
+      ...f,
+      precioCosto: valor,
+      precioVentaMesa: f.precioVentaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(f.precioVenta, valor, recargoMesaPct),
+    }));
+  }
+
+  function cambiarVentaEdit(valor: string) {
+    setEdit((f) => ({
+      ...f,
+      precioVenta: valor,
+      precioVentaMesa: f.precioVentaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(valor, f.precioCosto, recargoMesaPct),
+    }));
+  }
+
+  function cambiarVentaMesaEdit(valor: string) {
+    setEdit((f) => ({ ...f, precioVentaMesa: valor, precioVentaMesaManual: true }));
+  }
+
   function cancelarEdicion() {
     setEditandoId(null);
-    setEdit(emptyForm);
+    setEdit({ ...emptyForm, precioVentaMesaManual: false });
     setErrorFila("");
   }
 
@@ -170,6 +250,8 @@ export default function ProductosPage() {
         codigoBarras: edit.codigoBarras || null,
         categoriaId: edit.categoriaId || null,
         precioVenta: edit.precioVenta,
+        precioVentaMesa: edit.precioVentaMesa,
+        precioVentaMesaManual: edit.precioVentaMesaManual,
         precioCosto: edit.precioCosto,
         stock: edit.stock,
         unidad: edit.unidad,
@@ -265,21 +347,7 @@ export default function ProductosPage() {
           <div>
             <label className={label}>
               Precio de venta *{" "}
-              {(() => {
-                const m = margenPct(Number(form.precioCosto), Number(form.precioVenta));
-                if (m === null) return null;
-                const color =
-                  m < 0
-                    ? "text-red-600/70 dark:text-red-400/70"
-                    : m < 15
-                      ? "text-amber-600/70 dark:text-amber-400/70"
-                      : "text-emerald-600/70 dark:text-emerald-400/70";
-                return (
-                  <span className={`font-normal normal-case ${color}`}>
-                    ({m > 0 ? "+" : ""}{m.toFixed(0)}% margen{!ventaManual ? " sugerido" : ""})
-                  </span>
-                );
-              })()}
+              <MargenBadge costo={Number(form.precioCosto)} venta={Number(form.precioVenta)} sugerido={!ventaManual} />
             </label>
             <input
               type="number"
@@ -288,6 +356,19 @@ export default function ProductosPage() {
               value={form.precioVenta}
               onChange={(e) => cambiarVentaNuevo(e.target.value)}
               required
+            />
+          </div>
+          <div>
+            <label className={label}>
+              Precio de venta mesa{" "}
+              <MargenBadge costo={Number(form.precioCosto)} venta={Number(form.precioVentaMesa)} sugerido={!ventaMesaManual} />
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              className={input}
+              value={form.precioVentaMesa}
+              onChange={(e) => cambiarVentaMesaNuevo(e.target.value)}
             />
           </div>
           <div>
@@ -379,6 +460,7 @@ export default function ProductosPage() {
                   <th className={th}>Nombre</th>
                   <th className={th}>Costo</th>
                   <th className={th}>Precio venta</th>
+                  <th className={th}>Precio venta mesa</th>
                   <th className={th}>Stock</th>
                   <th className={th}>Código</th>
                   <th className={th}>Categoría</th>
@@ -405,7 +487,7 @@ export default function ProductosPage() {
                           step="0.01"
                           className={`${input} min-w-[100px]`}
                           value={edit.precioCosto}
-                          onChange={(e) => setEdit({ ...edit, precioCosto: e.target.value })}
+                          onChange={(e) => cambiarCostoEdit(e.target.value)}
                         />
                       </td>
                       <td className={td}>
@@ -414,23 +496,38 @@ export default function ProductosPage() {
                           step="0.01"
                           className={`${input} min-w-[100px]`}
                           value={edit.precioVenta}
-                          onChange={(e) => setEdit({ ...edit, precioVenta: e.target.value })}
+                          onChange={(e) => cambiarVentaEdit(e.target.value)}
                         />
-                        {(() => {
-                          const m = margenPct(Number(edit.precioCosto), Number(edit.precioVenta));
-                          if (m === null) return null;
-                          const color =
-                            m < 0
-                              ? "text-red-600/70 dark:text-red-400/70"
-                              : m < 15
-                                ? "text-amber-600/70 dark:text-amber-400/70"
-                                : "text-emerald-600/70 dark:text-emerald-400/70";
-                          return (
-                            <div className={`text-xs mt-0.5 ${color}`}>
-                              {m > 0 ? "+" : ""}{m.toFixed(0)}% margen
-                            </div>
-                          );
-                        })()}
+                        <div className="mt-0.5">
+                          <MargenBadge costo={Number(edit.precioCosto)} venta={Number(edit.precioVenta)} small />
+                        </div>
+                      </td>
+                      <td className={td}>
+                        <div className="flex items-start gap-1">
+                          <input
+                            type="number"
+                            step="0.01"
+                            className={`${input} min-w-[100px]`}
+                            value={edit.precioVentaMesa}
+                            onChange={(e) => cambiarVentaMesaEdit(e.target.value)}
+                          />
+                          {edit.precioVentaMesaManual && (
+                            <span
+                              className="text-amber-500 text-base leading-none pt-1.5 shrink-0"
+                              title="Precio fijado a mano: no se actualiza solo cuando cambia el % de recargo de mesa en Configuración. Revisalo."
+                            >
+                              ⚠️
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-0.5">
+                          <MargenBadge
+                            costo={Number(edit.precioCosto)}
+                            venta={Number(edit.precioVentaMesa)}
+                            sugerido={!edit.precioVentaMesaManual}
+                            small
+                          />
+                        </div>
                       </td>
                       <td className={td}>
                         <input
@@ -504,18 +601,12 @@ export default function ProductosPage() {
                       <td className={`${td} text-neutral-900 dark:text-neutral-50 font-medium`}>{p.nombre}</td>
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
                       <td className={`${td} text-emerald-400 font-medium`}>
-                        ${formatearMoneda(p.precioVenta)}
-                        {(() => {
-                          const m = margenPct(p.precioCosto, p.precioVenta);
-                          if (m === null) return null;
-                          const color =
-                            m < 0
-                              ? "text-red-600/70 dark:text-red-400/70"
-                              : m < 15
-                                ? "text-amber-600/70 dark:text-amber-400/70"
-                                : "text-emerald-600/70 dark:text-emerald-400/70";
-                          return <span className={`ml-1.5 text-xs font-normal ${color}`}>({m > 0 ? "+" : ""}{m.toFixed(0)}%)</span>;
-                        })()}
+                        ${formatearMoneda(p.precioVenta)}{" "}
+                        <MargenBadge costo={p.precioCosto} venta={p.precioVenta} compacto small />
+                      </td>
+                      <td className={`${td} text-blue-400 font-medium`}>
+                        ${formatearMoneda(p.precioVentaMesa)}{" "}
+                        <MargenBadge costo={p.precioCosto} venta={p.precioVentaMesa} compacto small />
                       </td>
                       <td
                         className={`${td} font-medium ${

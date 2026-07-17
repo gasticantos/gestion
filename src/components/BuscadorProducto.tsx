@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, KeyboardEvent, memo } from "react";
 import { input } from "@/components/ui/styles";
-import { calcularPrecio, Tarifa } from "@/lib/precio";
+import { Tarifa } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
 
 export type ProductoBusqueda = {
@@ -12,18 +12,17 @@ export type ProductoBusqueda = {
   unidad?: string;
   stock?: number;
   precioVenta: number;
+  precioVentaMesa?: number;
 };
 
 function BuscadorProductoBase({
   productos,
   onSeleccionar,
-  recargoMesaPct = 0,
   elegirPrecio: pedirPrecio = true,
   placeholder,
 }: {
   productos: ProductoBusqueda[];
   onSeleccionar: (p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) => void;
-  recargoMesaPct?: number;
   /** Si es false, agrega directo al precio de mostrador sin mostrar el paso de elegir precio (uso en carga de stock). */
   elegirPrecio?: boolean;
   placeholder?: string;
@@ -70,7 +69,8 @@ function BuscadorProductoBase({
 
   function elegirPrecio(tarifa: Tarifa) {
     if (!elegido) return;
-    onSeleccionar(elegido, tarifa, calcularPrecio(elegido.precioVenta, tarifa, recargoMesaPct));
+    const precio = tarifa === "MESA" ? elegido.precioVentaMesa ?? elegido.precioVenta : elegido.precioVenta;
+    onSeleccionar(elegido, tarifa, precio);
     setElegido(null);
     inputRef.current?.focus();
   }
@@ -99,8 +99,8 @@ function BuscadorProductoBase({
   }
 
   if (elegido) {
-    const precioMostrador = calcularPrecio(elegido.precioVenta, "PARTICULAR", recargoMesaPct);
-    const precioMesa = calcularPrecio(elegido.precioVenta, "MESA", recargoMesaPct);
+    const precioMostrador = elegido.precioVenta;
+    const precioMesa = elegido.precioVentaMesa ?? elegido.precioVenta;
     return (
       <div className="flex flex-col gap-2">
         <div className="text-sm text-neutral-700 dark:text-neutral-300">

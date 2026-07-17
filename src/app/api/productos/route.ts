@@ -11,6 +11,8 @@ export async function GET() {
       marca: true,
       categoriaId: true,
       precioVenta: true,
+      precioVentaMesa: true,
+      precioVentaMesaManual: true,
       precioCosto: true,
       stock: true,
       unidad: true,
@@ -26,7 +28,18 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { nombre, codigoBarras, categoriaId, precioVenta, precioCosto, stock, unidad, proveedorId } = body;
+  const {
+    nombre,
+    codigoBarras,
+    categoriaId,
+    precioVenta,
+    precioVentaMesa,
+    precioVentaMesaManual,
+    precioCosto,
+    stock,
+    unidad,
+    proveedorId,
+  } = body;
 
   if (!nombre || typeof nombre !== "string") {
     return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
@@ -42,6 +55,8 @@ export async function POST(req: NextRequest) {
         codigoBarras: codigoBarras || null,
         categoriaId: categoriaId ? Number(categoriaId) : null,
         precioVenta: Number(precioVenta),
+        precioVentaMesa: precioVentaMesa !== undefined ? Number(precioVentaMesa) : Number(precioVenta),
+        precioVentaMesaManual: Boolean(precioVentaMesaManual),
         precioCosto: precioCosto ? Number(precioCosto) : 0,
         stock: stock ? Number(stock) : 0,
         unidad: unidad || "unidad",

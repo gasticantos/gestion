@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { calcularPrecio, Tarifa, aplicarDescuento } from "@/lib/precio";
+import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa };
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
@@ -73,13 +73,11 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const config = await prisma.configuracion.findUnique({ where: { id: 1 } });
-  const recargoMesaPct = config?.recargoMesaPct ?? 0;
   const itemTarifa = (item: ItemInput): Tarifa => (item.tarifa === "MESA" ? "MESA" : "PARTICULAR");
 
   const subtotal = items.reduce((acc, item) => {
     const producto = porId.get(Number(item.productoId))!;
-    return acc + calcularPrecio(producto.precioVenta, itemTarifa(item), recargoMesaPct) * Number(item.cantidad);
+    return acc + precioSegunTarifa(producto, itemTarifa(item)) * Number(item.cantidad);
   }, 0);
   const { pct, total } = aplicarDescuento(subtotal, Number(descuentoPct) || 0);
 
@@ -107,7 +105,7 @@ export async function POST(req: NextRequest) {
             items: {
               create: items.map((item) => {
                 const producto = porId.get(Number(item.productoId))!;
-                const precioUnitario = calcularPrecio(producto.precioVenta, itemTarifa(item), recargoMesaPct);
+                const precioUnitario = precioSegunTarifa(producto, itemTarifa(item));
                 return {
                   productoId: producto.id,
                   cantidad: Number(item.cantidad),

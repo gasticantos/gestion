@@ -63,7 +63,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [descuentoPct, setDescuentoPct] = useState("0");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
-  const [recargoMesaPct, setRecargoMesaPct] = useState(0);
   const [rol, setRol] = useState<string | null>(null);
   const [editandoItemId, setEditandoItemId] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -81,14 +80,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   }, []);
 
   async function cargar() {
-    const [mesaRes, cliRes, configRes] = await Promise.all([
-      fetch(`/api/mesas/${id}`),
-      fetch("/api/clientes"),
-      fetch("/api/configuracion"),
-    ]);
+    const [mesaRes, cliRes] = await Promise.all([fetch(`/api/mesas/${id}`), fetch("/api/clientes")]);
     setMesa(await mesaRes.json());
     setClientes(await cliRes.json());
-    setRecargoMesaPct((await configRes.json()).recargoMesaPct);
   }
 
   // Carga productos después de los datos críticos
@@ -583,11 +577,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
             <Card className="p-4 flex flex-col gap-3">
               <div className="text-sm text-neutral-500 dark:text-neutral-400">Agregar más productos</div>
-              <BuscadorProducto
-                productos={productos}
-                onSeleccionar={agregarARonda}
-                recargoMesaPct={recargoMesaPct}
-              />
+              <BuscadorProducto productos={productos} onSeleccionar={agregarARonda} />
             </Card>
           </div>
 

@@ -1705,6 +1705,8 @@ export const ProductoScalarFieldEnum = {
   marca: 'marca',
   categoriaId: 'categoriaId',
   precioVenta: 'precioVenta',
+  precioVentaMesa: 'precioVentaMesa',
+  precioVentaMesaManual: 'precioVentaMesaManual',
   precioCosto: 'precioCosto',
   stock: 'stock',
   unidad: 'unidad',

@@ -4,7 +4,19 @@ import { prisma } from "@/lib/prisma";
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await req.json();
-  const { nombre, codigoBarras, categoriaId, precioVenta, precioCosto, stock, unidad, proveedorId, activo } = body;
+  const {
+    nombre,
+    codigoBarras,
+    categoriaId,
+    precioVenta,
+    precioVentaMesa,
+    precioVentaMesaManual,
+    precioCosto,
+    stock,
+    unidad,
+    proveedorId,
+    activo,
+  } = body;
 
   try {
     const producto = await prisma.producto.update({
@@ -14,6 +26,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         codigoBarras: codigoBarras || null,
         categoriaId: categoriaId ? Number(categoriaId) : null,
         precioVenta: precioVenta !== undefined ? Number(precioVenta) : undefined,
+        precioVentaMesa: precioVentaMesa !== undefined ? Number(precioVentaMesa) : undefined,
+        precioVentaMesaManual: precioVentaMesaManual !== undefined ? Boolean(precioVentaMesaManual) : undefined,
         precioCosto: precioCosto !== undefined ? Number(precioCosto) : undefined,
         stock: stock !== undefined ? Number(stock) : undefined,
         unidad,
