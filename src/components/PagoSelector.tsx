@@ -78,13 +78,17 @@ function PagoSelectorBase({
             <span className="text-xs text-neutral-500">Pago {idx + 1}</span>
           )}
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {/* flex + nowrap en vez de grid con breakpoint: sm: reacciona al ancho de la ventana,
+                no al del contenedor, y este componente vive en columnas angostas (ej. venta de
+                mostrador a 3 columnas). Con flex-nowrap + overflow-x-auto los 4 botones quedan
+                siempre en una sola fila, del mismo alto, sin importar cuánto espacio haya. */}
+            <div className="flex flex-nowrap gap-1.5 overflow-x-auto">
               {METODOS.map((m) => (
                 <button
                   key={m.value}
                   type="button"
                   onClick={() => actualizarPago(idx, "metodo", m.value)}
-                  className={`px-2 py-1.5 rounded-full text-sm font-medium border transition-colors text-center ${
+                  className={`flex-1 shrink-0 whitespace-nowrap px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium border transition-colors text-center ${
                     p.metodo === m.value
                       ? "bg-blue-600 border-blue-600 text-neutral-950"
                       : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-500"

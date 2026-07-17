@@ -265,11 +265,21 @@ export default function ProductosPage() {
           <div>
             <label className={label}>
               Precio de venta *{" "}
-              {!ventaManual && form.precioCosto && (
-                <span className="text-emerald-600/70 dark:text-emerald-400/70 font-normal normal-case">
-                  (sugerido +{MARGEN_SUGERIDO_PCT}%)
-                </span>
-              )}
+              {(() => {
+                const m = margenPct(Number(form.precioCosto), Number(form.precioVenta));
+                if (m === null) return null;
+                const color =
+                  m < 0
+                    ? "text-red-600/70 dark:text-red-400/70"
+                    : m < 15
+                      ? "text-amber-600/70 dark:text-amber-400/70"
+                      : "text-emerald-600/70 dark:text-emerald-400/70";
+                return (
+                  <span className={`font-normal normal-case ${color}`}>
+                    ({m > 0 ? "+" : ""}{m.toFixed(0)}% margen{!ventaManual ? " sugerido" : ""})
+                  </span>
+                );
+              })()}
             </label>
             <input
               type="number"
@@ -406,6 +416,21 @@ export default function ProductosPage() {
                           value={edit.precioVenta}
                           onChange={(e) => setEdit({ ...edit, precioVenta: e.target.value })}
                         />
+                        {(() => {
+                          const m = margenPct(Number(edit.precioCosto), Number(edit.precioVenta));
+                          if (m === null) return null;
+                          const color =
+                            m < 0
+                              ? "text-red-600/70 dark:text-red-400/70"
+                              : m < 15
+                                ? "text-amber-600/70 dark:text-amber-400/70"
+                                : "text-emerald-600/70 dark:text-emerald-400/70";
+                          return (
+                            <div className={`text-xs mt-0.5 ${color}`}>
+                              {m > 0 ? "+" : ""}{m.toFixed(0)}% margen
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className={td}>
                         <input
