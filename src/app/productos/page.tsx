@@ -51,11 +51,24 @@ const emptyForm = {
 
 type EditForm = typeof emptyForm;
 
+const MARGEN_SUGERIDO_PCT = 30;
+
+function calcularVentaSugerida(costo: string) {
+  const num = Number(costo);
+  return num > 0 ? (num * (1 + MARGEN_SUGERIDO_PCT / 100)).toFixed(2) : "";
+}
+
+function margenPct(costo: number, venta: number): number | null {
+  if (!costo || costo <= 0) return null;
+  return ((venta - costo) / costo) * 100;
+}
+
 export default function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [form, setForm] = useState(emptyForm);
+  const [ventaManual, setVentaManual] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
@@ -109,7 +122,21 @@ export default function ProductosPage() {
     }
 
     setForm(emptyForm);
+    setVentaManual(false);
     await cargar();
+  }
+
+  function cambiarCostoNuevo(valor: string) {
+    setForm((f) => ({
+      ...f,
+      precioCosto: valor,
+      precioVenta: ventaManual ? f.precioVenta : calcularVentaSugerida(valor),
+    }));
+  }
+
+  function cambiarVentaNuevo(valor: string) {
+    setVentaManual(true);
+    setForm((f) => ({ ...f, precioVenta: valor }));
   }
 
   function iniciarEdicion(p: Producto) {
@@ -226,24 +253,31 @@ export default function ProductosPage() {
             </select>
           </div>
           <div>
-            <label className={label}>Precio de venta *</label>
-            <input
-              type="number"
-              step="0.01"
-              className={input}
-              value={form.precioVenta}
-              onChange={(e) => setForm({ ...form, precioVenta: e.target.value })}
-              required
-            />
-          </div>
-          <div>
             <label className={label}>Precio de costo</label>
             <input
               type="number"
               step="0.01"
               className={input}
               value={form.precioCosto}
-              onChange={(e) => setForm({ ...form, precioCosto: e.target.value })}
+              onChange={(e) => cambiarCostoNuevo(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={label}>
+              Precio de venta *{" "}
+              {!ventaManual && form.precioCosto && (
+                <span className="text-emerald-600/70 dark:text-emerald-400/70 font-normal normal-case">
+                  (sugerido +{MARGEN_SUGERIDO_PCT}%)
+                </span>
+              )}
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              className={input}
+              value={form.precioVenta}
+              onChange={(e) => cambiarVentaNuevo(e.target.value)}
+              required
             />
           </div>
           <div>
@@ -444,7 +478,20 @@ export default function ProductosPage() {
                     <tr key={p.id} className={`${trHover} ${!p.activo ? "opacity-40" : ""}`}>
                       <td className={`${td} text-neutral-900 dark:text-neutral-50 font-medium`}>{p.nombre}</td>
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
-                      <td className={`${td} text-emerald-400 font-medium`}>${formatearMoneda(p.precioVenta)}</td>
+                      <td className={`${td} text-emerald-400 font-medium`}>
+                        ${formatearMoneda(p.precioVenta)}
+                        {(() => {
+                          const m = margenPct(p.precioCosto, p.precioVenta);
+                          if (m === null) return null;
+                          const color =
+                            m < 0
+                              ? "text-red-600/70 dark:text-red-400/70"
+                              : m < 15
+                                ? "text-amber-600/70 dark:text-amber-400/70"
+                                : "text-emerald-600/70 dark:text-emerald-400/70";
+                          return <span className={`ml-1.5 text-xs font-normal ${color}`}>({m > 0 ? "+" : ""}{m.toFixed(0)}%)</span>;
+                        })()}
+                      </td>
                       <td
                         className={`${td} font-medium ${
                           p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-700 dark:text-neutral-200"
