@@ -467,7 +467,7 @@ export default function ProductosPage() {
                   <th className={th}>Unidad</th>
                   <th className={th}>Proveedor</th>
                   <th className={th}>Última modificación</th>
-                  <th className={`${th} w-40`}></th>
+                  <th className={`${th} w-40 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}></th>
                 </tr>
               </thead>
               <tbody>
@@ -583,7 +583,9 @@ export default function ProductosPage() {
                       <td className={`${td} text-xs text-neutral-500`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
-                      <td className={`${td} text-right whitespace-nowrap gap-3`}>
+                      <td
+                        className={`${td} text-right whitespace-nowrap gap-3 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
+                      >
                         <button
                           className="text-blue-500 hover:text-blue-400"
                           onClick={() => guardarEdicion(p.id)}
@@ -622,7 +624,9 @@ export default function ProductosPage() {
                       <td className={`${td} text-xs text-neutral-500 whitespace-nowrap`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
-                      <td className={`${td} text-right whitespace-nowrap`}>
+                      <td
+                        className={`${td} text-right whitespace-nowrap sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
+                      >
                         <button
                           className="text-blue-500 hover:text-blue-400 mr-3"
                           onClick={() => iniciarEdicion(p)}
