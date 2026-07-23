@@ -40,25 +40,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { comandaImpresa: true },
     });
 
-    // Intentar ESC/POS como best-effort (solo funciona si el server corre en la misma
-    // máquina que la impresora USB; en Vercel esto siempre falla y no pasa nada).
-    try {
-      const { USB } = require("escpos");
-      const device = new USB();
-      const { Printer } = require("escpos");
-      const printer = new Printer(device);
-
-      device.open(async () => {
-        printer.font("a").style("normal").size(0, 0);
-        printer.text(contenido);
-        printer.cut();
-        printer.close();
-      });
-    } catch (printErr) {
-      console.error("Error ESC/POS (ignorado, se usa el diálogo de impresión del navegador):", printErr);
-    }
-
-    return NextResponse.json({ success: true });
+    // El servidor (Vercel) no tiene acceso a la impresora física: la impresión real la hace
+    // el navegador, ya sea vía el agente local (print-agent) o el diálogo de impresión.
+    return NextResponse.json({ success: true, contenido });
   } catch (err) {
     console.error("Error al generar comanda:", err);
     return NextResponse.json({ error: "Error al generar comanda" }, { status: 500 });

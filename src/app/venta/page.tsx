@@ -16,7 +16,7 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-import { imprimirEnSegundoPlano } from "@/lib/imprimir";
+import { imprimirEnSegundoPlano, imprimirLocal } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -144,10 +144,13 @@ export default function VentaPage() {
 
     const venta = await res.json();
 
-    // Imprimir el ticket real vía el diálogo de impresión del navegador (corre en la máquina
-    // de la caja, no en el servidor, así que funciona sin importar dónde esté hosteada la app).
-    // Se carga en un iframe oculto para no abrir pestaña ni navegar afuera de esta pantalla.
-    imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
+    // Intentar imprimir vía el agente local (sin ningún diálogo). Si no está corriendo en esta
+    // máquina, recurrir al diálogo de impresión del navegador cargando el ticket en un iframe
+    // oculto (no abre pestaña ni navega afuera de esta pantalla).
+    const resImp = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" }).catch(() => null);
+    const dataImp = resImp ? await resImp.json().catch(() => null) : null;
+    const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
+    if (!impresoLocal) imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
 
     setCarrito([]);
     setPagos([{ metodo: "EFECTIVO", monto: "0" }]);

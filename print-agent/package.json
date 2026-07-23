@@ -1,0 +1,14 @@
+{
+  "name": "print-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agente local que recibe tickets desde el navegador y los manda a la impresora USB, sin diálogo de impresión.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "escpos": "^3.0.0-alpha.6",
+    "escpos-usb": "^3.0.0-alpha.4"
+  }
+}

@@ -70,25 +70,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
     await registrarAuditoria(usuarioId, "imprimir_ticket", `Venta #${venta.id}`);
 
-    // Intentar imprimir
-    try {
-      const { USB } = require("escpos");
-      const device = new USB();
-      const { Printer } = require("escpos");
-      const printer = new Printer(device);
-
-      device.open(async () => {
-        printer.font("a").style("normal").size(0, 0);
-        printer.text(contenido);
-        printer.cut();
-        printer.close();
-      });
-
-      return NextResponse.json({ success: true });
-    } catch (printErr) {
-      console.error("Error ESC/POS:", printErr);
-      return NextResponse.json({ success: true }); // Marcar como impreso aunque falle ESC/POS
-    }
+    // El servidor (Vercel) no tiene acceso a la impresora física: la impresión real la hace
+    // el navegador, ya sea vía el agente local (print-agent) o el diálogo de impresión.
+    return NextResponse.json({ success: true, contenido });
   } catch (err) {
     console.error("Error:", err);
     return NextResponse.json({ error: "Error al generar ticket" }, { status: 500 });

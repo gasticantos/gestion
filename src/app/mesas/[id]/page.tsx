@@ -17,7 +17,7 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-import { imprimirEnSegundoPlano } from "@/lib/imprimir";
+import { imprimirEnSegundoPlano, imprimirLocal } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -329,8 +329,10 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
     const pedido = await res.json();
     if (imprimirComanda) {
-      await fetch(`/api/pedidos/${pedido.id}/imprimir`, { method: "POST" }).catch(() => {});
-      imprimirEnSegundoPlano(`/pedidos/${pedido.id}/comanda`);
+      const resImp = await fetch(`/api/pedidos/${pedido.id}/imprimir`, { method: "POST" }).catch(() => null);
+      const dataImp = resImp ? await resImp.json().catch(() => null) : null;
+      const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
+      if (!impresoLocal) imprimirEnSegundoPlano(`/pedidos/${pedido.id}/comanda`);
     }
     ultimoSincronizadoRef.current = "[]";
     setRonda([]);
@@ -341,11 +343,13 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     setError("");
     if (!venta) return;
     setEnviando(true);
-    await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
+    const res = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
+    const data = await res.json().catch(() => null);
     // Recargar mesa para sincronizar ticketImpreso desde la BD
     await cargar();
     setEnviando(false);
-    imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
+    const impresoLocal = data?.contenido ? await imprimirLocal(data.contenido) : false;
+    if (!impresoLocal) imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
   }
 
   async function cerrarMesa() {
