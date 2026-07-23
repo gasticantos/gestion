@@ -1,52 +1,63 @@
-# Agente de impresión local
+# Agente de impresión local (PowerShell, sin instalar nada)
 
-Corre en la PC de la caja (Windows) y escucha en `http://127.0.0.1:9847`. La app web
-(Chrome o Edge, usados de forma normal, sin flags) le pide imprimir por esa dirección;
-el agente manda el ticket directo a la impresora USB por ESC/POS. Como no pasa por
-`window.print()`, nunca aparece el diálogo de confirmación del navegador.
+Corre en la PC de la caja y escucha en `http://127.0.0.1:9847`. La app web (Chrome o
+Edge, usados de forma normal, sin flags) le pide imprimir por esa dirección; el agente
+manda el ticket directo a la impresora usando el driver de Windows que ya tenés
+instalado, en modo RAW (sin pasar por el diálogo de impresión ni por ningún visor).
 
-Si el agente no está corriendo (o la impresora no responde), la app cae automáticamente
-al método anterior (diálogo de impresión del navegador) — no rompe nada si todavía no
-lo instalaste.
+No hace falta instalar Node, ni reemplazar el driver de la impresora: usa PowerShell,
+que ya viene con Windows (7/8/10/11), y manda los datos a través del spooler normal de
+Windows con el mismo driver que la impresora ya tiene.
 
-## Instalación (una sola vez)
+Si el agente no está corriendo (o falla), la app cae automáticamente al método anterior
+(diálogo de impresión del navegador) — no rompe nada si todavía no lo configuraste.
 
-1. Instalar [Node.js](https://nodejs.org) en la PC de la caja (versión LTS).
-2. Copiar esta carpeta `print-agent` a esa PC (por ejemplo a `C:\print-agent`).
-3. Abrir una terminal (cmd) en esa carpeta y correr:
+## Configuración (una sola vez)
+
+1. Copiar esta carpeta `print-agent` a la PC de la caja (por ejemplo a `C:\print-agent`).
+2. Averiguar el nombre EXACTO de la impresora en Windows: abrir PowerShell y correr
    ```
-   npm install
+   Get-Printer
    ```
-4. **Paso importante en Windows: driver de la impresora.** El paquete que habla con la
-   impresora por USB necesita acceso "crudo" al dispositivo, y el driver normal que
-   Windows instala para imprimir (el que usa el Panel de Control) no lo permite. Hay que
-   reemplazar el driver de la impresora por `WinUSB` usando la herramienta gratuita
-   [Zadig](https://zadig.akeo.ie/):
-   - Abrir Zadig, activar "Options → List All Devices".
-   - Elegir la impresora térmica en el desplegable.
-   - Elegir el driver `WinUSB` e instalar/reemplazar.
-   - Ojo: después de este paso, esa impresora ya no va a aparecer como impresora normal
-     de Windows (no vas a poder imprimir un Word en ella, por ejemplo) — queda dedicada
-     a este agente. Si la usás para otra cosa además del ticket, avisame antes de este paso.
+   (o ir a Configuración → Bluetooth y dispositivos → Impresoras y escáneres). Copiar el
+   nombre tal cual aparece.
+3. Editar `agente-impresion.ps1` con el Bloc de notas y reemplazar esta línea:
+   ```
+   $PrinterName = "NOMBRE_DE_TU_IMPRESORA"
+   ```
+   por el nombre real, por ejemplo `$PrinterName = "POS-58"`.
 
-## Probar que funciona
+## Probarlo
 
-Con el agente corriendo (`npm start` en la carpeta), abrir en el navegador:
+1. Click derecho sobre `agente-impresion.ps1` → **Ejecutar con PowerShell**.
+   - Si Windows bloquea la ejecución de scripts, abrir PowerShell como administrador una
+     vez y correr: `Set-ExecutionPolicy RemoteSigned` (elegir "S" cuando pregunte).
+2. Tiene que quedar una ventana abierta diciendo "Agente de impresión escuchando en
+   http://127.0.0.1:9847". Dejarla así (no cerrarla) mientras probás.
+3. En el navegador, entrar a `http://127.0.0.1:9847/health` → tiene que responder `ok`.
+4. Desde la app, imprimir un ticket normalmente: debería salir directo por la impresora
+   sin ningún diálogo. Si algo falla, el motivo aparece en esa ventana de PowerShell y
+   también en la consola del navegador (F12 → Console).
+
+## Que arranque solo con Windows (sin dejar ninguna ventana abierta)
+
+1. `Win + R` → escribir `shell:startup` → Enter (abre la carpeta de Inicio).
+2. Crear ahí un acceso directo que apunte al archivo `iniciar-oculto.vbs` de esta carpeta.
+3. Reiniciar la PC una vez para confirmar que arranca solo (entrando de nuevo a
+   `http://127.0.0.1:9847/health`). Esta vez no va a aparecer ninguna ventana: corre
+   invisible en segundo plano.
+
+## Si los acentos/eñes salen mal en el ticket
+
+Dentro de `agente-impresion.ps1` buscar esta línea:
 ```
-http://127.0.0.1:9847/health
+$codepage = [System.Text.Encoding]::GetEncoding(437)
 ```
-Tiene que responder `ok`. Después, desde la app, imprimir un ticket normalmente: debería
-salir directo por la impresora sin ningún diálogo.
-
-## Que arranque solo con Windows
-
-1. Presionar `Win + R`, escribir `shell:startup` y Enter (abre la carpeta de Inicio).
-2. Crear un acceso directo ahí que apunte al archivo `iniciar-oculto.vbs` de esta carpeta.
-3. Reiniciar la PC una vez para confirmar que el agente arranca solo (podés verificarlo
-   entrando de nuevo a `http://127.0.0.1:9847/health`).
+y probar cambiando `437` por `850` (las dos tablas de caracteres más comunes en
+impresoras térmicas ESC/POS). Guardar y reiniciar el agente.
 
 ## Si cambia la URL de la app en Vercel
 
-Editar `server.js`, el set `ORIGENES_PERMITIDOS`, y agregar/actualizar la URL. Sin esto,
-el navegador bloquea el pedido por CORS y la app cae al diálogo de impresión de siempre
-(no rompe, pero no imprime en silencio).
+Editar `agente-impresion.ps1`, la línea `$OrigenesPermitidos`, y agregar/actualizar la
+URL. Sin esto, el navegador bloquea el pedido por CORS y la app cae al diálogo de
+impresión de siempre (no rompe, pero no imprime en silencio).
