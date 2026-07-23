@@ -17,7 +17,7 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-import { imprimirEnSegundoPlano, imprimirLocal } from "@/lib/imprimir";
+import { ERROR_IMPRESION_LOCAL, imprimirLocal } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -332,7 +332,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       const resImp = await fetch(`/api/pedidos/${pedido.id}/imprimir`, { method: "POST" }).catch(() => null);
       const dataImp = resImp ? await resImp.json().catch(() => null) : null;
       const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
-      if (!impresoLocal) imprimirEnSegundoPlano(`/pedidos/${pedido.id}/comanda`);
+      if (!impresoLocal) setError(ERROR_IMPRESION_LOCAL);
     }
     ultimoSincronizadoRef.current = "[]";
     setRonda([]);
@@ -349,7 +349,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     await cargar();
     setEnviando(false);
     const impresoLocal = data?.contenido ? await imprimirLocal(data.contenido) : false;
-    if (!impresoLocal) imprimirEnSegundoPlano(`/ventas/${venta.id}/ticket`);
+    if (!impresoLocal) setError(ERROR_IMPRESION_LOCAL);
   }
 
   async function cerrarMesa() {
@@ -380,8 +380,14 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       return;
     }
     const ventaCerrada = await res.json();
-    // Imprimir ticket automáticamente sin navegar
-    await fetch(`/api/ventas/${ventaCerrada.id}/imprimir`, { method: "POST" }).catch(() => {});
+    // Imprimir el ticket automáticamente mediante el agente local, sin diálogo del navegador.
+    const resImp = await fetch(`/api/ventas/${ventaCerrada.id}/imprimir`, { method: "POST" }).catch(() => null);
+    const dataImp = resImp ? await resImp.json().catch(() => null) : null;
+    const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
+    if (!impresoLocal) {
+      setError(ERROR_IMPRESION_LOCAL);
+      return;
+    }
     // Volver a mesas
     router.push("/mesas");
   }

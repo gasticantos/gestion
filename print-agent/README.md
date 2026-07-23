@@ -9,8 +9,9 @@ No hace falta instalar Node, ni reemplazar el driver de la impresora: usa PowerS
 que ya viene con Windows (7/8/10/11), y manda los datos a través del spooler normal de
 Windows con el mismo driver que la impresora ya tiene.
 
-Si el agente no está corriendo (o falla), la app cae automáticamente al método anterior
-(diálogo de impresión del navegador) — no rompe nada si todavía no lo configuraste.
+Si el agente no está corriendo (o falla), la app muestra un error y no imprime. Nunca abre
+el diálogo de impresión del navegador, para evitar que la caja quede esperando una
+confirmación manual.
 
 ## Configuración (una sola vez)
 
@@ -59,5 +60,5 @@ impresoras térmicas ESC/POS). Guardar y reiniciar el agente.
 ## Si cambia la URL de la app en Vercel
 
 Editar `agente-impresion.ps1`, la línea `$OrigenesPermitidos`, y agregar/actualizar la
-URL. Sin esto, el navegador bloquea el pedido por CORS y la app cae al diálogo de
-impresión de siempre (no rompe, pero no imprime en silencio).
+URL. Sin esto, el navegador bloquea el pedido por CORS y la app muestra un error de
+impresión.
