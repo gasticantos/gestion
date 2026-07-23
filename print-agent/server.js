@@ -20,6 +20,12 @@ function setCors(req, res) {
   }
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  // Chrome/Edge bloquean por defecto que una página pública (https://...vercel.app) le
+  // hable a una IP privada/local (127.0.0.1) - "Private Network Access". Este header en
+  // la respuesta al preflight es lo que le confirma al navegador que el pedido es válido.
+  if (req.headers["access-control-request-private-network"] === "true") {
+    res.setHeader("Access-Control-Allow-Private-Network", "true");
+  }
 }
 
 function imprimir(contenido) {

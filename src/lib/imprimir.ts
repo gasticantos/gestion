@@ -17,8 +17,14 @@ export async function imprimirLocal(contenido: string): Promise<boolean> {
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    return res.ok;
-  } catch {
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      console.warn("Agente de impresión local respondió con error, se usa el diálogo del navegador:", data?.error || res.status);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn("No se pudo contactar al agente de impresión local, se usa el diálogo del navegador:", err);
     return false;
   }
 }
