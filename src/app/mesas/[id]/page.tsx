@@ -283,6 +283,18 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     await cargar();
   }
 
+  async function cancelarMesa() {
+    if (!confirm("¿Cancelar esta mesa? Se descartará la cuenta abierta.")) return;
+    setError("");
+    const res = await fetch(`/api/mesas/${id}/cancelar`, { method: "POST" });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "Ocurrió un error");
+      return;
+    }
+    router.push("/mesas");
+  }
+
   async function guardarApodo() {
     const res = await fetch(`/api/mesas/${id}/apodo`, {
       method: "PUT",
@@ -433,6 +445,14 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-3">
+            {(venta?.pedidos.reduce((acc, p) => acc + p.items.length, 0) ?? 0) === 0 && (
+              <button
+                onClick={cancelarMesa}
+                className="self-start text-xs px-2 py-1 rounded border border-red-600/50 text-red-400 hover:bg-red-600/10"
+              >
+                Cancelar mesa (abierta por error)
+              </button>
+            )}
             <Card>
               <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400">
                 Productos cargados ({venta?.pedidos.reduce((acc, p) => acc + p.items.length, 0) ?? 0})
