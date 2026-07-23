@@ -20,7 +20,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
   "$agentPath = Join-Path $installDir 'agente-impresion.ps1';" ^
   "Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/gasticantos/gestion/main/print-agent/agente-impresion.ps1' -OutFile $agentPath;" ^
   "$content = Get-Content -Raw $agentPath;" ^
-  "$safeName = $printer.Name.Replace([char]34,'');" ^
+  "$safeName = $printer.Name -replace [char]34, [string]::Empty;" ^
   "$printerLine = '$PrinterName = ' + [char]34 + $safeName + [char]34;" ^
   "$content = $content -replace '(?m)^\$PrinterName\s*=.*$', $printerLine;" ^
   "Set-Content -Path $agentPath -Value $content -Encoding UTF8;" ^
