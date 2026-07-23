@@ -13,6 +13,13 @@ Si el agente no está corriendo (o falla), la app muestra un error y no imprime.
 el diálogo de impresión del navegador, para evitar que la caja quede esperando una
 confirmación manual.
 
+## Instalación rápida para EPSON TM-T20II
+
+En la PC que tiene conectada la impresora, hacer doble clic en
+`INSTALAR-EPSON-TM-T20II.cmd`. El instalador detecta el nombre configurado en Windows,
+descarga y configura el agente, lo inicia y lo deja preparado para arrancar
+automáticamente al iniciar sesión. No hace falta editar ningún archivo.
+
 ## Configuración (una sola vez)
 
 1. Copiar esta carpeta `print-agent` a la PC de la caja (por ejemplo a `C:\print-agent`).
