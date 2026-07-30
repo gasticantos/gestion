@@ -60,7 +60,8 @@ public static class GestionWindowsPrinter {
 
       document.DocumentName = "Ticket Gestion";
       document.PrintController = new StandardPrintController();
-      document.DefaultPageSettings.Margins = new Margins(25, 25, 25, 25);
+      // Margen superior mínimo para no desperdiciar papel antes del encabezado.
+      document.DefaultPageSettings.Margins = new Margins(10, 10, 3, 10);
 
       document.PrintPage += delegate(object sender, PrintPageEventArgs e) {
         // Negrita y renderizado sin grises: mejora mucho el contraste en impresoras
@@ -69,7 +70,7 @@ public static class GestionWindowsPrinter {
         using (var font = new Font(FontFamily.GenericMonospace, 11, FontStyle.Bold, GraphicsUnit.Point)) {
           Rectangle bounds = e.MarginBounds;
           if (bounds.Width <= 0 || bounds.Height <= 0)
-            bounds = new Rectangle(25, 25, Math.Max(100, e.PageBounds.Width - 50), Math.Max(100, e.PageBounds.Height - 50));
+            bounds = new Rectangle(10, 3, Math.Max(100, e.PageBounds.Width - 20), Math.Max(100, e.PageBounds.Height - 13));
 
           e.Graphics.DrawString(
             text,
@@ -164,7 +165,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.0.8"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.0.9"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()

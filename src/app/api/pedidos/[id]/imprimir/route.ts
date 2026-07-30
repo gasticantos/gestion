@@ -38,7 +38,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     for (const item of pedido.items) {
       lineas.push(`${item.cantidad}x ${item.producto.nombre}`);
-      if (item.notas) lineas.push(`   Nota: ${item.notas}`);
+      if (item.notas) {
+        lineas.push("");
+        lineas.push("   >>> NOTA <<<");
+        lineas.push(`   ${item.notas.toUpperCase()}`);
+        lineas.push("");
+      }
     }
 
     lineas.push("");
