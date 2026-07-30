@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   const desde = new Date(`${fecha}T00:00:00-03:00`);
   const hasta = new Date(`${fecha}T23:59:59.999-03:00`);
   const [reporte, configuracion] = await Promise.all([
-    obtenerReporteVentas(desde, hasta, { limiteProductos: 10_000 }),
+    obtenerReporteVentas(desde, hasta, { limiteProductos: 0 }),
     prisma.configuracion.findFirst({ select: { nombrePrograma: true } }),
   ]);
 
@@ -77,16 +77,6 @@ export async function POST(req: NextRequest) {
 
   for (const metodo of Object.keys(METODOS) as (keyof typeof METODOS)[]) {
     lineas.push(`[[ROW]] ${fila(METODOS[metodo], reporte.combinado.pagos[metodo])}`);
-  }
-
-  lineas.push("[[HR]]", "[[SECTION]] PRODUCTOS VENDIDOS");
-  if (reporte.productos.length === 0) {
-    lineas.push("[[CENTER]] SIN PRODUCTOS VENDIDOS");
-  } else {
-    for (const producto of reporte.productos) {
-      lineas.push(`[[ITEM]] ${producto.cantidad} x ${producto.nombre}`);
-      lineas.push(`[[DETAIL]] IMPORTE: ${dinero(producto.importe)}`);
-    }
   }
 
   lineas.push("[[HR]]", "[[SECTION]] CATEGORIAS");
