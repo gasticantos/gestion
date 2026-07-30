@@ -30,12 +30,14 @@ export type ReservaAvgAggregateOutputType = {
   id: number | null
   personas: number | null
   mesaId: number | null
+  negocioId: number | null
 }
 
 export type ReservaSumAggregateOutputType = {
   id: number | null
   personas: number | null
   mesaId: number | null
+  negocioId: number | null
 }
 
 export type ReservaMinAggregateOutputType = {
@@ -48,6 +50,7 @@ export type ReservaMinAggregateOutputType = {
   notas: string | null
   estado: $Enums.EstadoReserva | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type ReservaMaxAggregateOutputType = {
@@ -60,6 +63,7 @@ export type ReservaMaxAggregateOutputType = {
   notas: string | null
   estado: $Enums.EstadoReserva | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type ReservaCountAggregateOutputType = {
@@ -72,6 +76,7 @@ export type ReservaCountAggregateOutputType = {
   notas: number
   estado: number
   createdAt: number
+  negocioId: number
   _all: number
 }
 
@@ -80,12 +85,14 @@ export type ReservaAvgAggregateInputType = {
   id?: true
   personas?: true
   mesaId?: true
+  negocioId?: true
 }
 
 export type ReservaSumAggregateInputType = {
   id?: true
   personas?: true
   mesaId?: true
+  negocioId?: true
 }
 
 export type ReservaMinAggregateInputType = {
@@ -98,6 +105,7 @@ export type ReservaMinAggregateInputType = {
   notas?: true
   estado?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type ReservaMaxAggregateInputType = {
@@ -110,6 +118,7 @@ export type ReservaMaxAggregateInputType = {
   notas?: true
   estado?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type ReservaCountAggregateInputType = {
@@ -122,6 +131,7 @@ export type ReservaCountAggregateInputType = {
   notas?: true
   estado?: true
   createdAt?: true
+  negocioId?: true
   _all?: true
 }
 
@@ -221,6 +231,7 @@ export type ReservaGroupByOutputType = {
   notas: string | null
   estado: $Enums.EstadoReserva
   createdAt: Date
+  negocioId: number
   _count: ReservaCountAggregateOutputType | null
   _avg: ReservaAvgAggregateOutputType | null
   _sum: ReservaSumAggregateOutputType | null
@@ -256,7 +267,9 @@ export type ReservaWhereInput = {
   notas?: Prisma.StringNullableFilter<"Reserva"> | string | null
   estado?: Prisma.EnumEstadoReservaFilter<"Reserva"> | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFilter<"Reserva"> | Date | string
+  negocioId?: Prisma.IntFilter<"Reserva"> | number
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type ReservaOrderByWithRelationInput = {
@@ -269,7 +282,9 @@ export type ReservaOrderByWithRelationInput = {
   notas?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   mesa?: Prisma.MesaOrderByWithRelationInput
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type ReservaWhereUniqueInput = Prisma.AtLeast<{
@@ -285,7 +300,9 @@ export type ReservaWhereUniqueInput = Prisma.AtLeast<{
   notas?: Prisma.StringNullableFilter<"Reserva"> | string | null
   estado?: Prisma.EnumEstadoReservaFilter<"Reserva"> | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFilter<"Reserva"> | Date | string
+  negocioId?: Prisma.IntFilter<"Reserva"> | number
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id">
 
 export type ReservaOrderByWithAggregationInput = {
@@ -298,6 +315,7 @@ export type ReservaOrderByWithAggregationInput = {
   notas?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   _count?: Prisma.ReservaCountOrderByAggregateInput
   _avg?: Prisma.ReservaAvgOrderByAggregateInput
   _max?: Prisma.ReservaMaxOrderByAggregateInput
@@ -318,6 +336,7 @@ export type ReservaScalarWhereWithAggregatesInput = {
   notas?: Prisma.StringNullableWithAggregatesFilter<"Reserva"> | string | null
   estado?: Prisma.EnumEstadoReservaWithAggregatesFilter<"Reserva"> | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Reserva"> | Date | string
+  negocioId?: Prisma.IntWithAggregatesFilter<"Reserva"> | number
 }
 
 export type ReservaCreateInput = {
@@ -329,6 +348,7 @@ export type ReservaCreateInput = {
   estado?: $Enums.EstadoReserva
   createdAt?: Date | string
   mesa?: Prisma.MesaCreateNestedOneWithoutReservasInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutReservasInput
 }
 
 export type ReservaUncheckedCreateInput = {
@@ -341,6 +361,7 @@ export type ReservaUncheckedCreateInput = {
   notas?: string | null
   estado?: $Enums.EstadoReserva
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type ReservaUpdateInput = {
@@ -352,6 +373,7 @@ export type ReservaUpdateInput = {
   estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mesa?: Prisma.MesaUpdateOneWithoutReservasNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutReservasNestedInput
 }
 
 export type ReservaUncheckedUpdateInput = {
@@ -364,6 +386,7 @@ export type ReservaUncheckedUpdateInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ReservaCreateManyInput = {
@@ -376,6 +399,7 @@ export type ReservaCreateManyInput = {
   notas?: string | null
   estado?: $Enums.EstadoReserva
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type ReservaUpdateManyMutationInput = {
@@ -398,6 +422,7 @@ export type ReservaUncheckedUpdateManyInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ReservaListRelationFilter = {
@@ -420,12 +445,14 @@ export type ReservaCountOrderByAggregateInput = {
   notas?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ReservaAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   personas?: Prisma.SortOrder
   mesaId?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ReservaMaxOrderByAggregateInput = {
@@ -438,6 +465,7 @@ export type ReservaMaxOrderByAggregateInput = {
   notas?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ReservaMinOrderByAggregateInput = {
@@ -450,12 +478,56 @@ export type ReservaMinOrderByAggregateInput = {
   notas?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ReservaSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   personas?: Prisma.SortOrder
   mesaId?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
+}
+
+export type ReservaCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ReservaCreateWithoutNegocioInput, Prisma.ReservaUncheckedCreateWithoutNegocioInput> | Prisma.ReservaCreateWithoutNegocioInput[] | Prisma.ReservaUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ReservaCreateOrConnectWithoutNegocioInput | Prisma.ReservaCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ReservaCreateManyNegocioInputEnvelope
+  connect?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+}
+
+export type ReservaUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ReservaCreateWithoutNegocioInput, Prisma.ReservaUncheckedCreateWithoutNegocioInput> | Prisma.ReservaCreateWithoutNegocioInput[] | Prisma.ReservaUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ReservaCreateOrConnectWithoutNegocioInput | Prisma.ReservaCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ReservaCreateManyNegocioInputEnvelope
+  connect?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+}
+
+export type ReservaUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ReservaCreateWithoutNegocioInput, Prisma.ReservaUncheckedCreateWithoutNegocioInput> | Prisma.ReservaCreateWithoutNegocioInput[] | Prisma.ReservaUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ReservaCreateOrConnectWithoutNegocioInput | Prisma.ReservaCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ReservaUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ReservaUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ReservaCreateManyNegocioInputEnvelope
+  set?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  disconnect?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  delete?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  connect?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  update?: Prisma.ReservaUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ReservaUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ReservaUpdateManyWithWhereWithoutNegocioInput | Prisma.ReservaUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ReservaScalarWhereInput | Prisma.ReservaScalarWhereInput[]
+}
+
+export type ReservaUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ReservaCreateWithoutNegocioInput, Prisma.ReservaUncheckedCreateWithoutNegocioInput> | Prisma.ReservaCreateWithoutNegocioInput[] | Prisma.ReservaUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ReservaCreateOrConnectWithoutNegocioInput | Prisma.ReservaCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ReservaUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ReservaUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ReservaCreateManyNegocioInputEnvelope
+  set?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  disconnect?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  delete?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  connect?: Prisma.ReservaWhereUniqueInput | Prisma.ReservaWhereUniqueInput[]
+  update?: Prisma.ReservaUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ReservaUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ReservaUpdateManyWithWhereWithoutNegocioInput | Prisma.ReservaUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ReservaScalarWhereInput | Prisma.ReservaScalarWhereInput[]
 }
 
 export type ReservaCreateNestedManyWithoutMesaInput = {
@@ -504,6 +576,71 @@ export type EnumEstadoReservaFieldUpdateOperationsInput = {
   set?: $Enums.EstadoReserva
 }
 
+export type ReservaCreateWithoutNegocioInput = {
+  nombre: string
+  telefono?: string | null
+  personas: number
+  fecha: Date | string
+  notas?: string | null
+  estado?: $Enums.EstadoReserva
+  createdAt?: Date | string
+  mesa?: Prisma.MesaCreateNestedOneWithoutReservasInput
+}
+
+export type ReservaUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  nombre: string
+  telefono?: string | null
+  personas: number
+  fecha: Date | string
+  mesaId?: number | null
+  notas?: string | null
+  estado?: $Enums.EstadoReserva
+  createdAt?: Date | string
+}
+
+export type ReservaCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.ReservaWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReservaCreateWithoutNegocioInput, Prisma.ReservaUncheckedCreateWithoutNegocioInput>
+}
+
+export type ReservaCreateManyNegocioInputEnvelope = {
+  data: Prisma.ReservaCreateManyNegocioInput | Prisma.ReservaCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type ReservaUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ReservaWhereUniqueInput
+  update: Prisma.XOR<Prisma.ReservaUpdateWithoutNegocioInput, Prisma.ReservaUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.ReservaCreateWithoutNegocioInput, Prisma.ReservaUncheckedCreateWithoutNegocioInput>
+}
+
+export type ReservaUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ReservaWhereUniqueInput
+  data: Prisma.XOR<Prisma.ReservaUpdateWithoutNegocioInput, Prisma.ReservaUncheckedUpdateWithoutNegocioInput>
+}
+
+export type ReservaUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.ReservaScalarWhereInput
+  data: Prisma.XOR<Prisma.ReservaUpdateManyMutationInput, Prisma.ReservaUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type ReservaScalarWhereInput = {
+  AND?: Prisma.ReservaScalarWhereInput | Prisma.ReservaScalarWhereInput[]
+  OR?: Prisma.ReservaScalarWhereInput[]
+  NOT?: Prisma.ReservaScalarWhereInput | Prisma.ReservaScalarWhereInput[]
+  id?: Prisma.IntFilter<"Reserva"> | number
+  nombre?: Prisma.StringFilter<"Reserva"> | string
+  telefono?: Prisma.StringNullableFilter<"Reserva"> | string | null
+  personas?: Prisma.IntFilter<"Reserva"> | number
+  fecha?: Prisma.DateTimeFilter<"Reserva"> | Date | string
+  mesaId?: Prisma.IntNullableFilter<"Reserva"> | number | null
+  notas?: Prisma.StringNullableFilter<"Reserva"> | string | null
+  estado?: Prisma.EnumEstadoReservaFilter<"Reserva"> | $Enums.EstadoReserva
+  createdAt?: Prisma.DateTimeFilter<"Reserva"> | Date | string
+  negocioId?: Prisma.IntFilter<"Reserva"> | number
+}
+
 export type ReservaCreateWithoutMesaInput = {
   nombre: string
   telefono?: string | null
@@ -512,6 +649,7 @@ export type ReservaCreateWithoutMesaInput = {
   notas?: string | null
   estado?: $Enums.EstadoReserva
   createdAt?: Date | string
+  negocio?: Prisma.NegocioCreateNestedOneWithoutReservasInput
 }
 
 export type ReservaUncheckedCreateWithoutMesaInput = {
@@ -523,6 +661,7 @@ export type ReservaUncheckedCreateWithoutMesaInput = {
   notas?: string | null
   estado?: $Enums.EstadoReserva
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type ReservaCreateOrConnectWithoutMesaInput = {
@@ -551,19 +690,51 @@ export type ReservaUpdateManyWithWhereWithoutMesaInput = {
   data: Prisma.XOR<Prisma.ReservaUpdateManyMutationInput, Prisma.ReservaUncheckedUpdateManyWithoutMesaInput>
 }
 
-export type ReservaScalarWhereInput = {
-  AND?: Prisma.ReservaScalarWhereInput | Prisma.ReservaScalarWhereInput[]
-  OR?: Prisma.ReservaScalarWhereInput[]
-  NOT?: Prisma.ReservaScalarWhereInput | Prisma.ReservaScalarWhereInput[]
-  id?: Prisma.IntFilter<"Reserva"> | number
-  nombre?: Prisma.StringFilter<"Reserva"> | string
-  telefono?: Prisma.StringNullableFilter<"Reserva"> | string | null
-  personas?: Prisma.IntFilter<"Reserva"> | number
-  fecha?: Prisma.DateTimeFilter<"Reserva"> | Date | string
-  mesaId?: Prisma.IntNullableFilter<"Reserva"> | number | null
-  notas?: Prisma.StringNullableFilter<"Reserva"> | string | null
-  estado?: Prisma.EnumEstadoReservaFilter<"Reserva"> | $Enums.EstadoReserva
-  createdAt?: Prisma.DateTimeFilter<"Reserva"> | Date | string
+export type ReservaCreateManyNegocioInput = {
+  id?: number
+  nombre: string
+  telefono?: string | null
+  personas: number
+  fecha: Date | string
+  mesaId?: number | null
+  notas?: string | null
+  estado?: $Enums.EstadoReserva
+  createdAt?: Date | string
+}
+
+export type ReservaUpdateWithoutNegocioInput = {
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personas?: Prisma.IntFieldUpdateOperationsInput | number
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mesa?: Prisma.MesaUpdateOneWithoutReservasNestedInput
+}
+
+export type ReservaUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personas?: Prisma.IntFieldUpdateOperationsInput | number
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mesaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ReservaUncheckedUpdateManyWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personas?: Prisma.IntFieldUpdateOperationsInput | number
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mesaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReservaCreateManyMesaInput = {
@@ -575,6 +746,7 @@ export type ReservaCreateManyMesaInput = {
   notas?: string | null
   estado?: $Enums.EstadoReserva
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type ReservaUpdateWithoutMesaInput = {
@@ -585,6 +757,7 @@ export type ReservaUpdateWithoutMesaInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutReservasNestedInput
 }
 
 export type ReservaUncheckedUpdateWithoutMesaInput = {
@@ -596,6 +769,7 @@ export type ReservaUncheckedUpdateWithoutMesaInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ReservaUncheckedUpdateManyWithoutMesaInput = {
@@ -607,6 +781,7 @@ export type ReservaUncheckedUpdateManyWithoutMesaInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoReservaFieldUpdateOperationsInput | $Enums.EstadoReserva
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -621,7 +796,9 @@ export type ReservaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   notas?: boolean
   estado?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   mesa?: boolean | Prisma.Reserva$mesaArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["reserva"]>
 
 export type ReservaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -634,7 +811,9 @@ export type ReservaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   notas?: boolean
   estado?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   mesa?: boolean | Prisma.Reserva$mesaArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["reserva"]>
 
 export type ReservaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -647,7 +826,9 @@ export type ReservaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   notas?: boolean
   estado?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   mesa?: boolean | Prisma.Reserva$mesaArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["reserva"]>
 
 export type ReservaSelectScalar = {
@@ -660,23 +841,28 @@ export type ReservaSelectScalar = {
   notas?: boolean
   estado?: boolean
   createdAt?: boolean
+  negocioId?: boolean
 }
 
-export type ReservaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "telefono" | "personas" | "fecha" | "mesaId" | "notas" | "estado" | "createdAt", ExtArgs["result"]["reserva"]>
+export type ReservaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "telefono" | "personas" | "fecha" | "mesaId" | "notas" | "estado" | "createdAt" | "negocioId", ExtArgs["result"]["reserva"]>
 export type ReservaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Reserva$mesaArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 export type ReservaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Reserva$mesaArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 export type ReservaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Reserva$mesaArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 
 export type $ReservaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Reserva"
   objects: {
     mesa: Prisma.$MesaPayload<ExtArgs> | null
+    negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -688,6 +874,7 @@ export type $ReservaPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     notas: string | null
     estado: $Enums.EstadoReserva
     createdAt: Date
+    negocioId: number
   }, ExtArgs["result"]["reserva"]>
   composites: {}
 }
@@ -1083,6 +1270,7 @@ readonly fields: ReservaFieldRefs;
 export interface Prisma__ReservaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   mesa<T extends Prisma.Reserva$mesaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reserva$mesaArgs<ExtArgs>>): Prisma.Prisma__MesaClient<runtime.Types.Result.GetResult<Prisma.$MesaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1121,6 +1309,7 @@ export interface ReservaFieldRefs {
   readonly notas: Prisma.FieldRef<"Reserva", 'String'>
   readonly estado: Prisma.FieldRef<"Reserva", 'EstadoReserva'>
   readonly createdAt: Prisma.FieldRef<"Reserva", 'DateTime'>
+  readonly negocioId: Prisma.FieldRef<"Reserva", 'Int'>
 }
     
 

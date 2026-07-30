@@ -384,6 +384,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
+  Negocio: 'Negocio',
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
@@ -416,10 +417,84 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
+    modelProps: "negocio" | "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
+    Negocio: {
+      payload: Prisma.$NegocioPayload<ExtArgs>
+      fields: Prisma.NegocioFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NegocioFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NegocioFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>
+        }
+        findFirst: {
+          args: Prisma.NegocioFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NegocioFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>
+        }
+        findMany: {
+          args: Prisma.NegocioFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>[]
+        }
+        create: {
+          args: Prisma.NegocioCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>
+        }
+        createMany: {
+          args: Prisma.NegocioCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NegocioCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>[]
+        }
+        delete: {
+          args: Prisma.NegocioDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>
+        }
+        update: {
+          args: Prisma.NegocioUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>
+        }
+        deleteMany: {
+          args: Prisma.NegocioDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NegocioUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NegocioUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>[]
+        }
+        upsert: {
+          args: Prisma.NegocioUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NegocioPayload>
+        }
+        aggregate: {
+          args: Prisma.NegocioAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNegocio>
+        }
+        groupBy: {
+          args: Prisma.NegocioGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NegocioGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NegocioCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NegocioCountAggregateOutputType> | number
+        }
+      }
+    }
     Categoria: {
       payload: Prisma.$CategoriaPayload<ExtArgs>
       fields: Prisma.CategoriaFieldRefs
@@ -1717,9 +1792,20 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const NegocioScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  activo: 'activo',
+  createdAt: 'createdAt'
+} as const
+
+export type NegocioScalarFieldEnum = (typeof NegocioScalarFieldEnum)[keyof typeof NegocioScalarFieldEnum]
+
+
 export const CategoriaScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
+  negocioId: 'negocioId',
   activo: 'activo',
   createdAt: 'createdAt'
 } as const
@@ -1731,10 +1817,12 @@ export const UsuarioScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   email: 'email',
+  authId: 'authId',
   passwordHash: 'passwordHash',
   rol: 'rol',
   activo: 'activo',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
@@ -1742,6 +1830,7 @@ export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeo
 
 export const ConfiguracionScalarFieldEnum = {
   id: 'id',
+  negocioId: 'negocioId',
   recargoMesaPct: 'recargoMesaPct'
 } as const
 
@@ -1759,7 +1848,8 @@ export const ImpresionTrabajoScalarFieldEnum = {
   intentos: 'intentos',
   createdAt: 'createdAt',
   claimedAt: 'claimedAt',
-  printedAt: 'printedAt'
+  printedAt: 'printedAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ImpresionTrabajoScalarFieldEnum = (typeof ImpresionTrabajoScalarFieldEnum)[keyof typeof ImpresionTrabajoScalarFieldEnum]
@@ -1770,7 +1860,8 @@ export const AuditoriaLogScalarFieldEnum = {
   usuarioId: 'usuarioId',
   accion: 'accion',
   descripcion: 'descripcion',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type AuditoriaLogScalarFieldEnum = (typeof AuditoriaLogScalarFieldEnum)[keyof typeof AuditoriaLogScalarFieldEnum]
@@ -1783,7 +1874,8 @@ export const ProveedorScalarFieldEnum = {
   contacto: 'contacto',
   notas: 'notas',
   activo: 'activo',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ProveedorScalarFieldEnum = (typeof ProveedorScalarFieldEnum)[keyof typeof ProveedorScalarFieldEnum]
@@ -1805,7 +1897,8 @@ export const ProductoScalarFieldEnum = {
   activo: 'activo',
   proveedorId: 'proveedorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
@@ -1816,7 +1909,8 @@ export const StockEntryScalarFieldEnum = {
   proveedorId: 'proveedorId',
   tipo: 'tipo',
   notas: 'notas',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type StockEntryScalarFieldEnum = (typeof StockEntryScalarFieldEnum)[keyof typeof StockEntryScalarFieldEnum]
@@ -1842,7 +1936,8 @@ export const MesaScalarFieldEnum = {
   posX: 'posX',
   posY: 'posY',
   ancho: 'ancho',
-  alto: 'alto'
+  alto: 'alto',
+  negocioId: 'negocioId'
 } as const
 
 export type MesaScalarFieldEnum = (typeof MesaScalarFieldEnum)[keyof typeof MesaScalarFieldEnum]
@@ -1857,7 +1952,8 @@ export const ReservaScalarFieldEnum = {
   mesaId: 'mesaId',
   notas: 'notas',
   estado: 'estado',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ReservaScalarFieldEnum = (typeof ReservaScalarFieldEnum)[keyof typeof ReservaScalarFieldEnum]
@@ -1875,7 +1971,8 @@ export const VentaScalarFieldEnum = {
   borradorRonda: 'borradorRonda',
   ticketImpreso: 'ticketImpreso',
   createdAt: 'createdAt',
-  closedAt: 'closedAt'
+  closedAt: 'closedAt',
+  negocioId: 'negocioId'
 } as const
 
 export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof VentaScalarFieldEnum]
@@ -1921,7 +2018,8 @@ export const ClienteScalarFieldEnum = {
   telefono: 'telefono',
   saldo: 'saldo',
   activo: 'activo',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ClienteScalarFieldEnum = (typeof ClienteScalarFieldEnum)[keyof typeof ClienteScalarFieldEnum]
@@ -2328,6 +2426,7 @@ export type PrismaClientOptions = ({
   queryPlanCacheMaxSize?: number
 }
 export type GlobalOmitConfig = {
+  negocio?: Prisma.NegocioOmit
   categoria?: Prisma.CategoriaOmit
   usuario?: Prisma.UsuarioOmit
   configuracion?: Prisma.ConfiguracionOmit

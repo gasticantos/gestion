@@ -29,11 +29,13 @@ export type AggregateAuditoriaLog = {
 export type AuditoriaLogAvgAggregateOutputType = {
   id: number | null
   usuarioId: number | null
+  negocioId: number | null
 }
 
 export type AuditoriaLogSumAggregateOutputType = {
   id: number | null
   usuarioId: number | null
+  negocioId: number | null
 }
 
 export type AuditoriaLogMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type AuditoriaLogMinAggregateOutputType = {
   accion: string | null
   descripcion: string | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type AuditoriaLogMaxAggregateOutputType = {
@@ -50,6 +53,7 @@ export type AuditoriaLogMaxAggregateOutputType = {
   accion: string | null
   descripcion: string | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type AuditoriaLogCountAggregateOutputType = {
@@ -58,6 +62,7 @@ export type AuditoriaLogCountAggregateOutputType = {
   accion: number
   descripcion: number
   createdAt: number
+  negocioId: number
   _all: number
 }
 
@@ -65,11 +70,13 @@ export type AuditoriaLogCountAggregateOutputType = {
 export type AuditoriaLogAvgAggregateInputType = {
   id?: true
   usuarioId?: true
+  negocioId?: true
 }
 
 export type AuditoriaLogSumAggregateInputType = {
   id?: true
   usuarioId?: true
+  negocioId?: true
 }
 
 export type AuditoriaLogMinAggregateInputType = {
@@ -78,6 +85,7 @@ export type AuditoriaLogMinAggregateInputType = {
   accion?: true
   descripcion?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type AuditoriaLogMaxAggregateInputType = {
@@ -86,6 +94,7 @@ export type AuditoriaLogMaxAggregateInputType = {
   accion?: true
   descripcion?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type AuditoriaLogCountAggregateInputType = {
@@ -94,6 +103,7 @@ export type AuditoriaLogCountAggregateInputType = {
   accion?: true
   descripcion?: true
   createdAt?: true
+  negocioId?: true
   _all?: true
 }
 
@@ -189,6 +199,7 @@ export type AuditoriaLogGroupByOutputType = {
   accion: string
   descripcion: string | null
   createdAt: Date
+  negocioId: number
   _count: AuditoriaLogCountAggregateOutputType | null
   _avg: AuditoriaLogAvgAggregateOutputType | null
   _sum: AuditoriaLogSumAggregateOutputType | null
@@ -220,7 +231,9 @@ export type AuditoriaLogWhereInput = {
   accion?: Prisma.StringFilter<"AuditoriaLog"> | string
   descripcion?: Prisma.StringNullableFilter<"AuditoriaLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AuditoriaLog"> | Date | string
+  negocioId?: Prisma.IntFilter<"AuditoriaLog"> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type AuditoriaLogOrderByWithRelationInput = {
@@ -229,7 +242,9 @@ export type AuditoriaLogOrderByWithRelationInput = {
   accion?: Prisma.SortOrder
   descripcion?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   usuario?: Prisma.UsuarioOrderByWithRelationInput
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type AuditoriaLogWhereUniqueInput = Prisma.AtLeast<{
@@ -241,7 +256,9 @@ export type AuditoriaLogWhereUniqueInput = Prisma.AtLeast<{
   accion?: Prisma.StringFilter<"AuditoriaLog"> | string
   descripcion?: Prisma.StringNullableFilter<"AuditoriaLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AuditoriaLog"> | Date | string
+  negocioId?: Prisma.IntFilter<"AuditoriaLog"> | number
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id">
 
 export type AuditoriaLogOrderByWithAggregationInput = {
@@ -250,6 +267,7 @@ export type AuditoriaLogOrderByWithAggregationInput = {
   accion?: Prisma.SortOrder
   descripcion?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   _count?: Prisma.AuditoriaLogCountOrderByAggregateInput
   _avg?: Prisma.AuditoriaLogAvgOrderByAggregateInput
   _max?: Prisma.AuditoriaLogMaxOrderByAggregateInput
@@ -266,6 +284,7 @@ export type AuditoriaLogScalarWhereWithAggregatesInput = {
   accion?: Prisma.StringWithAggregatesFilter<"AuditoriaLog"> | string
   descripcion?: Prisma.StringNullableWithAggregatesFilter<"AuditoriaLog"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AuditoriaLog"> | Date | string
+  negocioId?: Prisma.IntWithAggregatesFilter<"AuditoriaLog"> | number
 }
 
 export type AuditoriaLogCreateInput = {
@@ -273,6 +292,7 @@ export type AuditoriaLogCreateInput = {
   descripcion?: string | null
   createdAt?: Date | string
   usuario: Prisma.UsuarioCreateNestedOneWithoutAuditoriasInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutAuditoriasInput
 }
 
 export type AuditoriaLogUncheckedCreateInput = {
@@ -281,6 +301,7 @@ export type AuditoriaLogUncheckedCreateInput = {
   accion: string
   descripcion?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type AuditoriaLogUpdateInput = {
@@ -288,6 +309,7 @@ export type AuditoriaLogUpdateInput = {
   descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usuario?: Prisma.UsuarioUpdateOneRequiredWithoutAuditoriasNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutAuditoriasNestedInput
 }
 
 export type AuditoriaLogUncheckedUpdateInput = {
@@ -296,6 +318,7 @@ export type AuditoriaLogUncheckedUpdateInput = {
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AuditoriaLogCreateManyInput = {
@@ -304,6 +327,7 @@ export type AuditoriaLogCreateManyInput = {
   accion: string
   descripcion?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type AuditoriaLogUpdateManyMutationInput = {
@@ -318,6 +342,7 @@ export type AuditoriaLogUncheckedUpdateManyInput = {
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AuditoriaLogListRelationFilter = {
@@ -336,11 +361,13 @@ export type AuditoriaLogCountOrderByAggregateInput = {
   accion?: Prisma.SortOrder
   descripcion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type AuditoriaLogAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   usuarioId?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type AuditoriaLogMaxOrderByAggregateInput = {
@@ -349,6 +376,7 @@ export type AuditoriaLogMaxOrderByAggregateInput = {
   accion?: Prisma.SortOrder
   descripcion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type AuditoriaLogMinOrderByAggregateInput = {
@@ -357,11 +385,55 @@ export type AuditoriaLogMinOrderByAggregateInput = {
   accion?: Prisma.SortOrder
   descripcion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type AuditoriaLogSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   usuarioId?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
+}
+
+export type AuditoriaLogCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.AuditoriaLogCreateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput> | Prisma.AuditoriaLogCreateWithoutNegocioInput[] | Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput | Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.AuditoriaLogCreateManyNegocioInputEnvelope
+  connect?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+}
+
+export type AuditoriaLogUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.AuditoriaLogCreateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput> | Prisma.AuditoriaLogCreateWithoutNegocioInput[] | Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput | Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.AuditoriaLogCreateManyNegocioInputEnvelope
+  connect?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+}
+
+export type AuditoriaLogUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.AuditoriaLogCreateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput> | Prisma.AuditoriaLogCreateWithoutNegocioInput[] | Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput | Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.AuditoriaLogUpsertWithWhereUniqueWithoutNegocioInput | Prisma.AuditoriaLogUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.AuditoriaLogCreateManyNegocioInputEnvelope
+  set?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  disconnect?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  delete?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  connect?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  update?: Prisma.AuditoriaLogUpdateWithWhereUniqueWithoutNegocioInput | Prisma.AuditoriaLogUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.AuditoriaLogUpdateManyWithWhereWithoutNegocioInput | Prisma.AuditoriaLogUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
+}
+
+export type AuditoriaLogUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.AuditoriaLogCreateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput> | Prisma.AuditoriaLogCreateWithoutNegocioInput[] | Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput | Prisma.AuditoriaLogCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.AuditoriaLogUpsertWithWhereUniqueWithoutNegocioInput | Prisma.AuditoriaLogUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.AuditoriaLogCreateManyNegocioInputEnvelope
+  set?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  disconnect?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  delete?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  connect?: Prisma.AuditoriaLogWhereUniqueInput | Prisma.AuditoriaLogWhereUniqueInput[]
+  update?: Prisma.AuditoriaLogUpdateWithWhereUniqueWithoutNegocioInput | Prisma.AuditoriaLogUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.AuditoriaLogUpdateManyWithWhereWithoutNegocioInput | Prisma.AuditoriaLogUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
 }
 
 export type AuditoriaLogCreateNestedManyWithoutUsuarioInput = {
@@ -406,10 +478,64 @@ export type AuditoriaLogUncheckedUpdateManyWithoutUsuarioNestedInput = {
   deleteMany?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
 }
 
+export type AuditoriaLogCreateWithoutNegocioInput = {
+  accion: string
+  descripcion?: string | null
+  createdAt?: Date | string
+  usuario: Prisma.UsuarioCreateNestedOneWithoutAuditoriasInput
+}
+
+export type AuditoriaLogUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  usuarioId: number
+  accion: string
+  descripcion?: string | null
+  createdAt?: Date | string
+}
+
+export type AuditoriaLogCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.AuditoriaLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.AuditoriaLogCreateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput>
+}
+
+export type AuditoriaLogCreateManyNegocioInputEnvelope = {
+  data: Prisma.AuditoriaLogCreateManyNegocioInput | Prisma.AuditoriaLogCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type AuditoriaLogUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.AuditoriaLogWhereUniqueInput
+  update: Prisma.XOR<Prisma.AuditoriaLogUpdateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.AuditoriaLogCreateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedCreateWithoutNegocioInput>
+}
+
+export type AuditoriaLogUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.AuditoriaLogWhereUniqueInput
+  data: Prisma.XOR<Prisma.AuditoriaLogUpdateWithoutNegocioInput, Prisma.AuditoriaLogUncheckedUpdateWithoutNegocioInput>
+}
+
+export type AuditoriaLogUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.AuditoriaLogScalarWhereInput
+  data: Prisma.XOR<Prisma.AuditoriaLogUpdateManyMutationInput, Prisma.AuditoriaLogUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type AuditoriaLogScalarWhereInput = {
+  AND?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
+  OR?: Prisma.AuditoriaLogScalarWhereInput[]
+  NOT?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
+  id?: Prisma.IntFilter<"AuditoriaLog"> | number
+  usuarioId?: Prisma.IntFilter<"AuditoriaLog"> | number
+  accion?: Prisma.StringFilter<"AuditoriaLog"> | string
+  descripcion?: Prisma.StringNullableFilter<"AuditoriaLog"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"AuditoriaLog"> | Date | string
+  negocioId?: Prisma.IntFilter<"AuditoriaLog"> | number
+}
+
 export type AuditoriaLogCreateWithoutUsuarioInput = {
   accion: string
   descripcion?: string | null
   createdAt?: Date | string
+  negocio?: Prisma.NegocioCreateNestedOneWithoutAuditoriasInput
 }
 
 export type AuditoriaLogUncheckedCreateWithoutUsuarioInput = {
@@ -417,6 +543,7 @@ export type AuditoriaLogUncheckedCreateWithoutUsuarioInput = {
   accion: string
   descripcion?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type AuditoriaLogCreateOrConnectWithoutUsuarioInput = {
@@ -445,15 +572,35 @@ export type AuditoriaLogUpdateManyWithWhereWithoutUsuarioInput = {
   data: Prisma.XOR<Prisma.AuditoriaLogUpdateManyMutationInput, Prisma.AuditoriaLogUncheckedUpdateManyWithoutUsuarioInput>
 }
 
-export type AuditoriaLogScalarWhereInput = {
-  AND?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
-  OR?: Prisma.AuditoriaLogScalarWhereInput[]
-  NOT?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
-  id?: Prisma.IntFilter<"AuditoriaLog"> | number
-  usuarioId?: Prisma.IntFilter<"AuditoriaLog"> | number
-  accion?: Prisma.StringFilter<"AuditoriaLog"> | string
-  descripcion?: Prisma.StringNullableFilter<"AuditoriaLog"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"AuditoriaLog"> | Date | string
+export type AuditoriaLogCreateManyNegocioInput = {
+  id?: number
+  usuarioId: number
+  accion: string
+  descripcion?: string | null
+  createdAt?: Date | string
+}
+
+export type AuditoriaLogUpdateWithoutNegocioInput = {
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuario?: Prisma.UsuarioUpdateOneRequiredWithoutAuditoriasNestedInput
+}
+
+export type AuditoriaLogUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AuditoriaLogUncheckedUpdateManyWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuarioId?: Prisma.IntFieldUpdateOperationsInput | number
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AuditoriaLogCreateManyUsuarioInput = {
@@ -461,12 +608,14 @@ export type AuditoriaLogCreateManyUsuarioInput = {
   accion: string
   descripcion?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type AuditoriaLogUpdateWithoutUsuarioInput = {
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutAuditoriasNestedInput
 }
 
 export type AuditoriaLogUncheckedUpdateWithoutUsuarioInput = {
@@ -474,6 +623,7 @@ export type AuditoriaLogUncheckedUpdateWithoutUsuarioInput = {
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AuditoriaLogUncheckedUpdateManyWithoutUsuarioInput = {
@@ -481,6 +631,7 @@ export type AuditoriaLogUncheckedUpdateManyWithoutUsuarioInput = {
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -491,7 +642,9 @@ export type AuditoriaLogSelect<ExtArgs extends runtime.Types.Extensions.Internal
   accion?: boolean
   descripcion?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["auditoriaLog"]>
 
 export type AuditoriaLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -500,7 +653,9 @@ export type AuditoriaLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   accion?: boolean
   descripcion?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["auditoriaLog"]>
 
 export type AuditoriaLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -509,7 +664,9 @@ export type AuditoriaLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   accion?: boolean
   descripcion?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["auditoriaLog"]>
 
 export type AuditoriaLogSelectScalar = {
@@ -518,23 +675,28 @@ export type AuditoriaLogSelectScalar = {
   accion?: boolean
   descripcion?: boolean
   createdAt?: boolean
+  negocioId?: boolean
 }
 
-export type AuditoriaLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuarioId" | "accion" | "descripcion" | "createdAt", ExtArgs["result"]["auditoriaLog"]>
+export type AuditoriaLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuarioId" | "accion" | "descripcion" | "createdAt" | "negocioId", ExtArgs["result"]["auditoriaLog"]>
 export type AuditoriaLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 export type AuditoriaLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 export type AuditoriaLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 
 export type $AuditoriaLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AuditoriaLog"
   objects: {
     usuario: Prisma.$UsuarioPayload<ExtArgs>
+    negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -542,6 +704,7 @@ export type $AuditoriaLogPayload<ExtArgs extends runtime.Types.Extensions.Intern
     accion: string
     descripcion: string | null
     createdAt: Date
+    negocioId: number
   }, ExtArgs["result"]["auditoriaLog"]>
   composites: {}
 }
@@ -937,6 +1100,7 @@ readonly fields: AuditoriaLogFieldRefs;
 export interface Prisma__AuditoriaLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   usuario<T extends Prisma.UsuarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsuarioDefaultArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -971,6 +1135,7 @@ export interface AuditoriaLogFieldRefs {
   readonly accion: Prisma.FieldRef<"AuditoriaLog", 'String'>
   readonly descripcion: Prisma.FieldRef<"AuditoriaLog", 'String'>
   readonly createdAt: Prisma.FieldRef<"AuditoriaLog", 'DateTime'>
+  readonly negocioId: Prisma.FieldRef<"AuditoriaLog", 'Int'>
 }
     
 

@@ -29,11 +29,13 @@ export type AggregateImpresionTrabajo = {
 export type ImpresionTrabajoAvgAggregateOutputType = {
   id: number | null
   intentos: number | null
+  negocioId: number | null
 }
 
 export type ImpresionTrabajoSumAggregateOutputType = {
   id: number | null
   intentos: number | null
+  negocioId: number | null
 }
 
 export type ImpresionTrabajoMinAggregateOutputType = {
@@ -48,6 +50,7 @@ export type ImpresionTrabajoMinAggregateOutputType = {
   createdAt: Date | null
   claimedAt: Date | null
   printedAt: Date | null
+  negocioId: number | null
 }
 
 export type ImpresionTrabajoMaxAggregateOutputType = {
@@ -62,6 +65,7 @@ export type ImpresionTrabajoMaxAggregateOutputType = {
   createdAt: Date | null
   claimedAt: Date | null
   printedAt: Date | null
+  negocioId: number | null
 }
 
 export type ImpresionTrabajoCountAggregateOutputType = {
@@ -76,6 +80,7 @@ export type ImpresionTrabajoCountAggregateOutputType = {
   createdAt: number
   claimedAt: number
   printedAt: number
+  negocioId: number
   _all: number
 }
 
@@ -83,11 +88,13 @@ export type ImpresionTrabajoCountAggregateOutputType = {
 export type ImpresionTrabajoAvgAggregateInputType = {
   id?: true
   intentos?: true
+  negocioId?: true
 }
 
 export type ImpresionTrabajoSumAggregateInputType = {
   id?: true
   intentos?: true
+  negocioId?: true
 }
 
 export type ImpresionTrabajoMinAggregateInputType = {
@@ -102,6 +109,7 @@ export type ImpresionTrabajoMinAggregateInputType = {
   createdAt?: true
   claimedAt?: true
   printedAt?: true
+  negocioId?: true
 }
 
 export type ImpresionTrabajoMaxAggregateInputType = {
@@ -116,6 +124,7 @@ export type ImpresionTrabajoMaxAggregateInputType = {
   createdAt?: true
   claimedAt?: true
   printedAt?: true
+  negocioId?: true
 }
 
 export type ImpresionTrabajoCountAggregateInputType = {
@@ -130,6 +139,7 @@ export type ImpresionTrabajoCountAggregateInputType = {
   createdAt?: true
   claimedAt?: true
   printedAt?: true
+  negocioId?: true
   _all?: true
 }
 
@@ -231,6 +241,7 @@ export type ImpresionTrabajoGroupByOutputType = {
   createdAt: Date
   claimedAt: Date | null
   printedAt: Date | null
+  negocioId: number
   _count: ImpresionTrabajoCountAggregateOutputType | null
   _avg: ImpresionTrabajoAvgAggregateOutputType | null
   _sum: ImpresionTrabajoSumAggregateOutputType | null
@@ -268,6 +279,8 @@ export type ImpresionTrabajoWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ImpresionTrabajo"> | Date | string
   claimedAt?: Prisma.DateTimeNullableFilter<"ImpresionTrabajo"> | Date | string | null
   printedAt?: Prisma.DateTimeNullableFilter<"ImpresionTrabajo"> | Date | string | null
+  negocioId?: Prisma.IntFilter<"ImpresionTrabajo"> | number
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type ImpresionTrabajoOrderByWithRelationInput = {
@@ -282,24 +295,29 @@ export type ImpresionTrabajoOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   claimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   printedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type ImpresionTrabajoWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  referencia?: string
+  negocioId_referencia?: Prisma.ImpresionTrabajoNegocioIdReferenciaCompoundUniqueInput
   AND?: Prisma.ImpresionTrabajoWhereInput | Prisma.ImpresionTrabajoWhereInput[]
   OR?: Prisma.ImpresionTrabajoWhereInput[]
   NOT?: Prisma.ImpresionTrabajoWhereInput | Prisma.ImpresionTrabajoWhereInput[]
   tipo?: Prisma.EnumTipoImpresionFilter<"ImpresionTrabajo"> | $Enums.TipoImpresion
   contenido?: Prisma.StringFilter<"ImpresionTrabajo"> | string
   estado?: Prisma.EnumEstadoImpresionFilter<"ImpresionTrabajo"> | $Enums.EstadoImpresion
+  referencia?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estacionId?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   error?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   intentos?: Prisma.IntFilter<"ImpresionTrabajo"> | number
   createdAt?: Prisma.DateTimeFilter<"ImpresionTrabajo"> | Date | string
   claimedAt?: Prisma.DateTimeNullableFilter<"ImpresionTrabajo"> | Date | string | null
   printedAt?: Prisma.DateTimeNullableFilter<"ImpresionTrabajo"> | Date | string | null
-}, "id" | "referencia">
+  negocioId?: Prisma.IntFilter<"ImpresionTrabajo"> | number
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
+}, "id" | "negocioId_referencia">
 
 export type ImpresionTrabajoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -313,6 +331,7 @@ export type ImpresionTrabajoOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   claimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   printedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   _count?: Prisma.ImpresionTrabajoCountOrderByAggregateInput
   _avg?: Prisma.ImpresionTrabajoAvgOrderByAggregateInput
   _max?: Prisma.ImpresionTrabajoMaxOrderByAggregateInput
@@ -335,6 +354,7 @@ export type ImpresionTrabajoScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImpresionTrabajo"> | Date | string
   claimedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ImpresionTrabajo"> | Date | string | null
   printedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ImpresionTrabajo"> | Date | string | null
+  negocioId?: Prisma.IntWithAggregatesFilter<"ImpresionTrabajo"> | number
 }
 
 export type ImpresionTrabajoCreateInput = {
@@ -348,6 +368,7 @@ export type ImpresionTrabajoCreateInput = {
   createdAt?: Date | string
   claimedAt?: Date | string | null
   printedAt?: Date | string | null
+  negocio?: Prisma.NegocioCreateNestedOneWithoutImpresionesInput
 }
 
 export type ImpresionTrabajoUncheckedCreateInput = {
@@ -362,6 +383,7 @@ export type ImpresionTrabajoUncheckedCreateInput = {
   createdAt?: Date | string
   claimedAt?: Date | string | null
   printedAt?: Date | string | null
+  negocioId?: number
 }
 
 export type ImpresionTrabajoUpdateInput = {
@@ -375,6 +397,7 @@ export type ImpresionTrabajoUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   printedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutImpresionesNestedInput
 }
 
 export type ImpresionTrabajoUncheckedUpdateInput = {
@@ -389,6 +412,7 @@ export type ImpresionTrabajoUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   printedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ImpresionTrabajoCreateManyInput = {
@@ -403,6 +427,7 @@ export type ImpresionTrabajoCreateManyInput = {
   createdAt?: Date | string
   claimedAt?: Date | string | null
   printedAt?: Date | string | null
+  negocioId?: number
 }
 
 export type ImpresionTrabajoUpdateManyMutationInput = {
@@ -430,6 +455,22 @@ export type ImpresionTrabajoUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   printedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ImpresionTrabajoListRelationFilter = {
+  every?: Prisma.ImpresionTrabajoWhereInput
+  some?: Prisma.ImpresionTrabajoWhereInput
+  none?: Prisma.ImpresionTrabajoWhereInput
+}
+
+export type ImpresionTrabajoOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type ImpresionTrabajoNegocioIdReferenciaCompoundUniqueInput = {
+  negocioId: number
+  referencia: string
 }
 
 export type ImpresionTrabajoCountOrderByAggregateInput = {
@@ -444,11 +485,13 @@ export type ImpresionTrabajoCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   claimedAt?: Prisma.SortOrder
   printedAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ImpresionTrabajoAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   intentos?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ImpresionTrabajoMaxOrderByAggregateInput = {
@@ -463,6 +506,7 @@ export type ImpresionTrabajoMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   claimedAt?: Prisma.SortOrder
   printedAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ImpresionTrabajoMinOrderByAggregateInput = {
@@ -477,11 +521,55 @@ export type ImpresionTrabajoMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   claimedAt?: Prisma.SortOrder
   printedAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ImpresionTrabajoSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   intentos?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
+}
+
+export type ImpresionTrabajoCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ImpresionTrabajoCreateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput> | Prisma.ImpresionTrabajoCreateWithoutNegocioInput[] | Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput | Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ImpresionTrabajoCreateManyNegocioInputEnvelope
+  connect?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+}
+
+export type ImpresionTrabajoUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ImpresionTrabajoCreateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput> | Prisma.ImpresionTrabajoCreateWithoutNegocioInput[] | Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput | Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ImpresionTrabajoCreateManyNegocioInputEnvelope
+  connect?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+}
+
+export type ImpresionTrabajoUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ImpresionTrabajoCreateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput> | Prisma.ImpresionTrabajoCreateWithoutNegocioInput[] | Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput | Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ImpresionTrabajoUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ImpresionTrabajoUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ImpresionTrabajoCreateManyNegocioInputEnvelope
+  set?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  disconnect?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  delete?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  connect?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  update?: Prisma.ImpresionTrabajoUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ImpresionTrabajoUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ImpresionTrabajoUpdateManyWithWhereWithoutNegocioInput | Prisma.ImpresionTrabajoUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ImpresionTrabajoScalarWhereInput | Prisma.ImpresionTrabajoScalarWhereInput[]
+}
+
+export type ImpresionTrabajoUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ImpresionTrabajoCreateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput> | Prisma.ImpresionTrabajoCreateWithoutNegocioInput[] | Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput | Prisma.ImpresionTrabajoCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ImpresionTrabajoUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ImpresionTrabajoUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ImpresionTrabajoCreateManyNegocioInputEnvelope
+  set?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  disconnect?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  delete?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  connect?: Prisma.ImpresionTrabajoWhereUniqueInput | Prisma.ImpresionTrabajoWhereUniqueInput[]
+  update?: Prisma.ImpresionTrabajoUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ImpresionTrabajoUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ImpresionTrabajoUpdateManyWithWhereWithoutNegocioInput | Prisma.ImpresionTrabajoUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ImpresionTrabajoScalarWhereInput | Prisma.ImpresionTrabajoScalarWhereInput[]
 }
 
 export type EnumTipoImpresionFieldUpdateOperationsInput = {
@@ -492,12 +580,134 @@ export type EnumEstadoImpresionFieldUpdateOperationsInput = {
   set?: $Enums.EstadoImpresion
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type ImpresionTrabajoCreateWithoutNegocioInput = {
+  tipo: $Enums.TipoImpresion
+  contenido: string
+  estado?: $Enums.EstadoImpresion
+  referencia?: string | null
+  estacionId?: string | null
+  error?: string | null
+  intentos?: number
+  createdAt?: Date | string
+  claimedAt?: Date | string | null
+  printedAt?: Date | string | null
+}
+
+export type ImpresionTrabajoUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  tipo: $Enums.TipoImpresion
+  contenido: string
+  estado?: $Enums.EstadoImpresion
+  referencia?: string | null
+  estacionId?: string | null
+  error?: string | null
+  intentos?: number
+  createdAt?: Date | string
+  claimedAt?: Date | string | null
+  printedAt?: Date | string | null
+}
+
+export type ImpresionTrabajoCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.ImpresionTrabajoWhereUniqueInput
+  create: Prisma.XOR<Prisma.ImpresionTrabajoCreateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput>
+}
+
+export type ImpresionTrabajoCreateManyNegocioInputEnvelope = {
+  data: Prisma.ImpresionTrabajoCreateManyNegocioInput | Prisma.ImpresionTrabajoCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type ImpresionTrabajoUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ImpresionTrabajoWhereUniqueInput
+  update: Prisma.XOR<Prisma.ImpresionTrabajoUpdateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.ImpresionTrabajoCreateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedCreateWithoutNegocioInput>
+}
+
+export type ImpresionTrabajoUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ImpresionTrabajoWhereUniqueInput
+  data: Prisma.XOR<Prisma.ImpresionTrabajoUpdateWithoutNegocioInput, Prisma.ImpresionTrabajoUncheckedUpdateWithoutNegocioInput>
+}
+
+export type ImpresionTrabajoUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.ImpresionTrabajoScalarWhereInput
+  data: Prisma.XOR<Prisma.ImpresionTrabajoUpdateManyMutationInput, Prisma.ImpresionTrabajoUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type ImpresionTrabajoScalarWhereInput = {
+  AND?: Prisma.ImpresionTrabajoScalarWhereInput | Prisma.ImpresionTrabajoScalarWhereInput[]
+  OR?: Prisma.ImpresionTrabajoScalarWhereInput[]
+  NOT?: Prisma.ImpresionTrabajoScalarWhereInput | Prisma.ImpresionTrabajoScalarWhereInput[]
+  id?: Prisma.IntFilter<"ImpresionTrabajo"> | number
+  tipo?: Prisma.EnumTipoImpresionFilter<"ImpresionTrabajo"> | $Enums.TipoImpresion
+  contenido?: Prisma.StringFilter<"ImpresionTrabajo"> | string
+  estado?: Prisma.EnumEstadoImpresionFilter<"ImpresionTrabajo"> | $Enums.EstadoImpresion
+  referencia?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
+  estacionId?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
+  error?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
+  intentos?: Prisma.IntFilter<"ImpresionTrabajo"> | number
+  createdAt?: Prisma.DateTimeFilter<"ImpresionTrabajo"> | Date | string
+  claimedAt?: Prisma.DateTimeNullableFilter<"ImpresionTrabajo"> | Date | string | null
+  printedAt?: Prisma.DateTimeNullableFilter<"ImpresionTrabajo"> | Date | string | null
+  negocioId?: Prisma.IntFilter<"ImpresionTrabajo"> | number
+}
+
+export type ImpresionTrabajoCreateManyNegocioInput = {
+  id?: number
+  tipo: $Enums.TipoImpresion
+  contenido: string
+  estado?: $Enums.EstadoImpresion
+  referencia?: string | null
+  estacionId?: string | null
+  error?: string | null
+  intentos?: number
+  createdAt?: Date | string
+  claimedAt?: Date | string | null
+  printedAt?: Date | string | null
+}
+
+export type ImpresionTrabajoUpdateWithoutNegocioInput = {
+  tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
+  contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
+  referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intentos?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  printedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type ImpresionTrabajoUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
+  contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
+  referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intentos?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  printedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type ImpresionTrabajoUncheckedUpdateManyWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
+  contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
+  referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intentos?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  printedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -514,6 +724,8 @@ export type ImpresionTrabajoSelect<ExtArgs extends runtime.Types.Extensions.Inte
   createdAt?: boolean
   claimedAt?: boolean
   printedAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["impresionTrabajo"]>
 
 export type ImpresionTrabajoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -528,6 +740,8 @@ export type ImpresionTrabajoSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   createdAt?: boolean
   claimedAt?: boolean
   printedAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["impresionTrabajo"]>
 
 export type ImpresionTrabajoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -542,6 +756,8 @@ export type ImpresionTrabajoSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   createdAt?: boolean
   claimedAt?: boolean
   printedAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["impresionTrabajo"]>
 
 export type ImpresionTrabajoSelectScalar = {
@@ -556,13 +772,25 @@ export type ImpresionTrabajoSelectScalar = {
   createdAt?: boolean
   claimedAt?: boolean
   printedAt?: boolean
+  negocioId?: boolean
 }
 
-export type ImpresionTrabajoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "contenido" | "estado" | "referencia" | "estacionId" | "error" | "intentos" | "createdAt" | "claimedAt" | "printedAt", ExtArgs["result"]["impresionTrabajo"]>
+export type ImpresionTrabajoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "contenido" | "estado" | "referencia" | "estacionId" | "error" | "intentos" | "createdAt" | "claimedAt" | "printedAt" | "negocioId", ExtArgs["result"]["impresionTrabajo"]>
+export type ImpresionTrabajoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
+export type ImpresionTrabajoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
+export type ImpresionTrabajoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
 
 export type $ImpresionTrabajoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ImpresionTrabajo"
-  objects: {}
+  objects: {
+    negocio: Prisma.$NegocioPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     tipo: $Enums.TipoImpresion
@@ -575,6 +803,7 @@ export type $ImpresionTrabajoPayload<ExtArgs extends runtime.Types.Extensions.In
     createdAt: Date
     claimedAt: Date | null
     printedAt: Date | null
+    negocioId: number
   }, ExtArgs["result"]["impresionTrabajo"]>
   composites: {}
 }
@@ -969,6 +1198,7 @@ readonly fields: ImpresionTrabajoFieldRefs;
  */
 export interface Prisma__ImpresionTrabajoClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1009,6 +1239,7 @@ export interface ImpresionTrabajoFieldRefs {
   readonly createdAt: Prisma.FieldRef<"ImpresionTrabajo", 'DateTime'>
   readonly claimedAt: Prisma.FieldRef<"ImpresionTrabajo", 'DateTime'>
   readonly printedAt: Prisma.FieldRef<"ImpresionTrabajo", 'DateTime'>
+  readonly negocioId: Prisma.FieldRef<"ImpresionTrabajo", 'Int'>
 }
     
 
@@ -1025,6 +1256,10 @@ export type ImpresionTrabajoFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
   /**
    * Filter, which ImpresionTrabajo to fetch.
    */
@@ -1044,6 +1279,10 @@ export type ImpresionTrabajoFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
+  /**
    * Filter, which ImpresionTrabajo to fetch.
    */
   where: Prisma.ImpresionTrabajoWhereUniqueInput
@@ -1061,6 +1300,10 @@ export type ImpresionTrabajoFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
   /**
    * Filter, which ImpresionTrabajo to fetch.
    */
@@ -1110,6 +1353,10 @@ export type ImpresionTrabajoFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
+  /**
    * Filter, which ImpresionTrabajo to fetch.
    */
   where?: Prisma.ImpresionTrabajoWhereInput
@@ -1157,6 +1404,10 @@ export type ImpresionTrabajoFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
   /**
    * Filter, which ImpresionTrabajos to fetch.
    */
@@ -1206,6 +1457,10 @@ export type ImpresionTrabajoCreateArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
+  /**
    * The data needed to create a ImpresionTrabajo.
    */
   data: Prisma.XOR<Prisma.ImpresionTrabajoCreateInput, Prisma.ImpresionTrabajoUncheckedCreateInput>
@@ -1239,6 +1494,10 @@ export type ImpresionTrabajoCreateManyAndReturnArgs<ExtArgs extends runtime.Type
    */
   data: Prisma.ImpresionTrabajoCreateManyInput | Prisma.ImpresionTrabajoCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1253,6 +1512,10 @@ export type ImpresionTrabajoUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
   /**
    * The data needed to update a ImpresionTrabajo.
    */
@@ -1305,6 +1568,10 @@ export type ImpresionTrabajoUpdateManyAndReturnArgs<ExtArgs extends runtime.Type
    * Limit how many ImpresionTrabajos to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1319,6 +1586,10 @@ export type ImpresionTrabajoUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
   /**
    * The filter to search for the ImpresionTrabajo to update in case it exists.
    */
@@ -1345,6 +1616,10 @@ export type ImpresionTrabajoDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
   /**
    * Filter which ImpresionTrabajo to delete.
    */
@@ -1377,4 +1652,8 @@ export type ImpresionTrabajoDefaultArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the ImpresionTrabajo
    */
   omit?: Prisma.ImpresionTrabajoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImpresionTrabajoInclude<ExtArgs> | null
 }

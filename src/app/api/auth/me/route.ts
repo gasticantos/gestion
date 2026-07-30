@@ -10,5 +10,9 @@ export async function GET() {
   if (!sesion) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
-  return NextResponse.json({ nombre: sesion.nombre, rol: sesion.rol });
+  return NextResponse.json({
+    nombre: sesion.nombre,
+    rol: sesion.rol,
+    negocio: sesion.negocioNombre,
+  });
 }

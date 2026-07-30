@@ -3,24 +3,6 @@ import { prisma } from "@/lib/prisma";
 
 const FRASE_CONFIRMACION = "BORRAR TODO";
 
-// Tablas de datos del negocio. Deliberadamente NO incluye Usuario ni Configuracion:
-// este reset es para volver a probar/cargar datos desde cero sin perder el login.
-const TABLAS = [
-  "MovimientoCuentaCorriente",
-  "Pago",
-  "PedidoItem",
-  "Pedido",
-  "Venta",
-  "Reserva",
-  "StockEntryItem",
-  "StockEntry",
-  "Producto",
-  "Proveedor",
-  "Mesa",
-  "Cliente",
-  "Categoria",
-];
-
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const { confirmacion } = body as { confirmacion?: string };
@@ -32,8 +14,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const lista = TABLAS.map((t) => `"${t}"`).join(", ");
-  await prisma.$executeRawUnsafe(`TRUNCATE ${lista} RESTART IDENTITY CASCADE`);
+  // Cada deleteMany queda limitado automáticamente al negocio de la sesión.
+  await prisma.movimientoCuentaCorriente.deleteMany();
+  await prisma.pago.deleteMany();
+  await prisma.pedidoItem.deleteMany();
+  await prisma.pedido.deleteMany();
+  await prisma.venta.deleteMany();
+  await prisma.reserva.deleteMany();
+  await prisma.stockEntryItem.deleteMany();
+  await prisma.stockEntry.deleteMany();
+  await prisma.producto.deleteMany();
+  await prisma.proveedor.deleteMany();
+  await prisma.mesa.deleteMany();
+  await prisma.cliente.deleteMany();
+  await prisma.categoria.deleteMany();
+  await prisma.impresionTrabajo.deleteMany();
 
   return NextResponse.json({ ok: true });
 }

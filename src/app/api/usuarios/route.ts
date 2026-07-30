@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
+import { crearUsuarioSupabase } from "@/lib/supabaseAuth";
 
 export async function GET() {
   const usuarios = await prisma.usuario.findMany({
@@ -22,10 +23,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const emailNormalizado = email.toLowerCase().trim();
+    const auth = await crearUsuarioSupabase(emailNormalizado, password, nombre);
     const usuario = await prisma.usuario.create({
       data: {
         nombre,
-        email: email.toLowerCase().trim(),
+        email: emailNormalizado,
+        authId: auth.id,
         passwordHash: await hashPassword(password),
         rol: rol || "MOZO",
       },

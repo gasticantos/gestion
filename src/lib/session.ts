@@ -7,6 +7,8 @@ export type SesionPayload = {
   sub: string;
   nombre: string;
   rol: Rol;
+  negocioId: number;
+  negocioNombre: string;
 };
 
 function secretKey() {
@@ -26,7 +28,9 @@ export async function firmarSesion(payload: SesionPayload) {
 export async function verificarSesion(token: string): Promise<SesionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secretKey());
-    return payload as unknown as SesionPayload;
+    const sesion = payload as unknown as SesionPayload;
+    if (!sesion.negocioId || !sesion.negocioNombre) return null;
+    return sesion;
   } catch {
     return null;
   }

@@ -6,7 +6,6 @@ import { Rol } from "@/generated/prisma/enums";
 const PUBLICAS = [
   "/login",
   "/api/auth/login",
-  "/api/auth/bootstrap",
   "/api/auth/logout",
   "/manifest.webmanifest",
   "/actualizacion.json",

@@ -51,6 +51,7 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Negocio: 'Negocio',
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
@@ -86,9 +87,20 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const NegocioScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  activo: 'activo',
+  createdAt: 'createdAt'
+} as const
+
+export type NegocioScalarFieldEnum = (typeof NegocioScalarFieldEnum)[keyof typeof NegocioScalarFieldEnum]
+
+
 export const CategoriaScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
+  negocioId: 'negocioId',
   activo: 'activo',
   createdAt: 'createdAt'
 } as const
@@ -100,10 +112,12 @@ export const UsuarioScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   email: 'email',
+  authId: 'authId',
   passwordHash: 'passwordHash',
   rol: 'rol',
   activo: 'activo',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
@@ -111,6 +125,7 @@ export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeo
 
 export const ConfiguracionScalarFieldEnum = {
   id: 'id',
+  negocioId: 'negocioId',
   recargoMesaPct: 'recargoMesaPct'
 } as const
 
@@ -128,7 +143,8 @@ export const ImpresionTrabajoScalarFieldEnum = {
   intentos: 'intentos',
   createdAt: 'createdAt',
   claimedAt: 'claimedAt',
-  printedAt: 'printedAt'
+  printedAt: 'printedAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ImpresionTrabajoScalarFieldEnum = (typeof ImpresionTrabajoScalarFieldEnum)[keyof typeof ImpresionTrabajoScalarFieldEnum]
@@ -139,7 +155,8 @@ export const AuditoriaLogScalarFieldEnum = {
   usuarioId: 'usuarioId',
   accion: 'accion',
   descripcion: 'descripcion',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type AuditoriaLogScalarFieldEnum = (typeof AuditoriaLogScalarFieldEnum)[keyof typeof AuditoriaLogScalarFieldEnum]
@@ -152,7 +169,8 @@ export const ProveedorScalarFieldEnum = {
   contacto: 'contacto',
   notas: 'notas',
   activo: 'activo',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ProveedorScalarFieldEnum = (typeof ProveedorScalarFieldEnum)[keyof typeof ProveedorScalarFieldEnum]
@@ -174,7 +192,8 @@ export const ProductoScalarFieldEnum = {
   activo: 'activo',
   proveedorId: 'proveedorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
@@ -185,7 +204,8 @@ export const StockEntryScalarFieldEnum = {
   proveedorId: 'proveedorId',
   tipo: 'tipo',
   notas: 'notas',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type StockEntryScalarFieldEnum = (typeof StockEntryScalarFieldEnum)[keyof typeof StockEntryScalarFieldEnum]
@@ -211,7 +231,8 @@ export const MesaScalarFieldEnum = {
   posX: 'posX',
   posY: 'posY',
   ancho: 'ancho',
-  alto: 'alto'
+  alto: 'alto',
+  negocioId: 'negocioId'
 } as const
 
 export type MesaScalarFieldEnum = (typeof MesaScalarFieldEnum)[keyof typeof MesaScalarFieldEnum]
@@ -226,7 +247,8 @@ export const ReservaScalarFieldEnum = {
   mesaId: 'mesaId',
   notas: 'notas',
   estado: 'estado',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ReservaScalarFieldEnum = (typeof ReservaScalarFieldEnum)[keyof typeof ReservaScalarFieldEnum]
@@ -244,7 +266,8 @@ export const VentaScalarFieldEnum = {
   borradorRonda: 'borradorRonda',
   ticketImpreso: 'ticketImpreso',
   createdAt: 'createdAt',
-  closedAt: 'closedAt'
+  closedAt: 'closedAt',
+  negocioId: 'negocioId'
 } as const
 
 export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof VentaScalarFieldEnum]
@@ -290,7 +313,8 @@ export const ClienteScalarFieldEnum = {
   telefono: 'telefono',
   saldo: 'saldo',
   activo: 'activo',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
 } as const
 
 export type ClienteScalarFieldEnum = (typeof ClienteScalarFieldEnum)[keyof typeof ClienteScalarFieldEnum]

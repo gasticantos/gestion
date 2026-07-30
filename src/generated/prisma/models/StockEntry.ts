@@ -29,11 +29,13 @@ export type AggregateStockEntry = {
 export type StockEntryAvgAggregateOutputType = {
   id: number | null
   proveedorId: number | null
+  negocioId: number | null
 }
 
 export type StockEntrySumAggregateOutputType = {
   id: number | null
   proveedorId: number | null
+  negocioId: number | null
 }
 
 export type StockEntryMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type StockEntryMinAggregateOutputType = {
   tipo: $Enums.TipoStockEntry | null
   notas: string | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type StockEntryMaxAggregateOutputType = {
@@ -50,6 +53,7 @@ export type StockEntryMaxAggregateOutputType = {
   tipo: $Enums.TipoStockEntry | null
   notas: string | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type StockEntryCountAggregateOutputType = {
@@ -58,6 +62,7 @@ export type StockEntryCountAggregateOutputType = {
   tipo: number
   notas: number
   createdAt: number
+  negocioId: number
   _all: number
 }
 
@@ -65,11 +70,13 @@ export type StockEntryCountAggregateOutputType = {
 export type StockEntryAvgAggregateInputType = {
   id?: true
   proveedorId?: true
+  negocioId?: true
 }
 
 export type StockEntrySumAggregateInputType = {
   id?: true
   proveedorId?: true
+  negocioId?: true
 }
 
 export type StockEntryMinAggregateInputType = {
@@ -78,6 +85,7 @@ export type StockEntryMinAggregateInputType = {
   tipo?: true
   notas?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type StockEntryMaxAggregateInputType = {
@@ -86,6 +94,7 @@ export type StockEntryMaxAggregateInputType = {
   tipo?: true
   notas?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type StockEntryCountAggregateInputType = {
@@ -94,6 +103,7 @@ export type StockEntryCountAggregateInputType = {
   tipo?: true
   notas?: true
   createdAt?: true
+  negocioId?: true
   _all?: true
 }
 
@@ -189,6 +199,7 @@ export type StockEntryGroupByOutputType = {
   tipo: $Enums.TipoStockEntry
   notas: string | null
   createdAt: Date
+  negocioId: number
   _count: StockEntryCountAggregateOutputType | null
   _avg: StockEntryAvgAggregateOutputType | null
   _sum: StockEntrySumAggregateOutputType | null
@@ -220,8 +231,10 @@ export type StockEntryWhereInput = {
   tipo?: Prisma.EnumTipoStockEntryFilter<"StockEntry"> | $Enums.TipoStockEntry
   notas?: Prisma.StringNullableFilter<"StockEntry"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockEntry"> | Date | string
+  negocioId?: Prisma.IntFilter<"StockEntry"> | number
   proveedor?: Prisma.XOR<Prisma.ProveedorNullableScalarRelationFilter, Prisma.ProveedorWhereInput> | null
   items?: Prisma.StockEntryItemListRelationFilter
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type StockEntryOrderByWithRelationInput = {
@@ -230,8 +243,10 @@ export type StockEntryOrderByWithRelationInput = {
   tipo?: Prisma.SortOrder
   notas?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   proveedor?: Prisma.ProveedorOrderByWithRelationInput
   items?: Prisma.StockEntryItemOrderByRelationAggregateInput
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type StockEntryWhereUniqueInput = Prisma.AtLeast<{
@@ -243,8 +258,10 @@ export type StockEntryWhereUniqueInput = Prisma.AtLeast<{
   tipo?: Prisma.EnumTipoStockEntryFilter<"StockEntry"> | $Enums.TipoStockEntry
   notas?: Prisma.StringNullableFilter<"StockEntry"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockEntry"> | Date | string
+  negocioId?: Prisma.IntFilter<"StockEntry"> | number
   proveedor?: Prisma.XOR<Prisma.ProveedorNullableScalarRelationFilter, Prisma.ProveedorWhereInput> | null
   items?: Prisma.StockEntryItemListRelationFilter
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id">
 
 export type StockEntryOrderByWithAggregationInput = {
@@ -253,6 +270,7 @@ export type StockEntryOrderByWithAggregationInput = {
   tipo?: Prisma.SortOrder
   notas?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   _count?: Prisma.StockEntryCountOrderByAggregateInput
   _avg?: Prisma.StockEntryAvgOrderByAggregateInput
   _max?: Prisma.StockEntryMaxOrderByAggregateInput
@@ -269,6 +287,7 @@ export type StockEntryScalarWhereWithAggregatesInput = {
   tipo?: Prisma.EnumTipoStockEntryWithAggregatesFilter<"StockEntry"> | $Enums.TipoStockEntry
   notas?: Prisma.StringNullableWithAggregatesFilter<"StockEntry"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StockEntry"> | Date | string
+  negocioId?: Prisma.IntWithAggregatesFilter<"StockEntry"> | number
 }
 
 export type StockEntryCreateInput = {
@@ -277,6 +296,7 @@ export type StockEntryCreateInput = {
   createdAt?: Date | string
   proveedor?: Prisma.ProveedorCreateNestedOneWithoutStockEntriesInput
   items?: Prisma.StockEntryItemCreateNestedManyWithoutStockEntryInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutStockEntriesInput
 }
 
 export type StockEntryUncheckedCreateInput = {
@@ -285,6 +305,7 @@ export type StockEntryUncheckedCreateInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
+  negocioId?: number
   items?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutStockEntryInput
 }
 
@@ -294,6 +315,7 @@ export type StockEntryUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proveedor?: Prisma.ProveedorUpdateOneWithoutStockEntriesNestedInput
   items?: Prisma.StockEntryItemUpdateManyWithoutStockEntryNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutStockEntriesNestedInput
 }
 
 export type StockEntryUncheckedUpdateInput = {
@@ -302,6 +324,7 @@ export type StockEntryUncheckedUpdateInput = {
   tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   items?: Prisma.StockEntryItemUncheckedUpdateManyWithoutStockEntryNestedInput
 }
 
@@ -311,6 +334,7 @@ export type StockEntryCreateManyInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type StockEntryUpdateManyMutationInput = {
@@ -325,6 +349,7 @@ export type StockEntryUncheckedUpdateManyInput = {
   tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StockEntryListRelationFilter = {
@@ -343,11 +368,13 @@ export type StockEntryCountOrderByAggregateInput = {
   tipo?: Prisma.SortOrder
   notas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type StockEntryAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type StockEntryMaxOrderByAggregateInput = {
@@ -356,6 +383,7 @@ export type StockEntryMaxOrderByAggregateInput = {
   tipo?: Prisma.SortOrder
   notas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type StockEntryMinOrderByAggregateInput = {
@@ -364,16 +392,60 @@ export type StockEntryMinOrderByAggregateInput = {
   tipo?: Prisma.SortOrder
   notas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type StockEntrySumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type StockEntryScalarRelationFilter = {
   is?: Prisma.StockEntryWhereInput
   isNot?: Prisma.StockEntryWhereInput
+}
+
+export type StockEntryCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.StockEntryCreateWithoutNegocioInput, Prisma.StockEntryUncheckedCreateWithoutNegocioInput> | Prisma.StockEntryCreateWithoutNegocioInput[] | Prisma.StockEntryUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.StockEntryCreateOrConnectWithoutNegocioInput | Prisma.StockEntryCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.StockEntryCreateManyNegocioInputEnvelope
+  connect?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+}
+
+export type StockEntryUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.StockEntryCreateWithoutNegocioInput, Prisma.StockEntryUncheckedCreateWithoutNegocioInput> | Prisma.StockEntryCreateWithoutNegocioInput[] | Prisma.StockEntryUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.StockEntryCreateOrConnectWithoutNegocioInput | Prisma.StockEntryCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.StockEntryCreateManyNegocioInputEnvelope
+  connect?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+}
+
+export type StockEntryUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.StockEntryCreateWithoutNegocioInput, Prisma.StockEntryUncheckedCreateWithoutNegocioInput> | Prisma.StockEntryCreateWithoutNegocioInput[] | Prisma.StockEntryUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.StockEntryCreateOrConnectWithoutNegocioInput | Prisma.StockEntryCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.StockEntryUpsertWithWhereUniqueWithoutNegocioInput | Prisma.StockEntryUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.StockEntryCreateManyNegocioInputEnvelope
+  set?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  disconnect?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  delete?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  connect?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  update?: Prisma.StockEntryUpdateWithWhereUniqueWithoutNegocioInput | Prisma.StockEntryUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.StockEntryUpdateManyWithWhereWithoutNegocioInput | Prisma.StockEntryUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.StockEntryScalarWhereInput | Prisma.StockEntryScalarWhereInput[]
+}
+
+export type StockEntryUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.StockEntryCreateWithoutNegocioInput, Prisma.StockEntryUncheckedCreateWithoutNegocioInput> | Prisma.StockEntryCreateWithoutNegocioInput[] | Prisma.StockEntryUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.StockEntryCreateOrConnectWithoutNegocioInput | Prisma.StockEntryCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.StockEntryUpsertWithWhereUniqueWithoutNegocioInput | Prisma.StockEntryUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.StockEntryCreateManyNegocioInputEnvelope
+  set?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  disconnect?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  delete?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  connect?: Prisma.StockEntryWhereUniqueInput | Prisma.StockEntryWhereUniqueInput[]
+  update?: Prisma.StockEntryUpdateWithWhereUniqueWithoutNegocioInput | Prisma.StockEntryUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.StockEntryUpdateManyWithWhereWithoutNegocioInput | Prisma.StockEntryUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.StockEntryScalarWhereInput | Prisma.StockEntryScalarWhereInput[]
 }
 
 export type StockEntryCreateNestedManyWithoutProveedorInput = {
@@ -436,11 +508,67 @@ export type StockEntryUpdateOneRequiredWithoutItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StockEntryUpdateToOneWithWhereWithoutItemsInput, Prisma.StockEntryUpdateWithoutItemsInput>, Prisma.StockEntryUncheckedUpdateWithoutItemsInput>
 }
 
+export type StockEntryCreateWithoutNegocioInput = {
+  tipo?: $Enums.TipoStockEntry
+  notas?: string | null
+  createdAt?: Date | string
+  proveedor?: Prisma.ProveedorCreateNestedOneWithoutStockEntriesInput
+  items?: Prisma.StockEntryItemCreateNestedManyWithoutStockEntryInput
+}
+
+export type StockEntryUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  proveedorId?: number | null
+  tipo?: $Enums.TipoStockEntry
+  notas?: string | null
+  createdAt?: Date | string
+  items?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutStockEntryInput
+}
+
+export type StockEntryCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.StockEntryWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockEntryCreateWithoutNegocioInput, Prisma.StockEntryUncheckedCreateWithoutNegocioInput>
+}
+
+export type StockEntryCreateManyNegocioInputEnvelope = {
+  data: Prisma.StockEntryCreateManyNegocioInput | Prisma.StockEntryCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type StockEntryUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.StockEntryWhereUniqueInput
+  update: Prisma.XOR<Prisma.StockEntryUpdateWithoutNegocioInput, Prisma.StockEntryUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.StockEntryCreateWithoutNegocioInput, Prisma.StockEntryUncheckedCreateWithoutNegocioInput>
+}
+
+export type StockEntryUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.StockEntryWhereUniqueInput
+  data: Prisma.XOR<Prisma.StockEntryUpdateWithoutNegocioInput, Prisma.StockEntryUncheckedUpdateWithoutNegocioInput>
+}
+
+export type StockEntryUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.StockEntryScalarWhereInput
+  data: Prisma.XOR<Prisma.StockEntryUpdateManyMutationInput, Prisma.StockEntryUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type StockEntryScalarWhereInput = {
+  AND?: Prisma.StockEntryScalarWhereInput | Prisma.StockEntryScalarWhereInput[]
+  OR?: Prisma.StockEntryScalarWhereInput[]
+  NOT?: Prisma.StockEntryScalarWhereInput | Prisma.StockEntryScalarWhereInput[]
+  id?: Prisma.IntFilter<"StockEntry"> | number
+  proveedorId?: Prisma.IntNullableFilter<"StockEntry"> | number | null
+  tipo?: Prisma.EnumTipoStockEntryFilter<"StockEntry"> | $Enums.TipoStockEntry
+  notas?: Prisma.StringNullableFilter<"StockEntry"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"StockEntry"> | Date | string
+  negocioId?: Prisma.IntFilter<"StockEntry"> | number
+}
+
 export type StockEntryCreateWithoutProveedorInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
   items?: Prisma.StockEntryItemCreateNestedManyWithoutStockEntryInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutStockEntriesInput
 }
 
 export type StockEntryUncheckedCreateWithoutProveedorInput = {
@@ -448,6 +576,7 @@ export type StockEntryUncheckedCreateWithoutProveedorInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
+  negocioId?: number
   items?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutStockEntryInput
 }
 
@@ -477,22 +606,12 @@ export type StockEntryUpdateManyWithWhereWithoutProveedorInput = {
   data: Prisma.XOR<Prisma.StockEntryUpdateManyMutationInput, Prisma.StockEntryUncheckedUpdateManyWithoutProveedorInput>
 }
 
-export type StockEntryScalarWhereInput = {
-  AND?: Prisma.StockEntryScalarWhereInput | Prisma.StockEntryScalarWhereInput[]
-  OR?: Prisma.StockEntryScalarWhereInput[]
-  NOT?: Prisma.StockEntryScalarWhereInput | Prisma.StockEntryScalarWhereInput[]
-  id?: Prisma.IntFilter<"StockEntry"> | number
-  proveedorId?: Prisma.IntNullableFilter<"StockEntry"> | number | null
-  tipo?: Prisma.EnumTipoStockEntryFilter<"StockEntry"> | $Enums.TipoStockEntry
-  notas?: Prisma.StringNullableFilter<"StockEntry"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"StockEntry"> | Date | string
-}
-
 export type StockEntryCreateWithoutItemsInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
   proveedor?: Prisma.ProveedorCreateNestedOneWithoutStockEntriesInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutStockEntriesInput
 }
 
 export type StockEntryUncheckedCreateWithoutItemsInput = {
@@ -501,6 +620,7 @@ export type StockEntryUncheckedCreateWithoutItemsInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type StockEntryCreateOrConnectWithoutItemsInput = {
@@ -524,9 +644,44 @@ export type StockEntryUpdateWithoutItemsInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proveedor?: Prisma.ProveedorUpdateOneWithoutStockEntriesNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutStockEntriesNestedInput
 }
 
 export type StockEntryUncheckedUpdateWithoutItemsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type StockEntryCreateManyNegocioInput = {
+  id?: number
+  proveedorId?: number | null
+  tipo?: $Enums.TipoStockEntry
+  notas?: string | null
+  createdAt?: Date | string
+}
+
+export type StockEntryUpdateWithoutNegocioInput = {
+  tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proveedor?: Prisma.ProveedorUpdateOneWithoutStockEntriesNestedInput
+  items?: Prisma.StockEntryItemUpdateManyWithoutStockEntryNestedInput
+}
+
+export type StockEntryUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.StockEntryItemUncheckedUpdateManyWithoutStockEntryNestedInput
+}
+
+export type StockEntryUncheckedUpdateManyWithoutNegocioInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
@@ -539,6 +694,7 @@ export type StockEntryCreateManyProveedorInput = {
   tipo?: $Enums.TipoStockEntry
   notas?: string | null
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type StockEntryUpdateWithoutProveedorInput = {
@@ -546,6 +702,7 @@ export type StockEntryUpdateWithoutProveedorInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.StockEntryItemUpdateManyWithoutStockEntryNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutStockEntriesNestedInput
 }
 
 export type StockEntryUncheckedUpdateWithoutProveedorInput = {
@@ -553,6 +710,7 @@ export type StockEntryUncheckedUpdateWithoutProveedorInput = {
   tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   items?: Prisma.StockEntryItemUncheckedUpdateManyWithoutStockEntryNestedInput
 }
 
@@ -561,6 +719,7 @@ export type StockEntryUncheckedUpdateManyWithoutProveedorInput = {
   tipo?: Prisma.EnumTipoStockEntryFieldUpdateOperationsInput | $Enums.TipoStockEntry
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -600,8 +759,10 @@ export type StockEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   tipo?: boolean
   notas?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   proveedor?: boolean | Prisma.StockEntry$proveedorArgs<ExtArgs>
   items?: boolean | Prisma.StockEntry$itemsArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.StockEntryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockEntry"]>
 
@@ -611,7 +772,9 @@ export type StockEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   tipo?: boolean
   notas?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   proveedor?: boolean | Prisma.StockEntry$proveedorArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockEntry"]>
 
 export type StockEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -620,7 +783,9 @@ export type StockEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   tipo?: boolean
   notas?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   proveedor?: boolean | Prisma.StockEntry$proveedorArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockEntry"]>
 
 export type StockEntrySelectScalar = {
@@ -629,19 +794,23 @@ export type StockEntrySelectScalar = {
   tipo?: boolean
   notas?: boolean
   createdAt?: boolean
+  negocioId?: boolean
 }
 
-export type StockEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "proveedorId" | "tipo" | "notas" | "createdAt", ExtArgs["result"]["stockEntry"]>
+export type StockEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "proveedorId" | "tipo" | "notas" | "createdAt" | "negocioId", ExtArgs["result"]["stockEntry"]>
 export type StockEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proveedor?: boolean | Prisma.StockEntry$proveedorArgs<ExtArgs>
   items?: boolean | Prisma.StockEntry$itemsArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.StockEntryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StockEntryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proveedor?: boolean | Prisma.StockEntry$proveedorArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 export type StockEntryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proveedor?: boolean | Prisma.StockEntry$proveedorArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 
 export type $StockEntryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -649,6 +818,7 @@ export type $StockEntryPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     proveedor: Prisma.$ProveedorPayload<ExtArgs> | null
     items: Prisma.$StockEntryItemPayload<ExtArgs>[]
+    negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -656,6 +826,7 @@ export type $StockEntryPayload<ExtArgs extends runtime.Types.Extensions.Internal
     tipo: $Enums.TipoStockEntry
     notas: string | null
     createdAt: Date
+    negocioId: number
   }, ExtArgs["result"]["stockEntry"]>
   composites: {}
 }
@@ -1052,6 +1223,7 @@ export interface Prisma__StockEntryClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   proveedor<T extends Prisma.StockEntry$proveedorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockEntry$proveedorArgs<ExtArgs>>): Prisma.Prisma__ProveedorClient<runtime.Types.Result.GetResult<Prisma.$ProveedorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.StockEntry$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockEntry$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockEntryItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1086,6 +1258,7 @@ export interface StockEntryFieldRefs {
   readonly tipo: Prisma.FieldRef<"StockEntry", 'TipoStockEntry'>
   readonly notas: Prisma.FieldRef<"StockEntry", 'String'>
   readonly createdAt: Prisma.FieldRef<"StockEntry", 'DateTime'>
+  readonly negocioId: Prisma.FieldRef<"StockEntry", 'Int'>
 }
     
 
@@ -1309,7 +1482,7 @@ export type StockEntryCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * The data needed to create a StockEntry.
    */
-  data?: Prisma.XOR<Prisma.StockEntryCreateInput, Prisma.StockEntryUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.StockEntryCreateInput, Prisma.StockEntryUncheckedCreateInput>
 }
 
 /**

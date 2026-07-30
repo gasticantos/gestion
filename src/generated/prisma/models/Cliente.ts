@@ -29,11 +29,13 @@ export type AggregateCliente = {
 export type ClienteAvgAggregateOutputType = {
   id: number | null
   saldo: number | null
+  negocioId: number | null
 }
 
 export type ClienteSumAggregateOutputType = {
   id: number | null
   saldo: number | null
+  negocioId: number | null
 }
 
 export type ClienteMinAggregateOutputType = {
@@ -43,6 +45,7 @@ export type ClienteMinAggregateOutputType = {
   saldo: number | null
   activo: boolean | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type ClienteMaxAggregateOutputType = {
@@ -52,6 +55,7 @@ export type ClienteMaxAggregateOutputType = {
   saldo: number | null
   activo: boolean | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type ClienteCountAggregateOutputType = {
@@ -61,6 +65,7 @@ export type ClienteCountAggregateOutputType = {
   saldo: number
   activo: number
   createdAt: number
+  negocioId: number
   _all: number
 }
 
@@ -68,11 +73,13 @@ export type ClienteCountAggregateOutputType = {
 export type ClienteAvgAggregateInputType = {
   id?: true
   saldo?: true
+  negocioId?: true
 }
 
 export type ClienteSumAggregateInputType = {
   id?: true
   saldo?: true
+  negocioId?: true
 }
 
 export type ClienteMinAggregateInputType = {
@@ -82,6 +89,7 @@ export type ClienteMinAggregateInputType = {
   saldo?: true
   activo?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type ClienteMaxAggregateInputType = {
@@ -91,6 +99,7 @@ export type ClienteMaxAggregateInputType = {
   saldo?: true
   activo?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type ClienteCountAggregateInputType = {
@@ -100,6 +109,7 @@ export type ClienteCountAggregateInputType = {
   saldo?: true
   activo?: true
   createdAt?: true
+  negocioId?: true
   _all?: true
 }
 
@@ -196,6 +206,7 @@ export type ClienteGroupByOutputType = {
   saldo: number
   activo: boolean
   createdAt: Date
+  negocioId: number
   _count: ClienteCountAggregateOutputType | null
   _avg: ClienteAvgAggregateOutputType | null
   _sum: ClienteSumAggregateOutputType | null
@@ -228,8 +239,10 @@ export type ClienteWhereInput = {
   saldo?: Prisma.FloatFilter<"Cliente"> | number
   activo?: Prisma.BoolFilter<"Cliente"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
+  negocioId?: Prisma.IntFilter<"Cliente"> | number
   ventas?: Prisma.VentaListRelationFilter
   movimientos?: Prisma.MovimientoCuentaCorrienteListRelationFilter
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type ClienteOrderByWithRelationInput = {
@@ -239,8 +252,10 @@ export type ClienteOrderByWithRelationInput = {
   saldo?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   ventas?: Prisma.VentaOrderByRelationAggregateInput
   movimientos?: Prisma.MovimientoCuentaCorrienteOrderByRelationAggregateInput
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type ClienteWhereUniqueInput = Prisma.AtLeast<{
@@ -253,8 +268,10 @@ export type ClienteWhereUniqueInput = Prisma.AtLeast<{
   saldo?: Prisma.FloatFilter<"Cliente"> | number
   activo?: Prisma.BoolFilter<"Cliente"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
+  negocioId?: Prisma.IntFilter<"Cliente"> | number
   ventas?: Prisma.VentaListRelationFilter
   movimientos?: Prisma.MovimientoCuentaCorrienteListRelationFilter
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id">
 
 export type ClienteOrderByWithAggregationInput = {
@@ -264,6 +281,7 @@ export type ClienteOrderByWithAggregationInput = {
   saldo?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   _count?: Prisma.ClienteCountOrderByAggregateInput
   _avg?: Prisma.ClienteAvgOrderByAggregateInput
   _max?: Prisma.ClienteMaxOrderByAggregateInput
@@ -281,6 +299,7 @@ export type ClienteScalarWhereWithAggregatesInput = {
   saldo?: Prisma.FloatWithAggregatesFilter<"Cliente"> | number
   activo?: Prisma.BoolWithAggregatesFilter<"Cliente"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Cliente"> | Date | string
+  negocioId?: Prisma.IntWithAggregatesFilter<"Cliente"> | number
 }
 
 export type ClienteCreateInput = {
@@ -291,6 +310,7 @@ export type ClienteCreateInput = {
   createdAt?: Date | string
   ventas?: Prisma.VentaCreateNestedManyWithoutClienteInput
   movimientos?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutClienteInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutClientesInput
 }
 
 export type ClienteUncheckedCreateInput = {
@@ -300,6 +320,7 @@ export type ClienteUncheckedCreateInput = {
   saldo?: number
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutClienteInput
   movimientos?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutClienteInput
 }
@@ -312,6 +333,7 @@ export type ClienteUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ventas?: Prisma.VentaUpdateManyWithoutClienteNestedInput
   movimientos?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutClienteNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutClientesNestedInput
 }
 
 export type ClienteUncheckedUpdateInput = {
@@ -321,6 +343,7 @@ export type ClienteUncheckedUpdateInput = {
   saldo?: Prisma.FloatFieldUpdateOperationsInput | number
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutClienteNestedInput
   movimientos?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutClienteNestedInput
 }
@@ -332,6 +355,7 @@ export type ClienteCreateManyInput = {
   saldo?: number
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type ClienteUpdateManyMutationInput = {
@@ -349,6 +373,17 @@ export type ClienteUncheckedUpdateManyInput = {
   saldo?: Prisma.FloatFieldUpdateOperationsInput | number
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ClienteListRelationFilter = {
+  every?: Prisma.ClienteWhereInput
+  some?: Prisma.ClienteWhereInput
+  none?: Prisma.ClienteWhereInput
+}
+
+export type ClienteOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ClienteNullableScalarRelationFilter = {
@@ -363,11 +398,13 @@ export type ClienteCountOrderByAggregateInput = {
   saldo?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ClienteAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   saldo?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ClienteMaxOrderByAggregateInput = {
@@ -377,6 +414,7 @@ export type ClienteMaxOrderByAggregateInput = {
   saldo?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ClienteMinOrderByAggregateInput = {
@@ -386,16 +424,60 @@ export type ClienteMinOrderByAggregateInput = {
   saldo?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ClienteSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   saldo?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ClienteScalarRelationFilter = {
   is?: Prisma.ClienteWhereInput
   isNot?: Prisma.ClienteWhereInput
+}
+
+export type ClienteCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ClienteCreateWithoutNegocioInput, Prisma.ClienteUncheckedCreateWithoutNegocioInput> | Prisma.ClienteCreateWithoutNegocioInput[] | Prisma.ClienteUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutNegocioInput | Prisma.ClienteCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ClienteCreateManyNegocioInputEnvelope
+  connect?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+}
+
+export type ClienteUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ClienteCreateWithoutNegocioInput, Prisma.ClienteUncheckedCreateWithoutNegocioInput> | Prisma.ClienteCreateWithoutNegocioInput[] | Prisma.ClienteUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutNegocioInput | Prisma.ClienteCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ClienteCreateManyNegocioInputEnvelope
+  connect?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+}
+
+export type ClienteUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ClienteCreateWithoutNegocioInput, Prisma.ClienteUncheckedCreateWithoutNegocioInput> | Prisma.ClienteCreateWithoutNegocioInput[] | Prisma.ClienteUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutNegocioInput | Prisma.ClienteCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ClienteUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ClienteUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ClienteCreateManyNegocioInputEnvelope
+  set?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  disconnect?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  delete?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  connect?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  update?: Prisma.ClienteUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ClienteUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ClienteUpdateManyWithWhereWithoutNegocioInput | Prisma.ClienteUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ClienteScalarWhereInput | Prisma.ClienteScalarWhereInput[]
+}
+
+export type ClienteUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ClienteCreateWithoutNegocioInput, Prisma.ClienteUncheckedCreateWithoutNegocioInput> | Prisma.ClienteCreateWithoutNegocioInput[] | Prisma.ClienteUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ClienteCreateOrConnectWithoutNegocioInput | Prisma.ClienteCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ClienteUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ClienteUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ClienteCreateManyNegocioInputEnvelope
+  set?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  disconnect?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  delete?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  connect?: Prisma.ClienteWhereUniqueInput | Prisma.ClienteWhereUniqueInput[]
+  update?: Prisma.ClienteUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ClienteUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ClienteUpdateManyWithWhereWithoutNegocioInput | Prisma.ClienteUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ClienteScalarWhereInput | Prisma.ClienteScalarWhereInput[]
 }
 
 export type ClienteCreateNestedOneWithoutVentasInput = {
@@ -428,6 +510,66 @@ export type ClienteUpdateOneRequiredWithoutMovimientosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClienteUpdateToOneWithWhereWithoutMovimientosInput, Prisma.ClienteUpdateWithoutMovimientosInput>, Prisma.ClienteUncheckedUpdateWithoutMovimientosInput>
 }
 
+export type ClienteCreateWithoutNegocioInput = {
+  nombre: string
+  telefono?: string | null
+  saldo?: number
+  activo?: boolean
+  createdAt?: Date | string
+  ventas?: Prisma.VentaCreateNestedManyWithoutClienteInput
+  movimientos?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutClienteInput
+}
+
+export type ClienteUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  nombre: string
+  telefono?: string | null
+  saldo?: number
+  activo?: boolean
+  createdAt?: Date | string
+  ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutClienteInput
+  movimientos?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutClienteInput
+}
+
+export type ClienteCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.ClienteWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClienteCreateWithoutNegocioInput, Prisma.ClienteUncheckedCreateWithoutNegocioInput>
+}
+
+export type ClienteCreateManyNegocioInputEnvelope = {
+  data: Prisma.ClienteCreateManyNegocioInput | Prisma.ClienteCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type ClienteUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ClienteWhereUniqueInput
+  update: Prisma.XOR<Prisma.ClienteUpdateWithoutNegocioInput, Prisma.ClienteUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.ClienteCreateWithoutNegocioInput, Prisma.ClienteUncheckedCreateWithoutNegocioInput>
+}
+
+export type ClienteUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ClienteWhereUniqueInput
+  data: Prisma.XOR<Prisma.ClienteUpdateWithoutNegocioInput, Prisma.ClienteUncheckedUpdateWithoutNegocioInput>
+}
+
+export type ClienteUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.ClienteScalarWhereInput
+  data: Prisma.XOR<Prisma.ClienteUpdateManyMutationInput, Prisma.ClienteUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type ClienteScalarWhereInput = {
+  AND?: Prisma.ClienteScalarWhereInput | Prisma.ClienteScalarWhereInput[]
+  OR?: Prisma.ClienteScalarWhereInput[]
+  NOT?: Prisma.ClienteScalarWhereInput | Prisma.ClienteScalarWhereInput[]
+  id?: Prisma.IntFilter<"Cliente"> | number
+  nombre?: Prisma.StringFilter<"Cliente"> | string
+  telefono?: Prisma.StringNullableFilter<"Cliente"> | string | null
+  saldo?: Prisma.FloatFilter<"Cliente"> | number
+  activo?: Prisma.BoolFilter<"Cliente"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Cliente"> | Date | string
+  negocioId?: Prisma.IntFilter<"Cliente"> | number
+}
+
 export type ClienteCreateWithoutVentasInput = {
   nombre: string
   telefono?: string | null
@@ -435,6 +577,7 @@ export type ClienteCreateWithoutVentasInput = {
   activo?: boolean
   createdAt?: Date | string
   movimientos?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutClienteInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutClientesInput
 }
 
 export type ClienteUncheckedCreateWithoutVentasInput = {
@@ -444,6 +587,7 @@ export type ClienteUncheckedCreateWithoutVentasInput = {
   saldo?: number
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
   movimientos?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutClienteInput
 }
 
@@ -470,6 +614,7 @@ export type ClienteUpdateWithoutVentasInput = {
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   movimientos?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutClienteNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutClientesNestedInput
 }
 
 export type ClienteUncheckedUpdateWithoutVentasInput = {
@@ -479,6 +624,7 @@ export type ClienteUncheckedUpdateWithoutVentasInput = {
   saldo?: Prisma.FloatFieldUpdateOperationsInput | number
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   movimientos?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutClienteNestedInput
 }
 
@@ -489,6 +635,7 @@ export type ClienteCreateWithoutMovimientosInput = {
   activo?: boolean
   createdAt?: Date | string
   ventas?: Prisma.VentaCreateNestedManyWithoutClienteInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutClientesInput
 }
 
 export type ClienteUncheckedCreateWithoutMovimientosInput = {
@@ -498,6 +645,7 @@ export type ClienteUncheckedCreateWithoutMovimientosInput = {
   saldo?: number
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutClienteInput
 }
 
@@ -524,6 +672,7 @@ export type ClienteUpdateWithoutMovimientosInput = {
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ventas?: Prisma.VentaUpdateManyWithoutClienteNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutClientesNestedInput
 }
 
 export type ClienteUncheckedUpdateWithoutMovimientosInput = {
@@ -533,7 +682,47 @@ export type ClienteUncheckedUpdateWithoutMovimientosInput = {
   saldo?: Prisma.FloatFieldUpdateOperationsInput | number
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutClienteNestedInput
+}
+
+export type ClienteCreateManyNegocioInput = {
+  id?: number
+  nombre: string
+  telefono?: string | null
+  saldo?: number
+  activo?: boolean
+  createdAt?: Date | string
+}
+
+export type ClienteUpdateWithoutNegocioInput = {
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saldo?: Prisma.FloatFieldUpdateOperationsInput | number
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ventas?: Prisma.VentaUpdateManyWithoutClienteNestedInput
+  movimientos?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutClienteNestedInput
+}
+
+export type ClienteUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saldo?: Prisma.FloatFieldUpdateOperationsInput | number
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ventas?: Prisma.VentaUncheckedUpdateManyWithoutClienteNestedInput
+  movimientos?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutClienteNestedInput
+}
+
+export type ClienteUncheckedUpdateManyWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saldo?: Prisma.FloatFieldUpdateOperationsInput | number
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -583,8 +772,10 @@ export type ClienteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   saldo?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   ventas?: boolean | Prisma.Cliente$ventasArgs<ExtArgs>
   movimientos?: boolean | Prisma.Cliente$movimientosArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ClienteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cliente"]>
 
@@ -595,6 +786,8 @@ export type ClienteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   saldo?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cliente"]>
 
 export type ClienteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -604,6 +797,8 @@ export type ClienteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   saldo?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cliente"]>
 
 export type ClienteSelectScalar = {
@@ -613,22 +808,29 @@ export type ClienteSelectScalar = {
   saldo?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
 }
 
-export type ClienteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "telefono" | "saldo" | "activo" | "createdAt", ExtArgs["result"]["cliente"]>
+export type ClienteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "telefono" | "saldo" | "activo" | "createdAt" | "negocioId", ExtArgs["result"]["cliente"]>
 export type ClienteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ventas?: boolean | Prisma.Cliente$ventasArgs<ExtArgs>
   movimientos?: boolean | Prisma.Cliente$movimientosArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ClienteCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ClienteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ClienteIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ClienteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
+export type ClienteIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
 
 export type $ClientePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Cliente"
   objects: {
     ventas: Prisma.$VentaPayload<ExtArgs>[]
     movimientos: Prisma.$MovimientoCuentaCorrientePayload<ExtArgs>[]
+    negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -637,6 +839,7 @@ export type $ClientePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     saldo: number
     activo: boolean
     createdAt: Date
+    negocioId: number
   }, ExtArgs["result"]["cliente"]>
   composites: {}
 }
@@ -1033,6 +1236,7 @@ export interface Prisma__ClienteClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ventas<T extends Prisma.Cliente$ventasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Cliente$ventasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VentaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimientos<T extends Prisma.Cliente$movimientosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Cliente$movimientosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MovimientoCuentaCorrientePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1068,6 +1272,7 @@ export interface ClienteFieldRefs {
   readonly saldo: Prisma.FieldRef<"Cliente", 'Float'>
   readonly activo: Prisma.FieldRef<"Cliente", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Cliente", 'DateTime'>
+  readonly negocioId: Prisma.FieldRef<"Cliente", 'Int'>
 }
     
 
@@ -1322,6 +1527,10 @@ export type ClienteCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.ClienteCreateManyInput | Prisma.ClienteCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClienteIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1392,6 +1601,10 @@ export type ClienteUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Clientes to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClienteIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

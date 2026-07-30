@@ -28,26 +28,31 @@ export type AggregateConfiguracion = {
 
 export type ConfiguracionAvgAggregateOutputType = {
   id: number | null
+  negocioId: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionSumAggregateOutputType = {
   id: number | null
+  negocioId: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionMinAggregateOutputType = {
   id: number | null
+  negocioId: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionMaxAggregateOutputType = {
   id: number | null
+  negocioId: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionCountAggregateOutputType = {
   id: number
+  negocioId: number
   recargoMesaPct: number
   _all: number
 }
@@ -55,26 +60,31 @@ export type ConfiguracionCountAggregateOutputType = {
 
 export type ConfiguracionAvgAggregateInputType = {
   id?: true
+  negocioId?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionSumAggregateInputType = {
   id?: true
+  negocioId?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionMinAggregateInputType = {
   id?: true
+  negocioId?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionMaxAggregateInputType = {
   id?: true
+  negocioId?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionCountAggregateInputType = {
   id?: true
+  negocioId?: true
   recargoMesaPct?: true
   _all?: true
 }
@@ -167,6 +177,7 @@ export type ConfiguracionGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type ConfiguracionGroupByOutputType = {
   id: number
+  negocioId: number
   recargoMesaPct: number
   _count: ConfiguracionCountAggregateOutputType | null
   _avg: ConfiguracionAvgAggregateOutputType | null
@@ -195,24 +206,31 @@ export type ConfiguracionWhereInput = {
   OR?: Prisma.ConfiguracionWhereInput[]
   NOT?: Prisma.ConfiguracionWhereInput | Prisma.ConfiguracionWhereInput[]
   id?: Prisma.IntFilter<"Configuracion"> | number
+  negocioId?: Prisma.IntFilter<"Configuracion"> | number
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type ConfiguracionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type ConfiguracionWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  negocioId?: number
   AND?: Prisma.ConfiguracionWhereInput | Prisma.ConfiguracionWhereInput[]
   OR?: Prisma.ConfiguracionWhereInput[]
   NOT?: Prisma.ConfiguracionWhereInput | Prisma.ConfiguracionWhereInput[]
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
-}, "id">
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
+}, "id" | "negocioId">
 
 export type ConfiguracionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
   _count?: Prisma.ConfiguracionCountOrderByAggregateInput
   _avg?: Prisma.ConfiguracionAvgOrderByAggregateInput
@@ -226,67 +244,128 @@ export type ConfiguracionScalarWhereWithAggregatesInput = {
   OR?: Prisma.ConfiguracionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ConfiguracionScalarWhereWithAggregatesInput | Prisma.ConfiguracionScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Configuracion"> | number
+  negocioId?: Prisma.IntWithAggregatesFilter<"Configuracion"> | number
   recargoMesaPct?: Prisma.FloatWithAggregatesFilter<"Configuracion"> | number
 }
 
 export type ConfiguracionCreateInput = {
-  id?: number
   recargoMesaPct?: number
+  negocio?: Prisma.NegocioCreateNestedOneWithoutConfiguracionesInput
 }
 
 export type ConfiguracionUncheckedCreateInput = {
   id?: number
+  negocioId?: number
   recargoMesaPct?: number
 }
 
 export type ConfiguracionUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutConfiguracionesNestedInput
 }
 
 export type ConfiguracionUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type ConfiguracionCreateManyInput = {
   id?: number
+  negocioId?: number
   recargoMesaPct?: number
 }
 
 export type ConfiguracionUpdateManyMutationInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type ConfiguracionUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
+}
+
+export type ConfiguracionListRelationFilter = {
+  every?: Prisma.ConfiguracionWhereInput
+  some?: Prisma.ConfiguracionWhereInput
+  none?: Prisma.ConfiguracionWhereInput
+}
+
+export type ConfiguracionOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ConfiguracionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
+}
+
+export type ConfiguracionCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ConfiguracionCreateWithoutNegocioInput, Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput> | Prisma.ConfiguracionCreateWithoutNegocioInput[] | Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput | Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ConfiguracionCreateManyNegocioInputEnvelope
+  connect?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+}
+
+export type ConfiguracionUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ConfiguracionCreateWithoutNegocioInput, Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput> | Prisma.ConfiguracionCreateWithoutNegocioInput[] | Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput | Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ConfiguracionCreateManyNegocioInputEnvelope
+  connect?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+}
+
+export type ConfiguracionUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ConfiguracionCreateWithoutNegocioInput, Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput> | Prisma.ConfiguracionCreateWithoutNegocioInput[] | Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput | Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ConfiguracionUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ConfiguracionUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ConfiguracionCreateManyNegocioInputEnvelope
+  set?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  disconnect?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  delete?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  connect?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  update?: Prisma.ConfiguracionUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ConfiguracionUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ConfiguracionUpdateManyWithWhereWithoutNegocioInput | Prisma.ConfiguracionUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ConfiguracionScalarWhereInput | Prisma.ConfiguracionScalarWhereInput[]
+}
+
+export type ConfiguracionUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ConfiguracionCreateWithoutNegocioInput, Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput> | Prisma.ConfiguracionCreateWithoutNegocioInput[] | Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput | Prisma.ConfiguracionCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ConfiguracionUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ConfiguracionUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ConfiguracionCreateManyNegocioInputEnvelope
+  set?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  disconnect?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  delete?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  connect?: Prisma.ConfiguracionWhereUniqueInput | Prisma.ConfiguracionWhereUniqueInput[]
+  update?: Prisma.ConfiguracionUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ConfiguracionUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ConfiguracionUpdateManyWithWhereWithoutNegocioInput | Prisma.ConfiguracionUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ConfiguracionScalarWhereInput | Prisma.ConfiguracionScalarWhereInput[]
 }
 
 export type FloatFieldUpdateOperationsInput = {
@@ -297,35 +376,117 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type ConfiguracionCreateWithoutNegocioInput = {
+  recargoMesaPct?: number
+}
+
+export type ConfiguracionUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  recargoMesaPct?: number
+}
+
+export type ConfiguracionCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.ConfiguracionWhereUniqueInput
+  create: Prisma.XOR<Prisma.ConfiguracionCreateWithoutNegocioInput, Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput>
+}
+
+export type ConfiguracionCreateManyNegocioInputEnvelope = {
+  data: Prisma.ConfiguracionCreateManyNegocioInput | Prisma.ConfiguracionCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type ConfiguracionUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ConfiguracionWhereUniqueInput
+  update: Prisma.XOR<Prisma.ConfiguracionUpdateWithoutNegocioInput, Prisma.ConfiguracionUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.ConfiguracionCreateWithoutNegocioInput, Prisma.ConfiguracionUncheckedCreateWithoutNegocioInput>
+}
+
+export type ConfiguracionUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ConfiguracionWhereUniqueInput
+  data: Prisma.XOR<Prisma.ConfiguracionUpdateWithoutNegocioInput, Prisma.ConfiguracionUncheckedUpdateWithoutNegocioInput>
+}
+
+export type ConfiguracionUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.ConfiguracionScalarWhereInput
+  data: Prisma.XOR<Prisma.ConfiguracionUpdateManyMutationInput, Prisma.ConfiguracionUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type ConfiguracionScalarWhereInput = {
+  AND?: Prisma.ConfiguracionScalarWhereInput | Prisma.ConfiguracionScalarWhereInput[]
+  OR?: Prisma.ConfiguracionScalarWhereInput[]
+  NOT?: Prisma.ConfiguracionScalarWhereInput | Prisma.ConfiguracionScalarWhereInput[]
+  id?: Prisma.IntFilter<"Configuracion"> | number
+  negocioId?: Prisma.IntFilter<"Configuracion"> | number
+  recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
+}
+
+export type ConfiguracionCreateManyNegocioInput = {
+  id?: number
+  recargoMesaPct?: number
+}
+
+export type ConfiguracionUpdateWithoutNegocioInput = {
+  recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
+}
+
+export type ConfiguracionUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
+}
+
+export type ConfiguracionUncheckedUpdateManyWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
+}
+
 
 
 export type ConfiguracionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  negocioId?: boolean
   recargoMesaPct?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracion"]>
 
 export type ConfiguracionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  negocioId?: boolean
   recargoMesaPct?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracion"]>
 
 export type ConfiguracionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  negocioId?: boolean
   recargoMesaPct?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracion"]>
 
 export type ConfiguracionSelectScalar = {
   id?: boolean
+  negocioId?: boolean
   recargoMesaPct?: boolean
 }
 
-export type ConfiguracionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recargoMesaPct", ExtArgs["result"]["configuracion"]>
+export type ConfiguracionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "negocioId" | "recargoMesaPct", ExtArgs["result"]["configuracion"]>
+export type ConfiguracionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
+export type ConfiguracionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
+export type ConfiguracionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
 
 export type $ConfiguracionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Configuracion"
-  objects: {}
+  objects: {
+    negocio: Prisma.$NegocioPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    negocioId: number
     recargoMesaPct: number
   }, ExtArgs["result"]["configuracion"]>
   composites: {}
@@ -721,6 +882,7 @@ readonly fields: ConfiguracionFieldRefs;
  */
 export interface Prisma__ConfiguracionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -751,6 +913,7 @@ export interface Prisma__ConfiguracionClient<T, Null = never, ExtArgs extends ru
  */
 export interface ConfiguracionFieldRefs {
   readonly id: Prisma.FieldRef<"Configuracion", 'Int'>
+  readonly negocioId: Prisma.FieldRef<"Configuracion", 'Int'>
   readonly recargoMesaPct: Prisma.FieldRef<"Configuracion", 'Float'>
 }
     
@@ -768,6 +931,10 @@ export type ConfiguracionFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
   /**
    * Filter, which Configuracion to fetch.
    */
@@ -787,6 +954,10 @@ export type ConfiguracionFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
+  /**
    * Filter, which Configuracion to fetch.
    */
   where: Prisma.ConfiguracionWhereUniqueInput
@@ -804,6 +975,10 @@ export type ConfiguracionFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
   /**
    * Filter, which Configuracion to fetch.
    */
@@ -853,6 +1028,10 @@ export type ConfiguracionFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
+  /**
    * Filter, which Configuracion to fetch.
    */
   where?: Prisma.ConfiguracionWhereInput
@@ -900,6 +1079,10 @@ export type ConfiguracionFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
   /**
    * Filter, which Configuracions to fetch.
    */
@@ -949,9 +1132,13 @@ export type ConfiguracionCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
+  /**
    * The data needed to create a Configuracion.
    */
-  data?: Prisma.XOR<Prisma.ConfiguracionCreateInput, Prisma.ConfiguracionUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.ConfiguracionCreateInput, Prisma.ConfiguracionUncheckedCreateInput>
 }
 
 /**
@@ -982,6 +1169,10 @@ export type ConfiguracionCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.ConfiguracionCreateManyInput | Prisma.ConfiguracionCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -996,6 +1187,10 @@ export type ConfiguracionUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
   /**
    * The data needed to update a Configuracion.
    */
@@ -1048,6 +1243,10 @@ export type ConfiguracionUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many Configuracions to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1062,6 +1261,10 @@ export type ConfiguracionUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
   /**
    * The filter to search for the Configuracion to update in case it exists.
    */
@@ -1088,6 +1291,10 @@ export type ConfiguracionDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
   /**
    * Filter which Configuracion to delete.
    */
@@ -1120,4 +1327,8 @@ export type ConfiguracionDefaultArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the Configuracion
    */
   omit?: Prisma.ConfiguracionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConfiguracionInclude<ExtArgs> | null
 }

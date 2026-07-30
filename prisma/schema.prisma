@@ -10,12 +10,36 @@ datasource db {
   provider = "postgresql"
 }
 
+model Negocio {
+  id              Int                @id @default(autoincrement())
+  nombre          String
+  activo          Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  categorias      Categoria[]
+  usuarios        Usuario[]
+  configuraciones Configuracion[]
+  impresiones     ImpresionTrabajo[]
+  auditorias      AuditoriaLog[]
+  proveedores     Proveedor[]
+  productos       Producto[]
+  stockEntries    StockEntry[]
+  mesas           Mesa[]
+  reservas        Reserva[]
+  ventas          Venta[]
+  clientes        Cliente[]
+}
+
 model Categoria {
   id        Int        @id @default(autoincrement())
-  nombre    String     @unique
+  nombre    String
+  negocioId Int        @default(1)
+  negocio   Negocio    @relation(fields: [negocioId], references: [id])
   activo    Boolean    @default(true)
   createdAt DateTime   @default(now())
   productos Producto[]
+
+  @@unique([negocioId, nombre])
+  @@index([negocioId])
 }
 
 enum Rol {
@@ -25,14 +49,19 @@ enum Rol {
 }
 
 model Usuario {
-  id           Int      @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   nombre       String
-  email        String   @unique
+  email        String         @unique
+  authId       String?        @unique @db.Uuid
   passwordHash String
-  rol          Rol      @default(MOZO)
-  activo       Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  rol          Rol            @default(MOZO)
+  activo       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
   auditorias   AuditoriaLog[]
+  negocioId    Int            @default(1)
+  negocio      Negocio        @relation(fields: [negocioId], references: [id])
+
+  @@index([negocioId])
 }
 
 enum TipoStockEntry {
@@ -74,8 +103,10 @@ enum TarifaPrecio {
 }
 
 model Configuracion {
-  id             Int   @id @default(1)
-  recargoMesaPct Float @default(0)
+  id             Int     @id @default(autoincrement())
+  negocioId      Int     @unique @default(1)
+  negocio        Negocio @relation(fields: [negocioId], references: [id])
+  recargoMesaPct Float   @default(0)
 }
 
 enum TipoImpresion {
@@ -92,67 +123,82 @@ enum EstadoImpresion {
 }
 
 model ImpresionTrabajo {
-  id          Int              @id @default(autoincrement())
-  tipo        TipoImpresion
-  contenido   String
-  estado      EstadoImpresion  @default(PENDIENTE)
-  referencia  String?          @unique
-  estacionId  String?
-  error       String?
-  intentos    Int              @default(0)
-  createdAt   DateTime         @default(now())
-  claimedAt   DateTime?
-  printedAt   DateTime?
+  id         Int             @id @default(autoincrement())
+  tipo       TipoImpresion
+  contenido  String
+  estado     EstadoImpresion @default(PENDIENTE)
+  referencia String?
+  estacionId String?
+  error      String?
+  intentos   Int             @default(0)
+  createdAt  DateTime        @default(now())
+  claimedAt  DateTime?
+  printedAt  DateTime?
+  negocioId  Int             @default(1)
+  negocio    Negocio         @relation(fields: [negocioId], references: [id])
 
-  @@index([estado, createdAt])
+  @@unique([negocioId, referencia])
+  @@index([negocioId, estado, createdAt])
 }
 
 model AuditoriaLog {
   id          Int      @id @default(autoincrement())
   usuarioId   Int
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])
-  accion      String   // ej: "crear_venta", "editar_mesa", "imprimir_ticket"
-  descripcion String?  // detalles de qué se hizo
+  accion      String // ej: "crear_venta", "editar_mesa", "imprimir_ticket"
+  descripcion String? // detalles de qué se hizo
   createdAt   DateTime @default(now())
+  negocioId   Int      @default(1)
+  negocio     Negocio  @relation(fields: [negocioId], references: [id])
 
   @@index([usuarioId])
   @@index([createdAt])
+  @@index([negocioId])
 }
 
 model Proveedor {
-  id          Int          @id @default(autoincrement())
-  nombre      String
-  telefono    String?
-  contacto    String?
-  notas       String?
-  activo      Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  productos   Producto[]
+  id           Int          @id @default(autoincrement())
+  nombre       String
+  telefono     String?
+  contacto     String?
+  notas        String?
+  activo       Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  productos    Producto[]
   stockEntries StockEntry[]
+  negocioId    Int          @default(1)
+  negocio      Negocio      @relation(fields: [negocioId], references: [id])
+
+  @@index([negocioId])
 }
 
 model Producto {
-  id            Int               @id @default(autoincrement())
-  nombre        String
-  codigoInterno String?           @unique
-  codigoBarras  String?           @unique
-  marca         String?
-  categoriaId   Int?
-  categoria     Categoria?        @relation(fields: [categoriaId], references: [id])
-  precioVenta   Float
-  precioVentaMesa       Float   @default(0)
-  precioVentaMesaManual Boolean @default(false)
-  precioCosto   Float             @default(0)
-  stock         Float             @default(0)
-  unidad        String            @default("unidad")
-  activo        Boolean           @default(true)
-  proveedorId   Int?
-  proveedor     Proveedor?        @relation(fields: [proveedorId], references: [id])
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  stockEntryItems StockEntryItem[]
-  pedidoItems   PedidoItem[]
+  id                    Int              @id @default(autoincrement())
+  nombre                String
+  codigoInterno         String?
+  codigoBarras          String?
+  marca                 String?
+  categoriaId           Int?
+  categoria             Categoria?       @relation(fields: [categoriaId], references: [id])
+  precioVenta           Float
+  precioVentaMesa       Float            @default(0)
+  precioVentaMesaManual Boolean          @default(false)
+  precioCosto           Float            @default(0)
+  stock                 Float            @default(0)
+  unidad                String           @default("unidad")
+  activo                Boolean          @default(true)
+  proveedorId           Int?
+  proveedor             Proveedor?       @relation(fields: [proveedorId], references: [id])
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  stockEntryItems       StockEntryItem[]
+  pedidoItems           PedidoItem[]
+  negocioId             Int              @default(1)
+  negocio               Negocio          @relation(fields: [negocioId], references: [id])
 
+  @@unique([negocioId, codigoInterno])
+  @@unique([negocioId, codigoBarras])
+  @@index([negocioId])
   @@index([proveedorId])
   @@index([categoriaId])
 }
@@ -165,7 +211,10 @@ model StockEntry {
   notas       String?
   createdAt   DateTime         @default(now())
   items       StockEntryItem[]
+  negocioId   Int              @default(1)
+  negocio     Negocio          @relation(fields: [negocioId], references: [id])
 
+  @@index([negocioId])
   @@index([proveedorId])
 }
 
@@ -183,17 +232,23 @@ model StockEntryItem {
 }
 
 model Mesa {
-  id       Int        @id @default(autoincrement())
-  nombre   String     @unique
-  numero   Int        @unique
-  apodo    String?
-  estado   EstadoMesa @default(LIBRE)
-  posX     Float      @default(0)
-  posY     Float      @default(0)
-  ancho    Float      @default(70)
-  alto     Float      @default(70)
-  ventas   Venta[]
-  reservas Reserva[]
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  numero    Int
+  apodo     String?
+  estado    EstadoMesa @default(LIBRE)
+  posX      Float      @default(0)
+  posY      Float      @default(0)
+  ancho     Float      @default(70)
+  alto      Float      @default(70)
+  ventas    Venta[]
+  reservas  Reserva[]
+  negocioId Int        @default(1)
+  negocio   Negocio    @relation(fields: [negocioId], references: [id])
+
+  @@unique([negocioId, nombre])
+  @@unique([negocioId, numero])
+  @@index([negocioId])
 }
 
 enum EstadoReserva {
@@ -213,42 +268,48 @@ model Reserva {
   notas     String?
   estado    EstadoReserva @default(PENDIENTE)
   createdAt DateTime      @default(now())
+  negocioId Int           @default(1)
+  negocio   Negocio       @relation(fields: [negocioId], references: [id])
 
+  @@index([negocioId])
   @@index([fecha])
   @@index([mesaId])
 }
 
 model Venta {
-  id         Int         @id @default(autoincrement())
-  tipo       TipoVenta
-  mesaId     Int?
-  mesa       Mesa?       @relation(fields: [mesaId], references: [id])
-  clienteId  Int?
-  cliente    Cliente?    @relation(fields: [clienteId], references: [id])
-  estado     EstadoVenta @default(ABIERTA)
-  tarifa     TarifaPrecio @default(PARTICULAR)
-  total      Float       @default(0)
-  descuentoPct Float     @default(0)
+  id            Int                         @id @default(autoincrement())
+  tipo          TipoVenta
+  mesaId        Int?
+  mesa          Mesa?                       @relation(fields: [mesaId], references: [id])
+  clienteId     Int?
+  cliente       Cliente?                    @relation(fields: [clienteId], references: [id])
+  estado        EstadoVenta                 @default(ABIERTA)
+  tarifa        TarifaPrecio                @default(PARTICULAR)
+  total         Float                       @default(0)
+  descuentoPct  Float                       @default(0)
   borradorRonda Json?
-  ticketImpreso Boolean   @default(false)
-  createdAt  DateTime    @default(now())
-  closedAt   DateTime?
-  pedidos    Pedido[]
-  pagos      Pago[]
+  ticketImpreso Boolean                     @default(false)
+  createdAt     DateTime                    @default(now())
+  closedAt      DateTime?
+  pedidos       Pedido[]
+  pagos         Pago[]
   movimientosCC MovimientoCuentaCorriente[]
+  negocioId     Int                         @default(1)
+  negocio       Negocio                     @relation(fields: [negocioId], references: [id])
 
+  @@index([negocioId])
   @@index([mesaId])
   @@index([clienteId])
   @@index([estado])
 }
 
 model Pedido {
-  id              Int          @id @default(autoincrement())
-  ventaId         Int
-  venta           Venta        @relation(fields: [ventaId], references: [id], onDelete: Cascade)
-  comandaImpresa  Boolean      @default(false)
-  createdAt       DateTime     @default(now())
-  items           PedidoItem[]
+  id             Int          @id @default(autoincrement())
+  ventaId        Int
+  venta          Venta        @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  comandaImpresa Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  items          PedidoItem[]
 
   @@index([ventaId])
 }
@@ -280,14 +341,18 @@ model Pago {
 }
 
 model Cliente {
-  id        Int      @id @default(autoincrement())
-  nombre    String
-  telefono  String?
-  saldo     Float    @default(0)
-  activo    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  ventas    Venta[]
+  id          Int                         @id @default(autoincrement())
+  nombre      String
+  telefono    String?
+  saldo       Float                       @default(0)
+  activo      Boolean                     @default(true)
+  createdAt   DateTime                    @default(now())
+  ventas      Venta[]
   movimientos MovimientoCuentaCorriente[]
+  negocioId   Int                         @default(1)
+  negocio     Negocio                     @relation(fields: [negocioId], references: [id])
+
+  @@index([negocioId])
 }
 
 model MovimientoCuentaCorriente {

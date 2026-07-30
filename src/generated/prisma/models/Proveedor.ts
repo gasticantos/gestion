@@ -28,10 +28,12 @@ export type AggregateProveedor = {
 
 export type ProveedorAvgAggregateOutputType = {
   id: number | null
+  negocioId: number | null
 }
 
 export type ProveedorSumAggregateOutputType = {
   id: number | null
+  negocioId: number | null
 }
 
 export type ProveedorMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type ProveedorMinAggregateOutputType = {
   notas: string | null
   activo: boolean | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type ProveedorMaxAggregateOutputType = {
@@ -52,6 +55,7 @@ export type ProveedorMaxAggregateOutputType = {
   notas: string | null
   activo: boolean | null
   createdAt: Date | null
+  negocioId: number | null
 }
 
 export type ProveedorCountAggregateOutputType = {
@@ -62,16 +66,19 @@ export type ProveedorCountAggregateOutputType = {
   notas: number
   activo: number
   createdAt: number
+  negocioId: number
   _all: number
 }
 
 
 export type ProveedorAvgAggregateInputType = {
   id?: true
+  negocioId?: true
 }
 
 export type ProveedorSumAggregateInputType = {
   id?: true
+  negocioId?: true
 }
 
 export type ProveedorMinAggregateInputType = {
@@ -82,6 +89,7 @@ export type ProveedorMinAggregateInputType = {
   notas?: true
   activo?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type ProveedorMaxAggregateInputType = {
@@ -92,6 +100,7 @@ export type ProveedorMaxAggregateInputType = {
   notas?: true
   activo?: true
   createdAt?: true
+  negocioId?: true
 }
 
 export type ProveedorCountAggregateInputType = {
@@ -102,6 +111,7 @@ export type ProveedorCountAggregateInputType = {
   notas?: true
   activo?: true
   createdAt?: true
+  negocioId?: true
   _all?: true
 }
 
@@ -199,6 +209,7 @@ export type ProveedorGroupByOutputType = {
   notas: string | null
   activo: boolean
   createdAt: Date
+  negocioId: number
   _count: ProveedorCountAggregateOutputType | null
   _avg: ProveedorAvgAggregateOutputType | null
   _sum: ProveedorSumAggregateOutputType | null
@@ -232,8 +243,10 @@ export type ProveedorWhereInput = {
   notas?: Prisma.StringNullableFilter<"Proveedor"> | string | null
   activo?: Prisma.BoolFilter<"Proveedor"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Proveedor"> | Date | string
+  negocioId?: Prisma.IntFilter<"Proveedor"> | number
   productos?: Prisma.ProductoListRelationFilter
   stockEntries?: Prisma.StockEntryListRelationFilter
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
 export type ProveedorOrderByWithRelationInput = {
@@ -244,8 +257,10 @@ export type ProveedorOrderByWithRelationInput = {
   notas?: Prisma.SortOrderInput | Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   productos?: Prisma.ProductoOrderByRelationAggregateInput
   stockEntries?: Prisma.StockEntryOrderByRelationAggregateInput
+  negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
 export type ProveedorWhereUniqueInput = Prisma.AtLeast<{
@@ -259,8 +274,10 @@ export type ProveedorWhereUniqueInput = Prisma.AtLeast<{
   notas?: Prisma.StringNullableFilter<"Proveedor"> | string | null
   activo?: Prisma.BoolFilter<"Proveedor"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Proveedor"> | Date | string
+  negocioId?: Prisma.IntFilter<"Proveedor"> | number
   productos?: Prisma.ProductoListRelationFilter
   stockEntries?: Prisma.StockEntryListRelationFilter
+  negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id">
 
 export type ProveedorOrderByWithAggregationInput = {
@@ -271,6 +288,7 @@ export type ProveedorOrderByWithAggregationInput = {
   notas?: Prisma.SortOrderInput | Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
   _count?: Prisma.ProveedorCountOrderByAggregateInput
   _avg?: Prisma.ProveedorAvgOrderByAggregateInput
   _max?: Prisma.ProveedorMaxOrderByAggregateInput
@@ -289,6 +307,7 @@ export type ProveedorScalarWhereWithAggregatesInput = {
   notas?: Prisma.StringNullableWithAggregatesFilter<"Proveedor"> | string | null
   activo?: Prisma.BoolWithAggregatesFilter<"Proveedor"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Proveedor"> | Date | string
+  negocioId?: Prisma.IntWithAggregatesFilter<"Proveedor"> | number
 }
 
 export type ProveedorCreateInput = {
@@ -300,6 +319,7 @@ export type ProveedorCreateInput = {
   createdAt?: Date | string
   productos?: Prisma.ProductoCreateNestedManyWithoutProveedorInput
   stockEntries?: Prisma.StockEntryCreateNestedManyWithoutProveedorInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutProveedoresInput
 }
 
 export type ProveedorUncheckedCreateInput = {
@@ -310,6 +330,7 @@ export type ProveedorUncheckedCreateInput = {
   notas?: string | null
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
   productos?: Prisma.ProductoUncheckedCreateNestedManyWithoutProveedorInput
   stockEntries?: Prisma.StockEntryUncheckedCreateNestedManyWithoutProveedorInput
 }
@@ -323,6 +344,7 @@ export type ProveedorUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productos?: Prisma.ProductoUpdateManyWithoutProveedorNestedInput
   stockEntries?: Prisma.StockEntryUpdateManyWithoutProveedorNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutProveedoresNestedInput
 }
 
 export type ProveedorUncheckedUpdateInput = {
@@ -333,6 +355,7 @@ export type ProveedorUncheckedUpdateInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   productos?: Prisma.ProductoUncheckedUpdateManyWithoutProveedorNestedInput
   stockEntries?: Prisma.StockEntryUncheckedUpdateManyWithoutProveedorNestedInput
 }
@@ -345,6 +368,7 @@ export type ProveedorCreateManyInput = {
   notas?: string | null
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
 }
 
 export type ProveedorUpdateManyMutationInput = {
@@ -364,6 +388,17 @@ export type ProveedorUncheckedUpdateManyInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ProveedorListRelationFilter = {
+  every?: Prisma.ProveedorWhereInput
+  some?: Prisma.ProveedorWhereInput
+  none?: Prisma.ProveedorWhereInput
+}
+
+export type ProveedorOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ProveedorCountOrderByAggregateInput = {
@@ -374,10 +409,12 @@ export type ProveedorCountOrderByAggregateInput = {
   notas?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ProveedorAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ProveedorMaxOrderByAggregateInput = {
@@ -388,6 +425,7 @@ export type ProveedorMaxOrderByAggregateInput = {
   notas?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ProveedorMinOrderByAggregateInput = {
@@ -398,15 +436,59 @@ export type ProveedorMinOrderByAggregateInput = {
   notas?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ProveedorSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  negocioId?: Prisma.SortOrder
 }
 
 export type ProveedorNullableScalarRelationFilter = {
   is?: Prisma.ProveedorWhereInput | null
   isNot?: Prisma.ProveedorWhereInput | null
+}
+
+export type ProveedorCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ProveedorCreateWithoutNegocioInput, Prisma.ProveedorUncheckedCreateWithoutNegocioInput> | Prisma.ProveedorCreateWithoutNegocioInput[] | Prisma.ProveedorUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ProveedorCreateOrConnectWithoutNegocioInput | Prisma.ProveedorCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ProveedorCreateManyNegocioInputEnvelope
+  connect?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+}
+
+export type ProveedorUncheckedCreateNestedManyWithoutNegocioInput = {
+  create?: Prisma.XOR<Prisma.ProveedorCreateWithoutNegocioInput, Prisma.ProveedorUncheckedCreateWithoutNegocioInput> | Prisma.ProveedorCreateWithoutNegocioInput[] | Prisma.ProveedorUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ProveedorCreateOrConnectWithoutNegocioInput | Prisma.ProveedorCreateOrConnectWithoutNegocioInput[]
+  createMany?: Prisma.ProveedorCreateManyNegocioInputEnvelope
+  connect?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+}
+
+export type ProveedorUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ProveedorCreateWithoutNegocioInput, Prisma.ProveedorUncheckedCreateWithoutNegocioInput> | Prisma.ProveedorCreateWithoutNegocioInput[] | Prisma.ProveedorUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ProveedorCreateOrConnectWithoutNegocioInput | Prisma.ProveedorCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ProveedorUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ProveedorUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ProveedorCreateManyNegocioInputEnvelope
+  set?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  disconnect?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  delete?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  connect?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  update?: Prisma.ProveedorUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ProveedorUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ProveedorUpdateManyWithWhereWithoutNegocioInput | Prisma.ProveedorUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ProveedorScalarWhereInput | Prisma.ProveedorScalarWhereInput[]
+}
+
+export type ProveedorUncheckedUpdateManyWithoutNegocioNestedInput = {
+  create?: Prisma.XOR<Prisma.ProveedorCreateWithoutNegocioInput, Prisma.ProveedorUncheckedCreateWithoutNegocioInput> | Prisma.ProveedorCreateWithoutNegocioInput[] | Prisma.ProveedorUncheckedCreateWithoutNegocioInput[]
+  connectOrCreate?: Prisma.ProveedorCreateOrConnectWithoutNegocioInput | Prisma.ProveedorCreateOrConnectWithoutNegocioInput[]
+  upsert?: Prisma.ProveedorUpsertWithWhereUniqueWithoutNegocioInput | Prisma.ProveedorUpsertWithWhereUniqueWithoutNegocioInput[]
+  createMany?: Prisma.ProveedorCreateManyNegocioInputEnvelope
+  set?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  disconnect?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  delete?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  connect?: Prisma.ProveedorWhereUniqueInput | Prisma.ProveedorWhereUniqueInput[]
+  update?: Prisma.ProveedorUpdateWithWhereUniqueWithoutNegocioInput | Prisma.ProveedorUpdateWithWhereUniqueWithoutNegocioInput[]
+  updateMany?: Prisma.ProveedorUpdateManyWithWhereWithoutNegocioInput | Prisma.ProveedorUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.ProveedorScalarWhereInput | Prisma.ProveedorScalarWhereInput[]
 }
 
 export type ProveedorCreateNestedOneWithoutProductosInput = {
@@ -441,6 +523,69 @@ export type ProveedorUpdateOneWithoutStockEntriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProveedorUpdateToOneWithWhereWithoutStockEntriesInput, Prisma.ProveedorUpdateWithoutStockEntriesInput>, Prisma.ProveedorUncheckedUpdateWithoutStockEntriesInput>
 }
 
+export type ProveedorCreateWithoutNegocioInput = {
+  nombre: string
+  telefono?: string | null
+  contacto?: string | null
+  notas?: string | null
+  activo?: boolean
+  createdAt?: Date | string
+  productos?: Prisma.ProductoCreateNestedManyWithoutProveedorInput
+  stockEntries?: Prisma.StockEntryCreateNestedManyWithoutProveedorInput
+}
+
+export type ProveedorUncheckedCreateWithoutNegocioInput = {
+  id?: number
+  nombre: string
+  telefono?: string | null
+  contacto?: string | null
+  notas?: string | null
+  activo?: boolean
+  createdAt?: Date | string
+  productos?: Prisma.ProductoUncheckedCreateNestedManyWithoutProveedorInput
+  stockEntries?: Prisma.StockEntryUncheckedCreateNestedManyWithoutProveedorInput
+}
+
+export type ProveedorCreateOrConnectWithoutNegocioInput = {
+  where: Prisma.ProveedorWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProveedorCreateWithoutNegocioInput, Prisma.ProveedorUncheckedCreateWithoutNegocioInput>
+}
+
+export type ProveedorCreateManyNegocioInputEnvelope = {
+  data: Prisma.ProveedorCreateManyNegocioInput | Prisma.ProveedorCreateManyNegocioInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProveedorUpsertWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ProveedorWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProveedorUpdateWithoutNegocioInput, Prisma.ProveedorUncheckedUpdateWithoutNegocioInput>
+  create: Prisma.XOR<Prisma.ProveedorCreateWithoutNegocioInput, Prisma.ProveedorUncheckedCreateWithoutNegocioInput>
+}
+
+export type ProveedorUpdateWithWhereUniqueWithoutNegocioInput = {
+  where: Prisma.ProveedorWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProveedorUpdateWithoutNegocioInput, Prisma.ProveedorUncheckedUpdateWithoutNegocioInput>
+}
+
+export type ProveedorUpdateManyWithWhereWithoutNegocioInput = {
+  where: Prisma.ProveedorScalarWhereInput
+  data: Prisma.XOR<Prisma.ProveedorUpdateManyMutationInput, Prisma.ProveedorUncheckedUpdateManyWithoutNegocioInput>
+}
+
+export type ProveedorScalarWhereInput = {
+  AND?: Prisma.ProveedorScalarWhereInput | Prisma.ProveedorScalarWhereInput[]
+  OR?: Prisma.ProveedorScalarWhereInput[]
+  NOT?: Prisma.ProveedorScalarWhereInput | Prisma.ProveedorScalarWhereInput[]
+  id?: Prisma.IntFilter<"Proveedor"> | number
+  nombre?: Prisma.StringFilter<"Proveedor"> | string
+  telefono?: Prisma.StringNullableFilter<"Proveedor"> | string | null
+  contacto?: Prisma.StringNullableFilter<"Proveedor"> | string | null
+  notas?: Prisma.StringNullableFilter<"Proveedor"> | string | null
+  activo?: Prisma.BoolFilter<"Proveedor"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Proveedor"> | Date | string
+  negocioId?: Prisma.IntFilter<"Proveedor"> | number
+}
+
 export type ProveedorCreateWithoutProductosInput = {
   nombre: string
   telefono?: string | null
@@ -449,6 +594,7 @@ export type ProveedorCreateWithoutProductosInput = {
   activo?: boolean
   createdAt?: Date | string
   stockEntries?: Prisma.StockEntryCreateNestedManyWithoutProveedorInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutProveedoresInput
 }
 
 export type ProveedorUncheckedCreateWithoutProductosInput = {
@@ -459,6 +605,7 @@ export type ProveedorUncheckedCreateWithoutProductosInput = {
   notas?: string | null
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
   stockEntries?: Prisma.StockEntryUncheckedCreateNestedManyWithoutProveedorInput
 }
 
@@ -486,6 +633,7 @@ export type ProveedorUpdateWithoutProductosInput = {
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   stockEntries?: Prisma.StockEntryUpdateManyWithoutProveedorNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutProveedoresNestedInput
 }
 
 export type ProveedorUncheckedUpdateWithoutProductosInput = {
@@ -496,6 +644,7 @@ export type ProveedorUncheckedUpdateWithoutProductosInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   stockEntries?: Prisma.StockEntryUncheckedUpdateManyWithoutProveedorNestedInput
 }
 
@@ -507,6 +656,7 @@ export type ProveedorCreateWithoutStockEntriesInput = {
   activo?: boolean
   createdAt?: Date | string
   productos?: Prisma.ProductoCreateNestedManyWithoutProveedorInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutProveedoresInput
 }
 
 export type ProveedorUncheckedCreateWithoutStockEntriesInput = {
@@ -517,6 +667,7 @@ export type ProveedorUncheckedCreateWithoutStockEntriesInput = {
   notas?: string | null
   activo?: boolean
   createdAt?: Date | string
+  negocioId?: number
   productos?: Prisma.ProductoUncheckedCreateNestedManyWithoutProveedorInput
 }
 
@@ -544,6 +695,7 @@ export type ProveedorUpdateWithoutStockEntriesInput = {
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productos?: Prisma.ProductoUpdateManyWithoutProveedorNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutProveedoresNestedInput
 }
 
 export type ProveedorUncheckedUpdateWithoutStockEntriesInput = {
@@ -554,7 +706,51 @@ export type ProveedorUncheckedUpdateWithoutStockEntriesInput = {
   notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   productos?: Prisma.ProductoUncheckedUpdateManyWithoutProveedorNestedInput
+}
+
+export type ProveedorCreateManyNegocioInput = {
+  id?: number
+  nombre: string
+  telefono?: string | null
+  contacto?: string | null
+  notas?: string | null
+  activo?: boolean
+  createdAt?: Date | string
+}
+
+export type ProveedorUpdateWithoutNegocioInput = {
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productos?: Prisma.ProductoUpdateManyWithoutProveedorNestedInput
+  stockEntries?: Prisma.StockEntryUpdateManyWithoutProveedorNestedInput
+}
+
+export type ProveedorUncheckedUpdateWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productos?: Prisma.ProductoUncheckedUpdateManyWithoutProveedorNestedInput
+  stockEntries?: Prisma.StockEntryUncheckedUpdateManyWithoutProveedorNestedInput
+}
+
+export type ProveedorUncheckedUpdateManyWithoutNegocioInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -605,8 +801,10 @@ export type ProveedorSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   notas?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
   productos?: boolean | Prisma.Proveedor$productosArgs<ExtArgs>
   stockEntries?: boolean | Prisma.Proveedor$stockEntriesArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ProveedorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proveedor"]>
 
@@ -618,6 +816,8 @@ export type ProveedorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   notas?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proveedor"]>
 
 export type ProveedorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -628,6 +828,8 @@ export type ProveedorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   notas?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proveedor"]>
 
 export type ProveedorSelectScalar = {
@@ -638,22 +840,29 @@ export type ProveedorSelectScalar = {
   notas?: boolean
   activo?: boolean
   createdAt?: boolean
+  negocioId?: boolean
 }
 
-export type ProveedorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "telefono" | "contacto" | "notas" | "activo" | "createdAt", ExtArgs["result"]["proveedor"]>
+export type ProveedorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "telefono" | "contacto" | "notas" | "activo" | "createdAt" | "negocioId", ExtArgs["result"]["proveedor"]>
 export type ProveedorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   productos?: boolean | Prisma.Proveedor$productosArgs<ExtArgs>
   stockEntries?: boolean | Prisma.Proveedor$stockEntriesArgs<ExtArgs>
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ProveedorCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ProveedorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ProveedorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ProveedorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
+export type ProveedorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
+}
 
 export type $ProveedorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Proveedor"
   objects: {
     productos: Prisma.$ProductoPayload<ExtArgs>[]
     stockEntries: Prisma.$StockEntryPayload<ExtArgs>[]
+    negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -663,6 +872,7 @@ export type $ProveedorPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     notas: string | null
     activo: boolean
     createdAt: Date
+    negocioId: number
   }, ExtArgs["result"]["proveedor"]>
   composites: {}
 }
@@ -1059,6 +1269,7 @@ export interface Prisma__ProveedorClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   productos<T extends Prisma.Proveedor$productosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proveedor$productosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockEntries<T extends Prisma.Proveedor$stockEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proveedor$stockEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1095,6 +1306,7 @@ export interface ProveedorFieldRefs {
   readonly notas: Prisma.FieldRef<"Proveedor", 'String'>
   readonly activo: Prisma.FieldRef<"Proveedor", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Proveedor", 'DateTime'>
+  readonly negocioId: Prisma.FieldRef<"Proveedor", 'Int'>
 }
     
 
@@ -1349,6 +1561,10 @@ export type ProveedorCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    */
   data: Prisma.ProveedorCreateManyInput | Prisma.ProveedorCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProveedorIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1419,6 +1635,10 @@ export type ProveedorUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    * Limit how many Proveedors to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProveedorIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
