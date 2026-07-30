@@ -1,5 +1,11 @@
 export type Tarifa = "PARTICULAR" | "MESA";
 
+/** Redondea hacia arriba al siguiente múltiplo de 100. Ej.: 20.342 → 20.400. */
+export function redondearPrecio(valor: number): number {
+  if (!Number.isFinite(valor)) return valor;
+  return Math.ceil(valor / 100) * 100;
+}
+
 export function calcularPrecio(precioBase: number, tarifa: Tarifa, recargoMesaPct: number) {
   return tarifa === "MESA" ? precioBase * (1 + recargoMesaPct / 100) : precioBase;
 }

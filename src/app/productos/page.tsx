@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, FormEvent } from "react";
 import dynamic from "next/dynamic";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -8,6 +8,7 @@ import Badge from "@/components/ui/Badge";
 import Plegable from "@/components/ui/Plegable";
 import { input, label, th, td, trHover } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
+import { redondearPrecio } from "@/lib/precio";
 
 const ImportarProductos = dynamic(() => import("@/components/ImportarProductos"), {
   loading: () => <div className="h-48 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
@@ -54,11 +55,32 @@ const emptyForm = {
 
 type EditForm = typeof emptyForm & { precioVentaMesaManual: boolean };
 
+type CampoMasivo =
+  | "categoriaId"
+  | "precioCosto"
+  | "precioVenta"
+  | "precioVentaMesa"
+  | "stock"
+  | "unidad"
+  | "proveedorId"
+  | "activo";
+
+const emptyBulkForm = {
+  categoriaId: "",
+  precioCosto: "",
+  precioVenta: "",
+  precioVentaMesa: "",
+  stock: "",
+  unidad: "unidad",
+  proveedorId: "",
+  activo: "true",
+};
+
 const MARGEN_SUGERIDO_PCT = 30;
 
 function calcularVentaSugerida(costo: string) {
   const num = Number(costo);
-  return num > 0 ? (num * (1 + MARGEN_SUGERIDO_PCT / 100)).toFixed(2) : "";
+  return num > 0 ? String(redondearPrecio(num * (1 + MARGEN_SUGERIDO_PCT / 100))) : "";
 }
 
 // El precio de mesa sugerido = precio de venta normal + el % de recargo de mesa (Configuración)
@@ -67,7 +89,7 @@ function calcularVentaMesaSugerida(venta: string, costo: string, recargoMesaPct:
   const ventaNum = Number(venta);
   const costoNum = Number(costo);
   if (!ventaNum) return "";
-  return (ventaNum + costoNum * (recargoMesaPct / 100)).toFixed(2);
+  return String(redondearPrecio(ventaNum + costoNum * (recargoMesaPct / 100)));
 }
 
 function margenPct(costo: number, venta: number): number | null {
@@ -121,6 +143,12 @@ export default function ProductosPage() {
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [edit, setEdit] = useState<EditForm>({ ...emptyForm, precioVentaMesaManual: false });
   const [errorFila, setErrorFila] = useState("");
+  const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
+  const [mostrarEdicionMasiva, setMostrarEdicionMasiva] = useState(false);
+  const [camposMasivos, setCamposMasivos] = useState<Set<CampoMasivo>>(new Set());
+  const [bulkForm, setBulkForm] = useState(emptyBulkForm);
+  const [guardandoMasivo, setGuardandoMasivo] = useState(false);
+  const seleccionarTodosRef = useRef<HTMLInputElement>(null);
 
   async function cargar() {
     setLoading(true);
@@ -290,6 +318,82 @@ export default function ProductosPage() {
     });
   }, [productos, mostrarInactivos, filtroCategoria, busqueda]);
 
+  const idsVisibles = useMemo(() => listado.map((p) => p.id), [listado]);
+  const seleccionadosVisibles = idsVisibles.filter((id) => seleccionados.has(id)).length;
+  const todosVisiblesSeleccionados = idsVisibles.length > 0 && seleccionadosVisibles === idsVisibles.length;
+
+  useEffect(() => {
+    if (seleccionarTodosRef.current) {
+      seleccionarTodosRef.current.indeterminate =
+        seleccionadosVisibles > 0 && !todosVisiblesSeleccionados;
+    }
+  }, [seleccionadosVisibles, todosVisiblesSeleccionados]);
+
+  function alternarSeleccion(id: number) {
+    setSeleccionados((actuales) => {
+      const siguientes = new Set(actuales);
+      if (siguientes.has(id)) siguientes.delete(id);
+      else siguientes.add(id);
+      return siguientes;
+    });
+  }
+
+  function alternarVisibles() {
+    setSeleccionados((actuales) => {
+      const siguientes = new Set(actuales);
+      if (todosVisiblesSeleccionados) idsVisibles.forEach((id) => siguientes.delete(id));
+      else idsVisibles.forEach((id) => siguientes.add(id));
+      return siguientes;
+    });
+  }
+
+  function alternarCampoMasivo(campo: CampoMasivo) {
+    setCamposMasivos((actuales) => {
+      const siguientes = new Set(actuales);
+      if (siguientes.has(campo)) siguientes.delete(campo);
+      else siguientes.add(campo);
+      return siguientes;
+    });
+  }
+
+  async function guardarEdicionMasiva(e: FormEvent) {
+    e.preventDefault();
+    setErrorFila("");
+    if (seleccionados.size === 0 || camposMasivos.size === 0) return;
+
+    const cambios: Record<string, string | boolean | null> = {};
+    for (const campo of camposMasivos) {
+      if (campo === "categoriaId" || campo === "proveedorId") {
+        cambios[campo] = bulkForm[campo] || null;
+      } else if (campo === "activo") {
+        cambios.activo = bulkForm.activo === "true";
+      } else {
+        cambios[campo] = bulkForm[campo];
+      }
+    }
+    if (camposMasivos.has("precioVentaMesa")) cambios.precioVentaMesaManual = true;
+
+    setGuardandoMasivo(true);
+    const res = await fetch("/api/productos", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: Array.from(seleccionados), cambios }),
+    });
+    setGuardandoMasivo(false);
+
+    if (!res.ok) {
+      const data = await res.json();
+      setErrorFila(data.error || "No se pudieron actualizar los productos");
+      return;
+    }
+
+    setSeleccionados(new Set());
+    setCamposMasivos(new Set());
+    setBulkForm(emptyBulkForm);
+    setMostrarEdicionMasiva(false);
+    await cargar();
+  }
+
   const opcionesCategoria = categorias.filter((c) => c.activo || String(c.id) === edit.categoriaId);
 
   return (
@@ -438,7 +542,24 @@ export default function ProductosPage() {
             </select>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} producto(s)</span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} producto(s)</span>
+              {seleccionados.size > 0 && (
+                <>
+                  <Badge variant="neutral">{seleccionados.size} seleccionado(s)</Badge>
+                  <Button type="button" size="sm" variant="primary" onClick={() => setMostrarEdicionMasiva(true)}>
+                    Editar selección
+                  </Button>
+                  <button
+                    type="button"
+                    className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                    onClick={() => setSeleccionados(new Set())}
+                  >
+                    Limpiar
+                  </button>
+                </>
+              )}
+            </div>
             <label className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
               <input
                 type="checkbox"
@@ -448,6 +569,89 @@ export default function ProductosPage() {
               Mostrar dados de baja
             </label>
           </div>
+          {mostrarEdicionMasiva && seleccionados.size > 0 && (
+            <form
+              onSubmit={guardarEdicionMasiva}
+              className="rounded-lg border border-blue-200 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/20"
+            >
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    Editar {seleccionados.size} producto(s)
+                  </p>
+                  <p className="text-xs text-neutral-500">Marcá únicamente los campos que querés reemplazar en todos.</p>
+                </div>
+                <button type="button" className="text-sm text-neutral-500" onClick={() => setMostrarEdicionMasiva(false)}>
+                  Cerrar
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {[
+                  ["precioCosto", "Precio de costo", "number"],
+                  ["precioVenta", "Precio de venta", "number"],
+                  ["precioVentaMesa", "Precio venta mesa", "number"],
+                  ["stock", "Stock", "number"],
+                  ["unidad", "Unidad", "text"],
+                ].map(([campo, texto, tipo]) => (
+                  <label key={campo} className="block">
+                    <span className={`${label} flex items-center gap-1.5`}>
+                      <input
+                        type="checkbox"
+                        checked={camposMasivos.has(campo as CampoMasivo)}
+                        onChange={() => alternarCampoMasivo(campo as CampoMasivo)}
+                      />
+                      {texto}
+                    </span>
+                    <input
+                      type={tipo}
+                      step={tipo === "number" ? "0.01" : undefined}
+                      className={input}
+                      disabled={!camposMasivos.has(campo as CampoMasivo)}
+                      value={bulkForm[campo as keyof typeof bulkForm]}
+                      onChange={(e) => setBulkForm({ ...bulkForm, [campo]: e.target.value })}
+                      required={camposMasivos.has(campo as CampoMasivo)}
+                    />
+                  </label>
+                ))}
+                <label className="block">
+                  <span className={`${label} flex items-center gap-1.5`}>
+                    <input type="checkbox" checked={camposMasivos.has("categoriaId")} onChange={() => alternarCampoMasivo("categoriaId")} />
+                    Categoría
+                  </span>
+                  <select className={input} disabled={!camposMasivos.has("categoriaId")} value={bulkForm.categoriaId} onChange={(e) => setBulkForm({ ...bulkForm, categoriaId: e.target.value })}>
+                    <option value="">Sin categoría</option>
+                    {categorias.filter((c) => c.activo).map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className={`${label} flex items-center gap-1.5`}>
+                    <input type="checkbox" checked={camposMasivos.has("proveedorId")} onChange={() => alternarCampoMasivo("proveedorId")} />
+                    Proveedor
+                  </span>
+                  <select className={input} disabled={!camposMasivos.has("proveedorId")} value={bulkForm.proveedorId} onChange={(e) => setBulkForm({ ...bulkForm, proveedorId: e.target.value })}>
+                    <option value="">Sin proveedor</option>
+                    {proveedores.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className={`${label} flex items-center gap-1.5`}>
+                    <input type="checkbox" checked={camposMasivos.has("activo")} onChange={() => alternarCampoMasivo("activo")} />
+                    Estado
+                  </span>
+                  <select className={input} disabled={!camposMasivos.has("activo")} value={bulkForm.activo} onChange={(e) => setBulkForm({ ...bulkForm, activo: e.target.value })}>
+                    <option value="true">Activo</option>
+                    <option value="false">Dado de baja</option>
+                  </select>
+                </label>
+              </div>
+              <div className="mt-3 flex items-center gap-3">
+                <Button type="submit" size="sm" variant="primary" disabled={guardandoMasivo || camposMasivos.size === 0}>
+                  {guardandoMasivo ? "Guardando..." : `Aplicar a ${seleccionados.size} producto(s)`}
+                </Button>
+                {camposMasivos.size === 0 && <span className="text-xs text-neutral-500">Elegí al menos un campo.</span>}
+              </div>
+            </form>
+          )}
           {errorFila && <span className="text-sm text-red-400">{errorFila}</span>}
         </div>
         {loading ? (
@@ -457,6 +661,15 @@ export default function ProductosPage() {
             <table className="w-full">
               <thead className="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
                 <tr>
+                  <th className={`${th} w-10`}>
+                    <input
+                      ref={seleccionarTodosRef}
+                      type="checkbox"
+                      aria-label="Seleccionar todos los productos visibles"
+                      checked={todosVisiblesSeleccionados}
+                      onChange={alternarVisibles}
+                    />
+                  </th>
                   <th className={th}>Nombre</th>
                   <th className={th}>Costo</th>
                   <th className={th}>Precio venta</th>
@@ -474,6 +687,9 @@ export default function ProductosPage() {
                 {listado.map((p) =>
                   editandoId === p.id ? (
                     <tr key={p.id} className={trHover}>
+                      <td className={td}>
+                        <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => alternarSeleccion(p.id)} aria-label={`Seleccionar ${p.nombre}`} />
+                      </td>
                       <td className={td}>
                         <input
                           className={input}
@@ -600,6 +816,9 @@ export default function ProductosPage() {
                     </tr>
                   ) : (
                     <tr key={p.id} className={`${trHover} ${!p.activo ? "opacity-40" : ""}`}>
+                      <td className={td}>
+                        <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => alternarSeleccion(p.id)} aria-label={`Seleccionar ${p.nombre}`} />
+                      </td>
                       <td className={`${td} text-neutral-900 dark:text-neutral-50 font-medium`}>{p.nombre}</td>
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
                       <td className={`${td} text-emerald-400 font-medium`}>

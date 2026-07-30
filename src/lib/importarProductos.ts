@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
+import { redondearPrecio } from "@/lib/precio";
 
 const REGLAS_CATEGORIA: [string, RegExp][] = [
   ["Whisky", /WHISK|SCOTCH|BOURBON|JOHNNIE|JHONIE|CHIVAS|JACK DANIEL|BALLANTINE|PIPERS|BUCHANAN|GLENFIDDICH|JAMESON|CLYNELISH|OLD PARR|GRANT'?S/i],
@@ -157,8 +158,8 @@ export async function procesarImportacion(
       if (existente) {
         aActualizar.push({ id: existente.id, f, categoriaId: existente.categoriaId ?? categoria.id });
       } else {
-        const precioVenta = Math.round(f.precioCosto * (1 + MARGEN_SUGERIDO_PCT / 100) * 100) / 100;
-        const precioVentaMesa = Math.round((precioVenta + f.precioCosto * (recargoMesaPct / 100)) * 100) / 100;
+        const precioVenta = redondearPrecio(f.precioCosto * (1 + MARGEN_SUGERIDO_PCT / 100));
+        const precioVentaMesa = redondearPrecio(precioVenta + f.precioCosto * (recargoMesaPct / 100));
         aCrear.push({
           nombre: f.nombre,
           codigoInterno: f.codigoInterno,

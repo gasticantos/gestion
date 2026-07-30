@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
   // Los fijados manualmente (precioVentaMesaManual = true) quedan tal cual el usuario los dejó.
   await prisma.$executeRaw`
     UPDATE "Producto"
-    SET "precioVentaMesa" = ROUND((("precioVenta" + "precioCosto" * ${Number(recargoMesaPct)} / 100))::numeric, 2)
+    SET "precioVentaMesa" = CEIL(("precioVenta" + "precioCosto" * ${Number(recargoMesaPct)} / 100) / 100) * 100
     WHERE "precioVentaMesaManual" = false
   `;
 

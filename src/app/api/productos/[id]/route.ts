@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { redondearPrecio } from "@/lib/precio";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,8 +26,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         nombre,
         codigoBarras: codigoBarras || null,
         categoriaId: categoriaId ? Number(categoriaId) : null,
-        precioVenta: precioVenta !== undefined ? Number(precioVenta) : undefined,
-        precioVentaMesa: precioVentaMesa !== undefined ? Number(precioVentaMesa) : undefined,
+        precioVenta: precioVenta !== undefined ? redondearPrecio(Number(precioVenta)) : undefined,
+        precioVentaMesa: precioVentaMesa !== undefined ? redondearPrecio(Number(precioVentaMesa)) : undefined,
         precioVentaMesaManual: precioVentaMesaManual !== undefined ? Boolean(precioVentaMesaManual) : undefined,
         precioCosto: precioCosto !== undefined ? Number(precioCosto) : undefined,
         stock: stock !== undefined ? Number(stock) : undefined,
