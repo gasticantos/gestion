@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isTauri } from "@tauri-apps/api/core";
+import { invoke, isTauri } from "@tauri-apps/api/core";
 import {
   imprimirLocal,
   listarImpresorasLocales,
@@ -46,6 +46,19 @@ function versionEsAnterior(actual: string, minima: string) {
 
 export default function EstacionImpresion() {
   const [agenteDesactualizado, setAgenteDesactualizado] = useState("");
+  const [reparando, setReparando] = useState(false);
+  const [errorReparacion, setErrorReparacion] = useState("");
+
+  async function repararInstalacion() {
+    setReparando(true);
+    setErrorReparacion("");
+    try {
+      await invoke("instalar_actualizacion");
+    } catch {
+      setReparando(false);
+      setErrorReparacion("No se pudo iniciar automáticamente. Descargá el instalador.");
+    }
+  }
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -126,17 +139,32 @@ export default function EstacionImpresion() {
 
   return (
     <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between dark:border-red-800 dark:bg-red-950 dark:text-red-50">
-      <span>
-        <strong>Impresión detenida:</strong> el agente instalado es {agenteDesactualizado} y se
-        necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
-        perderlas.
-      </span>
-      <a
-        href="/configuracion"
-        className="shrink-0 rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800"
-      >
-        Actualizar ahora
-      </a>
+      <div>
+        <span>
+          <strong>Impresión detenida:</strong> el agente instalado es {agenteDesactualizado} y se
+          necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
+          perderlas.
+        </span>
+        {errorReparacion && <p className="mt-1 font-medium">{errorReparacion}</p>}
+      </div>
+      <div className="flex shrink-0 flex-wrap gap-2">
+        {errorReparacion && (
+          <a
+            href="/downloads/Gestion-Windows-Setup.exe"
+            className="rounded-lg border border-red-700 px-3 py-2 text-center font-semibold hover:bg-red-100 dark:hover:bg-red-900"
+          >
+            Descargar instalador
+          </a>
+        )}
+        <button
+          type="button"
+          onClick={repararInstalacion}
+          disabled={reparando}
+          className="rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800 disabled:opacity-60"
+        >
+          {reparando ? "Reinstalando..." : "Reparar y actualizar"}
+        </button>
+      </div>
     </div>
   );
 }

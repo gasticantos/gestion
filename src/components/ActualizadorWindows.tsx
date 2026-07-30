@@ -94,6 +94,11 @@ export default function ActualizadorWindows() {
             Actualizar ahora
           </Button>
         )}
+        {!hayActualizacion && versionActual && (
+          <Button type="button" size="sm" variant="secondary" onClick={actualizar} disabled={cargando}>
+            Reparar instalación
+          </Button>
+        )}
       </div>
       {estado && <p className="text-sm text-emerald-500">{estado}</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
