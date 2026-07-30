@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AutoPrint from "@/components/AutoPrint";
+import { formatearFechaHora } from "@/lib/formato";
 
 export default async function ReservaTicketPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,7 +25,7 @@ export default async function ReservaTicketPage({ params }: { params: Promise<{ 
       <div className="ticket bg-white text-black border border-neutral-300 rounded p-4 font-mono text-xs mx-auto w-[80mm]">
         <div className="text-center mb-2">
           <div className="font-bold text-sm">RESERVA</div>
-          <div>{new Date(reserva.fecha).toLocaleString("es-AR")}</div>
+          <div>{formatearFechaHora(reserva.fecha)}</div>
         </div>
         <div className="border-t border-dashed my-2" />
         <div className="flex justify-between">

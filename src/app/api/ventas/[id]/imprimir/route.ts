@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 import { sesionActual } from "@/lib/sesionServidor";
 import { ROL_LABEL } from "@/lib/permisos";
-import { formatearMoneda } from "@/lib/formato";
+import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (sesion) {
       lineas.push(`[[CENTER]] ${sesion.nombre.toUpperCase()} · ${ROL_LABEL[sesion.rol]}`);
     }
-    lineas.push(`[[CENTER]] ${new Date(venta.createdAt).toLocaleString("es-AR")}`);
+    lineas.push(`[[CENTER]] ${formatearFechaHora(venta.createdAt)}`);
     lineas.push("[[HR]]");
     lineas.push("[[SECTION]] DETALLE DEL PEDIDO");
 

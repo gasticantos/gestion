@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
 import { ROL_LABEL } from "@/lib/permisos";
+import { formatearFechaHora } from "@/lib/formato";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       lineas.push(
         `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` · ${ROL_LABEL[rolUsuario]}` : ""}`
       );
-      lineas.push(`[[CENTER]] ${new Date(pedido.createdAt).toLocaleString("es-AR")} · Pedido #${pedido.id}`);
+      lineas.push(`[[CENTER]] ${formatearFechaHora(pedido.createdAt)} · Pedido #${pedido.id}`);
       lineas.push("[[HR]]");
       lineas.push("[[SECTION]] PRODUCTOS");
 

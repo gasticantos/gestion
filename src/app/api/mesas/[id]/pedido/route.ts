@@ -4,6 +4,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { precioSegunTarifa, Tarifa } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
 import { ROL_LABEL } from "@/lib/permisos";
+import { formatearFechaHora } from "@/lib/formato";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
 
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         "[[HR]]",
         `[[TITLE]] ${(mesa.nombre || "Mostrador").toUpperCase()}`,
         `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` · ${ROL_LABEL[rolUsuario]}` : ""}`,
-        `[[CENTER]] ${new Date(created.createdAt).toLocaleString("es-AR")} · Pedido #${created.id}`,
+        `[[CENTER]] ${formatearFechaHora(created.createdAt)} · Pedido #${created.id}`,
         "[[HR]]",
         "[[SECTION]] PRODUCTOS",
       ];

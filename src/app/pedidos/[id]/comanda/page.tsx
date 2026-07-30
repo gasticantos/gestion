@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AutoPrint from "@/components/AutoPrint";
+import { formatearFechaHora } from "@/lib/formato";
 
 export default async function ComandaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,7 +29,7 @@ export default async function ComandaPage({ params }: { params: Promise<{ id: st
         <div className="text-center mb-2">
           <div className="font-bold text-sm">COMANDA</div>
           <div>{pedido.venta.mesa?.nombre || "Mostrador"}</div>
-          <div>{new Date(pedido.createdAt).toLocaleString("es-AR")}</div>
+          <div>{formatearFechaHora(pedido.createdAt)}</div>
         </div>
         <div className="border-t border-dashed my-2" />
         {pedido.items.map((item) => (
