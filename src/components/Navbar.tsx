@@ -24,6 +24,10 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [usuario, setUsuario] = useState<{ nombre: string; rol: Rol } | null>(null);
+  const [identidad, setIdentidad] = useState<{ nombrePrograma: string; logoPrograma: string | null }>({
+    nombrePrograma: "Gestión",
+    logoPrograma: null,
+  });
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -47,10 +51,30 @@ export default function Navbar() {
 
   useEffect(() => {
     if (pathname === "/login") return;
-    fetch("/api/auth/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setUsuario(data));
+    Promise.all([
+      fetch("/api/auth/me").then((res) => (res.ok ? res.json() : null)),
+      fetch("/api/configuracion").then((res) => (res.ok ? res.json() : null)),
+    ]).then(([usuarioActual, configuracion]) => {
+      setUsuario(usuarioActual);
+      if (configuracion) {
+        setIdentidad({
+          nombrePrograma: configuracion.nombrePrograma || "Gestión",
+          logoPrograma: configuracion.logoPrograma || null,
+        });
+        document.title = configuracion.nombrePrograma || "Gestión";
+      }
+    });
   }, [pathname]);
+
+  useEffect(() => {
+    function actualizar(evento: Event) {
+      const detalle = (evento as CustomEvent<typeof identidad>).detail;
+      setIdentidad(detalle);
+      document.title = detalle.nombrePrograma;
+    }
+    window.addEventListener("identidad-actualizada", actualizar);
+    return () => window.removeEventListener("identidad-actualizada", actualizar);
+  }, []);
 
   if (pathname === "/login") return null;
 
@@ -67,10 +91,17 @@ export default function Navbar() {
   return (
     <nav className="print:hidden sticky top-0 z-20 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-3 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 flex-wrap transition-colors text-sm sm:text-base">
       <Link href="/" className="flex items-center gap-1.5 sm:gap-2 mr-2 sm:mr-4 shrink-0">
-        <span className="grid place-items-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-600 dark:bg-blue-500 text-white font-bold text-xs sm:text-sm">
-          G
+        <span className="grid place-items-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-600 dark:bg-blue-500 text-white font-bold text-xs sm:text-sm overflow-hidden">
+          {identidad.logoPrograma ? (
+            // eslint-disable-next-line @next/next/no-img-element -- logo configurable guardado por el negocio
+            <img src={identidad.logoPrograma} alt="" className="w-full h-full object-cover" />
+          ) : (
+            identidad.nombrePrograma.charAt(0).toUpperCase() || "G"
+          )}
         </span>
-        <span className="hidden sm:inline font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Gestión</span>
+        <span className="hidden sm:inline font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+          {identidad.nombrePrograma}
+        </span>
       </Link>
 
       <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto">

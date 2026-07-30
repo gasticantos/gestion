@@ -11,6 +11,7 @@ export async function GET() {
     create: {
       negocioId: sesion.negocioId,
       margenVentaBasePct: 30,
+      nombrePrograma: "Gestión",
       precioMesaActivo: true,
       recargoMesaPct: 0,
     },
@@ -25,8 +26,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "No tenés permiso para modificar la configuración" }, { status: 403 });
   }
   const body = await req.json();
-  const { margenVentaBasePct, precioMesaActivo, recargoMesaPct } = body as {
+  const { margenVentaBasePct, nombrePrograma, logoPrograma, precioMesaActivo, recargoMesaPct } = body as {
     margenVentaBasePct: number;
+    nombrePrograma: string;
+    logoPrograma: string | null;
     precioMesaActivo: boolean;
     recargoMesaPct: number;
   };
@@ -41,17 +44,31 @@ export async function PUT(req: NextRequest) {
   ) {
     return NextResponse.json({ error: "El margen base debe ser un número mayor o igual a cero" }, { status: 400 });
   }
+  const nombreLimpio = String(nombrePrograma || "").trim();
+  if (!nombreLimpio || nombreLimpio.length > 50) {
+    return NextResponse.json({ error: "El nombre debe tener entre 1 y 50 caracteres" }, { status: 400 });
+  }
+  if (
+    logoPrograma &&
+    (!logoPrograma.startsWith("data:image/") || logoPrograma.length > 500_000)
+  ) {
+    return NextResponse.json({ error: "El logo no es válido o es demasiado grande" }, { status: 400 });
+  }
 
   const config = await prisma.configuracion.upsert({
     where: { negocioId: sesion.negocioId },
     update: {
       margenVentaBasePct: Number(margenVentaBasePct),
+      nombrePrograma: nombreLimpio,
+      logoPrograma: logoPrograma || null,
       precioMesaActivo: precioMesaActivo !== false,
       recargoMesaPct: Number(recargoMesaPct),
     },
     create: {
       negocioId: sesion.negocioId,
       margenVentaBasePct: Number(margenVentaBasePct),
+      nombrePrograma: nombreLimpio,
+      logoPrograma: logoPrograma || null,
       precioMesaActivo: precioMesaActivo !== false,
       recargoMesaPct: Number(recargoMesaPct),
     },

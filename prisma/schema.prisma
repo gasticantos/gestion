@@ -107,6 +107,8 @@ model Configuracion {
   negocioId         Int     @unique @default(1)
   negocio           Negocio @relation(fields: [negocioId], references: [id])
   margenVentaBasePct Float   @default(30)
+  nombrePrograma     String  @default("Gestión")
+  logoPrograma       String? @db.Text
   precioMesaActivo   Boolean @default(true)
   recargoMesaPct    Float   @default(0)
 }

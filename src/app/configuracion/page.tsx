@@ -19,6 +19,8 @@ type AuditoriaLog = {
 };
 
 export default function ConfiguracionPage() {
+  const [nombrePrograma, setNombrePrograma] = useState("Gestión");
+  const [logoPrograma, setLogoPrograma] = useState<string | null>(null);
   const [margenVentaBasePct, setMargenVentaBasePct] = useState("30");
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
   const [recargoMesaPct, setRecargoMesaPct] = useState("0");
@@ -43,6 +45,8 @@ export default function ConfiguracionPage() {
   async function cargar() {
     const [configRes, catRes] = await Promise.all([fetch("/api/configuracion"), fetch("/api/categorias")]);
     const data = await configRes.json();
+    setNombrePrograma(data.nombrePrograma || "Gestión");
+    setLogoPrograma(data.logoPrograma || null);
     setMargenVentaBasePct(String(data.margenVentaBasePct ?? 30));
     setPrecioMesaActivo(data.precioMesaActivo !== false);
     setRecargoMesaPct(String(data.recargoMesaPct));
@@ -74,6 +78,8 @@ export default function ConfiguracionPage() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        nombrePrograma,
+        logoPrograma,
         margenVentaBasePct: Number(margenVentaBasePct),
         precioMesaActivo,
         recargoMesaPct: Number(recargoMesaPct),
@@ -85,7 +91,55 @@ export default function ConfiguracionPage() {
       setError(data.error || "Ocurrió un error");
       return;
     }
+    const configGuardada = await res.json();
+    window.dispatchEvent(
+      new CustomEvent("identidad-actualizada", {
+        detail: {
+          nombrePrograma: configGuardada.nombrePrograma,
+          logoPrograma: configGuardada.logoPrograma,
+        },
+      })
+    );
     setOk("Guardado");
+  }
+
+  async function cargarLogo(archivo: File) {
+    if (!archivo.type.startsWith("image/")) {
+      setError("Elegí un archivo de imagen");
+      return;
+    }
+    const url = URL.createObjectURL(archivo);
+    try {
+      const imagen = new Image();
+      await new Promise<void>((resolve, reject) => {
+        imagen.onload = () => resolve();
+        imagen.onerror = () => reject(new Error("Imagen inválida"));
+        imagen.src = url;
+      });
+      const lado = Math.min(imagen.naturalWidth, imagen.naturalHeight);
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 256;
+      const contexto = canvas.getContext("2d");
+      if (!contexto) throw new Error("No se pudo procesar");
+      contexto.drawImage(
+        imagen,
+        (imagen.naturalWidth - lado) / 2,
+        (imagen.naturalHeight - lado) / 2,
+        lado,
+        lado,
+        0,
+        0,
+        256,
+        256
+      );
+      setLogoPrograma(canvas.toDataURL("image/webp", 0.82));
+      setError("");
+    } catch {
+      setError("No se pudo procesar el logo");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   async function guardarCategoria(e: FormEvent) {
@@ -168,6 +222,49 @@ export default function ConfiguracionPage() {
 
       <Card className="p-4">
         <form onSubmit={guardar} className="flex flex-col gap-3">
+          <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Identidad del programa</div>
+          <div>
+            <label className={label}>Nombre del programa</label>
+            <input
+              className={input}
+              maxLength={50}
+              value={nombrePrograma}
+              onChange={(e) => setNombrePrograma(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className={label}>Logo</label>
+            <div className="flex items-center gap-3">
+              <div className="grid place-items-center w-14 h-14 rounded-xl bg-blue-600 overflow-hidden text-white font-bold">
+                {logoPrograma ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- vista previa de una imagen local elegida por el usuario
+                  <img src={logoPrograma} alt="Logo actual" className="w-full h-full object-cover" />
+                ) : (
+                  nombrePrograma.trim().charAt(0).toUpperCase() || "G"
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="text-xs text-neutral-500"
+                  onChange={(e) => {
+                    const archivo = e.target.files?.[0];
+                    if (archivo) cargarLogo(archivo);
+                    e.target.value = "";
+                  }}
+                />
+                {logoPrograma && (
+                  <button type="button" onClick={() => setLogoPrograma(null)} className="text-xs text-red-400 text-left">
+                    Quitar logo
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="text-xs text-neutral-500 mt-1">La imagen se recorta en formato cuadrado automáticamente.</p>
+          </div>
+          <div className="border-t border-neutral-200 dark:border-neutral-800 my-1" />
           <div>
             <label className={label}>Porcentaje base de ganancia (%)</label>
             <input
