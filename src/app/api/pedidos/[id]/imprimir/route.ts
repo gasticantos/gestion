@@ -21,25 +21,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
     }
 
-    // Generar contenido de comanda en texto plano para ESC/POS
+    const configuracion = await prisma.configuracion.findFirst();
     const lineas: string[] = [];
-    lineas.push("=".repeat(40));
+    lineas.push((configuracion?.nombrePrograma || "GESTION").toUpperCase());
     lineas.push("COMANDA");
-    lineas.push("=".repeat(40));
+    lineas.push("");
     lineas.push(pedido.venta.mesa?.nombre || "Mostrador");
     const nombreUsuario = pedido.creadoPor?.nombre || sesion?.nombre || "Usuario";
     const rolUsuario = pedido.creadoPor?.rol || sesion?.rol;
     lineas.push(
-      `Usuario: ${nombreUsuario.toUpperCase()}${rolUsuario ? ` - ${ROL_LABEL[rolUsuario]}` : ""}`
+      `${nombreUsuario.toUpperCase()}${rolUsuario ? ` - ${ROL_LABEL[rolUsuario]}` : ""}`
     );
     lineas.push(new Date(pedido.createdAt).toLocaleString("es-AR"));
-    lineas.push("-".repeat(40));
+    lineas.push("");
+    lineas.push("PEDIDO");
 
     for (const item of pedido.items) {
       lineas.push(`${item.cantidad}x ${item.producto.nombre}`);
+      if (item.notas) lineas.push(`   Nota: ${item.notas}`);
     }
 
-    lineas.push("=".repeat(40));
+    lineas.push("");
 
     const contenido = lineas.join("\n");
 

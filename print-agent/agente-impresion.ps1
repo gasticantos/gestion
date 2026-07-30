@@ -43,6 +43,7 @@ Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @"
 using System;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Drawing.Printing;
 
 public static class GestionWindowsPrinter {
@@ -62,7 +63,10 @@ public static class GestionWindowsPrinter {
       document.DefaultPageSettings.Margins = new Margins(25, 25, 25, 25);
 
       document.PrintPage += delegate(object sender, PrintPageEventArgs e) {
-        using (var font = new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular, GraphicsUnit.Point)) {
+        // Negrita y renderizado sin grises: mejora mucho el contraste en impresoras
+        // termicas y evita que el texto salga fino o lavado.
+        e.Graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+        using (var font = new Font(FontFamily.GenericMonospace, 11, FontStyle.Bold, GraphicsUnit.Point)) {
           Rectangle bounds = e.MarginBounds;
           if (bounds.Width <= 0 || bounds.Height <= 0)
             bounds = new Rectangle(25, 25, Math.Max(100, e.PageBounds.Width - 50), Math.Max(100, e.PageBounds.Height - 50));
@@ -160,7 +164,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.0.7"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.0.8"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
