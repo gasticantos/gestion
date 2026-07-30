@@ -50,7 +50,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/login") return;
+    if (pathname === "/login" || usuario) return;
     Promise.all([
       fetch("/api/auth/me").then((res) => (res.ok ? res.json() : null)),
       fetch("/api/configuracion").then((res) => (res.ok ? res.json() : null)),
@@ -64,7 +64,7 @@ export default function Navbar() {
         document.title = configuracion.nombrePrograma || "Gestión";
       }
     });
-  }, [pathname]);
+  }, [pathname, usuario]);
 
   useEffect(() => {
     function actualizar(evento: Event) {

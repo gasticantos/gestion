@@ -3,7 +3,23 @@ import { prisma } from "@/lib/prisma";
 import { redondearPrecio } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (req.nextUrl.searchParams.get("venta") === "1") {
+    const productos = await prisma.producto.findMany({
+      where: { activo: true },
+      select: {
+        id: true,
+        nombre: true,
+        codigoBarras: true,
+        precioVenta: true,
+        precioVentaMesa: true,
+        stock: true,
+      },
+      orderBy: { nombre: "asc" },
+    });
+    return NextResponse.json(productos);
+  }
+
   const productos = await prisma.producto.findMany({
     select: {
       id: true,

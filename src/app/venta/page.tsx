@@ -43,7 +43,7 @@ export default function VentaPage() {
   useEffect(() => {
     // Carga productos primero (crítico para búsqueda)
     Promise.all([
-      fetch("/api/productos").then((res) => res.json()),
+      fetch("/api/productos?venta=1").then((res) => res.json()),
       fetch("/api/clientes").then((res) => res.json()),
       fetch("/api/configuracion").then((res) => res.json()),
     ]).then(([productos, clientes, configuracion]) => {

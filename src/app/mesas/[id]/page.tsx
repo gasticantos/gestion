@@ -73,33 +73,27 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [apodoInput, setApodoInput] = useState("");
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
 
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setRol(data?.rol ?? null));
-  }, []);
-
   async function cargar() {
-    const [mesaRes, cliRes, configRes] = await Promise.all([
-      fetch(`/api/mesas/${id}`),
-      fetch("/api/clientes"),
-      fetch("/api/configuracion"),
-    ]);
-    setMesa(await mesaRes.json());
-    setClientes(await cliRes.json());
-    setPrecioMesaActivo((await configRes.json()).precioMesaActivo !== false);
+    const mesaRes = await fetch(`/api/mesas/${id}`, { cache: "no-store" });
+    if (mesaRes.ok) setMesa(await mesaRes.json());
   }
 
-  // Carga productos después de los datos críticos
-  const cargarProductos = async () => {
-    const prodRes = await fetch("/api/productos");
-    setProductos((await prodRes.json()).filter((p: { activo: boolean }) => p.activo));
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- recarga al cambiar de mesa
-    cargar();
-    cargarProductos();
+    let activo = true;
+    fetch(`/api/mesas/${id}?inicial=1`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        if (!activo) return;
+        setMesa(data.mesa);
+        setProductos(data.productos);
+        setClientes(data.clientes);
+        setPrecioMesaActivo(data.precioMesaActivo);
+        setRol(data.rol);
+      })
+      .catch(() => activo && setError("No se pudo cargar la mesa"));
+    return () => {
+      activo = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -193,9 +187,30 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         return;
       }
 
+      const pedido = await res.json();
+      setMesa((actual) => {
+        if (!actual?.ventas[0]) return actual;
+        return {
+          ...actual,
+          ventas: actual.ventas.map((ventaActual, index) =>
+            index === 0
+              ? {
+                  ...ventaActual,
+                  total: pedido.ventaTotal,
+                  pedidos: [...ventaActual.pedidos, pedido],
+                  borradorRonda: null,
+                }
+              : ventaActual
+          ),
+        };
+      });
+      setProductos((actuales) =>
+        actuales.map((item) =>
+          item.id === producto.id ? { ...item, stock: item.stock - cantidad } : item
+        )
+      );
       ultimoSincronizadoRef.current = "[]";
       setRonda([]);
-      await cargar();
     } finally {
       setEnviando(false);
     }
@@ -295,36 +310,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       setEditandoApodo(false);
       await cargar();
     }
-  }
-
-  async function enviarPedido(imprimirComanda: boolean) {
-    setError("");
-    if (ronda.length === 0) {
-      setError("Agregá al menos un producto");
-      return;
-    }
-    setEnviando(true);
-    const res = await fetch(`/api/mesas/${id}/pedido`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: ronda.map((i) => ({ productoId: i.productoId, cantidad: i.cantidad, tarifa: i.tarifa })),
-      }),
-    });
-    setEnviando(false);
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error || "Ocurrió un error");
-      return;
-    }
-    const pedido = await res.json();
-    if (imprimirComanda) {
-      const resImp = await fetch(`/api/pedidos/${pedido.id}/imprimir`, { method: "POST" }).catch(() => null);
-      if (!resImp?.ok) setError("El pedido se guardó, pero no se pudo enviar la comanda a impresión.");
-    }
-    ultimoSincronizadoRef.current = "[]";
-    setRonda([]);
-    await cargar();
   }
 
   async function imprimirTicket() {

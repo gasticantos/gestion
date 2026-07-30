@@ -142,7 +142,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { comandaImpresa: true },
     });
 
-    return { ...created, trabajoIds: trabajos.map((trabajo) => trabajo.id) };
+    return {
+      ...created,
+      trabajoIds: trabajos.map((trabajo) => trabajo.id),
+      ventaTotal: venta.total + subtotalPedido,
+    };
   });
 
   return NextResponse.json(pedido, { status: 201 });

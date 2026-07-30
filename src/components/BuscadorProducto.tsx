@@ -52,30 +52,33 @@ function BuscadorProductoBase({
     );
   }, []);
 
+  const indiceBusqueda = useMemo(
+    () =>
+      productos.map((producto) => ({
+        producto,
+        nombre: producto.nombre.toLocaleLowerCase("es"),
+        codigo: producto.codigoBarras?.toLocaleLowerCase("es") || "",
+      })),
+    [productos]
+  );
+
   const resultados = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = query.trim().toLocaleLowerCase("es");
     if (!q) return [];
 
-    // Buscar por código de barras exacto
-    if (productos.some((p) => p.codigoBarras?.toLowerCase() === q)) {
-      return productos.filter((p) => p.codigoBarras?.toLowerCase() === q);
-    }
+    const exacto = indiceBusqueda.find((item) => item.codigo === q);
+    if (exacto) return [exacto.producto];
 
-    // Dividir por espacios para múltiples términos
     const terminos = q.split(/\s+/).filter(Boolean);
-
-    return productos
-      .filter((p) => {
-        const nombreLower = p.nombre.toLowerCase();
-        const codigoLower = p.codigoBarras?.toLowerCase() || "";
-
-        // Todas las palabras deben estar en el nombre o código
-        return terminos.every((termino) =>
-          nombreLower.includes(termino) || codigoLower.includes(termino)
-        );
-      })
-      .slice(0, 12);
-  }, [query, productos]);
+    const encontrados: ProductoBusqueda[] = [];
+    for (const item of indiceBusqueda) {
+      if (terminos.every((termino) => item.nombre.includes(termino) || item.codigo.includes(termino))) {
+        encontrados.push(item.producto);
+        if (encontrados.length === 12) break;
+      }
+    }
+    return encontrados;
+  }, [query, indiceBusqueda]);
 
   function elegirProducto(p: ProductoBusqueda) {
     setMostrarTeclado(false);
