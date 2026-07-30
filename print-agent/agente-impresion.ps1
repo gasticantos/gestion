@@ -82,47 +82,16 @@ function Send-RawDataToPrinter {
 function Send-TextWithWindowsDriver {
   param([string]$PrinterName, [string]$Text)
 
-  Add-Type -AssemblyName System.Drawing
-  $documento = New-Object System.Drawing.Printing.PrintDocument
-  try {
-    $documento.PrinterSettings.PrinterName = $PrinterName
-    if (-not $documento.PrinterSettings.IsValid) {
-      throw "La impresora '$PrinterName' no esta disponible en Windows"
-    }
-
-    # StandardPrintController evita cualquier ventana de progreso o confirmacion.
-    $documento.PrintController = New-Object System.Drawing.Printing.StandardPrintController
-    $documento.DocumentName = "Ticket Gestion"
-
-    $textoTicket = [string]$Text
-    $imprimirPagina = {
-      param($sender, $evento)
-      $fuente = New-Object System.Drawing.Font(
-        [System.Drawing.FontFamily]::GenericMonospace,
-        9,
-        [System.Drawing.FontStyle]::Regular
-      )
-      try {
-        $area = $evento.Graphics.VisibleClipBounds
-        $evento.Graphics.DrawString(
-          $textoTicket,
-          $fuente,
-          [System.Drawing.Brushes]::Black,
-          [single]($area.Left + 5),
-          [single]($area.Top + 5)
-        )
-        $evento.HasMorePages = $false
-      } finally {
-        $fuente.Dispose()
-      }
-    }.GetNewClosure()
-
-    $documento.add_PrintPage($imprimirPagina)
-    $documento.Print()
-    $documento.remove_PrintPage($imprimirPagina)
-  } finally {
-    $documento.Dispose()
+  $impresora = Get-CimInstance Win32_Printer |
+    Where-Object { $_.Name -eq $PrinterName } |
+    Select-Object -First 1
+  if (-not $impresora) {
+    throw "La impresora '$PrinterName' no esta disponible en Windows"
   }
+
+  # Out-Printer utiliza la misma cola y el mismo controlador que la pagina de prueba
+  # de Windows. No abre dialogos y evita generar una pagina grafica vacia.
+  [string]$Text | Out-Printer -Name $PrinterName -ErrorAction Stop
 }
 
 $listener = New-Object System.Net.HttpListener
