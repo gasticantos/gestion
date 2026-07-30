@@ -217,6 +217,16 @@ public static class GestionWindowsPrinter {
         Rectangle bounds = e.MarginBounds;
         if (bounds.Width <= 0 || bounds.Height <= 0)
           bounds = new Rectangle(10, 3, Math.Max(100, e.PageBounds.Width - 20), Math.Max(100, e.PageBounds.Height - 13));
+        // MarginBounds incluye el margen físico del controlador, aunque Graphics ya parte
+        // desde el área imprimible. Compensarlo evita que todo el ticket quede corrido a la derecha.
+        int hardMarginX = (int)Math.Round(e.PageSettings.HardMarginX);
+        int hardMarginY = (int)Math.Round(e.PageSettings.HardMarginY);
+        bounds = new Rectangle(
+          Math.Max(0, bounds.X - hardMarginX),
+          Math.Max(0, bounds.Y - hardMarginY),
+          bounds.Width,
+          bounds.Height
+        );
 
         DrawStyledTicket(e.Graphics, bounds, text);
         e.HasMorePages = false;
@@ -304,7 +314,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.6"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.7"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
@@ -345,7 +355,13 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "POST" -and $request.Url.AbsolutePath -eq "/imprimir") {
-      $reader = New-Object System.IO.StreamReader($request.InputStream, $request.ContentEncoding)
+      # El navegador siempre envía JSON en UTF-8. Usar explícitamente esa codificación evita
+      # mojibake en textos como "Dueño", "Gestión" o nombres con acentos.
+      $reader = New-Object System.IO.StreamReader(
+        $request.InputStream,
+        [System.Text.Encoding]::UTF8,
+        $true
+      )
       $body = $reader.ReadToEnd()
       $reader.Close()
 
