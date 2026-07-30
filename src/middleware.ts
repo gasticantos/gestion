@@ -10,6 +10,7 @@ const PUBLICAS = [
   "/api/auth/logout",
   "/manifest.webmanifest",
   "/icons",
+  "/downloads",
 ];
 
 export async function middleware(req: NextRequest) {
