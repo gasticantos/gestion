@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
   const { itemId } = await params;
@@ -47,26 +48,52 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { itemId } = await params;
 
   try {
-    const item = await prisma.pedidoItem.findUnique({ where: { id: Number(itemId) } });
+    const item = await prisma.pedidoItem.findUnique({
+      where: { id: Number(itemId) },
+      include: {
+        producto: { select: { nombre: true } },
+        pedido: {
+          select: {
+            ventaId: true,
+            venta: {
+              select: {
+                mesa: { select: { id: true, nombre: true, apodo: true } },
+              },
+            },
+          },
+        },
+      },
+    });
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
     }
 
-    await prisma.pedidoItem.delete({ where: { id: Number(itemId) } });
+    await prisma.$transaction([
+      prisma.pedidoItem.delete({ where: { id: Number(itemId) } }),
+      prisma.producto.update({
+        where: { id: item.productoId },
+        data: { stock: { increment: item.cantidad } },
+      }),
+      prisma.venta.update({
+        where: { id: item.pedido.ventaId },
+        data: { total: { decrement: item.subtotal } },
+      }),
+    ]);
 
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: item.pedidoId },
-      include: { items: true },
+    const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
+    const mesa = item.pedido.venta.mesa;
+    const nombreMesa = mesa?.apodo || mesa?.nombre || "Mostrador";
+    await registrarAuditoria(
+      usuarioId,
+      "quitar_producto_mesa",
+      `${item.cantidad} x ${item.producto.nombre} quitado de ${nombreMesa} · Venta #${item.pedido.ventaId}`
+    );
+
+    return NextResponse.json({
+      success: true,
+      totalDescontado: item.subtotal,
+      stockDevuelto: item.cantidad,
     });
-    if (pedido) {
-      const nuevoTotal = pedido.items.reduce((acc, i) => acc + i.subtotal, 0);
-      await prisma.venta.update({
-        where: { id: pedido.ventaId },
-        data: { total: nuevoTotal },
-      });
-    }
-
-    return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json({ error: "No se pudo eliminar el item" }, { status: 500 });
   }
