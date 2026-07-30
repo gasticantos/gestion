@@ -65,6 +65,8 @@ export async function POST(req: NextRequest) {
     where: { id: { in: items.map((i) => Number(i.productoId)) } },
   });
   const porId = new Map(productos.map((p) => [p.id, p]));
+  const configuracion = await prisma.configuracion.findFirst();
+  const precioMesaActivo = configuracion?.precioMesaActivo !== false;
 
   for (const item of items) {
     const producto = porId.get(Number(item.productoId));
@@ -73,7 +75,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const itemTarifa = (item: ItemInput): Tarifa => (item.tarifa === "MESA" ? "MESA" : "PARTICULAR");
+  const itemTarifa = (item: ItemInput): Tarifa =>
+    precioMesaActivo && item.tarifa === "MESA" ? "MESA" : "PARTICULAR";
 
   const subtotal = items.reduce((acc, item) => {
     const producto = porId.get(Number(item.productoId))!;

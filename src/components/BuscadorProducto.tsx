@@ -19,12 +19,14 @@ function BuscadorProductoBase({
   productos,
   onSeleccionar,
   elegirPrecio: pedirPrecio = true,
+  precioMesaActivo = true,
   placeholder,
 }: {
   productos: ProductoBusqueda[];
   onSeleccionar: (p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) => void;
   /** Si es false, agrega directo al precio de mostrador sin mostrar el paso de elegir precio (uso en carga de stock). */
   elegirPrecio?: boolean;
+  precioMesaActivo?: boolean;
   placeholder?: string;
 }) {
   const [query, setQuery] = useState("");
@@ -57,7 +59,7 @@ function BuscadorProductoBase({
   }, [query, productos]);
 
   function elegirProducto(p: ProductoBusqueda) {
-    if (!pedirPrecio) {
+    if (!pedirPrecio || !precioMesaActivo) {
       onSeleccionar(p, "PARTICULAR", p.precioVenta);
       setQuery("");
       inputRef.current?.focus();

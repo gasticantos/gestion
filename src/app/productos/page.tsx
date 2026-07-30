@@ -112,6 +112,7 @@ export default function ProductosPage() {
   const [ventaManual, setVentaManual] = useState(false);
   const [ventaMesaManual, setVentaMesaManual] = useState(false);
   const [margenVentaBasePct, setMargenVentaBasePct] = useState(30);
+  const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
   const [recargoMesaPct, setRecargoMesaPct] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -137,6 +138,7 @@ export default function ProductosPage() {
     setCategorias(await catRes.json());
     const config = await configRes.json();
     setMargenVentaBasePct(config.margenVentaBasePct ?? 30);
+    setPrecioMesaActivo(config.precioMesaActivo !== false);
     setRecargoMesaPct(config.recargoMesaPct);
     setLoading(false);
   }
@@ -416,19 +418,21 @@ export default function ProductosPage() {
               required
             />
           </div>
-          <div>
-            <label className={label}>
-              Precio de venta mesa{" "}
-              <MargenBadge costo={Number(form.precioCosto)} venta={Number(form.precioVentaMesa)} sugerido={!ventaMesaManual} />
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              className={input}
-              value={form.precioVentaMesa}
-              onChange={(e) => cambiarVentaMesaNuevo(e.target.value)}
-            />
-          </div>
+          {precioMesaActivo && (
+            <div>
+              <label className={label}>
+                Precio de venta mesa{" "}
+                <MargenBadge costo={Number(form.precioCosto)} venta={Number(form.precioVentaMesa)} sugerido={!ventaMesaManual} />
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                className={input}
+                value={form.precioVentaMesa}
+                onChange={(e) => cambiarVentaMesaNuevo(e.target.value)}
+              />
+            </div>
+          )}
           <div>
             <label className={label}>Stock</label>
             <input
@@ -555,7 +559,7 @@ export default function ProductosPage() {
                   <th className={th}>Nombre</th>
                   <th className={th}>Costo</th>
                   <th className={th}>Precio venta</th>
-                  <th className={th}>Precio venta mesa</th>
+                  {precioMesaActivo && <th className={th}>Precio venta mesa</th>}
                   <th className={th}>Stock</th>
                   <th className={th}>Código</th>
                   <th className={th}>Categoría</th>
@@ -602,8 +606,8 @@ export default function ProductosPage() {
                           <MargenBadge costo={Number(edicion.precioCosto)} venta={Number(edicion.precioVenta)} small />
                         </div>
                       </td>
-                      <td className={td}>
-                        <div className="flex items-start gap-1">
+                      {precioMesaActivo && (
+                        <td className={td}>
                           <input
                             type="number"
                             step="0.01"
@@ -611,24 +615,8 @@ export default function ProductosPage() {
                             value={edicion.precioVentaMesa}
                             onChange={(e) => cambiarVentaMesaEdit(p.id, e.target.value)}
                           />
-                          {edicion.precioVentaMesaManual && (
-                            <span
-                              className="text-amber-500 text-base leading-none pt-1.5 shrink-0"
-                              title="Precio fijado a mano: no se actualiza solo cuando cambia el % de recargo de mesa en Configuración. Revisalo."
-                            >
-                              ⚠️
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-0.5">
-                          <MargenBadge
-                            costo={Number(edicion.precioCosto)}
-                            venta={Number(edicion.precioVentaMesa)}
-                            sugerido={!edicion.precioVentaMesaManual}
-                            small
-                          />
-                        </div>
-                      </td>
+                        </td>
+                      )}
                       <td className={td}>
                         <input
                           type="number"
@@ -700,10 +688,12 @@ export default function ProductosPage() {
                         ${formatearMoneda(p.precioVenta)}{" "}
                         <MargenBadge costo={p.precioCosto} venta={p.precioVenta} compacto small />
                       </td>
-                      <td className={`${td} text-blue-400 font-medium`}>
-                        ${formatearMoneda(p.precioVentaMesa)}{" "}
-                        <MargenBadge costo={p.precioCosto} venta={p.precioVentaMesa} compacto small />
-                      </td>
+                      {precioMesaActivo && (
+                        <td className={`${td} text-blue-400 font-medium`}>
+                          ${formatearMoneda(p.precioVentaMesa)}{" "}
+                          <MargenBadge costo={p.precioCosto} venta={p.precioVentaMesa} compacto small />
+                        </td>
+                      )}
                       <td
                         className={`${td} font-medium ${
                           p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-700 dark:text-neutral-200"

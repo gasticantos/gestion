@@ -50,14 +50,19 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const configuracion = await prisma.configuracion.findFirst();
+    const precioMesaHabilitado = configuracion?.precioMesaActivo !== false;
+    const precioVentaRedondeado = redondearPrecio(Number(precioVenta));
     const producto = await prisma.producto.create({
       data: {
         nombre,
         codigoBarras: codigoBarras || null,
         categoriaId: categoriaId ? Number(categoriaId) : null,
-        precioVenta: redondearPrecio(Number(precioVenta)),
-        precioVentaMesa: redondearPrecio(precioVentaMesa !== undefined ? Number(precioVentaMesa) : Number(precioVenta)),
-        precioVentaMesaManual: Boolean(precioVentaMesaManual),
+        precioVenta: precioVentaRedondeado,
+        precioVentaMesa: precioMesaHabilitado
+          ? redondearPrecio(precioVentaMesa !== undefined ? Number(precioVentaMesa) : Number(precioVenta))
+          : precioVentaRedondeado,
+        precioVentaMesaManual: precioMesaHabilitado && Boolean(precioVentaMesaManual),
         precioCosto: precioCosto ? Number(precioCosto) : 0,
         stock: stock ? Number(stock) : 0,
         unidad: unidad || "unidad",
@@ -109,6 +114,8 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
+    const configuracion = await prisma.configuracion.findFirst();
+    const precioMesaHabilitado = configuracion?.precioMesaActivo !== false;
     await prisma.$transaction(
       actualizaciones.map((item) =>
         prisma.producto.update({
@@ -119,8 +126,10 @@ export async function PATCH(req: NextRequest) {
             categoriaId: item.categoriaId ? Number(item.categoriaId) : null,
             precioCosto: Number(item.precioCosto),
             precioVenta: redondearPrecio(Number(item.precioVenta)),
-            precioVentaMesa: redondearPrecio(Number(item.precioVentaMesa)),
-            precioVentaMesaManual: Boolean(item.precioVentaMesaManual),
+            precioVentaMesa: precioMesaHabilitado
+              ? redondearPrecio(Number(item.precioVentaMesa))
+              : redondearPrecio(Number(item.precioVenta)),
+            precioVentaMesaManual: precioMesaHabilitado && Boolean(item.precioVentaMesaManual),
             stock: Number(item.stock),
             unidad: String(item.unidad).trim(),
             proveedorId: item.proveedorId ? Number(item.proveedorId) : null,

@@ -113,6 +113,7 @@ export async function procesarImportacion(
 ): Promise<ResumenImportacion> {
   const config = await prisma.configuracion.findFirst();
   const margenVentaBasePct = config?.margenVentaBasePct ?? 30;
+  const precioMesaActivo = config?.precioMesaActivo !== false;
   const recargoMesaPct = config?.recargoMesaPct ?? 0;
 
   const categoriasExistentes = await prisma.categoria.findMany();
@@ -158,7 +159,9 @@ export async function procesarImportacion(
         aActualizar.push({ id: existente.id, f, categoriaId: existente.categoriaId ?? categoria.id });
       } else {
         const precioVenta = redondearPrecio(f.precioCosto * (1 + margenVentaBasePct / 100));
-        const precioVentaMesa = redondearPrecio(precioVenta + f.precioCosto * (recargoMesaPct / 100));
+        const precioVentaMesa = precioMesaActivo
+          ? redondearPrecio(precioVenta + f.precioCosto * (recargoMesaPct / 100))
+          : precioVenta;
         aCrear.push({
           nombre: f.nombre,
           codigoInterno: f.codigoInterno,

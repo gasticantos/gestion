@@ -20,6 +20,7 @@ type AuditoriaLog = {
 
 export default function ConfiguracionPage() {
   const [margenVentaBasePct, setMargenVentaBasePct] = useState("30");
+  const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
   const [recargoMesaPct, setRecargoMesaPct] = useState("0");
   const [ok, setOk] = useState("");
   const [error, setError] = useState("");
@@ -43,6 +44,7 @@ export default function ConfiguracionPage() {
     const [configRes, catRes] = await Promise.all([fetch("/api/configuracion"), fetch("/api/categorias")]);
     const data = await configRes.json();
     setMargenVentaBasePct(String(data.margenVentaBasePct ?? 30));
+    setPrecioMesaActivo(data.precioMesaActivo !== false);
     setRecargoMesaPct(String(data.recargoMesaPct));
     setCategorias(await catRes.json());
   }
@@ -73,6 +75,7 @@ export default function ConfiguracionPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         margenVentaBasePct: Number(margenVentaBasePct),
+        precioMesaActivo,
         recargoMesaPct: Number(recargoMesaPct),
       }),
     });
@@ -180,21 +183,32 @@ export default function ConfiguracionPage() {
               los precios existentes.
             </p>
           </div>
-          <div>
-            <label className={label}>Recargo por venta de mesa (%)</label>
+          <label className="flex items-center gap-3 text-sm text-neutral-700 dark:text-neutral-200">
             <input
-              type="number"
-              step="0.01"
-              min="0"
-              className={input}
-              value={recargoMesaPct}
-              onChange={(e) => setRecargoMesaPct(e.target.value)}
+              type="checkbox"
+              checked={precioMesaActivo}
+              onChange={(e) => setPrecioMesaActivo(e.target.checked)}
+              className="h-4 w-4"
             />
-            <p className="text-xs text-neutral-500 mt-1">
-              Se aplica sobre el precio de cada producto cuando la venta se cobra como &quot;Mesa&quot; en vez
-              de &quot;Particular&quot;.
-            </p>
-          </div>
+            Usar precio de venta para mesa
+          </label>
+          {precioMesaActivo && (
+            <div>
+              <label className={label}>Recargo por venta de mesa (%)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                className={input}
+                value={recargoMesaPct}
+                onChange={(e) => setRecargoMesaPct(e.target.value)}
+              />
+              <p className="text-xs text-neutral-500 mt-1">
+                Se aplica sobre el precio de cada producto cuando la venta se cobra como &quot;Mesa&quot; en vez
+                de &quot;Particular&quot;.
+              </p>
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <Button type="submit" variant="primary" disabled={enviando}>
               Guardar

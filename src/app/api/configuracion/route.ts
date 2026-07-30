@@ -8,7 +8,12 @@ export async function GET() {
   const config = await prisma.configuracion.upsert({
     where: { negocioId: sesion.negocioId },
     update: {},
-    create: { negocioId: sesion.negocioId, margenVentaBasePct: 30, recargoMesaPct: 0 },
+    create: {
+      negocioId: sesion.negocioId,
+      margenVentaBasePct: 30,
+      precioMesaActivo: true,
+      recargoMesaPct: 0,
+    },
   });
   return NextResponse.json(config);
 }
@@ -17,8 +22,9 @@ export async function PUT(req: NextRequest) {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const body = await req.json();
-  const { margenVentaBasePct, recargoMesaPct } = body as {
+  const { margenVentaBasePct, precioMesaActivo, recargoMesaPct } = body as {
     margenVentaBasePct: number;
+    precioMesaActivo: boolean;
     recargoMesaPct: number;
   };
 
@@ -37,11 +43,13 @@ export async function PUT(req: NextRequest) {
     where: { negocioId: sesion.negocioId },
     update: {
       margenVentaBasePct: Number(margenVentaBasePct),
+      precioMesaActivo: precioMesaActivo !== false,
       recargoMesaPct: Number(recargoMesaPct),
     },
     create: {
       negocioId: sesion.negocioId,
       margenVentaBasePct: Number(margenVentaBasePct),
+      precioMesaActivo: precioMesaActivo !== false,
       recargoMesaPct: Number(recargoMesaPct),
     },
   });

@@ -18,6 +18,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     proveedorId,
     activo,
   } = body;
+  const configuracion = await prisma.configuracion.findFirst();
+  const precioMesaHabilitado = configuracion?.precioMesaActivo !== false;
+  const precioVentaFinal =
+    precioVenta !== undefined ? redondearPrecio(Number(precioVenta)) : undefined;
 
   try {
     const producto = await prisma.producto.update({
@@ -26,9 +30,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         nombre,
         codigoBarras: codigoBarras || null,
         categoriaId: categoriaId ? Number(categoriaId) : null,
-        precioVenta: precioVenta !== undefined ? redondearPrecio(Number(precioVenta)) : undefined,
-        precioVentaMesa: precioVentaMesa !== undefined ? redondearPrecio(Number(precioVentaMesa)) : undefined,
-        precioVentaMesaManual: precioVentaMesaManual !== undefined ? Boolean(precioVentaMesaManual) : undefined,
+        precioVenta: precioVentaFinal,
+        precioVentaMesa: precioMesaHabilitado
+          ? precioVentaMesa !== undefined
+            ? redondearPrecio(Number(precioVentaMesa))
+            : undefined
+          : precioVentaFinal,
+        precioVentaMesaManual: precioMesaHabilitado
+          ? precioVentaMesaManual !== undefined
+            ? Boolean(precioVentaMesaManual)
+            : undefined
+          : false,
         precioCosto: precioCosto !== undefined ? Number(precioCosto) : undefined,
         stock: stock !== undefined ? Number(stock) : undefined,
         unidad,

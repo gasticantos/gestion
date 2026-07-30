@@ -71,6 +71,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [editandoItems, setEditandoItems] = useState<Set<number>>(new Set());
   const [editandoApodo, setEditandoApodo] = useState(false);
   const [apodoInput, setApodoInput] = useState("");
+  const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -79,9 +80,14 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   }, []);
 
   async function cargar() {
-    const [mesaRes, cliRes] = await Promise.all([fetch(`/api/mesas/${id}`), fetch("/api/clientes")]);
+    const [mesaRes, cliRes, configRes] = await Promise.all([
+      fetch(`/api/mesas/${id}`),
+      fetch("/api/clientes"),
+      fetch("/api/configuracion"),
+    ]);
     setMesa(await mesaRes.json());
     setClientes(await cliRes.json());
+    setPrecioMesaActivo((await configRes.json()).precioMesaActivo !== false);
   }
 
   // Carga productos después de los datos críticos
@@ -548,9 +554,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                         <tr key={`${i.productoId}-${i.tarifa}`} className={trHover}>
                           <td className={td}>
                             {i.nombre}
-                            <Badge variant={i.tarifa === "MESA" ? "accent" : "neutral"} className="ml-1">
-                              {i.tarifa === "MESA" ? "Mesa" : "Mostrador"}
-                            </Badge>
+                            {precioMesaActivo && (
+                              <Badge variant={i.tarifa === "MESA" ? "accent" : "neutral"} className="ml-1">
+                                {i.tarifa === "MESA" ? "Mesa" : "Mostrador"}
+                              </Badge>
+                            )}
                           </td>
                           <td className={`${td} text-center`}>
                             <div className="flex items-center justify-center gap-1">
@@ -599,7 +607,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
             <Card className="p-4 flex flex-col gap-3">
               <div className="text-sm text-neutral-500 dark:text-neutral-400">Agregar más productos</div>
-              <BuscadorProducto productos={productos} onSeleccionar={agregarARonda} />
+              <BuscadorProducto
+                productos={productos}
+                onSeleccionar={agregarARonda}
+                precioMesaActivo={precioMesaActivo}
+              />
             </Card>
           </div>
 

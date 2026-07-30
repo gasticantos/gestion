@@ -6,7 +6,9 @@ import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditori
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
-  const tarifa: Tarifa = body.tarifa === "PARTICULAR" ? "PARTICULAR" : "MESA";
+  const configuracion = await prisma.configuracion.findFirst();
+  const tarifa: Tarifa =
+    configuracion?.precioMesaActivo !== false && body.tarifa !== "PARTICULAR" ? "MESA" : "PARTICULAR";
 
   const mesa = await prisma.mesa.findUnique({ where: { id: Number(id) } });
 
