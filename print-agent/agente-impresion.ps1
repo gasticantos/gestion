@@ -93,12 +93,6 @@ function Send-TextWithWindowsDriver {
     # StandardPrintController evita cualquier ventana de progreso o confirmacion.
     $documento.PrintController = New-Object System.Drawing.Printing.StandardPrintController
     $documento.DocumentName = "Ticket Gestion"
-    $lineas = ([string]$Text -split "`r?`n").Count
-    $alto = [Math]::Min(32000, [Math]::Max(400, (($lineas + 6) * 16)))
-    $documento.DefaultPageSettings.PaperSize =
-      New-Object System.Drawing.Printing.PaperSize("Ticket 80mm", 315, $alto)
-    $documento.DefaultPageSettings.Margins =
-      New-Object System.Drawing.Printing.Margins(4, 4, 4, 4)
 
     $textoTicket = [string]$Text
     $imprimirPagina = {
@@ -113,7 +107,8 @@ function Send-TextWithWindowsDriver {
           $textoTicket,
           $fuente,
           [System.Drawing.Brushes]::Black,
-          $evento.MarginBounds
+          [single]0,
+          [single]0
         )
         $evento.HasMorePages = $false
       } finally {
