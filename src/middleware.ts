@@ -7,6 +7,7 @@ const PUBLICAS = [
   "/login",
   "/api/auth/login",
   "/api/auth/logout",
+  "/api/impresion/reparar",
   "/manifest.webmanifest",
   "/actualizacion.json",
   "/icons",
