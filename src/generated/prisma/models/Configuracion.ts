@@ -46,6 +46,7 @@ export type ConfiguracionMinAggregateOutputType = {
   margenVentaBasePct: number | null
   nombrePrograma: string | null
   logoPrograma: string | null
+  aliasTransferencia: string | null
   precioMesaActivo: boolean | null
   recargoMesaPct: number | null
 }
@@ -56,6 +57,7 @@ export type ConfiguracionMaxAggregateOutputType = {
   margenVentaBasePct: number | null
   nombrePrograma: string | null
   logoPrograma: string | null
+  aliasTransferencia: string | null
   precioMesaActivo: boolean | null
   recargoMesaPct: number | null
 }
@@ -66,6 +68,7 @@ export type ConfiguracionCountAggregateOutputType = {
   margenVentaBasePct: number
   nombrePrograma: number
   logoPrograma: number
+  aliasTransferencia: number
   precioMesaActivo: number
   recargoMesaPct: number
   _all: number
@@ -92,6 +95,7 @@ export type ConfiguracionMinAggregateInputType = {
   margenVentaBasePct?: true
   nombrePrograma?: true
   logoPrograma?: true
+  aliasTransferencia?: true
   precioMesaActivo?: true
   recargoMesaPct?: true
 }
@@ -102,6 +106,7 @@ export type ConfiguracionMaxAggregateInputType = {
   margenVentaBasePct?: true
   nombrePrograma?: true
   logoPrograma?: true
+  aliasTransferencia?: true
   precioMesaActivo?: true
   recargoMesaPct?: true
 }
@@ -112,6 +117,7 @@ export type ConfiguracionCountAggregateInputType = {
   margenVentaBasePct?: true
   nombrePrograma?: true
   logoPrograma?: true
+  aliasTransferencia?: true
   precioMesaActivo?: true
   recargoMesaPct?: true
   _all?: true
@@ -209,6 +215,7 @@ export type ConfiguracionGroupByOutputType = {
   margenVentaBasePct: number
   nombrePrograma: string
   logoPrograma: string | null
+  aliasTransferencia: string | null
   precioMesaActivo: boolean
   recargoMesaPct: number
   _count: ConfiguracionCountAggregateOutputType | null
@@ -242,6 +249,7 @@ export type ConfiguracionWhereInput = {
   margenVentaBasePct?: Prisma.FloatFilter<"Configuracion"> | number
   nombrePrograma?: Prisma.StringFilter<"Configuracion"> | string
   logoPrograma?: Prisma.StringNullableFilter<"Configuracion"> | string | null
+  aliasTransferencia?: Prisma.StringNullableFilter<"Configuracion"> | string | null
   precioMesaActivo?: Prisma.BoolFilter<"Configuracion"> | boolean
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
@@ -253,6 +261,7 @@ export type ConfiguracionOrderByWithRelationInput = {
   margenVentaBasePct?: Prisma.SortOrder
   nombrePrograma?: Prisma.SortOrder
   logoPrograma?: Prisma.SortOrderInput | Prisma.SortOrder
+  aliasTransferencia?: Prisma.SortOrderInput | Prisma.SortOrder
   precioMesaActivo?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
   negocio?: Prisma.NegocioOrderByWithRelationInput
@@ -267,6 +276,7 @@ export type ConfiguracionWhereUniqueInput = Prisma.AtLeast<{
   margenVentaBasePct?: Prisma.FloatFilter<"Configuracion"> | number
   nombrePrograma?: Prisma.StringFilter<"Configuracion"> | string
   logoPrograma?: Prisma.StringNullableFilter<"Configuracion"> | string | null
+  aliasTransferencia?: Prisma.StringNullableFilter<"Configuracion"> | string | null
   precioMesaActivo?: Prisma.BoolFilter<"Configuracion"> | boolean
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
@@ -278,6 +288,7 @@ export type ConfiguracionOrderByWithAggregationInput = {
   margenVentaBasePct?: Prisma.SortOrder
   nombrePrograma?: Prisma.SortOrder
   logoPrograma?: Prisma.SortOrderInput | Prisma.SortOrder
+  aliasTransferencia?: Prisma.SortOrderInput | Prisma.SortOrder
   precioMesaActivo?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
   _count?: Prisma.ConfiguracionCountOrderByAggregateInput
@@ -296,6 +307,7 @@ export type ConfiguracionScalarWhereWithAggregatesInput = {
   margenVentaBasePct?: Prisma.FloatWithAggregatesFilter<"Configuracion"> | number
   nombrePrograma?: Prisma.StringWithAggregatesFilter<"Configuracion"> | string
   logoPrograma?: Prisma.StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+  aliasTransferencia?: Prisma.StringNullableWithAggregatesFilter<"Configuracion"> | string | null
   precioMesaActivo?: Prisma.BoolWithAggregatesFilter<"Configuracion"> | boolean
   recargoMesaPct?: Prisma.FloatWithAggregatesFilter<"Configuracion"> | number
 }
@@ -304,6 +316,7 @@ export type ConfiguracionCreateInput = {
   margenVentaBasePct?: number
   nombrePrograma?: string
   logoPrograma?: string | null
+  aliasTransferencia?: string | null
   precioMesaActivo?: boolean
   recargoMesaPct?: number
   negocio?: Prisma.NegocioCreateNestedOneWithoutConfiguracionesInput
@@ -315,6 +328,7 @@ export type ConfiguracionUncheckedCreateInput = {
   margenVentaBasePct?: number
   nombrePrograma?: string
   logoPrograma?: string | null
+  aliasTransferencia?: string | null
   precioMesaActivo?: boolean
   recargoMesaPct?: number
 }
@@ -323,6 +337,7 @@ export type ConfiguracionUpdateInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutConfiguracionesNestedInput
@@ -334,6 +349,7 @@ export type ConfiguracionUncheckedUpdateInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -344,6 +360,7 @@ export type ConfiguracionCreateManyInput = {
   margenVentaBasePct?: number
   nombrePrograma?: string
   logoPrograma?: string | null
+  aliasTransferencia?: string | null
   precioMesaActivo?: boolean
   recargoMesaPct?: number
 }
@@ -352,6 +369,7 @@ export type ConfiguracionUpdateManyMutationInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -362,6 +380,7 @@ export type ConfiguracionUncheckedUpdateManyInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -382,6 +401,7 @@ export type ConfiguracionCountOrderByAggregateInput = {
   margenVentaBasePct?: Prisma.SortOrder
   nombrePrograma?: Prisma.SortOrder
   logoPrograma?: Prisma.SortOrder
+  aliasTransferencia?: Prisma.SortOrder
   precioMesaActivo?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
@@ -399,6 +419,7 @@ export type ConfiguracionMaxOrderByAggregateInput = {
   margenVentaBasePct?: Prisma.SortOrder
   nombrePrograma?: Prisma.SortOrder
   logoPrograma?: Prisma.SortOrder
+  aliasTransferencia?: Prisma.SortOrder
   precioMesaActivo?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
@@ -409,6 +430,7 @@ export type ConfiguracionMinOrderByAggregateInput = {
   margenVentaBasePct?: Prisma.SortOrder
   nombrePrograma?: Prisma.SortOrder
   logoPrograma?: Prisma.SortOrder
+  aliasTransferencia?: Prisma.SortOrder
   precioMesaActivo?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
@@ -474,6 +496,7 @@ export type ConfiguracionCreateWithoutNegocioInput = {
   margenVentaBasePct?: number
   nombrePrograma?: string
   logoPrograma?: string | null
+  aliasTransferencia?: string | null
   precioMesaActivo?: boolean
   recargoMesaPct?: number
 }
@@ -483,6 +506,7 @@ export type ConfiguracionUncheckedCreateWithoutNegocioInput = {
   margenVentaBasePct?: number
   nombrePrograma?: string
   logoPrograma?: string | null
+  aliasTransferencia?: string | null
   precioMesaActivo?: boolean
   recargoMesaPct?: number
 }
@@ -522,6 +546,7 @@ export type ConfiguracionScalarWhereInput = {
   margenVentaBasePct?: Prisma.FloatFilter<"Configuracion"> | number
   nombrePrograma?: Prisma.StringFilter<"Configuracion"> | string
   logoPrograma?: Prisma.StringNullableFilter<"Configuracion"> | string | null
+  aliasTransferencia?: Prisma.StringNullableFilter<"Configuracion"> | string | null
   precioMesaActivo?: Prisma.BoolFilter<"Configuracion"> | boolean
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
 }
@@ -531,6 +556,7 @@ export type ConfiguracionCreateManyNegocioInput = {
   margenVentaBasePct?: number
   nombrePrograma?: string
   logoPrograma?: string | null
+  aliasTransferencia?: string | null
   precioMesaActivo?: boolean
   recargoMesaPct?: number
 }
@@ -539,6 +565,7 @@ export type ConfiguracionUpdateWithoutNegocioInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -548,6 +575,7 @@ export type ConfiguracionUncheckedUpdateWithoutNegocioInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -557,6 +585,7 @@ export type ConfiguracionUncheckedUpdateManyWithoutNegocioInput = {
   margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   nombrePrograma?: Prisma.StringFieldUpdateOperationsInput | string
   logoPrograma?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aliasTransferencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioMesaActivo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -569,6 +598,7 @@ export type ConfiguracionSelect<ExtArgs extends runtime.Types.Extensions.Interna
   margenVentaBasePct?: boolean
   nombrePrograma?: boolean
   logoPrograma?: boolean
+  aliasTransferencia?: boolean
   precioMesaActivo?: boolean
   recargoMesaPct?: boolean
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
@@ -580,6 +610,7 @@ export type ConfiguracionSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   margenVentaBasePct?: boolean
   nombrePrograma?: boolean
   logoPrograma?: boolean
+  aliasTransferencia?: boolean
   precioMesaActivo?: boolean
   recargoMesaPct?: boolean
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
@@ -591,6 +622,7 @@ export type ConfiguracionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   margenVentaBasePct?: boolean
   nombrePrograma?: boolean
   logoPrograma?: boolean
+  aliasTransferencia?: boolean
   precioMesaActivo?: boolean
   recargoMesaPct?: boolean
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
@@ -602,11 +634,12 @@ export type ConfiguracionSelectScalar = {
   margenVentaBasePct?: boolean
   nombrePrograma?: boolean
   logoPrograma?: boolean
+  aliasTransferencia?: boolean
   precioMesaActivo?: boolean
   recargoMesaPct?: boolean
 }
 
-export type ConfiguracionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "negocioId" | "margenVentaBasePct" | "nombrePrograma" | "logoPrograma" | "precioMesaActivo" | "recargoMesaPct", ExtArgs["result"]["configuracion"]>
+export type ConfiguracionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "negocioId" | "margenVentaBasePct" | "nombrePrograma" | "logoPrograma" | "aliasTransferencia" | "precioMesaActivo" | "recargoMesaPct", ExtArgs["result"]["configuracion"]>
 export type ConfiguracionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
@@ -628,6 +661,7 @@ export type $ConfiguracionPayload<ExtArgs extends runtime.Types.Extensions.Inter
     margenVentaBasePct: number
     nombrePrograma: string
     logoPrograma: string | null
+    aliasTransferencia: string | null
     precioMesaActivo: boolean
     recargoMesaPct: number
   }, ExtArgs["result"]["configuracion"]>
@@ -1059,6 +1093,7 @@ export interface ConfiguracionFieldRefs {
   readonly margenVentaBasePct: Prisma.FieldRef<"Configuracion", 'Float'>
   readonly nombrePrograma: Prisma.FieldRef<"Configuracion", 'String'>
   readonly logoPrograma: Prisma.FieldRef<"Configuracion", 'String'>
+  readonly aliasTransferencia: Prisma.FieldRef<"Configuracion", 'String'>
   readonly precioMesaActivo: Prisma.FieldRef<"Configuracion", 'Boolean'>
   readonly recargoMesaPct: Prisma.FieldRef<"Configuracion", 'Float'>
 }

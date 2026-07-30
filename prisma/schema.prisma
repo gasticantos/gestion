@@ -110,6 +110,7 @@ model Configuracion {
   margenVentaBasePct Float   @default(30)
   nombrePrograma     String  @default("Gestión")
   logoPrograma       String? @db.Text
+  aliasTransferencia String?
   precioMesaActivo   Boolean @default(true)
   recargoMesaPct     Float   @default(0)
 }

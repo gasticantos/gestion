@@ -59,6 +59,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
     lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL", venta.total)}`);
 
+    if (venta.estado !== "CERRADA" && configuracion?.aliasTransferencia) {
+      lineas.push("[[HR]]");
+      lineas.push(
+        `[[NOTE]] TRANSFERENCIA · ALIAS: ${configuracion.aliasTransferencia.toUpperCase()}`
+      );
+    }
+
     if (venta.estado === "CERRADA") {
       lineas.push("[[HR]]");
       lineas.push("[[SECTION]] FORMA DE PAGO");

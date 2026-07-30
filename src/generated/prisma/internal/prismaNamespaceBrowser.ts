@@ -129,6 +129,7 @@ export const ConfiguracionScalarFieldEnum = {
   margenVentaBasePct: 'margenVentaBasePct',
   nombrePrograma: 'nombrePrograma',
   logoPrograma: 'logoPrograma',
+  aliasTransferencia: 'aliasTransferencia',
   precioMesaActivo: 'precioMesaActivo',
   recargoMesaPct: 'recargoMesaPct'
 } as const

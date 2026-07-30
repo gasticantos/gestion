@@ -21,6 +21,7 @@ type AuditoriaLog = {
 export default function ConfiguracionPage() {
   const [nombrePrograma, setNombrePrograma] = useState("Gestión");
   const [logoPrograma, setLogoPrograma] = useState<string | null>(null);
+  const [aliasTransferencia, setAliasTransferencia] = useState("");
   const [margenVentaBasePct, setMargenVentaBasePct] = useState("30");
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
   const [recargoMesaPct, setRecargoMesaPct] = useState("0");
@@ -47,6 +48,7 @@ export default function ConfiguracionPage() {
     const data = await configRes.json();
     setNombrePrograma(data.nombrePrograma || "Gestión");
     setLogoPrograma(data.logoPrograma || null);
+    setAliasTransferencia(data.aliasTransferencia || "");
     setMargenVentaBasePct(String(data.margenVentaBasePct ?? 30));
     setPrecioMesaActivo(data.precioMesaActivo !== false);
     setRecargoMesaPct(String(data.recargoMesaPct));
@@ -80,6 +82,7 @@ export default function ConfiguracionPage() {
       body: JSON.stringify({
         nombrePrograma,
         logoPrograma,
+        aliasTransferencia,
         margenVentaBasePct: Number(margenVentaBasePct),
         precioMesaActivo,
         recargoMesaPct: Number(recargoMesaPct),
@@ -263,6 +266,20 @@ export default function ConfiguracionPage() {
               </div>
             </div>
             <p className="text-xs text-neutral-500 mt-1">La imagen se recorta en formato cuadrado automáticamente.</p>
+          </div>
+          <div className="border-t border-neutral-200 dark:border-neutral-800 my-1" />
+          <div>
+            <label className={label}>Alias para transferencias</label>
+            <input
+              className={input}
+              maxLength={100}
+              value={aliasTransferencia}
+              onChange={(e) => setAliasTransferencia(e.target.value)}
+              placeholder="Ej.: elmagosrl"
+            />
+            <p className="text-xs text-neutral-500 mt-1">
+              Aparece destacado en el ticket previo que se entrega antes de cobrar.
+            </p>
           </div>
           <div className="border-t border-neutral-200 dark:border-neutral-800 my-1" />
           <div>
