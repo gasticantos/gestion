@@ -48,6 +48,28 @@ using System.Drawing.Printing;
 using System.Text;
 
 public static class GestionWindowsPrinter {
+  private static void AppendBoxedText(StringBuilder output, string text) {
+    const int innerWidth = 30;
+    string border = "+" + new string('-', innerWidth + 2) + "+";
+    output.AppendLine(border);
+
+    string remaining = (text ?? "").Trim();
+    while (remaining.Length > 0) {
+      int take = Math.Min(innerWidth, remaining.Length);
+      if (take < remaining.Length) {
+        int lastSpace = remaining.LastIndexOf(' ', take - 1, take);
+        if (lastSpace > 0) take = lastSpace;
+      }
+      string part = remaining.Substring(0, take).Trim();
+      output.AppendLine("| " + part.PadRight(innerWidth) + " |");
+      remaining = remaining.Substring(take).TrimStart();
+    }
+    if (String.IsNullOrWhiteSpace(text))
+      output.AppendLine("| " + new string(' ', innerWidth) + " |");
+
+    output.AppendLine(border);
+  }
+
   private static string StableTicketText(string text) {
     var output = new StringBuilder();
     string normalized = text.Replace("\r\n", "\n").Replace('\r', '\n');
@@ -75,9 +97,7 @@ public static class GestionWindowsPrinter {
           break;
         case "NOTE":
           output.AppendLine();
-          output.AppendLine("********************************");
-          output.AppendLine(line.ToUpperInvariant());
-          output.AppendLine("********************************");
+          AppendBoxedText(output, line.ToUpperInvariant());
           output.AppendLine();
           break;
         default:
@@ -206,7 +226,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.1"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.2"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
