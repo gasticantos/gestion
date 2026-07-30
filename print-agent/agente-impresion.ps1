@@ -54,18 +54,78 @@ function Send-RawDataToPrinter {
       throw "No se pudo iniciar el documento de impresion"
     }
     try {
-      [RawPrinterHelper.Native]::StartPagePrinter($hPrinter) | Out-Null
+      if (-not [RawPrinterHelper.Native]::StartPagePrinter($hPrinter)) {
+        throw "Windows no pudo iniciar la pagina de impresion (error $([Runtime.InteropServices.Marshal]::GetLastWin32Error()))"
+      }
       $unmanagedBytes = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($Bytes.Length)
-      [System.Runtime.InteropServices.Marshal]::Copy($Bytes, 0, $unmanagedBytes, $Bytes.Length)
-      $written = 0
-      [RawPrinterHelper.Native]::WritePrinter($hPrinter, $unmanagedBytes, $Bytes.Length, [ref]$written) | Out-Null
-      [System.Runtime.InteropServices.Marshal]::FreeHGlobal($unmanagedBytes)
-      [RawPrinterHelper.Native]::EndPagePrinter($hPrinter) | Out-Null
+      try {
+        [System.Runtime.InteropServices.Marshal]::Copy($Bytes, 0, $unmanagedBytes, $Bytes.Length)
+        $written = 0
+        $ok = [RawPrinterHelper.Native]::WritePrinter($hPrinter, $unmanagedBytes, $Bytes.Length, [ref]$written)
+        if (-not $ok -or $written -ne $Bytes.Length) {
+          throw "Windows rechazo los datos RAW (error $([Runtime.InteropServices.Marshal]::GetLastWin32Error()), enviados $written de $($Bytes.Length) bytes)"
+        }
+      } finally {
+        [System.Runtime.InteropServices.Marshal]::FreeHGlobal($unmanagedBytes)
+      }
+      if (-not [RawPrinterHelper.Native]::EndPagePrinter($hPrinter)) {
+        throw "Windows no pudo finalizar la pagina de impresion"
+      }
     } finally {
       [RawPrinterHelper.Native]::EndDocPrinter($hPrinter) | Out-Null
     }
   } finally {
     [RawPrinterHelper.Native]::ClosePrinter($hPrinter) | Out-Null
+  }
+}
+
+function Send-TextWithWindowsDriver {
+  param([string]$PrinterName, [string]$Text)
+
+  Add-Type -AssemblyName System.Drawing
+  $documento = New-Object System.Drawing.Printing.PrintDocument
+  try {
+    $documento.PrinterSettings.PrinterName = $PrinterName
+    if (-not $documento.PrinterSettings.IsValid) {
+      throw "La impresora '$PrinterName' no esta disponible en Windows"
+    }
+
+    # StandardPrintController evita cualquier ventana de progreso o confirmacion.
+    $documento.PrintController = New-Object System.Drawing.Printing.StandardPrintController
+    $documento.DocumentName = "Ticket Gestion"
+    $lineas = ([string]$Text -split "`r?`n").Count
+    $alto = [Math]::Min(32000, [Math]::Max(400, (($lineas + 6) * 16)))
+    $documento.DefaultPageSettings.PaperSize =
+      New-Object System.Drawing.Printing.PaperSize("Ticket 80mm", 315, $alto)
+    $documento.DefaultPageSettings.Margins =
+      New-Object System.Drawing.Printing.Margins(4, 4, 4, 4)
+
+    $textoTicket = [string]$Text
+    $imprimirPagina = {
+      param($sender, $evento)
+      $fuente = New-Object System.Drawing.Font(
+        [System.Drawing.FontFamily]::GenericMonospace,
+        9,
+        [System.Drawing.FontStyle]::Regular
+      )
+      try {
+        $evento.Graphics.DrawString(
+          $textoTicket,
+          $fuente,
+          [System.Drawing.Brushes]::Black,
+          $evento.MarginBounds
+        )
+        $evento.HasMorePages = $false
+      } finally {
+        $fuente.Dispose()
+      }
+    }.GetNewClosure()
+
+    $documento.add_PrintPage($imprimirPagina)
+    $documento.Print()
+    $documento.remove_PrintPage($imprimirPagina)
+  } finally {
+    $documento.Dispose()
   }
 }
 
@@ -161,15 +221,9 @@ while ($listener.IsListening) {
       }
 
       try {
-        # CP437 es la tabla de caracteres que casi todas las impresoras termicas ESC/POS
-        # traen por defecto. Si los acentos/enies salen mal, probar cambiando 437 por 850.
-        $codepage = [System.Text.Encoding]::GetEncoding(437)
-        $textoBytes = $codepage.GetBytes("$contenido`r`n`r`n`r`n")
-        $reset = [byte[]](0x1B, 0x40)        # ESC @ -> reset impresora
-        $corte = [byte[]](0x1D, 0x56, 0x00)  # GS V 0 -> corte total de papel
-        $todosBytes = $reset + $textoBytes + $corte
-
-        Send-RawDataToPrinter -PrinterName $impresoraElegida -Bytes $todosBytes
+        # Se imprime por el controlador de Windows. Esto funciona tanto con impresoras
+        # termicas ESC/POS como con colas que no aceptan correctamente trabajos RAW.
+        Send-TextWithWindowsDriver -PrinterName $impresoraElegida -Text "$contenido`r`n`r`n"
 
         $response.StatusCode = 200
         $okBytes = [System.Text.Encoding]::UTF8.GetBytes('{"success":true}')
