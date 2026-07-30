@@ -27,6 +27,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No tenés permiso para cerrar la caja" }, { status: 403 });
   }
 
+  const mesasAbiertas = await prisma.mesa.findMany({
+    where: {
+      OR: [
+        { estado: "OCUPADA" },
+        { ventas: { some: { estado: "ABIERTA" } } },
+      ],
+    },
+    select: { nombre: true, apodo: true },
+    orderBy: { numero: "asc" },
+  });
+  if (mesasAbiertas.length > 0) {
+    const nombres = mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre);
+    return NextResponse.json(
+      {
+        error: `No se puede cerrar la caja. Hay ${mesasAbiertas.length} mesa(s) abierta(s): ${nombres.join(", ")}`,
+        mesasAbiertas: nombres,
+      },
+      { status: 409 }
+    );
+  }
+
   const fecha = fechaArgentinaYMD();
   const desde = new Date(`${fecha}T00:00:00-03:00`);
   const hasta = new Date(`${fecha}T23:59:59.999-03:00`);
