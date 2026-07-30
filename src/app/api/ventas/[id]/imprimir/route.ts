@@ -66,9 +66,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (venta.estado !== "CERRADA" && configuracion?.aliasTransferencia) {
       lineas.push("[[HR]]");
-      lineas.push(
-        `[[NOTE]] TRANSFERENCIA - ALIAS: ${configuracion.aliasTransferencia.toUpperCase()}`
-      );
+      lineas.push(`[[NOTE]] Alias: ${configuracion.aliasTransferencia}`);
     }
 
     if (venta.estado === "CERRADA") {
