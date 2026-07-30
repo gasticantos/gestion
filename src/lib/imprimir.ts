@@ -9,6 +9,7 @@ function agenteImpresionUrl() {
   return isTauri() ? "http://127.0.0.1:9848" : "http://127.0.0.1:9847";
 }
 const CLAVE_IMPRESORA = "gestion_impresora_seleccionada";
+let ultimoErrorImpresion = "";
 
 export type ImpresoraLocal = {
   nombre: string;
@@ -24,9 +25,11 @@ export const ERROR_IMPRESION_LOCAL =
 // no está corriendo en esta máquina (por ejemplo, un celular o una PC sin el agente instalado).
 // Nunca llama a window.print(): la aplicación debe imprimir sin confirmaciones.
 export async function imprimirLocal(contenido: string): Promise<boolean> {
+  ultimoErrorImpresion = "";
   try {
     const impresora = localStorage.getItem(CLAVE_IMPRESORA);
     if (!impresora) {
+      ultimoErrorImpresion = "No hay una impresora seleccionada en este dispositivo.";
       console.warn("No hay una impresora seleccionada en este dispositivo.");
       return false;
     }
@@ -41,14 +44,20 @@ export async function imprimirLocal(contenido: string): Promise<boolean> {
     clearTimeout(timeout);
     if (!res.ok) {
       const data = await res.json().catch(() => null);
+      ultimoErrorImpresion = data?.error || `Windows respondió con error ${res.status}`;
       console.warn("Agente de impresión local respondió con error:", data?.error || res.status);
       return false;
     }
     return true;
   } catch (err) {
+    ultimoErrorImpresion = err instanceof Error ? err.message : "No se pudo contactar al agente local";
     console.warn("No se pudo contactar al agente de impresión local:", err);
     return false;
   }
+}
+
+export function obtenerUltimoErrorImpresion(): string {
+  return ultimoErrorImpresion;
 }
 
 export function obtenerImpresoraSeleccionada(): string {

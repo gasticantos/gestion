@@ -8,6 +8,7 @@ import {
   ImpresoraLocal,
   listarImpresorasLocales,
   obtenerImpresoraSeleccionada,
+  obtenerUltimoErrorImpresion,
   imprimirLocal,
 } from "@/lib/imprimir";
 
@@ -82,7 +83,12 @@ export default function SelectorImpresora() {
       `PRUEBA DE IMPRESION\n${seleccionada}\n${new Date().toLocaleString("es-AR")}\n\n`
     );
     setEstado(ok ? "Prueba enviada correctamente" : "");
-    if (!ok) setError("No se pudo imprimir la prueba. Revisá la impresora y el agente local.");
+    if (!ok) {
+      setError(
+        obtenerUltimoErrorImpresion() ||
+          "No se pudo imprimir la prueba. Revisá la impresora y el agente local."
+      );
+    }
   }
 
   return (

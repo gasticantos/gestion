@@ -39,6 +39,51 @@ public static extern bool EndPagePrinter(IntPtr hPrinter);
 public static extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, int dwCount, out int dwWritten);
 "@
 
+Add-Type -AssemblyName System.Drawing
+Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @"
+using System;
+using System.Drawing;
+using System.Drawing.Printing;
+
+public static class GestionWindowsPrinter {
+  public static void Print(string printerName, string text) {
+    if (String.IsNullOrWhiteSpace(printerName))
+      throw new ArgumentException("Falta el nombre de la impresora");
+    if (String.IsNullOrWhiteSpace(text))
+      throw new ArgumentException("El ticket llego sin contenido");
+
+    using (var document = new PrintDocument()) {
+      document.PrinterSettings.PrinterName = printerName;
+      if (!document.PrinterSettings.IsValid)
+        throw new InvalidOperationException("La impresora no esta disponible en Windows: " + printerName);
+
+      document.DocumentName = "Ticket Gestion";
+      document.PrintController = new StandardPrintController();
+      document.DefaultPageSettings.Margins = new Margins(25, 25, 25, 25);
+
+      document.PrintPage += delegate(object sender, PrintPageEventArgs e) {
+        using (var font = new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular, GraphicsUnit.Point)) {
+          Rectangle bounds = e.MarginBounds;
+          if (bounds.Width <= 0 || bounds.Height <= 0)
+            bounds = new Rectangle(25, 25, Math.Max(100, e.PageBounds.Width - 50), Math.Max(100, e.PageBounds.Height - 50));
+
+          e.Graphics.DrawString(
+            text,
+            font,
+            Brushes.Black,
+            new RectangleF(bounds.X, bounds.Y, bounds.Width, bounds.Height),
+            StringFormat.GenericTypographic
+          );
+          e.HasMorePages = false;
+        }
+      };
+
+      document.Print();
+    }
+  }
+}
+"@
+
 function Send-RawDataToPrinter {
   param([string]$PrinterName, [byte[]]$Bytes)
 
@@ -82,16 +127,7 @@ function Send-RawDataToPrinter {
 function Send-TextWithWindowsDriver {
   param([string]$PrinterName, [string]$Text)
 
-  $impresora = Get-CimInstance Win32_Printer |
-    Where-Object { $_.Name -eq $PrinterName } |
-    Select-Object -First 1
-  if (-not $impresora) {
-    throw "La impresora '$PrinterName' no esta disponible en Windows"
-  }
-
-  # Out-Printer utiliza la misma cola y el mismo controlador que la pagina de prueba
-  # de Windows. No abre dialogos y evita generar una pagina grafica vacia.
-  [string]$Text | Out-Printer -Name $PrinterName -ErrorAction Stop
+  [GestionWindowsPrinter]::Print($PrinterName, $Text)
 }
 
 $listener = New-Object System.Net.HttpListener
