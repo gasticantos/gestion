@@ -18,7 +18,11 @@ function pagosVacio(): Record<Metodo, number> {
   return Object.fromEntries(METODOS.map((m) => [m, 0])) as Record<Metodo, number>;
 }
 
-export async function obtenerReporteVentas(desde: Date, hasta: Date): Promise<ReporteVentas> {
+export async function obtenerReporteVentas(
+  desde: Date,
+  hasta: Date,
+  opciones?: { limiteProductos?: number }
+): Promise<ReporteVentas> {
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
@@ -72,10 +76,13 @@ export async function obtenerReporteVentas(desde: Date, hasta: Date): Promise<Re
     .map(([categoria, v]) => ({ categoria, ...v }))
     .sort((a, b) => b.importe - a.importe);
 
-  const productos = [...productoMap.entries()]
+  const productosOrdenados = [...productoMap.entries()]
     .map(([nombre, v]) => ({ nombre, ...v }))
-    .sort((a, b) => b.importe - a.importe)
-    .slice(0, 10);
+    .sort((a, b) => b.importe - a.importe);
+  const productos =
+    opciones?.limiteProductos === undefined
+      ? productosOrdenados.slice(0, 10)
+      : productosOrdenados.slice(0, opciones.limiteProductos);
 
   const serieDiaria = [...diaMap.entries()]
     .map(([fecha, total]) => ({ fecha, total }))

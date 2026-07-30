@@ -10,8 +10,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Faltan los parámetros desde/hasta" }, { status: 400 });
   }
 
-  const desde = new Date(`${desdeStr}T00:00:00`);
-  const hasta = new Date(`${hastaStr}T23:59:59.999`);
+  const desde = new Date(`${desdeStr}T00:00:00-03:00`);
+  const hasta = new Date(`${hastaStr}T23:59:59.999-03:00`);
 
   if (isNaN(desde.getTime()) || isNaN(hasta.getTime())) {
     return NextResponse.json({ error: "Fechas inválidas" }, { status: 400 });
