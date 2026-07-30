@@ -165,55 +165,42 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }, [venta?.ticketImpreso]);
 
-  async function agregarARonda(p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) {
+  async function agregarARonda(p: ProductoBusqueda, tarifa: Tarifa, _precioUnitario: number) {
     const producto = productos.find((x) => x.id === p.id);
     if (!producto) return;
     ultimoCambioLocalRef.current = Date.now();
-
-    // Buscar si ya existe en algún pedido guardado
-    const pedidoConItem = venta?.pedidos.find((pedido) =>
-      pedido.items.some((item) => item.productoId === p.id)
-    );
-    if (pedidoConItem) {
-      const item = pedidoConItem.items.find((item) => item.productoId === p.id);
-      if (item) {
-        actualizarItemPedido(item.id, item.cantidad + 1);
-        return;
-      }
-    }
-
-    // Agregar a ronda temporal y enviar inmediatamente
-    const itemRonda = {
-      productoId: producto.id,
-      nombre: producto.nombre,
-      tarifa,
-      precioUnitario,
-      cantidad: 1,
-      stockDisponible: producto.stock,
-    };
-
-    const rondaActual = ronda.find((i) => i.productoId === p.id && i.tarifa === tarifa)
-      ? ronda.map((i) => (i.productoId === p.id && i.tarifa === tarifa ? { ...i, cantidad: i.cantidad + 1 } : i))
-      : [...ronda, itemRonda];
-
-    // Enviar inmediatamente (sin ronda temporal)
     setError("");
     setEnviando(true);
-    const res = await fetch(`/api/mesas/${id}/pedido`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: rondaActual.map((i) => ({ productoId: i.productoId, cantidad: i.cantidad, tarifa: i.tarifa })),
-      }),
-    });
-    setEnviando(false);
-    if (!res.ok) {
-      setError("Error al agregar producto");
-      return;
+    try {
+      // Cada selección se guarda como un pedido independiente para que produzca
+      // exactamente una comanda, incluso si el producto ya estaba en la mesa.
+      const res = await fetch(`/api/mesas/${id}/pedido`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: [{ productoId: producto.id, cantidad: 1, tarifa }],
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error || "Error al agregar producto");
+        return;
+      }
+
+      const pedido = await res.json();
+      const resImpresion = await fetch(`/api/pedidos/${pedido.id}/imprimir`, {
+        method: "POST",
+      }).catch(() => null);
+      if (!resImpresion?.ok) {
+        setError("El producto se agregó, pero no se pudo enviar la comanda a impresión.");
+      }
+
+      ultimoSincronizadoRef.current = "[]";
+      setRonda([]);
+      await cargar();
+    } finally {
+      setEnviando(false);
     }
-    ultimoSincronizadoRef.current = "[]";
-    setRonda([]);
-    await cargar();
   }
 
   function cambiarCantidad(productoId: number, tarifa: Tarifa, cantidad: number) {
