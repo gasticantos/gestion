@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState, KeyboardEvent, memo } from "react";
+import { useEffect, useMemo, useRef, useState, KeyboardEvent, memo } from "react";
 import { input } from "@/components/ui/styles";
 import { Tarifa } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
+import VirtualKeyboard from "@/components/VirtualKeyboard";
 
 export type ProductoBusqueda = {
   id: number;
@@ -31,7 +32,15 @@ function BuscadorProductoBase({
 }) {
   const [query, setQuery] = useState("");
   const [elegido, setElegido] = useState<ProductoBusqueda | null>(null);
+  const [dispositivoTactil, setDispositivoTactil] = useState(false);
+  const [mostrarTeclado, setMostrarTeclado] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setDispositivoTactil(
+      navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches
+    );
+  }, []);
 
   const resultados = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -59,6 +68,7 @@ function BuscadorProductoBase({
   }, [query, productos]);
 
   function elegirProducto(p: ProductoBusqueda) {
+    setMostrarTeclado(false);
     if (!pedirPrecio || !precioMesaActivo) {
       onSeleccionar(p, "PARTICULAR", p.precioVenta);
       setQuery("");
@@ -98,6 +108,18 @@ function BuscadorProductoBase({
     if (resultados.length === 1) {
       elegirProducto(resultados[0]);
     }
+  }
+
+  function entradaVirtual(char: string) {
+    if (char === "\n") {
+      const q = query.trim();
+      if (!q) return;
+      const exacto = productos.find((p) => p.codigoBarras === q);
+      if (exacto) elegirProducto(exacto);
+      else if (resultados.length === 1) elegirProducto(resultados[0]);
+      return;
+    }
+    setQuery((actual) => (char === "\b" ? actual.slice(0, -1) : actual + char));
   }
 
   if (elegido) {
@@ -143,6 +165,8 @@ function BuscadorProductoBase({
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}
+        inputMode={dispositivoTactil ? "none" : "text"}
+        readOnly={dispositivoTactil}
         data-lpignore="true"
         data-1p-ignore
         data-form-type="other"
@@ -150,8 +174,13 @@ function BuscadorProductoBase({
         placeholder={placeholder || "Escanear código de barras o escribir para buscar..."}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => dispositivoTactil && setMostrarTeclado(true)}
+        onPointerDown={() => dispositivoTactil && setMostrarTeclado(true)}
         onKeyDown={handleKeyDown}
       />
+      {dispositivoTactil && mostrarTeclado && (
+        <VirtualKeyboard onInput={entradaVirtual} onCerrar={() => setMostrarTeclado(false)} />
+      )}
       {resultados.length > 0 && (
         <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto">
           {resultados.map((p) => (

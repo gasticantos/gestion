@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parsearExcelProductos, procesarImportacion } from "@/lib/importarProductos";
+import { sesionActual } from "@/lib/sesionServidor";
 
 // Una importación grande (1000+ filas) contra una base remota puede tardar más que el límite
 // por defecto de una función serverless; se pide el máximo margen posible.
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para importar productos" }, { status: 403 });
+  }
   const formData = await req.formData();
   const archivo = formData.get("archivo");
   const confirmar = formData.get("confirmar") === "true";

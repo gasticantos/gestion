@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redondearPrecio } from "@/lib/precio";
+import { sesionActual } from "@/lib/sesionServidor";
 
 export async function GET() {
   const productos = await prisma.producto.findMany({
@@ -28,6 +29,10 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para crear productos" }, { status: 403 });
+  }
   const body = await req.json();
   const {
     nombre,
@@ -79,6 +84,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para editar productos" }, { status: 403 });
+  }
   const body = await req.json();
   type ActualizacionProducto = {
     id: unknown;

@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redondearPrecio } from "@/lib/precio";
+import { sesionActual } from "@/lib/sesionServidor";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para editar productos" }, { status: 403 });
+  }
   const { id } = await params;
   const body = await req.json();
   const {
@@ -58,6 +63,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para eliminar productos" }, { status: 403 });
+  }
   const { id } = await params;
   // Baja lógica en vez de borrado físico: preserva historial de ventas/stock ya registrado.
   const producto = await prisma.producto.update({

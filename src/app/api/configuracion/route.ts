@@ -21,6 +21,9 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (sesion.rol !== "DUENIO") {
+    return NextResponse.json({ error: "No tenés permiso para modificar la configuración" }, { status: 403 });
+  }
   const body = await req.json();
   const { margenVentaBasePct, precioMesaActivo, recargoMesaPct } = body as {
     margenVentaBasePct: number;
