@@ -21,7 +21,7 @@ fn instalar_actualizacion(app: tauri::AppHandle) -> Result<(), String> {
         const SCRIPT: &str = r#"
 $destino = Join-Path $env:TEMP ("Gestion-Update-" + [guid]::NewGuid().ToString() + ".exe")
 $marca = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-$url = "https://github.com/gasticantos/gestion/raw/refs/heads/main/public/downloads/Gestion-Windows-Setup.exe?actualizacion=$marca"
+$url = "https://gestion-nexusgestion.vercel.app/downloads/Gestion-Windows-Setup.exe?actualizacion=$marca"
 (New-Object System.Net.WebClient).DownloadFile($url, $destino)
 Start-Sleep -Seconds 2
 Start-Process -FilePath $destino -ArgumentList "/S"
