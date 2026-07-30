@@ -155,7 +155,8 @@ public static class GestionWindowsPrinter {
         case "CENTER": size = 9; center = true; break;
         case "SECTION": size = 11; fontStyle = FontStyle.Bold; before = 3; after = 3; break;
         case "ITEM": size = 15; fontStyle = FontStyle.Bold; before = 2; after = 3; break;
-        case "DETAIL": size = 8; mono = true; after = 2; break;
+        case "RECEIPT_ITEM": size = 10; fontStyle = FontStyle.Bold; before = 4; after = 0; break;
+        case "DETAIL": size = 9; fontStyle = FontStyle.Bold; mono = true; after = 3; break;
         case "ROW": size = 10; fontStyle = FontStyle.Bold; mono = true; break;
         case "TOTAL": size = 15; fontStyle = FontStyle.Bold; mono = true; before = 3; after = 4; break;
         case "NOTE":
@@ -303,7 +304,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.5"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.6"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()

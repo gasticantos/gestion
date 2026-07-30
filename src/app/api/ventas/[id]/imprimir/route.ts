@@ -31,6 +31,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const dinero = (valor: number) => `$${formatearMoneda(valor)}`;
     const lineaImporte = (etiqueta: string, valor: number) =>
       `${etiqueta}${dinero(valor).padStart(Math.max(1, 36 - etiqueta.length))}`;
+    const lineaDetalle = (cantidad: number, unitario: number, total: number) => {
+      const izquierda = `${cantidad} x ${dinero(unitario)}`;
+      const derecha = dinero(total);
+      return `${izquierda}${derecha.padStart(Math.max(1, 36 - izquierda.length))}`;
+    };
 
     const lineas: string[] = [];
     lineas.push(`[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`);
@@ -46,8 +51,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     for (const pedido of venta.pedidos) {
       for (const item of pedido.items) {
-        lineas.push(`[[ITEM]] ${item.producto.nombre}`);
-        lineas.push(`[[DETAIL]] ${item.cantidad} x ${dinero(item.precioUnitario)} c/u     ${dinero(item.subtotal)}`);
+        lineas.push(`[[RECEIPT_ITEM]] ${item.producto.nombre}`);
+        lineas.push(`[[DETAIL]] ${lineaDetalle(item.cantidad, item.precioUnitario, item.subtotal)}`);
       }
     }
 
