@@ -55,11 +55,9 @@ const emptyForm = {
 
 type EditForm = typeof emptyForm & { precioVentaMesaManual: boolean };
 
-const MARGEN_SUGERIDO_PCT = 30;
-
-function calcularVentaSugerida(costo: string) {
+function calcularVentaSugerida(costo: string, margenVentaBasePct: number) {
   const num = Number(costo);
-  return num > 0 ? String(redondearPrecio(num * (1 + MARGEN_SUGERIDO_PCT / 100))) : "";
+  return num > 0 ? String(redondearPrecio(num * (1 + margenVentaBasePct / 100))) : "";
 }
 
 // El precio de mesa sugerido = precio de venta normal + el % de recargo de mesa (Configuración)
@@ -113,6 +111,7 @@ export default function ProductosPage() {
   const [form, setForm] = useState(emptyForm);
   const [ventaManual, setVentaManual] = useState(false);
   const [ventaMesaManual, setVentaMesaManual] = useState(false);
+  const [margenVentaBasePct, setMargenVentaBasePct] = useState(30);
   const [recargoMesaPct, setRecargoMesaPct] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -136,7 +135,9 @@ export default function ProductosPage() {
     setProductos(await prodRes.json());
     setProveedores(await provRes.json());
     setCategorias(await catRes.json());
-    setRecargoMesaPct((await configRes.json()).recargoMesaPct);
+    const config = await configRes.json();
+    setMargenVentaBasePct(config.margenVentaBasePct ?? 30);
+    setRecargoMesaPct(config.recargoMesaPct);
     setLoading(false);
   }
 
@@ -180,7 +181,7 @@ export default function ProductosPage() {
 
   function cambiarCostoNuevo(valor: string) {
     setForm((f) => {
-      const precioVenta = ventaManual ? f.precioVenta : calcularVentaSugerida(valor);
+      const precioVenta = ventaManual ? f.precioVenta : calcularVentaSugerida(valor, margenVentaBasePct);
       const precioVentaMesa = ventaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(precioVenta, valor, recargoMesaPct);
       return { ...f, precioCosto: valor, precioVenta, precioVentaMesa };
     });

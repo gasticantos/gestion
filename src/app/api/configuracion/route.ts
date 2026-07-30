@@ -8,7 +8,7 @@ export async function GET() {
   const config = await prisma.configuracion.upsert({
     where: { negocioId: sesion.negocioId },
     update: {},
-    create: { negocioId: sesion.negocioId, recargoMesaPct: 0 },
+    create: { negocioId: sesion.negocioId, margenVentaBasePct: 30, recargoMesaPct: 0 },
   });
   return NextResponse.json(config);
 }
@@ -17,16 +17,33 @@ export async function PUT(req: NextRequest) {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const body = await req.json();
-  const { recargoMesaPct } = body as { recargoMesaPct: number };
+  const { margenVentaBasePct, recargoMesaPct } = body as {
+    margenVentaBasePct: number;
+    recargoMesaPct: number;
+  };
 
   if (recargoMesaPct === undefined || isNaN(Number(recargoMesaPct)) || Number(recargoMesaPct) < 0) {
     return NextResponse.json({ error: "El recargo debe ser un número mayor o igual a cero" }, { status: 400 });
   }
+  if (
+    margenVentaBasePct === undefined ||
+    !Number.isFinite(Number(margenVentaBasePct)) ||
+    Number(margenVentaBasePct) < 0
+  ) {
+    return NextResponse.json({ error: "El margen base debe ser un número mayor o igual a cero" }, { status: 400 });
+  }
 
   const config = await prisma.configuracion.upsert({
     where: { negocioId: sesion.negocioId },
-    update: { recargoMesaPct: Number(recargoMesaPct) },
-    create: { negocioId: sesion.negocioId, recargoMesaPct: Number(recargoMesaPct) },
+    update: {
+      margenVentaBasePct: Number(margenVentaBasePct),
+      recargoMesaPct: Number(recargoMesaPct),
+    },
+    create: {
+      negocioId: sesion.negocioId,
+      margenVentaBasePct: Number(margenVentaBasePct),
+      recargoMesaPct: Number(recargoMesaPct),
+    },
   });
 
   // Recalcular precioVentaMesa de todos los productos que NO fueron fijados a mano.

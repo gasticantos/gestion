@@ -103,10 +103,11 @@ enum TarifaPrecio {
 }
 
 model Configuracion {
-  id             Int     @id @default(autoincrement())
-  negocioId      Int     @unique @default(1)
-  negocio        Negocio @relation(fields: [negocioId], references: [id])
-  recargoMesaPct Float   @default(0)
+  id                Int     @id @default(autoincrement())
+  negocioId         Int     @unique @default(1)
+  negocio           Negocio @relation(fields: [negocioId], references: [id])
+  margenVentaBasePct Float   @default(30)
+  recargoMesaPct    Float   @default(0)
 }
 
 enum TipoImpresion {

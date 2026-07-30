@@ -126,6 +126,7 @@ export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeo
 export const ConfiguracionScalarFieldEnum = {
   id: 'id',
   negocioId: 'negocioId',
+  margenVentaBasePct: 'margenVentaBasePct',
   recargoMesaPct: 'recargoMesaPct'
 } as const
 

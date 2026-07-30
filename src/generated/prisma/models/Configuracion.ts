@@ -29,30 +29,35 @@ export type AggregateConfiguracion = {
 export type ConfiguracionAvgAggregateOutputType = {
   id: number | null
   negocioId: number | null
+  margenVentaBasePct: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionSumAggregateOutputType = {
   id: number | null
   negocioId: number | null
+  margenVentaBasePct: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionMinAggregateOutputType = {
   id: number | null
   negocioId: number | null
+  margenVentaBasePct: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionMaxAggregateOutputType = {
   id: number | null
   negocioId: number | null
+  margenVentaBasePct: number | null
   recargoMesaPct: number | null
 }
 
 export type ConfiguracionCountAggregateOutputType = {
   id: number
   negocioId: number
+  margenVentaBasePct: number
   recargoMesaPct: number
   _all: number
 }
@@ -61,30 +66,35 @@ export type ConfiguracionCountAggregateOutputType = {
 export type ConfiguracionAvgAggregateInputType = {
   id?: true
   negocioId?: true
+  margenVentaBasePct?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionSumAggregateInputType = {
   id?: true
   negocioId?: true
+  margenVentaBasePct?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionMinAggregateInputType = {
   id?: true
   negocioId?: true
+  margenVentaBasePct?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionMaxAggregateInputType = {
   id?: true
   negocioId?: true
+  margenVentaBasePct?: true
   recargoMesaPct?: true
 }
 
 export type ConfiguracionCountAggregateInputType = {
   id?: true
   negocioId?: true
+  margenVentaBasePct?: true
   recargoMesaPct?: true
   _all?: true
 }
@@ -178,6 +188,7 @@ export type ConfiguracionGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 export type ConfiguracionGroupByOutputType = {
   id: number
   negocioId: number
+  margenVentaBasePct: number
   recargoMesaPct: number
   _count: ConfiguracionCountAggregateOutputType | null
   _avg: ConfiguracionAvgAggregateOutputType | null
@@ -207,6 +218,7 @@ export type ConfiguracionWhereInput = {
   NOT?: Prisma.ConfiguracionWhereInput | Prisma.ConfiguracionWhereInput[]
   id?: Prisma.IntFilter<"Configuracion"> | number
   negocioId?: Prisma.IntFilter<"Configuracion"> | number
+  margenVentaBasePct?: Prisma.FloatFilter<"Configuracion"> | number
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
@@ -214,6 +226,7 @@ export type ConfiguracionWhereInput = {
 export type ConfiguracionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
   negocio?: Prisma.NegocioOrderByWithRelationInput
 }
@@ -224,6 +237,7 @@ export type ConfiguracionWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ConfiguracionWhereInput | Prisma.ConfiguracionWhereInput[]
   OR?: Prisma.ConfiguracionWhereInput[]
   NOT?: Prisma.ConfiguracionWhereInput | Prisma.ConfiguracionWhereInput[]
+  margenVentaBasePct?: Prisma.FloatFilter<"Configuracion"> | number
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id" | "negocioId">
@@ -231,6 +245,7 @@ export type ConfiguracionWhereUniqueInput = Prisma.AtLeast<{
 export type ConfiguracionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
   _count?: Prisma.ConfiguracionCountOrderByAggregateInput
   _avg?: Prisma.ConfiguracionAvgOrderByAggregateInput
@@ -245,10 +260,12 @@ export type ConfiguracionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ConfiguracionScalarWhereWithAggregatesInput | Prisma.ConfiguracionScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Configuracion"> | number
   negocioId?: Prisma.IntWithAggregatesFilter<"Configuracion"> | number
+  margenVentaBasePct?: Prisma.FloatWithAggregatesFilter<"Configuracion"> | number
   recargoMesaPct?: Prisma.FloatWithAggregatesFilter<"Configuracion"> | number
 }
 
 export type ConfiguracionCreateInput = {
+  margenVentaBasePct?: number
   recargoMesaPct?: number
   negocio?: Prisma.NegocioCreateNestedOneWithoutConfiguracionesInput
 }
@@ -256,10 +273,12 @@ export type ConfiguracionCreateInput = {
 export type ConfiguracionUncheckedCreateInput = {
   id?: number
   negocioId?: number
+  margenVentaBasePct?: number
   recargoMesaPct?: number
 }
 
 export type ConfiguracionUpdateInput = {
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutConfiguracionesNestedInput
 }
@@ -267,22 +286,26 @@ export type ConfiguracionUpdateInput = {
 export type ConfiguracionUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type ConfiguracionCreateManyInput = {
   id?: number
   negocioId?: number
+  margenVentaBasePct?: number
   recargoMesaPct?: number
 }
 
 export type ConfiguracionUpdateManyMutationInput = {
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type ConfiguracionUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
@@ -299,30 +322,35 @@ export type ConfiguracionOrderByRelationAggregateInput = {
 export type ConfiguracionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
 export type ConfiguracionSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
+  margenVentaBasePct?: Prisma.SortOrder
   recargoMesaPct?: Prisma.SortOrder
 }
 
@@ -377,11 +405,13 @@ export type FloatFieldUpdateOperationsInput = {
 }
 
 export type ConfiguracionCreateWithoutNegocioInput = {
+  margenVentaBasePct?: number
   recargoMesaPct?: number
 }
 
 export type ConfiguracionUncheckedCreateWithoutNegocioInput = {
   id?: number
+  margenVentaBasePct?: number
   recargoMesaPct?: number
 }
 
@@ -417,25 +447,30 @@ export type ConfiguracionScalarWhereInput = {
   NOT?: Prisma.ConfiguracionScalarWhereInput | Prisma.ConfiguracionScalarWhereInput[]
   id?: Prisma.IntFilter<"Configuracion"> | number
   negocioId?: Prisma.IntFilter<"Configuracion"> | number
+  margenVentaBasePct?: Prisma.FloatFilter<"Configuracion"> | number
   recargoMesaPct?: Prisma.FloatFilter<"Configuracion"> | number
 }
 
 export type ConfiguracionCreateManyNegocioInput = {
   id?: number
+  margenVentaBasePct?: number
   recargoMesaPct?: number
 }
 
 export type ConfiguracionUpdateWithoutNegocioInput = {
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type ConfiguracionUncheckedUpdateWithoutNegocioInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type ConfiguracionUncheckedUpdateManyWithoutNegocioInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  margenVentaBasePct?: Prisma.FloatFieldUpdateOperationsInput | number
   recargoMesaPct?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
@@ -444,6 +479,7 @@ export type ConfiguracionUncheckedUpdateManyWithoutNegocioInput = {
 export type ConfiguracionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   negocioId?: boolean
+  margenVentaBasePct?: boolean
   recargoMesaPct?: boolean
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracion"]>
@@ -451,6 +487,7 @@ export type ConfiguracionSelect<ExtArgs extends runtime.Types.Extensions.Interna
 export type ConfiguracionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   negocioId?: boolean
+  margenVentaBasePct?: boolean
   recargoMesaPct?: boolean
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracion"]>
@@ -458,6 +495,7 @@ export type ConfiguracionSelectCreateManyAndReturn<ExtArgs extends runtime.Types
 export type ConfiguracionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   negocioId?: boolean
+  margenVentaBasePct?: boolean
   recargoMesaPct?: boolean
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracion"]>
@@ -465,10 +503,11 @@ export type ConfiguracionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type ConfiguracionSelectScalar = {
   id?: boolean
   negocioId?: boolean
+  margenVentaBasePct?: boolean
   recargoMesaPct?: boolean
 }
 
-export type ConfiguracionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "negocioId" | "recargoMesaPct", ExtArgs["result"]["configuracion"]>
+export type ConfiguracionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "negocioId" | "margenVentaBasePct" | "recargoMesaPct", ExtArgs["result"]["configuracion"]>
 export type ConfiguracionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
@@ -487,6 +526,7 @@ export type $ConfiguracionPayload<ExtArgs extends runtime.Types.Extensions.Inter
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     negocioId: number
+    margenVentaBasePct: number
     recargoMesaPct: number
   }, ExtArgs["result"]["configuracion"]>
   composites: {}
@@ -914,6 +954,7 @@ export interface Prisma__ConfiguracionClient<T, Null = never, ExtArgs extends ru
 export interface ConfiguracionFieldRefs {
   readonly id: Prisma.FieldRef<"Configuracion", 'Int'>
   readonly negocioId: Prisma.FieldRef<"Configuracion", 'Int'>
+  readonly margenVentaBasePct: Prisma.FieldRef<"Configuracion", 'Float'>
   readonly recargoMesaPct: Prisma.FieldRef<"Configuracion", 'Float'>
 }
     

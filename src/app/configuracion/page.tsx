@@ -19,6 +19,7 @@ type AuditoriaLog = {
 };
 
 export default function ConfiguracionPage() {
+  const [margenVentaBasePct, setMargenVentaBasePct] = useState("30");
   const [recargoMesaPct, setRecargoMesaPct] = useState("0");
   const [ok, setOk] = useState("");
   const [error, setError] = useState("");
@@ -41,6 +42,7 @@ export default function ConfiguracionPage() {
   async function cargar() {
     const [configRes, catRes] = await Promise.all([fetch("/api/configuracion"), fetch("/api/categorias")]);
     const data = await configRes.json();
+    setMargenVentaBasePct(String(data.margenVentaBasePct ?? 30));
     setRecargoMesaPct(String(data.recargoMesaPct));
     setCategorias(await catRes.json());
   }
@@ -69,7 +71,10 @@ export default function ConfiguracionPage() {
     const res = await fetch("/api/configuracion", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ recargoMesaPct: Number(recargoMesaPct) }),
+      body: JSON.stringify({
+        margenVentaBasePct: Number(margenVentaBasePct),
+        recargoMesaPct: Number(recargoMesaPct),
+      }),
     });
     setEnviando(false);
     if (!res.ok) {
@@ -160,6 +165,21 @@ export default function ConfiguracionPage() {
 
       <Card className="p-4">
         <form onSubmit={guardar} className="flex flex-col gap-3">
+          <div>
+            <label className={label}>Porcentaje base de ganancia (%)</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              className={input}
+              value={margenVentaBasePct}
+              onChange={(e) => setMargenVentaBasePct(e.target.value)}
+            />
+            <p className="text-xs text-neutral-500 mt-1">
+              Se usa para sugerir el precio de venta de productos nuevos y productos importados. No modifica
+              los precios existentes.
+            </p>
+          </div>
           <div>
             <label className={label}>Recargo por venta de mesa (%)</label>
             <input

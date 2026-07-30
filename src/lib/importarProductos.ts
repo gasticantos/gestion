@@ -106,14 +106,13 @@ export type ResumenImportacion = {
   errores: string[];
 };
 
-const MARGEN_SUGERIDO_PCT = 30;
-
 export async function procesarImportacion(
   filas: FilaImportada[],
   errores: string[],
   confirmar: boolean
 ): Promise<ResumenImportacion> {
-  const config = await prisma.configuracion.findUnique({ where: { id: 1 } });
+  const config = await prisma.configuracion.findFirst();
+  const margenVentaBasePct = config?.margenVentaBasePct ?? 30;
   const recargoMesaPct = config?.recargoMesaPct ?? 0;
 
   const categoriasExistentes = await prisma.categoria.findMany();
@@ -158,7 +157,7 @@ export async function procesarImportacion(
       if (existente) {
         aActualizar.push({ id: existente.id, f, categoriaId: existente.categoriaId ?? categoria.id });
       } else {
-        const precioVenta = redondearPrecio(f.precioCosto * (1 + MARGEN_SUGERIDO_PCT / 100));
+        const precioVenta = redondearPrecio(f.precioCosto * (1 + margenVentaBasePct / 100));
         const precioVentaMesa = redondearPrecio(precioVenta + f.precioCosto * (recargoMesaPct / 100));
         aCrear.push({
           nombre: f.nombre,
