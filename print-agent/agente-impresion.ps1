@@ -231,7 +231,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.3"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.4"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()

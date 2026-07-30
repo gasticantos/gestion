@@ -10,7 +10,7 @@ import {
 } from "@/lib/imprimir";
 
 const CLAVE_ESTACION = "gestion_estacion_impresion_id";
-const VERSION_MINIMA_AGENTE = "1.1.3";
+const VERSION_MINIMA_AGENTE = "1.1.4";
 
 type TrabajoPendiente = {
   id: number;
@@ -145,7 +145,7 @@ export default function EstacionImpresion() {
           necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
           perderlas.
         </span>
-        <p className="mt-1 font-medium">La actualización 0.1.14 corrige el agente automáticamente.</p>
+        <p className="mt-1 font-medium">La actualización 0.1.15 usa el agente nuevo aislado.</p>
         {errorActualizacion && <p className="mt-1 font-medium">{errorActualizacion}</p>}
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
@@ -155,7 +155,7 @@ export default function EstacionImpresion() {
           disabled={actualizando}
           className="rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800 disabled:opacity-60"
         >
-          {actualizando ? "Actualizando..." : "Instalar actualización 0.1.14"}
+          {actualizando ? "Actualizando..." : "Instalar actualización 0.1.15"}
         </button>
       </div>
     </div>

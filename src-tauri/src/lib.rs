@@ -63,7 +63,7 @@ fn iniciar_agente(app: &tauri::App) -> Option<Child> {
     // El agente de una instalación anterior puede quedar huérfano y conservar el
     // puerto. Lo cerramos antes de iniciar el agente incluido en esta versión.
     let limpiar_puerto = r#"
-$procesos = Get-NetTCPConnection -LocalPort 9850 -State Listen -ErrorAction SilentlyContinue |
+$procesos = Get-NetTCPConnection -LocalPort 9851 -State Listen -ErrorAction SilentlyContinue |
   Select-Object -ExpandProperty OwningProcess -Unique
 foreach ($proceso in $procesos) {
   if ($proceso -and $proceso -ne $PID) {
@@ -104,7 +104,7 @@ Start-Sleep -Milliseconds 500
             "-File",
         ])
         .arg(script)
-        .args(["-Puerto", "9850"])
+        .args(["-Puerto", "9851"])
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
