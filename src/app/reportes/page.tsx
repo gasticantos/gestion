@@ -91,8 +91,6 @@ export default function ReportesPage() {
   const [rango, setRango] = useState(() => rangoPreset("hoy"));
   const [reporte, setReporte] = useState<ReporteVentas | null>(null);
   const [loading, setLoading] = useState(true);
-  const [descargandoPdf, setDescargandoPdf] = useState(false);
-  const [errorPdf, setErrorPdf] = useState("");
 
   async function cargar(desde: string, hasta: string) {
     setLoading(true);
@@ -129,109 +127,13 @@ export default function ReportesPage() {
     }));
   }, [reporte]);
 
-  async function descargarPdf() {
-    if (!reporte) return;
-    setDescargandoPdf(true);
-    setErrorPdf("");
-    try {
-      const [{ jsPDF }, { default: autoTable }] = await Promise.all([
-        import("jspdf"),
-        import("jspdf-autotable"),
-      ]);
-      const doc = new jsPDF();
-      const moneda = (valor: number) => `$${formatearMoneda(valor)}`;
-      const periodo =
-        reporte.desde === reporte.hasta ? reporte.desde : `${reporte.desde} al ${reporte.hasta}`;
-      const obtenerY = () =>
-        ((doc as typeof doc & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 20) + 9;
-
-      doc.setFontSize(18);
-      doc.text("Reporte completo de ventas", 14, 16);
-      doc.setFontSize(10);
-      doc.text(`Periodo: ${periodo}`, 14, 23);
-
-      autoTable(doc, {
-        startY: 29,
-        head: [["Resumen", "Valor"]],
-        body: [
-          ["Total combinado", moneda(reporte.combinado.total)],
-          ["Mostrador", moneda(reporte.porCanal.MOSTRADOR.total)],
-          ["Mesas", moneda(reporte.porCanal.MESA.total)],
-          ["Cantidad de ventas", String(reporte.cantidadVentas)],
-        ],
-        theme: "grid",
-      });
-
-      const canales = [
-        ["Mostrador", reporte.porCanal.MOSTRADOR],
-        ["Mesas", reporte.porCanal.MESA],
-        ["Combinado", reporte.combinado],
-      ] as const;
-      for (const [titulo, datos] of canales) {
-        autoTable(doc, {
-          startY: obtenerY(),
-          head: [[titulo, "Importe"]],
-          body: (Object.keys(METODO_LABEL) as Metodo[])
-            .map((metodo) => [METODO_LABEL[metodo], moneda(datos.pagos[metodo])])
-            .concat([["Total", moneda(datos.total)]]),
-          theme: "grid",
-        });
-      }
-
-      if (reporte.serieDiaria.length > 0) {
-        autoTable(doc, {
-          startY: obtenerY(),
-          head: [["Evolucion diaria", "Total"]],
-          body: reporte.serieDiaria.map((dia) => [dia.fecha, moneda(dia.total)]),
-          theme: "grid",
-        });
-      }
-
-      if (reporte.categorias.length > 0) {
-        autoTable(doc, {
-          startY: obtenerY(),
-          head: [["Categoria", "Cantidad", "Importe"]],
-          body: reporte.categorias.map((categoria) => [
-            categoria.categoria,
-            String(categoria.cantidad),
-            moneda(categoria.importe),
-          ]),
-          theme: "grid",
-        });
-      }
-
-      autoTable(doc, {
-        startY: obtenerY(),
-        head: [["Producto", "Cantidad", "Importe"]],
-        body:
-          reporte.productos.length > 0
-            ? reporte.productos.map((producto) => [
-                producto.nombre,
-                String(producto.cantidad),
-                moneda(producto.importe),
-              ])
-            : [["Sin productos vendidos en el periodo", "", ""]],
-        theme: "grid",
-      });
-
-      doc.save(`reporte-ventas-${reporte.desde}-${reporte.hasta}.pdf`);
-    } catch {
-      setErrorPdf("No se pudo generar el PDF");
-    } finally {
-      setDescargandoPdf(false);
-    }
-  }
-
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reportes de ventas</h1>
-        <div className="flex items-center gap-2">
-          {errorPdf && <span className="text-sm text-red-400">{errorPdf}</span>}
-          <Button variant="primary" onClick={descargarPdf} disabled={!reporte || loading || descargandoPdf}>
-            {descargandoPdf ? "Generando PDF..." : "Descargar PDF"}
-          </Button>
-        </div>
+        <a href={`/api/reportes/pdf?desde=${rango.desde}&hasta=${rango.hasta}`} download>
+          <Button variant="primary" disabled={!reporte || loading}>Descargar PDF</Button>
+        </a>
       </div>
 
       <Card className="p-4 flex flex-col gap-3">
