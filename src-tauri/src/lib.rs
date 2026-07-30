@@ -9,6 +9,7 @@ fn iniciar_agente(app: &tauri::App) -> Option<Child> {
     use std::os::windows::process::CommandExt;
 
     const CREATE_NO_WINDOW: u32 = 0x08000000;
+    const DETACHED_PROCESS: u32 = 0x00000008;
     let script = app
         .path()
         .resource_dir()
@@ -29,7 +30,7 @@ fn iniciar_agente(app: &tauri::App) -> Option<Child> {
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
-        .creation_flags(CREATE_NO_WINDOW)
+        .creation_flags(CREATE_NO_WINDOW | DETACHED_PROCESS)
         .spawn()
         .ok()
 }
