@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth";
 import { firmarSesion, COOKIE_SESION } from "@/lib/session";
-import { autenticarSupabase } from "@/lib/supabaseAuth";
+import { autenticarSupabase, buscarUsuarioSupabasePorEmail } from "@/lib/supabaseAuth";
 import { hashPassword } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -45,6 +45,23 @@ export async function POST(req: NextRequest) {
       data: { authId: usuarioAuth.id },
       include: { negocio: true },
     });
+  }
+
+  if (usuario && !usuario.authId && !usuarioAuth) {
+    const usuarioCreadoEnSupabase = await buscarUsuarioSupabasePorEmail(emailNormalizado).catch(() => null);
+    if (usuarioCreadoEnSupabase) {
+      await prisma.usuario.update({
+        where: { id: usuario.id },
+        data: { authId: usuarioCreadoEnSupabase.id },
+      });
+      return NextResponse.json(
+        {
+          error:
+            "La cuenta ya quedó vinculada con Supabase. Ingresá con la contraseña nueva configurada allí.",
+        },
+        { status: 401 }
+      );
+    }
   }
 
   const accesoLegacy =

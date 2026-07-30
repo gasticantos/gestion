@@ -36,6 +36,18 @@ export async function crearUsuarioSupabase(email: string, password: string, nomb
   return data as AuthUser;
 }
 
+export async function buscarUsuarioSupabasePorEmail(email: string): Promise<AuthUser | null> {
+  const { url, secret } = configuracion();
+  const respuesta = await fetch(`${url}/auth/v1/admin/users?page=1&per_page=1000`, {
+    headers: { apikey: secret, Authorization: `Bearer ${secret}` },
+    cache: "no-store",
+  });
+  if (!respuesta.ok) throw new Error("No se pudo consultar Supabase Auth");
+  const data = await respuesta.json();
+  const usuarios = Array.isArray(data.users) ? data.users : [];
+  return usuarios.find((usuario: AuthUser) => usuario.email?.toLowerCase() === email.toLowerCase()) || null;
+}
+
 export async function actualizarUsuarioSupabase(
   authId: string,
   cambios: { email?: string; password?: string; nombre?: string; activo?: boolean }
