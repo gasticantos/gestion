@@ -138,7 +138,7 @@ export default function EstacionImpresion() {
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
         <a
-          href="/downloads/Reparar-Impresion.cmd"
+          href="/api/impresion/reparar"
           download
           className="rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800 disabled:opacity-60"
         >
