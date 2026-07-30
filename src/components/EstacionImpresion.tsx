@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { invoke, isTauri } from "@tauri-apps/api/core";
+import { isTauri } from "@tauri-apps/api/core";
 import {
   imprimirLocal,
   listarImpresorasLocales,
@@ -46,19 +46,6 @@ function versionEsAnterior(actual: string, minima: string) {
 
 export default function EstacionImpresion() {
   const [agenteDesactualizado, setAgenteDesactualizado] = useState("");
-  const [reparando, setReparando] = useState(false);
-  const [errorReparacion, setErrorReparacion] = useState("");
-
-  async function repararInstalacion() {
-    setReparando(true);
-    setErrorReparacion("");
-    try {
-      await invoke("instalar_actualizacion");
-    } catch {
-      setReparando(false);
-      setErrorReparacion("No se pudo iniciar automáticamente. Descargá el instalador.");
-    }
-  }
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -145,25 +132,18 @@ export default function EstacionImpresion() {
           necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
           perderlas.
         </span>
-        {errorReparacion && <p className="mt-1 font-medium">{errorReparacion}</p>}
+        <p className="mt-1 font-medium">
+          Descargá la reparación, abrí el archivo y aceptá la ejecución. Gestión se reiniciará.
+        </p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
-        {errorReparacion && (
-          <a
-            href="/downloads/Gestion-Windows-Setup.exe"
-            className="rounded-lg border border-red-700 px-3 py-2 text-center font-semibold hover:bg-red-100 dark:hover:bg-red-900"
-          >
-            Descargar instalador
-          </a>
-        )}
-        <button
-          type="button"
-          onClick={repararInstalacion}
-          disabled={reparando}
+        <a
+          href="/downloads/Reparar-Impresion.cmd"
+          download
           className="rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800 disabled:opacity-60"
         >
-          {reparando ? "Reinstalando..." : "Reparar y actualizar"}
-        </button>
+          Descargar reparación
+        </a>
       </div>
     </div>
   );
