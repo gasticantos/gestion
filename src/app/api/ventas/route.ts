@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
 
-type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa };
+type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
 export async function GET() {
@@ -117,6 +117,7 @@ export async function POST(req: NextRequest) {
                   cantidad: Number(item.cantidad),
                   precioUnitario,
                   subtotal: precioUnitario * Number(item.cantidad),
+                  notas: item.notas?.trim().slice(0, 200) || null,
                 };
               }),
             },

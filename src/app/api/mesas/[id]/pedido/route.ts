@@ -15,6 +15,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "Agregá al menos un producto" }, { status: 400 });
   }
+  if (
+    items.some(
+      (item) =>
+        !Number.isFinite(Number(item.cantidad)) ||
+        Number(item.cantidad) <= 0 ||
+        String(item.notas || "").length > 200
+    )
+  ) {
+    return NextResponse.json({ error: "Revisá la cantidad y las notas" }, { status: 400 });
+  }
 
   const mesa = await prisma.mesa.findUnique({
     where: { id: Number(id) },
@@ -64,7 +74,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
               cantidad: Number(item.cantidad),
               precioUnitario,
               subtotal: precioUnitario * Number(item.cantidad),
-              notas: item.notas || null,
+              notas: item.notas?.trim().slice(0, 200) || null,
             };
           }),
         },

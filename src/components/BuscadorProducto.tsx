@@ -21,17 +21,27 @@ function BuscadorProductoBase({
   onSeleccionar,
   elegirPrecio: pedirPrecio = true,
   precioMesaActivo = true,
+  permitirNotas = false,
   placeholder,
 }: {
   productos: ProductoBusqueda[];
-  onSeleccionar: (p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) => void;
+  onSeleccionar: (
+    p: ProductoBusqueda,
+    tarifa: Tarifa,
+    precioUnitario: number,
+    cantidad?: number,
+    notas?: string
+  ) => void;
   /** Si es false, agrega directo al precio de mostrador sin mostrar el paso de elegir precio (uso en carga de stock). */
   elegirPrecio?: boolean;
   precioMesaActivo?: boolean;
+  permitirNotas?: boolean;
   placeholder?: string;
 }) {
   const [query, setQuery] = useState("");
   const [elegido, setElegido] = useState<ProductoBusqueda | null>(null);
+  const [cantidad, setCantidad] = useState(1);
+  const [notas, setNotas] = useState("");
   const [dispositivoTactil, setDispositivoTactil] = useState(false);
   const [mostrarTeclado, setMostrarTeclado] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,12 +79,14 @@ function BuscadorProductoBase({
 
   function elegirProducto(p: ProductoBusqueda) {
     setMostrarTeclado(false);
-    if (!pedirPrecio || !precioMesaActivo) {
+    if (!pedirPrecio) {
       onSeleccionar(p, "PARTICULAR", p.precioVenta);
       setQuery("");
       inputRef.current?.focus();
       return;
     }
+    setCantidad(1);
+    setNotas("");
     setElegido(p);
     setQuery("");
   }
@@ -82,8 +94,10 @@ function BuscadorProductoBase({
   function elegirPrecio(tarifa: Tarifa) {
     if (!elegido) return;
     const precio = tarifa === "MESA" ? elegido.precioVentaMesa ?? elegido.precioVenta : elegido.precioVenta;
-    onSeleccionar(elegido, tarifa, precio);
+    onSeleccionar(elegido, tarifa, precio, cantidad, permitirNotas ? notas.trim() : "");
     setElegido(null);
+    setCantidad(1);
+    setNotas("");
     inputRef.current?.focus();
   }
 
@@ -130,7 +144,47 @@ function BuscadorProductoBase({
         <div className="text-sm text-neutral-700 dark:text-neutral-300">
           <span className="font-medium">{elegido.nombre}</span> · elegí el precio
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-300 dark:border-neutral-700 p-2">
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">Cantidad</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCantidad((actual) => Math.max(1, actual - 1))}
+              className="w-9 h-9 rounded-lg border border-neutral-300 dark:border-neutral-700 text-lg"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              className={`${input} w-16 text-center`}
+              value={cantidad}
+              onChange={(e) => setCantidad(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+            />
+            <button
+              type="button"
+              onClick={() => setCantidad((actual) => actual + 1)}
+              className="w-9 h-9 rounded-lg border border-neutral-300 dark:border-neutral-700 text-lg"
+            >
+              +
+            </button>
+          </div>
+        </div>
+        {permitirNotas && (
+          <div>
+            <label className="text-xs text-neutral-500">Notas para la comanda</label>
+            <textarea
+              className={`${input} mt-1 min-h-16 resize-none`}
+              maxLength={200}
+              placeholder="Ej.: sin azúcar, bien caliente..."
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+            />
+          </div>
+        )}
+        <div className={`grid ${precioMesaActivo ? "grid-cols-2" : "grid-cols-1"} gap-2`}>
           <button
             type="button"
             onClick={() => elegirPrecio("PARTICULAR")}
@@ -139,14 +193,16 @@ function BuscadorProductoBase({
             <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mostrador</span>
             <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMostrador)}</span>
           </button>
-          <button
-            type="button"
-            onClick={() => elegirPrecio("MESA")}
-            className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
-          >
-            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mesa</span>
-            <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMesa)}</span>
-          </button>
+          {precioMesaActivo && (
+            <button
+              type="button"
+              onClick={() => elegirPrecio("MESA")}
+              className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
+            >
+              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mesa</span>
+              <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMesa)}</span>
+            </button>
+          )}
         </div>
         <button type="button" onClick={cancelarEleccion} className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 self-start">
           ‹ Volver a buscar

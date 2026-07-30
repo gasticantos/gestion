@@ -165,7 +165,13 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }, [venta?.ticketImpreso]);
 
-  async function agregarARonda(p: ProductoBusqueda, tarifa: Tarifa, _precioUnitario: number) {
+  async function agregarARonda(
+    p: ProductoBusqueda,
+    tarifa: Tarifa,
+    _precioUnitario: number,
+    cantidad = 1,
+    notas = ""
+  ) {
     const producto = productos.find((x) => x.id === p.id);
     if (!producto) return;
     ultimoCambioLocalRef.current = Date.now();
@@ -178,7 +184,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [{ productoId: producto.id, cantidad: 1, tarifa }],
+          items: [{ productoId: producto.id, cantidad, tarifa, notas }],
         }),
       });
       if (!res.ok) {
@@ -606,6 +612,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 productos={productos}
                 onSeleccionar={agregarARonda}
                 precioMesaActivo={precioMesaActivo}
+                permitirNotas
               />
             </Card>
           </div>

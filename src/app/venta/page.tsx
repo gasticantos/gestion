@@ -89,13 +89,18 @@ export default function VentaPage() {
   const descuento = useMemo(() => aplicarDescuento(subtotal, Number(descuentoPct)), [subtotal, descuentoPct]);
   const total = descuento.total;
 
-  function agregar(p: ProductoBusqueda, tarifa: Tarifa, precioUnitario: number) {
+  function agregar(
+    p: ProductoBusqueda,
+    tarifa: Tarifa,
+    precioUnitario: number,
+    cantidad = 1
+  ) {
     const producto = productos.find((x) => x.id === p.id);
     if (!producto) return;
     setCarrito((prev) => {
       const existe = prev.find((i) => i.productoId === p.id && i.tarifa === tarifa);
       if (existe) {
-        return prev.map((i) => (i === existe ? { ...i, cantidad: i.cantidad + 1 } : i));
+        return prev.map((i) => (i === existe ? { ...i, cantidad: i.cantidad + cantidad } : i));
       }
       return [
         ...prev,
@@ -104,7 +109,7 @@ export default function VentaPage() {
           nombre: producto.nombre,
           tarifa,
           precioUnitario,
-          cantidad: 1,
+          cantidad,
           stockDisponible: producto.stock,
         },
       ];
