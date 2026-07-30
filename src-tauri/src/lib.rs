@@ -20,7 +20,9 @@ fn instalar_actualizacion(app: tauri::AppHandle) -> Result<(), String> {
         const CREATE_NO_WINDOW: u32 = 0x08000000;
         const SCRIPT: &str = r#"
 $destino = Join-Path $env:TEMP ("Gestion-Update-" + [guid]::NewGuid().ToString() + ".exe")
-(New-Object System.Net.WebClient).DownloadFile("https://github.com/gasticantos/gestion/raw/refs/heads/main/public/downloads/Gestion-Windows-Setup.exe", $destino)
+$marca = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$url = "https://github.com/gasticantos/gestion/raw/refs/heads/main/public/downloads/Gestion-Windows-Setup.exe?actualizacion=$marca"
+(New-Object System.Net.WebClient).DownloadFile($url, $destino)
 Start-Sleep -Seconds 2
 Start-Process -FilePath $destino -ArgumentList "/S"
 "#;
