@@ -34,7 +34,9 @@ export async function imprimirLocal(contenido: string, impresoraDestino?: string
       return false;
     }
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    // El spooler de Windows puede tardar varios segundos si la impresora estaba en reposo.
+    // No cortar prematuramente: el agente podría estar procesando correctamente el trabajo.
+    const timeout = setTimeout(() => controller.abort(), 20_000);
     const res = await fetch(`${agenteImpresionUrl()}/imprimir`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

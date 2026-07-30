@@ -96,6 +96,11 @@ export async function PUT(req: NextRequest) {
   }
 
   const ok = body.ok === true;
+  const trabajo = await prisma.impresionTrabajo.findUnique({
+    where: { id: Number(body.id) },
+    select: { intentos: true },
+  });
+  const reintentar = !ok && Boolean(trabajo && trabajo.intentos < 3);
   const resultado = await prisma.impresionTrabajo.updateMany({
     where: {
       id: Number(body.id),
@@ -103,7 +108,9 @@ export async function PUT(req: NextRequest) {
       estacionId: String(body.estacionId),
     },
     data: {
-      estado: ok ? "IMPRESO" : "ERROR",
+      estado: ok ? "IMPRESO" : reintentar ? "PENDIENTE" : "ERROR",
+      estacionId: reintentar ? null : undefined,
+      claimedAt: reintentar ? null : undefined,
       printedAt: ok ? new Date() : null,
       error: ok ? null : String(body.error || "Error de impresión").slice(0, 500),
     },

@@ -193,14 +193,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         return;
       }
 
-      const pedido = await res.json();
-      const resImpresion = await fetch(`/api/pedidos/${pedido.id}/imprimir`, {
-        method: "POST",
-      }).catch(() => null);
-      if (!resImpresion?.ok) {
-        setError("El producto se agregó, pero no se pudo enviar la comanda a impresión.");
-      }
-
       ultimoSincronizadoRef.current = "[]";
       setRonda([]);
       await cargar();

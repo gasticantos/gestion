@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { precioSegunTarifa, Tarifa } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { ROL_LABEL } from "@/lib/permisos";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
 
@@ -94,7 +95,54 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { total: { increment: subtotalPedido }, borradorRonda: Prisma.JsonNull },
     });
 
-    return created;
+    // La comanda se crea dentro de la misma transacción que el pedido. Antes el navegador
+    // hacía una segunda llamada y, si se cortaba la conexión entre ambas, el producto quedaba
+    // agregado pero sin trabajo de impresión.
+    const itemsPorImpresora = new Map<string, typeof created.items>();
+    for (const item of created.items) {
+      const destino = item.producto.impresora?.trim() || "";
+      const grupo = itemsPorImpresora.get(destino) || [];
+      grupo.push(item);
+      itemsPorImpresora.set(destino, grupo);
+    }
+
+    const nombreUsuario = sesion?.nombre || "Usuario";
+    const rolUsuario = sesion?.rol;
+    const trabajos = [];
+    for (const [impresora, itemsDestino] of itemsPorImpresora) {
+      const lineas: string[] = [
+        `[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`,
+        "[[SUBTITLE]] COMANDA",
+        "[[HR]]",
+        `[[TITLE]] ${(mesa.nombre || "Mostrador").toUpperCase()}`,
+        `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` · ${ROL_LABEL[rolUsuario]}` : ""}`,
+        `[[CENTER]] ${new Date(created.createdAt).toLocaleString("es-AR")} · Pedido #${created.id}`,
+        "[[HR]]",
+        "[[SECTION]] PRODUCTOS",
+      ];
+      for (const item of itemsDestino) {
+        lineas.push(`[[ITEM]] ${item.cantidad} x ${item.producto.nombre}`);
+        if (item.notas) lineas.push(`[[NOTE]] NOTA: ${item.notas.toUpperCase()}`);
+      }
+      lineas.push("[[HR]]", "[[FOOTER]] Comanda de cocina", "");
+      trabajos.push(
+        await tx.impresionTrabajo.create({
+          data: {
+            tipo: "COMANDA",
+            contenido: lineas.join("\n"),
+            impresora: impresora || null,
+          },
+          select: { id: true },
+        })
+      );
+    }
+
+    await tx.pedido.update({
+      where: { id: created.id },
+      data: { comandaImpresa: true },
+    });
+
+    return { ...created, trabajoIds: trabajos.map((trabajo) => trabajo.id) };
   });
 
   return NextResponse.json(pedido, { status: 201 });
