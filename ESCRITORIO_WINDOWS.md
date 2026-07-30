@@ -13,7 +13,8 @@ tablets, pero además actúa como estación central de impresión.
 
 ## Instalar
 
-1. Entrar a **Configuración** en la web y tocar **Descargar aplicación para Windows**.
+1. Entrar a **Configuración** en la web y tocar **Descargar aplicación para Windows**
+   (la descarga se sirve desde el repositorio público para no depender del acceso de Vercel).
 2. Ejecutar el archivo `Gestion_..._setup.exe`.
 3. Abrir Gestión, iniciar sesión y entrar a **Configuración**.
 4. Elegir la impresora y usar **Imprimir prueba**.

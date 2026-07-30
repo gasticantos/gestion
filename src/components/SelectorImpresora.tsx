@@ -119,7 +119,7 @@ export default function SelectorImpresora() {
       <div className="flex flex-wrap gap-3 text-sm">
         <a
           className="font-medium text-blue-500 hover:text-blue-400"
-          href="/downloads/Gestion-Windows-Setup.exe"
+          href="https://github.com/gasticantos/gestion/raw/refs/heads/main/public/downloads/Gestion-Windows-Setup.exe"
         >
           Descargar aplicación para Windows
         </a>
