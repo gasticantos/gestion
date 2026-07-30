@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 // La estación consulta esta ruta periódicamente. Los trabajos que quedaron tomados por
 // una estación cerrada vuelven a estar disponibles después de dos minutos.
 export async function GET(req: NextRequest) {
+  const estacionId = req.nextUrl.searchParams.get("estacionId")?.trim();
+  const configuracion = await prisma.configuracion.findFirst({
+    select: { estacionImpresionId: true },
+  });
+  if (!estacionId || configuracion?.estacionImpresionId !== estacionId) {
+    return NextResponse.json({ trabajos: [] });
+  }
+
   const siguiente = req.nextUrl.searchParams.get("siguiente") === "1";
   const limite = siguiente ? 1 : 20;
   const impresorasDisponibles = req.nextUrl.searchParams
@@ -65,6 +73,13 @@ export async function POST(req: NextRequest) {
 
   if (body.accion !== "tomar" || !Number.isInteger(Number(body.id)) || !body.estacionId) {
     return NextResponse.json({ error: "Solicitud inválida" }, { status: 400 });
+  }
+
+  const configuracion = await prisma.configuracion.findFirst({
+    select: { estacionImpresionId: true },
+  });
+  if (configuracion?.estacionImpresionId !== String(body.estacionId)) {
+    return NextResponse.json({ error: "Esta computadora no es la estación principal" }, { status: 409 });
   }
 
   const resultado = await prisma.impresionTrabajo.updateMany({

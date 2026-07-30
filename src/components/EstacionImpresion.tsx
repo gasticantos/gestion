@@ -46,6 +46,8 @@ function versionEsAnterior(actual: string, minima: string) {
 
 export default function EstacionImpresion() {
   const [agenteDesactualizado, setAgenteDesactualizado] = useState("");
+  const [esEstacionPrincipal, setEsEstacionPrincipal] = useState<boolean | null>(null);
+  const [guardandoEstacion, setGuardandoEstacion] = useState(false);
   const [actualizando, setActualizando] = useState(false);
   const [errorActualizacion, setErrorActualizacion] = useState("");
 
@@ -60,6 +62,20 @@ export default function EstacionImpresion() {
     }
   }
 
+  async function establecerComoPrincipal() {
+    setGuardandoEstacion(true);
+    try {
+      const res = await fetch("/api/impresion/estacion", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estacionId: obtenerEstacionId() }),
+      });
+      if (res.ok) setEsEstacionPrincipal(true);
+    } finally {
+      setGuardandoEstacion(false);
+    }
+  }
+
   useEffect(() => {
     if (!isTauri()) return;
 
@@ -71,8 +87,23 @@ export default function EstacionImpresion() {
     let ultimaConsultaAgente = 0;
     let versionAgente = "";
 
+    async function comprobarEstacion() {
+      try {
+        const res = await fetch(
+          `/api/impresion/estacion?estacionId=${encodeURIComponent(estacionId)}`,
+          { cache: "no-store" }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setEsEstacionPrincipal(data.principal === true);
+        }
+      } catch {
+        setEsEstacionPrincipal(false);
+      }
+    }
+
     async function buscarEImprimir() {
-      if (!activo || procesando || !obtenerImpresoraSeleccionada()) return;
+      if (!activo || procesando || !obtenerImpresoraSeleccionada() || esEstacionPrincipal !== true) return;
       procesando = true;
       try {
         if (Date.now() - ultimaConsultaAgente > 15_000) {
@@ -92,7 +123,7 @@ export default function EstacionImpresion() {
           impresorasDisponibles = (await listarImpresorasLocales()).map((p) => p.nombre);
           ultimaConsultaImpresoras = Date.now();
         }
-        const params = new URLSearchParams({ siguiente: "1" });
+        const params = new URLSearchParams({ siguiente: "1", estacionId });
         impresorasDisponibles.forEach((nombre) => params.append("impresora", nombre));
         const listaRes = await fetch(`/api/impresion/cola?${params}`, { cache: "no-store" });
         if (!listaRes.ok) return;
@@ -127,28 +158,29 @@ export default function EstacionImpresion() {
       }
     }
 
+    comprobarEstacion();
+    const intervaloEstacion = window.setInterval(comprobarEstacion, 15_000);
     buscarEImprimir();
     const intervalo = window.setInterval(buscarEImprimir, 1500);
     return () => {
       activo = false;
       window.clearInterval(intervalo);
+      window.clearInterval(intervaloEstacion);
     };
-  }, []);
+  }, [esEstacionPrincipal]);
 
-  if (!agenteDesactualizado) return null;
-
-  return (
-    <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between dark:border-red-800 dark:bg-red-950 dark:text-red-50">
-      <div>
-        <span>
-          <strong>Impresión detenida:</strong> el agente instalado es {agenteDesactualizado} y se
-          necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
-          perderlas.
-        </span>
-        <p className="mt-1 font-medium">La actualización 0.1.15 usa el agente nuevo aislado.</p>
-        {errorActualizacion && <p className="mt-1 font-medium">{errorActualizacion}</p>}
-      </div>
-      <div className="flex shrink-0 flex-wrap gap-2">
+  if (agenteDesactualizado) {
+    return (
+      <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between dark:border-red-800 dark:bg-red-950 dark:text-red-50">
+        <div>
+          <span>
+            <strong>Impresión detenida:</strong> el agente instalado es {agenteDesactualizado} y se
+            necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
+            perderlas.
+          </span>
+          <p className="mt-1 font-medium">La actualización 0.1.15 usa el agente nuevo aislado.</p>
+          {errorActualizacion && <p className="mt-1 font-medium">{errorActualizacion}</p>}
+        </div>
         <button
           type="button"
           onClick={actualizarWindows}
@@ -158,6 +190,27 @@ export default function EstacionImpresion() {
           {actualizando ? "Actualizando..." : "Instalar actualización 0.1.15"}
         </button>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (esEstacionPrincipal === false) {
+    return (
+      <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
+        <span>
+          <strong>Esta computadora no es la caja principal.</strong> Activala para que todas las
+          comandas y tickets se impriman únicamente acá.
+        </span>
+        <button
+          type="button"
+          onClick={establecerComoPrincipal}
+          disabled={guardandoEstacion}
+          className="shrink-0 rounded-lg bg-amber-700 px-3 py-2 font-semibold text-white hover:bg-amber-800 disabled:opacity-60"
+        >
+          {guardandoEstacion ? "Activando..." : "Usar esta computadora para imprimir"}
+        </button>
+      </div>
+    );
+  }
+
+  return null;
 }

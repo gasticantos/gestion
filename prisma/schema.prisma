@@ -111,6 +111,7 @@ model Configuracion {
   nombrePrograma     String  @default("Gestión")
   logoPrograma       String? @db.Text
   aliasTransferencia String?
+  estacionImpresionId String?
   precioMesaActivo   Boolean @default(true)
   recargoMesaPct     Float   @default(0)
 }
