@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const accesoLegacy = usuario && (await verifyPassword(password, usuario.passwordHash));
+  const accesoLegacy =
+    usuario && !usuario.authId && (await verifyPassword(password, usuario.passwordHash));
   if (!usuario || !usuario.activo || !usuario.negocio.activo || (!usuarioAuth && !accesoLegacy)) {
     return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
   }
