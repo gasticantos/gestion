@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { input, label, th, td, trHover } from "@/components/ui/styles";
 import SelectorImpresora from "@/components/SelectorImpresora";
+import ActualizadorWindows from "@/components/ActualizadorWindows";
 
 type Categoria = { id: number; nombre: string; activo: boolean };
 
@@ -151,6 +152,10 @@ export default function ConfiguracionPage() {
 
       <Card className="p-4">
         <SelectorImpresora />
+      </Card>
+
+      <Card className="p-4">
+        <ActualizadorWindows />
       </Card>
 
       <Card className="p-4">
