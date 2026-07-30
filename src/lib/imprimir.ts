@@ -6,7 +6,7 @@ import { isTauri } from "@tauri-apps/api/core";
 function agenteImpresionUrl() {
   // La aplicación Windows usa un puerto propio para no chocar con una instalación anterior
   // del agente independiente.
-  return isTauri() ? "http://127.0.0.1:9848" : "http://127.0.0.1:9847";
+  return isTauri() ? "http://127.0.0.1:9850" : "http://127.0.0.1:9847";
 }
 const CLAVE_IMPRESORA = "gestion_impresora_seleccionada";
 let ultimoErrorImpresion = "";

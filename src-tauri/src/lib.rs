@@ -76,7 +76,7 @@ fn iniciar_agente(app: &tauri::App) -> Option<Child> {
             "-File",
         ])
         .arg(script)
-        .args(["-Puerto", "9848"])
+        .args(["-Puerto", "9850"])
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
