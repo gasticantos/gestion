@@ -115,7 +115,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         `[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`,
         "[[SUBTITLE]] COMANDA",
         "[[HR]]",
-        `[[TITLE]] ${(mesa.nombre || "Mostrador").toUpperCase()}`,
+        `[[HERO]] ${(mesa.nombre || "Mostrador").toUpperCase()}`,
         `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` - ${ROL_LABEL[rolUsuario]}` : ""}`,
         `[[CENTER]] ${formatearFechaHora(created.createdAt)} - Pedido #${created.id}`,
         "[[HR]]",
