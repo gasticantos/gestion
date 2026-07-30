@@ -17,7 +17,6 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-import { ERROR_IMPRESION_LOCAL, imprimirLocal } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -330,9 +329,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     const pedido = await res.json();
     if (imprimirComanda) {
       const resImp = await fetch(`/api/pedidos/${pedido.id}/imprimir`, { method: "POST" }).catch(() => null);
-      const dataImp = resImp ? await resImp.json().catch(() => null) : null;
-      const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
-      if (!impresoLocal) setError(ERROR_IMPRESION_LOCAL);
+      if (!resImp?.ok) setError("El pedido se guardó, pero no se pudo enviar la comanda a impresión.");
     }
     ultimoSincronizadoRef.current = "[]";
     setRonda([]);
@@ -344,12 +341,10 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     if (!venta) return;
     setEnviando(true);
     const res = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
-    const data = await res.json().catch(() => null);
     // Recargar mesa para sincronizar ticketImpreso desde la BD
     await cargar();
     setEnviando(false);
-    const impresoLocal = data?.contenido ? await imprimirLocal(data.contenido) : false;
-    if (!impresoLocal) setError(ERROR_IMPRESION_LOCAL);
+    if (!res.ok) setError("No se pudo enviar el ticket a la estación de impresión.");
   }
 
   async function cerrarMesa() {
@@ -380,12 +375,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       return;
     }
     const ventaCerrada = await res.json();
-    // Imprimir el ticket automáticamente mediante el agente local, sin diálogo del navegador.
     const resImp = await fetch(`/api/ventas/${ventaCerrada.id}/imprimir`, { method: "POST" }).catch(() => null);
-    const dataImp = resImp ? await resImp.json().catch(() => null) : null;
-    const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
-    if (!impresoLocal) {
-      setError(ERROR_IMPRESION_LOCAL);
+    if (!resImp?.ok) {
+      setError("La mesa se cerró, pero no se pudo enviar el ticket a la estación de impresión.");
       return;
     }
     // Volver a mesas

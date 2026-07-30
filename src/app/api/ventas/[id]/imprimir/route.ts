@@ -61,18 +61,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const contenido = lineas.join("\n");
 
-    // Marcar ticket como impreso
-    await prisma.venta.update({
-      where: { id: Number(id) },
-      data: { ticketImpreso: true },
-    });
+    const [trabajo] = await prisma.$transaction([
+      prisma.impresionTrabajo.create({
+        data: { tipo: "TICKET", contenido },
+        select: { id: true },
+      }),
+      // Conservamos este indicador como "ticket enviado a impresión". El resultado físico
+      // queda registrado de forma separada en ImpresionTrabajo.
+      prisma.venta.update({
+        where: { id: Number(id) },
+        data: { ticketImpreso: true },
+      }),
+    ]);
 
     const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
     await registrarAuditoria(usuarioId, "imprimir_ticket", `Venta #${venta.id}`);
 
-    // El servidor (Vercel) no tiene acceso a la impresora física: la impresión real la hace
-    // el navegador, ya sea vía el agente local (print-agent) o el diálogo de impresión.
-    return NextResponse.json({ success: true, contenido });
+    return NextResponse.json({ success: true, encolado: true, trabajoId: trabajo.id });
   } catch (err) {
     console.error("Error:", err);
     return NextResponse.json({ error: "Error al generar ticket" }, { status: 500 });

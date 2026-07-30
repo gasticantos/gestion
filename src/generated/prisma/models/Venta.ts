@@ -617,10 +617,6 @@ export type EnumTarifaPrecioFieldUpdateOperationsInput = {
   set?: $Enums.TarifaPrecio
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type VentaCreateNestedOneWithoutPedidosInput = {
   create?: Prisma.XOR<Prisma.VentaCreateWithoutPedidosInput, Prisma.VentaUncheckedCreateWithoutPedidosInput>
   connectOrCreate?: Prisma.VentaCreateOrConnectWithoutPedidosInput

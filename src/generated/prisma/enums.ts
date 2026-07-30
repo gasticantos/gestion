@@ -77,6 +77,25 @@ export const TarifaPrecio = {
 export type TarifaPrecio = (typeof TarifaPrecio)[keyof typeof TarifaPrecio]
 
 
+export const TipoImpresion = {
+  TICKET: 'TICKET',
+  COMANDA: 'COMANDA',
+  PRUEBA: 'PRUEBA'
+} as const
+
+export type TipoImpresion = (typeof TipoImpresion)[keyof typeof TipoImpresion]
+
+
+export const EstadoImpresion = {
+  PENDIENTE: 'PENDIENTE',
+  IMPRIMIENDO: 'IMPRIMIENDO',
+  IMPRESO: 'IMPRESO',
+  ERROR: 'ERROR'
+} as const
+
+export type EstadoImpresion = (typeof EstadoImpresion)[keyof typeof EstadoImpresion]
+
+
 export const EstadoReserva = {
   PENDIENTE: 'PENDIENTE',
   CUMPLIDA: 'CUMPLIDA',

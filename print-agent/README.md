@@ -20,20 +20,15 @@ En la PC que tiene conectada la impresora, hacer doble clic en
 descarga y configura el agente, lo inicia y lo deja preparado para arrancar
 automáticamente al iniciar sesión. No hace falta editar ningún archivo.
 
-## Configuración (una sola vez)
+## Seleccionar la impresora (una sola vez por computadora)
 
-1. Copiar esta carpeta `print-agent` a la PC de la caja (por ejemplo a `C:\print-agent`).
-2. Averiguar el nombre EXACTO de la impresora en Windows: abrir PowerShell y correr
-   ```
-   Get-Printer
-   ```
-   (o ir a Configuración → Bluetooth y dispositivos → Impresoras y escáneres). Copiar el
-   nombre tal cual aparece.
-3. Editar `agente-impresion.ps1` con el Bloc de notas y reemplazar esta línea:
-   ```
-   $PrinterName = "NOMBRE_DE_TU_IMPRESORA"
-   ```
-   por el nombre real, por ejemplo `$PrinterName = "POS-58"`.
+1. Instalar o actualizar el agente en la PC de la caja.
+2. Entrar en la app a **Configuración → Impresora de tickets de este dispositivo**.
+3. La app mostrará todas las impresoras instaladas en Windows. Elegir la correspondiente
+   y tocar **Imprimir prueba**.
+
+La elección se guarda en esa computadora y perfil del navegador. Desde ese momento los
+tickets se mandan directamente a esa impresora, sin diálogo ni confirmación.
 
 ## Probarlo
 

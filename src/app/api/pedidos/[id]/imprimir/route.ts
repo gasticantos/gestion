@@ -34,15 +34,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const contenido = lineas.join("\n");
 
-    // Marcar comanda como impresa (la impresión real ocurre en el navegador vía /pedidos/[id]/comanda)
-    await prisma.pedido.update({
-      where: { id: Number(id) },
-      data: { comandaImpresa: true },
-    });
+    const [trabajo] = await prisma.$transaction([
+      prisma.impresionTrabajo.create({
+        data: { tipo: "COMANDA", contenido },
+        select: { id: true },
+      }),
+      prisma.pedido.update({
+        where: { id: Number(id) },
+        data: { comandaImpresa: true },
+      }),
+    ]);
 
-    // El servidor (Vercel) no tiene acceso a la impresora física: la impresión real la hace
-    // el navegador, ya sea vía el agente local (print-agent) o el diálogo de impresión.
-    return NextResponse.json({ success: true, contenido });
+    return NextResponse.json({ success: true, encolado: true, trabajoId: trabajo.id });
   } catch (err) {
     console.error("Error al generar comanda:", err);
     return NextResponse.json({ error: "Error al generar comanda" }, { status: 500 });

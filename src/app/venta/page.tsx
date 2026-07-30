@@ -16,7 +16,6 @@ import Badge from "@/components/ui/Badge";
 import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-import { ERROR_IMPRESION_LOCAL, imprimirLocal } from "@/lib/imprimir";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -144,11 +143,8 @@ export default function VentaPage() {
 
     const venta = await res.json();
 
-    // Imprimir únicamente mediante el agente local, sin abrir el diálogo del navegador.
     const resImp = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" }).catch(() => null);
-    const dataImp = resImp ? await resImp.json().catch(() => null) : null;
-    const impresoLocal = dataImp?.contenido ? await imprimirLocal(dataImp.contenido) : false;
-    if (!impresoLocal) setError(ERROR_IMPRESION_LOCAL);
+    if (!resImp?.ok) setError("La venta se guardó, pero no se pudo enviar el ticket a la estación de impresión.");
 
     setCarrito([]);
     setPagos([{ metodo: "EFECTIVO", monto: "0" }]);

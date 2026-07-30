@@ -57,6 +57,11 @@ export type Usuario = Prisma.UsuarioModel
  */
 export type Configuracion = Prisma.ConfiguracionModel
 /**
+ * Model ImpresionTrabajo
+ * 
+ */
+export type ImpresionTrabajo = Prisma.ImpresionTrabajoModel
+/**
  * Model AuditoriaLog
  * 
  */

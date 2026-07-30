@@ -406,10 +406,6 @@ export type AuditoriaLogUncheckedUpdateManyWithoutUsuarioNestedInput = {
   deleteMany?: Prisma.AuditoriaLogScalarWhereInput | Prisma.AuditoriaLogScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type AuditoriaLogCreateWithoutUsuarioInput = {
   accion: string
   descripcion?: string | null

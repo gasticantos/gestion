@@ -5,7 +5,7 @@ color 1F
 
 echo.
 echo ============================================
-echo   IMPRESION AUTOMATICA - EPSON TM-T20II
+echo   IMPRESION AUTOMATICA - GESTION
 echo ============================================
 echo.
 echo Configurando la impresora. Espere un momento...
@@ -13,8 +13,9 @@ echo.
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference = 'Stop';" ^
-  "$printer = Get-CimInstance Win32_Printer | Where-Object { $_.Name -match 'TM.?T20II' } | Select-Object -First 1;" ^
-  "if (-not $printer) { throw 'No se encontro una impresora EPSON TM-T20II instalada en Windows.' };" ^
+  "$printer = Get-CimInstance Win32_Printer | Where-Object { $_.Default } | Select-Object -First 1;" ^
+  "if (-not $printer) { $printer = Get-CimInstance Win32_Printer | Select-Object -First 1 };" ^
+  "if (-not $printer) { throw 'No se encontro ninguna impresora instalada en Windows.' };" ^
   "$installDir = Join-Path $env:LOCALAPPDATA 'GestionPrintAgent';" ^
   "New-Item -ItemType Directory -Force -Path $installDir | Out-Null;" ^
   "$agentPath = Join-Path $installDir 'agente-impresion.ps1';" ^
@@ -37,7 +38,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
   "Start-Sleep -Seconds 2;" ^
   "$health = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:9847/health' -TimeoutSec 3;" ^
   "if ($health.Content.Trim() -ne 'ok') { throw 'El agente no respondio correctamente.' };" ^
-  "Write-Host ('Impresora detectada: ' + $printer.Name) -ForegroundColor Green"
+  "Write-Host ('Agente instalado. Impresora inicial: ' + $printer.Name) -ForegroundColor Green"
 
 if errorlevel 1 goto error
 
@@ -47,7 +48,8 @@ echo   LISTO - INSTALACION COMPLETADA
 echo ============================================
 echo.
 echo Ya puede cerrar esta ventana.
-echo Los tickets se imprimiran automaticamente.
+echo Entre a Configuracion en el sistema, elija la impresora
+echo y use el boton Imprimir prueba.
 echo.
 pause
 exit /b 0

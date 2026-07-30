@@ -55,27 +55,6 @@ const emptyForm = {
 
 type EditForm = typeof emptyForm & { precioVentaMesaManual: boolean };
 
-type CampoMasivo =
-  | "categoriaId"
-  | "precioCosto"
-  | "precioVenta"
-  | "precioVentaMesa"
-  | "stock"
-  | "unidad"
-  | "proveedorId"
-  | "activo";
-
-const emptyBulkForm = {
-  categoriaId: "",
-  precioCosto: "",
-  precioVenta: "",
-  precioVentaMesa: "",
-  stock: "",
-  unidad: "unidad",
-  proveedorId: "",
-  activo: "true",
-};
-
 const MARGEN_SUGERIDO_PCT = 30;
 
 function calcularVentaSugerida(costo: string) {
@@ -140,14 +119,10 @@ export default function ProductosPage() {
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
-  const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [edit, setEdit] = useState<EditForm>({ ...emptyForm, precioVentaMesaManual: false });
+  const [ediciones, setEdiciones] = useState<Record<number, EditForm>>({});
   const [errorFila, setErrorFila] = useState("");
   const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
-  const [mostrarEdicionMasiva, setMostrarEdicionMasiva] = useState(false);
-  const [camposMasivos, setCamposMasivos] = useState<Set<CampoMasivo>>(new Set());
-  const [bulkForm, setBulkForm] = useState(emptyBulkForm);
-  const [guardandoMasivo, setGuardandoMasivo] = useState(false);
+  const [guardandoEdiciones, setGuardandoEdiciones] = useState(false);
   const seleccionarTodosRef = useRef<HTMLInputElement>(null);
 
   async function cargar() {
@@ -225,10 +200,8 @@ export default function ProductosPage() {
     setForm((f) => ({ ...f, precioVentaMesa: valor }));
   }
 
-  function iniciarEdicion(p: Producto) {
-    setEditandoId(p.id);
-    setErrorFila("");
-    setEdit({
+  function productoAEditForm(p: Producto): EditForm {
+    return {
       nombre: p.nombre,
       codigoBarras: p.codigoBarras || "",
       categoriaId: p.categoriaId ? String(p.categoriaId) : "",
@@ -239,53 +212,70 @@ export default function ProductosPage() {
       stock: String(p.stock),
       unidad: p.unidad,
       proveedorId: p.proveedorId ? String(p.proveedorId) : "",
-    });
+    };
   }
 
-  function cambiarCostoEdit(valor: string) {
-    setEdit((f) => ({
-      ...f,
+  function iniciarEdicion(p: Producto) {
+    setErrorFila("");
+    setEdiciones({ [p.id]: productoAEditForm(p) });
+  }
+
+  function actualizarEdicion(id: number, cambios: Partial<EditForm>) {
+    setEdiciones((actuales) => ({
+      ...actuales,
+      [id]: { ...actuales[id], ...cambios },
+    }));
+  }
+
+  function cambiarCostoEdit(id: number, valor: string) {
+    const f = ediciones[id];
+    actualizarEdicion(id, {
       precioCosto: valor,
       precioVentaMesa: f.precioVentaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(f.precioVenta, valor, recargoMesaPct),
-    }));
+    });
   }
 
-  function cambiarVentaEdit(valor: string) {
-    setEdit((f) => ({
-      ...f,
+  function cambiarVentaEdit(id: number, valor: string) {
+    const f = ediciones[id];
+    actualizarEdicion(id, {
       precioVenta: valor,
       precioVentaMesa: f.precioVentaMesaManual ? f.precioVentaMesa : calcularVentaMesaSugerida(valor, f.precioCosto, recargoMesaPct),
-    }));
-  }
-
-  function cambiarVentaMesaEdit(valor: string) {
-    setEdit((f) => ({ ...f, precioVentaMesa: valor, precioVentaMesaManual: true }));
-  }
-
-  function cancelarEdicion() {
-    setEditandoId(null);
-    setEdit({ ...emptyForm, precioVentaMesaManual: false });
-    setErrorFila("");
-  }
-
-  async function guardarEdicion(id: number) {
-    setErrorFila("");
-    const res = await fetch(`/api/productos/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nombre: edit.nombre,
-        codigoBarras: edit.codigoBarras || null,
-        categoriaId: edit.categoriaId || null,
-        precioVenta: edit.precioVenta,
-        precioVentaMesa: edit.precioVentaMesa,
-        precioVentaMesaManual: edit.precioVentaMesaManual,
-        precioCosto: edit.precioCosto,
-        stock: edit.stock,
-        unidad: edit.unidad,
-        proveedorId: edit.proveedorId || null,
-      }),
     });
+  }
+
+  function cambiarVentaMesaEdit(id: number, valor: string) {
+    actualizarEdicion(id, { precioVentaMesa: valor, precioVentaMesaManual: true });
+  }
+
+  function cancelarEdiciones() {
+    setEdiciones({});
+    setErrorFila("");
+  }
+
+  async function guardarEdiciones() {
+    setErrorFila("");
+    const actualizaciones = Object.entries(ediciones).map(([id, edit]) => ({
+      id: Number(id),
+      nombre: edit.nombre,
+      codigoBarras: edit.codigoBarras || null,
+      categoriaId: edit.categoriaId || null,
+      precioVenta: edit.precioVenta,
+      precioVentaMesa: edit.precioVentaMesa,
+      precioVentaMesaManual: edit.precioVentaMesaManual,
+      precioCosto: edit.precioCosto,
+      stock: edit.stock,
+      unidad: edit.unidad,
+      proveedorId: edit.proveedorId || null,
+    }));
+    if (actualizaciones.length === 0) return;
+
+    setGuardandoEdiciones(true);
+    const res = await fetch("/api/productos", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ actualizaciones }),
+    });
+    setGuardandoEdiciones(false);
 
     if (!res.ok) {
       const data = await res.json();
@@ -293,7 +283,8 @@ export default function ProductosPage() {
       return;
     }
 
-    cancelarEdicion();
+    setEdiciones({});
+    setSeleccionados(new Set());
     await cargar();
   }
 
@@ -347,54 +338,16 @@ export default function ProductosPage() {
     });
   }
 
-  function alternarCampoMasivo(campo: CampoMasivo) {
-    setCamposMasivos((actuales) => {
-      const siguientes = new Set(actuales);
-      if (siguientes.has(campo)) siguientes.delete(campo);
-      else siguientes.add(campo);
-      return siguientes;
-    });
-  }
-
-  async function guardarEdicionMasiva(e: FormEvent) {
-    e.preventDefault();
+  function editarSeleccion() {
     setErrorFila("");
-    if (seleccionados.size === 0 || camposMasivos.size === 0) return;
-
-    const cambios: Record<string, string | boolean | null> = {};
-    for (const campo of camposMasivos) {
-      if (campo === "categoriaId" || campo === "proveedorId") {
-        cambios[campo] = bulkForm[campo] || null;
-      } else if (campo === "activo") {
-        cambios.activo = bulkForm.activo === "true";
-      } else {
-        cambios[campo] = bulkForm[campo];
-      }
-    }
-    if (camposMasivos.has("precioVentaMesa")) cambios.precioVentaMesaManual = true;
-
-    setGuardandoMasivo(true);
-    const res = await fetch("/api/productos", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: Array.from(seleccionados), cambios }),
+    const nuevas: Record<number, EditForm> = {};
+    productos.forEach((p) => {
+      if (seleccionados.has(p.id)) nuevas[p.id] = productoAEditForm(p);
     });
-    setGuardandoMasivo(false);
-
-    if (!res.ok) {
-      const data = await res.json();
-      setErrorFila(data.error || "No se pudieron actualizar los productos");
-      return;
-    }
-
-    setSeleccionados(new Set());
-    setCamposMasivos(new Set());
-    setBulkForm(emptyBulkForm);
-    setMostrarEdicionMasiva(false);
-    await cargar();
+    setEdiciones(nuevas);
   }
 
-  const opcionesCategoria = categorias.filter((c) => c.activo || String(c.id) === edit.categoriaId);
+  const hayEdiciones = Object.keys(ediciones).length > 0;
 
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
@@ -544,10 +497,10 @@ export default function ProductosPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} producto(s)</span>
-              {seleccionados.size > 0 && (
+              {seleccionados.size > 0 && !hayEdiciones && (
                 <>
                   <Badge variant="neutral">{seleccionados.size} seleccionado(s)</Badge>
-                  <Button type="button" size="sm" variant="primary" onClick={() => setMostrarEdicionMasiva(true)}>
+                  <Button type="button" size="sm" variant="primary" onClick={editarSeleccion}>
                     Editar selección
                   </Button>
                   <button
@@ -557,6 +510,17 @@ export default function ProductosPage() {
                   >
                     Limpiar
                   </button>
+                </>
+              )}
+              {hayEdiciones && (
+                <>
+                  <Badge variant="neutral">{Object.keys(ediciones).length} fila(s) en edición</Badge>
+                  <Button type="button" size="sm" variant="primary" onClick={guardarEdiciones} disabled={guardandoEdiciones}>
+                    {guardandoEdiciones ? "Guardando..." : "Guardar todo"}
+                  </Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={cancelarEdiciones} disabled={guardandoEdiciones}>
+                    Cancelar
+                  </Button>
                 </>
               )}
             </div>
@@ -569,89 +533,6 @@ export default function ProductosPage() {
               Mostrar dados de baja
             </label>
           </div>
-          {mostrarEdicionMasiva && seleccionados.size > 0 && (
-            <form
-              onSubmit={guardarEdicionMasiva}
-              className="rounded-lg border border-blue-200 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/20"
-            >
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                    Editar {seleccionados.size} producto(s)
-                  </p>
-                  <p className="text-xs text-neutral-500">Marcá únicamente los campos que querés reemplazar en todos.</p>
-                </div>
-                <button type="button" className="text-sm text-neutral-500" onClick={() => setMostrarEdicionMasiva(false)}>
-                  Cerrar
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                {[
-                  ["precioCosto", "Precio de costo", "number"],
-                  ["precioVenta", "Precio de venta", "number"],
-                  ["precioVentaMesa", "Precio venta mesa", "number"],
-                  ["stock", "Stock", "number"],
-                  ["unidad", "Unidad", "text"],
-                ].map(([campo, texto, tipo]) => (
-                  <label key={campo} className="block">
-                    <span className={`${label} flex items-center gap-1.5`}>
-                      <input
-                        type="checkbox"
-                        checked={camposMasivos.has(campo as CampoMasivo)}
-                        onChange={() => alternarCampoMasivo(campo as CampoMasivo)}
-                      />
-                      {texto}
-                    </span>
-                    <input
-                      type={tipo}
-                      step={tipo === "number" ? "0.01" : undefined}
-                      className={input}
-                      disabled={!camposMasivos.has(campo as CampoMasivo)}
-                      value={bulkForm[campo as keyof typeof bulkForm]}
-                      onChange={(e) => setBulkForm({ ...bulkForm, [campo]: e.target.value })}
-                      required={camposMasivos.has(campo as CampoMasivo)}
-                    />
-                  </label>
-                ))}
-                <label className="block">
-                  <span className={`${label} flex items-center gap-1.5`}>
-                    <input type="checkbox" checked={camposMasivos.has("categoriaId")} onChange={() => alternarCampoMasivo("categoriaId")} />
-                    Categoría
-                  </span>
-                  <select className={input} disabled={!camposMasivos.has("categoriaId")} value={bulkForm.categoriaId} onChange={(e) => setBulkForm({ ...bulkForm, categoriaId: e.target.value })}>
-                    <option value="">Sin categoría</option>
-                    {categorias.filter((c) => c.activo).map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                  </select>
-                </label>
-                <label className="block">
-                  <span className={`${label} flex items-center gap-1.5`}>
-                    <input type="checkbox" checked={camposMasivos.has("proveedorId")} onChange={() => alternarCampoMasivo("proveedorId")} />
-                    Proveedor
-                  </span>
-                  <select className={input} disabled={!camposMasivos.has("proveedorId")} value={bulkForm.proveedorId} onChange={(e) => setBulkForm({ ...bulkForm, proveedorId: e.target.value })}>
-                    <option value="">Sin proveedor</option>
-                    {proveedores.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                  </select>
-                </label>
-                <label className="block">
-                  <span className={`${label} flex items-center gap-1.5`}>
-                    <input type="checkbox" checked={camposMasivos.has("activo")} onChange={() => alternarCampoMasivo("activo")} />
-                    Estado
-                  </span>
-                  <select className={input} disabled={!camposMasivos.has("activo")} value={bulkForm.activo} onChange={(e) => setBulkForm({ ...bulkForm, activo: e.target.value })}>
-                    <option value="true">Activo</option>
-                    <option value="false">Dado de baja</option>
-                  </select>
-                </label>
-              </div>
-              <div className="mt-3 flex items-center gap-3">
-                <Button type="submit" size="sm" variant="primary" disabled={guardandoMasivo || camposMasivos.size === 0}>
-                  {guardandoMasivo ? "Guardando..." : `Aplicar a ${seleccionados.size} producto(s)`}
-                </Button>
-                {camposMasivos.size === 0 && <span className="text-xs text-neutral-500">Elegí al menos un campo.</span>}
-              </div>
-            </form>
-          )}
           {errorFila && <span className="text-sm text-red-400">{errorFila}</span>}
         </div>
         {loading ? (
@@ -684,8 +565,10 @@ export default function ProductosPage() {
                 </tr>
               </thead>
               <tbody>
-                {listado.map((p) =>
-                  editandoId === p.id ? (
+                {listado.map((p) => {
+                  const edicion = ediciones[p.id];
+                  const opcionesCategoria = categorias.filter((c) => c.activo || String(c.id) === edicion?.categoriaId);
+                  return edicion ? (
                     <tr key={p.id} className={trHover}>
                       <td className={td}>
                         <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => alternarSeleccion(p.id)} aria-label={`Seleccionar ${p.nombre}`} />
@@ -693,8 +576,8 @@ export default function ProductosPage() {
                       <td className={td}>
                         <input
                           className={input}
-                          value={edit.nombre}
-                          onChange={(e) => setEdit({ ...edit, nombre: e.target.value })}
+                          value={edicion.nombre}
+                          onChange={(e) => actualizarEdicion(p.id, { nombre: e.target.value })}
                         />
                       </td>
                       <td className={td}>
@@ -702,8 +585,8 @@ export default function ProductosPage() {
                           type="number"
                           step="0.01"
                           className={`${input} min-w-[100px]`}
-                          value={edit.precioCosto}
-                          onChange={(e) => cambiarCostoEdit(e.target.value)}
+                          value={edicion.precioCosto}
+                          onChange={(e) => cambiarCostoEdit(p.id, e.target.value)}
                         />
                       </td>
                       <td className={td}>
@@ -711,11 +594,11 @@ export default function ProductosPage() {
                           type="number"
                           step="0.01"
                           className={`${input} min-w-[100px]`}
-                          value={edit.precioVenta}
-                          onChange={(e) => cambiarVentaEdit(e.target.value)}
+                          value={edicion.precioVenta}
+                          onChange={(e) => cambiarVentaEdit(p.id, e.target.value)}
                         />
                         <div className="mt-0.5">
-                          <MargenBadge costo={Number(edit.precioCosto)} venta={Number(edit.precioVenta)} small />
+                          <MargenBadge costo={Number(edicion.precioCosto)} venta={Number(edicion.precioVenta)} small />
                         </div>
                       </td>
                       <td className={td}>
@@ -724,10 +607,10 @@ export default function ProductosPage() {
                             type="number"
                             step="0.01"
                             className={`${input} min-w-[100px]`}
-                            value={edit.precioVentaMesa}
-                            onChange={(e) => cambiarVentaMesaEdit(e.target.value)}
+                            value={edicion.precioVentaMesa}
+                            onChange={(e) => cambiarVentaMesaEdit(p.id, e.target.value)}
                           />
-                          {edit.precioVentaMesaManual && (
+                          {edicion.precioVentaMesaManual && (
                             <span
                               className="text-amber-500 text-base leading-none pt-1.5 shrink-0"
                               title="Precio fijado a mano: no se actualiza solo cuando cambia el % de recargo de mesa en Configuración. Revisalo."
@@ -738,9 +621,9 @@ export default function ProductosPage() {
                         </div>
                         <div className="mt-0.5">
                           <MargenBadge
-                            costo={Number(edit.precioCosto)}
-                            venta={Number(edit.precioVentaMesa)}
-                            sugerido={!edit.precioVentaMesaManual}
+                            costo={Number(edicion.precioCosto)}
+                            venta={Number(edicion.precioVentaMesa)}
+                            sugerido={!edicion.precioVentaMesaManual}
                             small
                           />
                         </div>
@@ -750,22 +633,22 @@ export default function ProductosPage() {
                           type="number"
                           step="0.01"
                           className={`${input} min-w-[80px]`}
-                          value={edit.stock}
-                          onChange={(e) => setEdit({ ...edit, stock: e.target.value })}
+                          value={edicion.stock}
+                          onChange={(e) => actualizarEdicion(p.id, { stock: e.target.value })}
                         />
                       </td>
                       <td className={td}>
                         <input
                           className={input}
-                          value={edit.codigoBarras}
-                          onChange={(e) => setEdit({ ...edit, codigoBarras: e.target.value })}
+                          value={edicion.codigoBarras}
+                          onChange={(e) => actualizarEdicion(p.id, { codigoBarras: e.target.value })}
                         />
                       </td>
                       <td className={td}>
                         <select
                           className={input}
-                          value={edit.categoriaId}
-                          onChange={(e) => setEdit({ ...edit, categoriaId: e.target.value })}
+                          value={edicion.categoriaId}
+                          onChange={(e) => actualizarEdicion(p.id, { categoriaId: e.target.value })}
                         >
                           <option value="">-</option>
                           {opcionesCategoria.map((c) => (
@@ -778,15 +661,15 @@ export default function ProductosPage() {
                       <td className={td}>
                         <input
                           className={`${input} min-w-[80px]`}
-                          value={edit.unidad}
-                          onChange={(e) => setEdit({ ...edit, unidad: e.target.value })}
+                          value={edicion.unidad}
+                          onChange={(e) => actualizarEdicion(p.id, { unidad: e.target.value })}
                         />
                       </td>
                       <td className={td}>
                         <select
                           className={input}
-                          value={edit.proveedorId}
-                          onChange={(e) => setEdit({ ...edit, proveedorId: e.target.value })}
+                          value={edicion.proveedorId}
+                          onChange={(e) => actualizarEdicion(p.id, { proveedorId: e.target.value })}
                         >
                           <option value="">-</option>
                           {proveedores.map((pr) => (
@@ -802,16 +685,7 @@ export default function ProductosPage() {
                       <td
                         className={`${td} text-right whitespace-nowrap gap-3 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
                       >
-                        <button
-                          className="text-blue-500 hover:text-blue-400"
-                          onClick={() => guardarEdicion(p.id)}
-                        >
-                          Guardar
-                        </button>
-                        <span className="mx-2">|</span>
-                        <button className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200" onClick={cancelarEdicion}>
-                          Cancelar
-                        </button>
+                        <span className="text-xs text-blue-500">En edición</span>
                       </td>
                     </tr>
                   ) : (
@@ -861,8 +735,8 @@ export default function ProductosPage() {
                         )}
                       </td>
                     </tr>
-                  )
-                )}
+                  );
+                })}
               </tbody>
             </table>
           </div>

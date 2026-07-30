@@ -54,6 +54,7 @@ export const ModelName = {
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
+  ImpresionTrabajo: 'ImpresionTrabajo',
   AuditoriaLog: 'AuditoriaLog',
   Proveedor: 'Proveedor',
   Producto: 'Producto',
@@ -114,6 +115,23 @@ export const ConfiguracionScalarFieldEnum = {
 } as const
 
 export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
+
+
+export const ImpresionTrabajoScalarFieldEnum = {
+  id: 'id',
+  tipo: 'tipo',
+  contenido: 'contenido',
+  estado: 'estado',
+  referencia: 'referencia',
+  estacionId: 'estacionId',
+  error: 'error',
+  intentos: 'intentos',
+  createdAt: 'createdAt',
+  claimedAt: 'claimedAt',
+  printedAt: 'printedAt'
+} as const
+
+export type ImpresionTrabajoScalarFieldEnum = (typeof ImpresionTrabajoScalarFieldEnum)[keyof typeof ImpresionTrabajoScalarFieldEnum]
 
 
 export const AuditoriaLogScalarFieldEnum = {

@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permisos mínimos de la aplicación de Gestión",
+  "windows": ["main"],
+  "remote": {
+    "urls": [
+      "https://gestion-nexusgestion.vercel.app/*",
+      "http://localhost:3000/*"
+    ]
+  },
+  "permissions": ["core:default"]
+}
+

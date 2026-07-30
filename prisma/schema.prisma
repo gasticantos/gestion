@@ -78,6 +78,35 @@ model Configuracion {
   recargoMesaPct Float @default(0)
 }
 
+enum TipoImpresion {
+  TICKET
+  COMANDA
+  PRUEBA
+}
+
+enum EstadoImpresion {
+  PENDIENTE
+  IMPRIMIENDO
+  IMPRESO
+  ERROR
+}
+
+model ImpresionTrabajo {
+  id          Int              @id @default(autoincrement())
+  tipo        TipoImpresion
+  contenido   String
+  estado      EstadoImpresion  @default(PENDIENTE)
+  referencia  String?          @unique
+  estacionId  String?
+  error       String?
+  intentos    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  claimedAt   DateTime?
+  printedAt   DateTime?
+
+  @@index([estado, createdAt])
+}
+
 model AuditoriaLog {
   id          Int      @id @default(autoincrement())
   usuarioId   Int

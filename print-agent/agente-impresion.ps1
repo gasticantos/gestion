@@ -1,12 +1,12 @@
 # Agente de impresion local. Escucha en http://127.0.0.1:9847 y manda los tickets
 # directo a la impresora en RAW (sin dialogo, sin instalar nada: usa PowerShell y el
 # driver de Windows que la impresora ya tiene instalado).
+param([int]$Puerto = 9847)
 #
-# EDITAR ANTES DE USAR: poner el nombre exacto de la impresora tal como figura en
-# Windows (Configuracion > Impresoras y escaneres, o corriendo Get-Printer en PowerShell).
+# Impresora de respaldo para instalaciones antiguas. La app envia en cada impresion
+# la impresora elegida y guardada en ese dispositivo.
 $PrinterName = "NOMBRE_DE_TU_IMPRESORA"
 
-$Puerto = 9847
 $OrigenesPermitidos = @("https://gestion-nexusgestion.vercel.app", "http://localhost:3000")
 
 Add-Type -Namespace RawPrinterHelper -Name Native -MemberDefinition @"
@@ -106,6 +106,39 @@ while ($listener.IsListening) {
       continue
     }
 
+    if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/impresoras") {
+      try {
+        $impresoras = @(Get-CimInstance Win32_Printer | Sort-Object Name | ForEach-Object {
+          [PSCustomObject]@{
+            nombre = $_.Name
+            predeterminada = [bool]$_.Default
+            desconectada = [bool]$_.WorkOffline
+            estado = switch ([int]$_.PrinterStatus) {
+              1 { "Otro" }
+              2 { "Desconocido" }
+              3 { "Lista" }
+              4 { "Imprimiendo" }
+              5 { "Calentando" }
+              default { "Disponible" }
+            }
+          }
+        })
+        $jsonImpresoras = @{ impresoras = $impresoras } | ConvertTo-Json -Depth 4 -Compress
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($jsonImpresoras)
+        $response.StatusCode = 200
+        $response.ContentType = "application/json; charset=utf-8"
+        $response.OutputStream.Write($bytes, 0, $bytes.Length)
+      } catch {
+        $response.StatusCode = 500
+        $msg = ($_.Exception.Message -replace '"', "'")
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes("{`"error`":`"$msg`"}")
+        $response.ContentType = "application/json; charset=utf-8"
+        $response.OutputStream.Write($bytes, 0, $bytes.Length)
+      }
+      $response.Close()
+      continue
+    }
+
     if ($request.HttpMethod -eq "POST" -and $request.Url.AbsolutePath -eq "/imprimir") {
       $reader = New-Object System.IO.StreamReader($request.InputStream, $request.ContentEncoding)
       $body = $reader.ReadToEnd()
@@ -113,6 +146,10 @@ while ($listener.IsListening) {
 
       $json = $body | ConvertFrom-Json
       $contenido = $json.contenido
+      $impresoraElegida = [string]$json.impresora
+      if ([string]::IsNullOrWhiteSpace($impresoraElegida)) {
+        $impresoraElegida = $PrinterName
+      }
 
       if (-not $contenido) {
         $response.StatusCode = 400
@@ -132,7 +169,7 @@ while ($listener.IsListening) {
         $corte = [byte[]](0x1D, 0x56, 0x00)  # GS V 0 -> corte total de papel
         $todosBytes = $reset + $textoBytes + $corte
 
-        Send-RawDataToPrinter -PrinterName $PrinterName -Bytes $todosBytes
+        Send-RawDataToPrinter -PrinterName $impresoraElegida -Bytes $todosBytes
 
         $response.StatusCode = 200
         $okBytes = [System.Text.Encoding]::UTF8.GetBytes('{"success":true}')

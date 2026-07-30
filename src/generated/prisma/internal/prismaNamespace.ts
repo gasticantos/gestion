@@ -387,6 +387,7 @@ export const ModelName = {
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
+  ImpresionTrabajo: 'ImpresionTrabajo',
   AuditoriaLog: 'AuditoriaLog',
   Proveedor: 'Proveedor',
   Producto: 'Producto',
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "categoria" | "usuario" | "configuracion" | "auditoriaLog" | "proveedor" | "producto" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
+    modelProps: "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -638,6 +639,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ConfiguracionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ConfiguracionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ImpresionTrabajo: {
+      payload: Prisma.$ImpresionTrabajoPayload<ExtArgs>
+      fields: Prisma.ImpresionTrabajoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImpresionTrabajoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImpresionTrabajoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>
+        }
+        findFirst: {
+          args: Prisma.ImpresionTrabajoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImpresionTrabajoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>
+        }
+        findMany: {
+          args: Prisma.ImpresionTrabajoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>[]
+        }
+        create: {
+          args: Prisma.ImpresionTrabajoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>
+        }
+        createMany: {
+          args: Prisma.ImpresionTrabajoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImpresionTrabajoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>[]
+        }
+        delete: {
+          args: Prisma.ImpresionTrabajoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>
+        }
+        update: {
+          args: Prisma.ImpresionTrabajoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImpresionTrabajoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImpresionTrabajoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImpresionTrabajoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImpresionTrabajoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImpresionTrabajoPayload>
+        }
+        aggregate: {
+          args: Prisma.ImpresionTrabajoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImpresionTrabajo>
+        }
+        groupBy: {
+          args: Prisma.ImpresionTrabajoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImpresionTrabajoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImpresionTrabajoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImpresionTrabajoCountAggregateOutputType> | number
         }
       }
     }
@@ -1673,6 +1748,23 @@ export const ConfiguracionScalarFieldEnum = {
 export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
 
 
+export const ImpresionTrabajoScalarFieldEnum = {
+  id: 'id',
+  tipo: 'tipo',
+  contenido: 'contenido',
+  estado: 'estado',
+  referencia: 'referencia',
+  estacionId: 'estacionId',
+  error: 'error',
+  intentos: 'intentos',
+  createdAt: 'createdAt',
+  claimedAt: 'claimedAt',
+  printedAt: 'printedAt'
+} as const
+
+export type ImpresionTrabajoScalarFieldEnum = (typeof ImpresionTrabajoScalarFieldEnum)[keyof typeof ImpresionTrabajoScalarFieldEnum]
+
+
 export const AuditoriaLogScalarFieldEnum = {
   id: 'id',
   usuarioId: 'usuarioId',
@@ -1974,6 +2066,34 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
 
 
 /**
+ * Reference to a field of type 'TipoImpresion'
+ */
+export type EnumTipoImpresionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoImpresion'>
+    
+
+
+/**
+ * Reference to a field of type 'TipoImpresion[]'
+ */
+export type ListEnumTipoImpresionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoImpresion[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EstadoImpresion'
+ */
+export type EnumEstadoImpresionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EstadoImpresion'>
+    
+
+
+/**
+ * Reference to a field of type 'EstadoImpresion[]'
+ */
+export type ListEnumEstadoImpresionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EstadoImpresion[]'>
+    
+
+
+/**
  * Reference to a field of type 'TipoStockEntry'
  */
 export type EnumTipoStockEntryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoStockEntry'>
@@ -2211,6 +2331,7 @@ export type GlobalOmitConfig = {
   categoria?: Prisma.CategoriaOmit
   usuario?: Prisma.UsuarioOmit
   configuracion?: Prisma.ConfiguracionOmit
+  impresionTrabajo?: Prisma.ImpresionTrabajoOmit
   auditoriaLog?: Prisma.AuditoriaLogOmit
   proveedor?: Prisma.ProveedorOmit
   producto?: Prisma.ProductoOmit

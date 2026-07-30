@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
+import EstacionImpresion from "@/components/EstacionImpresion";
 
 export const metadata: Metadata = {
   title: "Gestión",
@@ -51,6 +52,7 @@ export default function RootLayout({
       </head>
       <ThemeWrapper>
         <body className="min-h-full flex flex-col bg-white text-neutral-950 dark:bg-neutral-950 dark:text-neutral-100 transition-colors">
+          <EstacionImpresion />
           <Navbar />
           <main className="flex-1 p-6">{children}</main>
         </body>

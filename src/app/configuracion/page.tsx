@@ -5,6 +5,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { input, label, th, td, trHover } from "@/components/ui/styles";
+import SelectorImpresora from "@/components/SelectorImpresora";
 
 type Categoria = { id: number; nombre: string; activo: boolean };
 
@@ -147,6 +148,10 @@ export default function ConfiguracionPage() {
   return (
     <div className="max-w-md mx-auto flex flex-col gap-6">
       <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Configuración</h1>
+
+      <Card className="p-4">
+        <SelectorImpresora />
+      </Card>
 
       <Card className="p-4">
         <form onSubmit={guardar} className="flex flex-col gap-3">
