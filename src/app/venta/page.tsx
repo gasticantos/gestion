@@ -47,7 +47,9 @@ export default function VentaPage() {
       fetch("/api/clientes").then((res) => res.json()),
       fetch("/api/configuracion").then((res) => res.json()),
     ]).then(([productos, clientes, configuracion]) => {
-      setProductos(productos.filter((p: { activo: boolean }) => p.activo));
+      // /api/productos?venta=1 ya devuelve únicamente productos activos y no incluye
+      // el campo "activo". Volver a filtrarlo vaciaba por completo el buscador.
+      setProductos(Array.isArray(productos) ? productos : []);
       setClientes(clientes);
       setPrecioMesaActivo(configuracion.precioMesaActivo !== false);
     });
