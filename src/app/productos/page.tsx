@@ -127,6 +127,7 @@ export default function ProductosPage() {
   const [errorFila, setErrorFila] = useState("");
   const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
   const [guardandoEdiciones, setGuardandoEdiciones] = useState(false);
+  const [impresoraMasiva, setImpresoraMasiva] = useState("");
   const seleccionarTodosRef = useRef<HTMLInputElement>(null);
 
   async function cargar() {
@@ -261,6 +262,7 @@ export default function ProductosPage() {
 
   function cancelarEdiciones() {
     setEdiciones({});
+    setImpresoraMasiva("");
     setErrorFila("");
   }
 
@@ -297,6 +299,7 @@ export default function ProductosPage() {
     }
 
     setEdiciones({});
+    setImpresoraMasiva("");
     setSeleccionados(new Set());
     await cargar();
   }
@@ -367,6 +370,20 @@ export default function ProductosPage() {
       ...productos.map((p) => p.impresora).filter((nombre): nombre is string => Boolean(nombre)),
     ])
   ).sort((a, b) => a.localeCompare(b));
+
+  function aplicarImpresoraMasiva() {
+    setEdiciones((actuales) =>
+      Object.fromEntries(
+        Object.entries(actuales).map(([id, edicion]) => [
+          id,
+          {
+            ...edicion,
+            impresora: impresoraMasiva === "__predeterminada__" ? "" : impresoraMasiva,
+          },
+        ])
+      )
+    );
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
@@ -552,6 +569,28 @@ export default function ProductosPage() {
               {hayEdiciones && (
                 <>
                   <Badge variant="neutral">{Object.keys(ediciones).length} fila(s) en edición</Badge>
+                  <select
+                    className={`${input} !w-auto min-w-[190px]`}
+                    value={impresoraMasiva}
+                    onChange={(e) => setImpresoraMasiva(e.target.value)}
+                    aria-label="Impresora para toda la selección"
+                  >
+                    <option value="">Asignar impresora...</option>
+                    <option value="__predeterminada__">Predeterminada</option>
+                    {opcionesImpresora.map((nombre) => (
+                      <option key={nombre} value={nombre}>
+                        {nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={aplicarImpresoraMasiva}
+                    disabled={!impresoraMasiva || guardandoEdiciones}
+                  >
+                    Aplicar a selección
+                  </Button>
                   <Button type="button" size="sm" variant="primary" onClick={guardarEdiciones} disabled={guardandoEdiciones}>
                     {guardandoEdiciones ? "Guardando..." : "Guardar todo"}
                   </Button>
