@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
+import { sesionActual } from "@/lib/sesionServidor";
+import { ROL_LABEL } from "@/lib/permisos";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const sesion = await sesionActual();
   const { id } = await params;
 
   try {
@@ -22,10 +25,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Generar contenido de ticket en texto plano
     const lineas: string[] = [];
     lineas.push("=".repeat(40));
-    lineas.push("TICKET");
+    lineas.push(venta.estado === "CERRADA" ? "TICKET FINAL" : "CUENTA PREVIA");
     lineas.push("=".repeat(40));
     lineas.push(`Venta #${venta.id}`);
     lineas.push(venta.mesa?.nombre || "Mostrador");
+    if (sesion) {
+      lineas.push(`Usuario: ${sesion.nombre.toUpperCase()} - ${ROL_LABEL[sesion.rol]}`);
+    }
     lineas.push(new Date(venta.createdAt).toLocaleString("es-AR"));
     lineas.push("-".repeat(40));
 
@@ -45,6 +51,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     lineas.push(`Total: $${venta.total.toFixed(2)}`);
     lineas.push("-".repeat(40));
 
+    if (venta.estado === "CERRADA") {
+      lineas.push("FORMA DE PAGO");
+    }
     for (const pago of venta.pagos) {
       const metodos: Record<string, string> = {
         EFECTIVO: "Efectivo",

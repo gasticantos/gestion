@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
+import { sesionActual } from "@/lib/sesionServidor";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa };
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
@@ -41,6 +42,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const sesion = await sesionActual();
   const body = await req.json();
   const { items, pagos, clienteId, descuentoPct } = body as {
     items: ItemInput[];
@@ -104,6 +106,7 @@ export async function POST(req: NextRequest) {
         descuentoPct: pct,
         pedidos: {
           create: {
+            creadoPorId: sesion ? Number(sesion.sub) : null,
             comandaImpresa: true,
             items: {
               create: items.map((item) => {

@@ -49,17 +49,18 @@ enum Rol {
 }
 
 model Usuario {
-  id           Int            @id @default(autoincrement())
-  nombre       String
-  email        String         @unique
-  authId       String?        @unique @db.Uuid
-  passwordHash String
-  rol          Rol            @default(MOZO)
-  activo       Boolean        @default(true)
-  createdAt    DateTime       @default(now())
-  auditorias   AuditoriaLog[]
-  negocioId    Int            @default(1)
-  negocio      Negocio        @relation(fields: [negocioId], references: [id])
+  id             Int            @id @default(autoincrement())
+  nombre         String
+  email          String         @unique
+  authId         String?        @unique @db.Uuid
+  passwordHash   String
+  rol            Rol            @default(MOZO)
+  activo         Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  auditorias     AuditoriaLog[]
+  pedidosCreados Pedido[]       @relation("PedidoCreadoPor")
+  negocioId      Int            @default(1)
+  negocio        Negocio        @relation(fields: [negocioId], references: [id])
 
   @@index([negocioId])
 }
@@ -103,14 +104,14 @@ enum TarifaPrecio {
 }
 
 model Configuracion {
-  id                Int     @id @default(autoincrement())
-  negocioId         Int     @unique @default(1)
-  negocio           Negocio @relation(fields: [negocioId], references: [id])
+  id                 Int     @id @default(autoincrement())
+  negocioId          Int     @unique @default(1)
+  negocio            Negocio @relation(fields: [negocioId], references: [id])
   margenVentaBasePct Float   @default(30)
   nombrePrograma     String  @default("Gestión")
   logoPrograma       String? @db.Text
   precioMesaActivo   Boolean @default(true)
-  recargoMesaPct    Float   @default(0)
+  recargoMesaPct     Float   @default(0)
 }
 
 enum TipoImpresion {
@@ -311,11 +312,14 @@ model Pedido {
   id             Int          @id @default(autoincrement())
   ventaId        Int
   venta          Venta        @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  creadoPorId    Int?
+  creadoPor      Usuario?     @relation("PedidoCreadoPor", fields: [creadoPorId], references: [id], onDelete: SetNull)
   comandaImpresa Boolean      @default(false)
   createdAt      DateTime     @default(now())
   items          PedidoItem[]
 
   @@index([ventaId])
+  @@index([creadoPorId])
 }
 
 model PedidoItem {

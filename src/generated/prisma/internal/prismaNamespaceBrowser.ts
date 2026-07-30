@@ -280,6 +280,7 @@ export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof Ve
 export const PedidoScalarFieldEnum = {
   id: 'id',
   ventaId: 'ventaId',
+  creadoPorId: 'creadoPorId',
   comandaImpresa: 'comandaImpresa',
   createdAt: 'createdAt'
 } as const
