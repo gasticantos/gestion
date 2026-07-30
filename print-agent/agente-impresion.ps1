@@ -103,12 +103,13 @@ function Send-TextWithWindowsDriver {
         [System.Drawing.FontStyle]::Regular
       )
       try {
+        $area = $evento.Graphics.VisibleClipBounds
         $evento.Graphics.DrawString(
           $textoTicket,
           $fuente,
           [System.Drawing.Brushes]::Black,
-          [single]0,
-          [single]0
+          [single]($area.Left + 5),
+          [single]($area.Top + 5)
         )
         $evento.HasMorePages = $false
       } finally {
