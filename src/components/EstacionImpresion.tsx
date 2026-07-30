@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isTauri } from "@tauri-apps/api/core";
+import { invoke, isTauri } from "@tauri-apps/api/core";
 import {
   imprimirLocal,
   listarImpresorasLocales,
@@ -46,6 +46,19 @@ function versionEsAnterior(actual: string, minima: string) {
 
 export default function EstacionImpresion() {
   const [agenteDesactualizado, setAgenteDesactualizado] = useState("");
+  const [actualizando, setActualizando] = useState(false);
+  const [errorActualizacion, setErrorActualizacion] = useState("");
+
+  async function actualizarWindows() {
+    setActualizando(true);
+    setErrorActualizacion("");
+    try {
+      await invoke("instalar_actualizacion");
+    } catch {
+      setActualizando(false);
+      setErrorActualizacion("No se pudo iniciar automáticamente.");
+    }
+  }
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -132,18 +145,18 @@ export default function EstacionImpresion() {
           necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
           perderlas.
         </span>
-        <p className="mt-1 font-medium">
-          Descargá la reparación, abrí el archivo y aceptá la ejecución. Gestión se reiniciará.
-        </p>
+        <p className="mt-1 font-medium">La actualización 0.1.14 corrige el agente automáticamente.</p>
+        {errorActualizacion && <p className="mt-1 font-medium">{errorActualizacion}</p>}
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
-        <a
-          href="/api/impresion/reparar"
-          download
+        <button
+          type="button"
+          onClick={actualizarWindows}
+          disabled={actualizando}
           className="rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800 disabled:opacity-60"
         >
-          Descargar reparación
-        </a>
+          {actualizando ? "Actualizando..." : "Instalar actualización 0.1.14"}
+        </button>
       </div>
     </div>
   );

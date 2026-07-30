@@ -60,6 +60,34 @@ fn iniciar_agente(app: &tauri::App) -> Option<Child> {
     use std::os::windows::process::CommandExt;
 
     const CREATE_NO_WINDOW: u32 = 0x08000000;
+    // El agente de una instalación anterior puede quedar huérfano y conservar el
+    // puerto. Lo cerramos antes de iniciar el agente incluido en esta versión.
+    let limpiar_puerto = r#"
+$procesos = Get-NetTCPConnection -LocalPort 9850 -State Listen -ErrorAction SilentlyContinue |
+  Select-Object -ExpandProperty OwningProcess -Unique
+foreach ($proceso in $procesos) {
+  if ($proceso -and $proceso -ne $PID) {
+    Stop-Process -Id $proceso -Force -ErrorAction SilentlyContinue
+  }
+}
+Start-Sleep -Milliseconds 500
+"#;
+    let _ = Command::new("powershell.exe")
+        .args([
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-WindowStyle",
+            "Hidden",
+            "-Command",
+            limpiar_puerto,
+        ])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .creation_flags(CREATE_NO_WINDOW)
+        .status();
+
     let script = app
         .path()
         .resource_dir()
