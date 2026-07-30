@@ -116,14 +116,22 @@ export default function SelectorImpresora() {
         {estado && <span className="text-sm text-emerald-500">{estado}</span>}
       </div>
       {error && <p className="text-sm text-red-400">{error}</p>}
-      {error && (
+      <div className="flex flex-wrap gap-3 text-sm">
         <a
-          className="text-sm font-medium text-blue-500 hover:text-blue-400"
-          href="https://github.com/gasticantos/gestion/raw/refs/heads/main/print-agent/INSTALAR-EPSON-TM-T20II-V2.zip"
+          className="font-medium text-blue-500 hover:text-blue-400"
+          href="/downloads/Gestion-Windows-Setup.exe"
         >
-          Descargar o actualizar agente de impresión
+          Descargar aplicación para Windows
         </a>
-      )}
+        {error && (
+          <a
+            className="font-medium text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+            href="https://github.com/gasticantos/gestion/raw/refs/heads/main/print-agent/INSTALAR-EPSON-TM-T20II-V2.zip"
+          >
+            Descargar solamente el agente antiguo
+          </a>
+        )}
+      </div>
     </div>
   );
 }

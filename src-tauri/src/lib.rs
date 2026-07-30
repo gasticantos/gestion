@@ -56,7 +56,7 @@ pub fn run() {
                 if let Some(proceso) = agente.as_mut() {
                     let _ = proceso.kill();
                 }
-            }
+            };
         }
     });
 }
