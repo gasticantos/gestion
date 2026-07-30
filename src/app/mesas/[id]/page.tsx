@@ -346,11 +346,19 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     setError("");
     if (!venta) return;
     setEnviando(true);
-    const res = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
-    // Recargar mesa para sincronizar ticketImpreso desde la BD
-    await cargar();
-    setEnviando(false);
-    if (!res.ok) setError("No se pudo enviar el ticket a la estación de impresión.");
+    try {
+      const res = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
+      if (!res.ok) {
+        setError("No se pudo enviar el ticket a la estación de impresión.");
+        return;
+      }
+      // Recargar mesa para sincronizar ticketImpreso desde la BD.
+      await cargar();
+    } catch {
+      setError("No se pudo conectar para enviar el ticket.");
+    } finally {
+      setEnviando(false);
+    }
   }
 
   async function cerrarMesa() {
@@ -667,12 +675,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                   />
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => setTicketImpreso(false)}
+                      onClick={imprimirTicket}
                       disabled={enviando}
                       variant="secondary"
                       className="flex-1"
                     >
-                      Volver
+                      {enviando ? "Enviando..." : "Reimprimir ticket"}
                     </Button>
                     <Button
                       onClick={cerrarMesa}
