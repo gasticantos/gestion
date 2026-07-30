@@ -6,6 +6,10 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   const siguiente = req.nextUrl.searchParams.get("siguiente") === "1";
   const limite = siguiente ? 1 : 20;
+  const impresorasDisponibles = req.nextUrl.searchParams
+    .getAll("impresora")
+    .map((nombre) => nombre.trim())
+    .filter(Boolean);
   const haceDosMinutos = new Date(Date.now() - 2 * 60 * 1000);
 
   await prisma.impresionTrabajo.updateMany({
@@ -14,11 +18,22 @@ export async function GET(req: NextRequest) {
   });
 
   const trabajos = await prisma.impresionTrabajo.findMany({
-    where: siguiente ? { estado: "PENDIENTE" } : undefined,
+    where: siguiente
+      ? {
+          estado: "PENDIENTE",
+          OR: [
+            { impresora: null },
+            ...(impresorasDisponibles.length
+              ? [{ impresora: { in: impresorasDisponibles } }]
+              : []),
+          ],
+        }
+      : undefined,
     select: {
       id: true,
       tipo: true,
       contenido: true,
+      impresora: true,
       estado: true,
       referencia: true,
       estacionId: true,
@@ -69,7 +84,7 @@ export async function POST(req: NextRequest) {
 
   const trabajo = await prisma.impresionTrabajo.findUnique({
     where: { id: Number(body.id) },
-    select: { id: true, tipo: true, contenido: true },
+    select: { id: true, tipo: true, contenido: true, impresora: true },
   });
   return NextResponse.json(trabajo);
 }

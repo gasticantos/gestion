@@ -131,6 +131,7 @@ model ImpresionTrabajo {
   id         Int             @id @default(autoincrement())
   tipo       TipoImpresion
   contenido  String
+  impresora  String?
   estado     EstadoImpresion @default(PENDIENTE)
   referencia String?
   estacionId String?
@@ -191,6 +192,7 @@ model Producto {
   precioCosto           Float            @default(0)
   stock                 Float            @default(0)
   unidad                String           @default("unidad")
+  impresora             String?
   activo                Boolean          @default(true)
   proveedorId           Int?
   proveedor             Proveedor?       @relation(fields: [proveedorId], references: [id])
@@ -204,6 +206,7 @@ model Producto {
   @@unique([negocioId, codigoInterno])
   @@unique([negocioId, codigoBarras])
   @@index([negocioId])
+  @@index([negocioId, impresora])
   @@index([proveedorId])
   @@index([categoriaId])
 }

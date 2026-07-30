@@ -18,6 +18,7 @@ export async function GET() {
       precioCosto: true,
       stock: true,
       unidad: true,
+      impresora: true,
       activo: true,
       updatedAt: true,
       proveedor: { select: { id: true, nombre: true } },
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
     precioCosto,
     stock,
     unidad,
+    impresora,
     proveedorId,
   } = body;
 
@@ -71,6 +73,7 @@ export async function POST(req: NextRequest) {
         precioCosto: precioCosto ? Number(precioCosto) : 0,
         stock: stock ? Number(stock) : 0,
         unidad: unidad || "unidad",
+        impresora: impresora ? String(impresora).trim() : null,
         proveedorId: proveedorId ? Number(proveedorId) : null,
       },
     });
@@ -100,6 +103,7 @@ export async function PATCH(req: NextRequest) {
     precioVentaMesaManual: unknown;
     stock: unknown;
     unidad: unknown;
+    impresora: unknown;
     proveedorId: unknown;
   };
   const actualizaciones: ActualizacionProducto[] = Array.isArray(body.actualizaciones)
@@ -141,6 +145,7 @@ export async function PATCH(req: NextRequest) {
             precioVentaMesaManual: precioMesaHabilitado && Boolean(item.precioVentaMesaManual),
             stock: Number(item.stock),
             unidad: String(item.unidad).trim(),
+            impresora: item.impresora ? String(item.impresora).trim() : null,
             proveedorId: item.proveedorId ? Number(item.proveedorId) : null,
           },
         })

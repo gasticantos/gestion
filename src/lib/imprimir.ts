@@ -24,10 +24,10 @@ export const ERROR_IMPRESION_LOCAL =
 // Intenta imprimir a través del agente local. Devuelve true si lo logró; false si el agente
 // no está corriendo en esta máquina (por ejemplo, un celular o una PC sin el agente instalado).
 // Nunca llama a window.print(): la aplicación debe imprimir sin confirmaciones.
-export async function imprimirLocal(contenido: string): Promise<boolean> {
+export async function imprimirLocal(contenido: string, impresoraDestino?: string | null): Promise<boolean> {
   ultimoErrorImpresion = "";
   try {
-    const impresora = localStorage.getItem(CLAVE_IMPRESORA);
+    const impresora = impresoraDestino?.trim() || localStorage.getItem(CLAVE_IMPRESORA);
     if (!impresora) {
       ultimoErrorImpresion = "No hay una impresora seleccionada en este dispositivo.";
       console.warn("No hay una impresora seleccionada en este dispositivo.");

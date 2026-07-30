@@ -20,6 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     precioCosto,
     stock,
     unidad,
+    impresora,
     proveedorId,
     activo,
   } = body;
@@ -49,6 +50,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         precioCosto: precioCosto !== undefined ? Number(precioCosto) : undefined,
         stock: stock !== undefined ? Number(stock) : undefined,
         unidad,
+        impresora: impresora !== undefined ? (impresora ? String(impresora).trim() : null) : undefined,
         proveedorId: proveedorId ? Number(proveedorId) : null,
         activo,
       },

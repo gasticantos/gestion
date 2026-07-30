@@ -2,7 +2,11 @@
 
 import { useEffect } from "react";
 import { isTauri } from "@tauri-apps/api/core";
-import { imprimirLocal, obtenerImpresoraSeleccionada } from "@/lib/imprimir";
+import {
+  imprimirLocal,
+  listarImpresorasLocales,
+  obtenerImpresoraSeleccionada,
+} from "@/lib/imprimir";
 
 const CLAVE_ESTACION = "gestion_estacion_impresion_id";
 
@@ -10,6 +14,7 @@ type TrabajoPendiente = {
   id: number;
   tipo: "TICKET" | "COMANDA" | "PRUEBA";
   contenido: string;
+  impresora: string | null;
 };
 
 function obtenerEstacionId() {
@@ -28,12 +33,20 @@ export default function EstacionImpresion() {
     let activo = true;
     let procesando = false;
     const estacionId = obtenerEstacionId();
+    let impresorasDisponibles: string[] = [];
+    let ultimaConsultaImpresoras = 0;
 
     async function buscarEImprimir() {
       if (!activo || procesando || !obtenerImpresoraSeleccionada()) return;
       procesando = true;
       try {
-        const listaRes = await fetch("/api/impresion/cola?siguiente=1", { cache: "no-store" });
+        if (Date.now() - ultimaConsultaImpresoras > 30_000) {
+          impresorasDisponibles = (await listarImpresorasLocales()).map((p) => p.nombre);
+          ultimaConsultaImpresoras = Date.now();
+        }
+        const params = new URLSearchParams({ siguiente: "1" });
+        impresorasDisponibles.forEach((nombre) => params.append("impresora", nombre));
+        const listaRes = await fetch(`/api/impresion/cola?${params}`, { cache: "no-store" });
         if (!listaRes.ok) return;
         const lista = await listaRes.json();
         const candidato = lista.trabajos?.[0] as TrabajoPendiente | undefined;
@@ -47,7 +60,7 @@ export default function EstacionImpresion() {
         if (!tomarRes.ok) return;
         const trabajo = (await tomarRes.json()) as TrabajoPendiente;
 
-        const ok = await imprimirLocal(trabajo.contenido);
+        const ok = await imprimirLocal(trabajo.contenido, trabajo.impresora);
         await fetch("/api/impresion/cola", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -9,6 +9,7 @@ import Plegable from "@/components/ui/Plegable";
 import { input, label, th, td, trHover } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 import { redondearPrecio } from "@/lib/precio";
+import { listarImpresorasLocales } from "@/lib/imprimir";
 
 const ImportarProductos = dynamic(() => import("@/components/ImportarProductos"), {
   loading: () => <div className="h-48 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
@@ -35,6 +36,7 @@ type Producto = {
   precioCosto: number;
   stock: number;
   unidad: string;
+  impresora: string | null;
   activo: boolean;
   proveedorId: number | null;
   proveedor: Proveedor | null;
@@ -50,6 +52,7 @@ const emptyForm = {
   precioCosto: "",
   stock: "",
   unidad: "unidad",
+  impresora: "",
   proveedorId: "",
 };
 
@@ -114,6 +117,7 @@ export default function ProductosPage() {
   const [margenVentaBasePct, setMargenVentaBasePct] = useState(30);
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
   const [recargoMesaPct, setRecargoMesaPct] = useState(0);
+  const [impresorasLocales, setImpresorasLocales] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
@@ -146,6 +150,9 @@ export default function ProductosPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
     cargar();
+    listarImpresorasLocales()
+      .then((lista) => setImpresorasLocales(lista.map((p) => p.nombre)))
+      .catch(() => setImpresorasLocales([]));
   }, []);
 
   async function agregar(e: FormEvent) {
@@ -165,6 +172,7 @@ export default function ProductosPage() {
         precioCosto: form.precioCosto,
         stock: form.stock,
         unidad: form.unidad,
+        impresora: form.impresora || null,
         proveedorId: form.proveedorId || null,
       }),
     });
@@ -214,6 +222,7 @@ export default function ProductosPage() {
       precioCosto: String(p.precioCosto),
       stock: String(p.stock),
       unidad: p.unidad,
+      impresora: p.impresora || "",
       proveedorId: p.proveedorId ? String(p.proveedorId) : "",
     };
   }
@@ -268,6 +277,7 @@ export default function ProductosPage() {
       precioCosto: edit.precioCosto,
       stock: edit.stock,
       unidad: edit.unidad,
+      impresora: edit.impresora || null,
       proveedorId: edit.proveedorId || null,
     }));
     if (actualizaciones.length === 0) return;
@@ -351,6 +361,12 @@ export default function ProductosPage() {
   }
 
   const hayEdiciones = Object.keys(ediciones).length > 0;
+  const opcionesImpresora = Array.from(
+    new Set([
+      ...impresorasLocales,
+      ...productos.map((p) => p.impresora).filter((nombre): nombre is string => Boolean(nombre)),
+    ])
+  ).sort((a, b) => a.localeCompare(b));
 
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
@@ -467,6 +483,22 @@ export default function ProductosPage() {
               ))}
             </select>
           </div>
+          <div>
+            <label className={label}>Impresora de comanda</label>
+            <input
+              className={input}
+              list="impresoras-productos"
+              value={form.impresora}
+              onChange={(e) => setForm({ ...form, impresora: e.target.value })}
+              placeholder="Predeterminada"
+            />
+          </div>
+
+          <datalist id="impresoras-productos">
+            {opcionesImpresora.map((nombre) => (
+              <option key={nombre} value={nombre} />
+            ))}
+          </datalist>
 
           <div className="col-span-2 md:col-span-4 flex items-center gap-3 pt-1">
             <Button type="submit" variant="primary">
@@ -565,6 +597,7 @@ export default function ProductosPage() {
                   <th className={th}>Categoría</th>
                   <th className={th}>Unidad</th>
                   <th className={th}>Proveedor</th>
+                  <th className={th}>Impresora</th>
                   <th className={th}>Última modificación</th>
                   <th className={`${th} w-40 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}></th>
                 </tr>
@@ -668,6 +701,15 @@ export default function ProductosPage() {
                           ))}
                         </select>
                       </td>
+                      <td className={td}>
+                        <input
+                          className={`${input} min-w-[180px]`}
+                          list="impresoras-productos"
+                          value={edicion.impresora}
+                          onChange={(e) => actualizarEdicion(p.id, { impresora: e.target.value })}
+                          placeholder="Predeterminada"
+                        />
+                      </td>
                       <td className={`${td} text-xs text-neutral-500`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
@@ -705,6 +747,9 @@ export default function ProductosPage() {
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.categoria?.nombre || "-"}</td>
                       <td className={`${td} text-neutral-500`}>{p.unidad}</td>
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
+                      <td className={`${td} text-neutral-500 dark:text-neutral-400 whitespace-nowrap`}>
+                        {p.impresora || "Predeterminada"}
+                      </td>
                       <td className={`${td} text-xs text-neutral-500 whitespace-nowrap`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>

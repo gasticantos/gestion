@@ -42,6 +42,7 @@ export type ImpresionTrabajoMinAggregateOutputType = {
   id: number | null
   tipo: $Enums.TipoImpresion | null
   contenido: string | null
+  impresora: string | null
   estado: $Enums.EstadoImpresion | null
   referencia: string | null
   estacionId: string | null
@@ -57,6 +58,7 @@ export type ImpresionTrabajoMaxAggregateOutputType = {
   id: number | null
   tipo: $Enums.TipoImpresion | null
   contenido: string | null
+  impresora: string | null
   estado: $Enums.EstadoImpresion | null
   referencia: string | null
   estacionId: string | null
@@ -72,6 +74,7 @@ export type ImpresionTrabajoCountAggregateOutputType = {
   id: number
   tipo: number
   contenido: number
+  impresora: number
   estado: number
   referencia: number
   estacionId: number
@@ -101,6 +104,7 @@ export type ImpresionTrabajoMinAggregateInputType = {
   id?: true
   tipo?: true
   contenido?: true
+  impresora?: true
   estado?: true
   referencia?: true
   estacionId?: true
@@ -116,6 +120,7 @@ export type ImpresionTrabajoMaxAggregateInputType = {
   id?: true
   tipo?: true
   contenido?: true
+  impresora?: true
   estado?: true
   referencia?: true
   estacionId?: true
@@ -131,6 +136,7 @@ export type ImpresionTrabajoCountAggregateInputType = {
   id?: true
   tipo?: true
   contenido?: true
+  impresora?: true
   estado?: true
   referencia?: true
   estacionId?: true
@@ -233,6 +239,7 @@ export type ImpresionTrabajoGroupByOutputType = {
   id: number
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora: string | null
   estado: $Enums.EstadoImpresion
   referencia: string | null
   estacionId: string | null
@@ -271,6 +278,7 @@ export type ImpresionTrabajoWhereInput = {
   id?: Prisma.IntFilter<"ImpresionTrabajo"> | number
   tipo?: Prisma.EnumTipoImpresionFilter<"ImpresionTrabajo"> | $Enums.TipoImpresion
   contenido?: Prisma.StringFilter<"ImpresionTrabajo"> | string
+  impresora?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estado?: Prisma.EnumEstadoImpresionFilter<"ImpresionTrabajo"> | $Enums.EstadoImpresion
   referencia?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estacionId?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
@@ -287,6 +295,7 @@ export type ImpresionTrabajoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
+  impresora?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   referencia?: Prisma.SortOrderInput | Prisma.SortOrder
   estacionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -307,6 +316,7 @@ export type ImpresionTrabajoWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ImpresionTrabajoWhereInput | Prisma.ImpresionTrabajoWhereInput[]
   tipo?: Prisma.EnumTipoImpresionFilter<"ImpresionTrabajo"> | $Enums.TipoImpresion
   contenido?: Prisma.StringFilter<"ImpresionTrabajo"> | string
+  impresora?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estado?: Prisma.EnumEstadoImpresionFilter<"ImpresionTrabajo"> | $Enums.EstadoImpresion
   referencia?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estacionId?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
@@ -323,6 +333,7 @@ export type ImpresionTrabajoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
+  impresora?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   referencia?: Prisma.SortOrderInput | Prisma.SortOrder
   estacionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -346,6 +357,7 @@ export type ImpresionTrabajoScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"ImpresionTrabajo"> | number
   tipo?: Prisma.EnumTipoImpresionWithAggregatesFilter<"ImpresionTrabajo"> | $Enums.TipoImpresion
   contenido?: Prisma.StringWithAggregatesFilter<"ImpresionTrabajo"> | string
+  impresora?: Prisma.StringNullableWithAggregatesFilter<"ImpresionTrabajo"> | string | null
   estado?: Prisma.EnumEstadoImpresionWithAggregatesFilter<"ImpresionTrabajo"> | $Enums.EstadoImpresion
   referencia?: Prisma.StringNullableWithAggregatesFilter<"ImpresionTrabajo"> | string | null
   estacionId?: Prisma.StringNullableWithAggregatesFilter<"ImpresionTrabajo"> | string | null
@@ -360,6 +372,7 @@ export type ImpresionTrabajoScalarWhereWithAggregatesInput = {
 export type ImpresionTrabajoCreateInput = {
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora?: string | null
   estado?: $Enums.EstadoImpresion
   referencia?: string | null
   estacionId?: string | null
@@ -375,6 +388,7 @@ export type ImpresionTrabajoUncheckedCreateInput = {
   id?: number
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora?: string | null
   estado?: $Enums.EstadoImpresion
   referencia?: string | null
   estacionId?: string | null
@@ -389,6 +403,7 @@ export type ImpresionTrabajoUncheckedCreateInput = {
 export type ImpresionTrabajoUpdateInput = {
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -404,6 +419,7 @@ export type ImpresionTrabajoUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -419,6 +435,7 @@ export type ImpresionTrabajoCreateManyInput = {
   id?: number
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora?: string | null
   estado?: $Enums.EstadoImpresion
   referencia?: string | null
   estacionId?: string | null
@@ -433,6 +450,7 @@ export type ImpresionTrabajoCreateManyInput = {
 export type ImpresionTrabajoUpdateManyMutationInput = {
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -447,6 +465,7 @@ export type ImpresionTrabajoUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -477,6 +496,7 @@ export type ImpresionTrabajoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
+  impresora?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   referencia?: Prisma.SortOrder
   estacionId?: Prisma.SortOrder
@@ -498,6 +518,7 @@ export type ImpresionTrabajoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
+  impresora?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   referencia?: Prisma.SortOrder
   estacionId?: Prisma.SortOrder
@@ -513,6 +534,7 @@ export type ImpresionTrabajoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
+  impresora?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   referencia?: Prisma.SortOrder
   estacionId?: Prisma.SortOrder
@@ -587,6 +609,7 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 export type ImpresionTrabajoCreateWithoutNegocioInput = {
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora?: string | null
   estado?: $Enums.EstadoImpresion
   referencia?: string | null
   estacionId?: string | null
@@ -601,6 +624,7 @@ export type ImpresionTrabajoUncheckedCreateWithoutNegocioInput = {
   id?: number
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora?: string | null
   estado?: $Enums.EstadoImpresion
   referencia?: string | null
   estacionId?: string | null
@@ -644,6 +668,7 @@ export type ImpresionTrabajoScalarWhereInput = {
   id?: Prisma.IntFilter<"ImpresionTrabajo"> | number
   tipo?: Prisma.EnumTipoImpresionFilter<"ImpresionTrabajo"> | $Enums.TipoImpresion
   contenido?: Prisma.StringFilter<"ImpresionTrabajo"> | string
+  impresora?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estado?: Prisma.EnumEstadoImpresionFilter<"ImpresionTrabajo"> | $Enums.EstadoImpresion
   referencia?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
   estacionId?: Prisma.StringNullableFilter<"ImpresionTrabajo"> | string | null
@@ -659,6 +684,7 @@ export type ImpresionTrabajoCreateManyNegocioInput = {
   id?: number
   tipo: $Enums.TipoImpresion
   contenido: string
+  impresora?: string | null
   estado?: $Enums.EstadoImpresion
   referencia?: string | null
   estacionId?: string | null
@@ -672,6 +698,7 @@ export type ImpresionTrabajoCreateManyNegocioInput = {
 export type ImpresionTrabajoUpdateWithoutNegocioInput = {
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -686,6 +713,7 @@ export type ImpresionTrabajoUncheckedUpdateWithoutNegocioInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -700,6 +728,7 @@ export type ImpresionTrabajoUncheckedUpdateManyWithoutNegocioInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   tipo?: Prisma.EnumTipoImpresionFieldUpdateOperationsInput | $Enums.TipoImpresion
   contenido?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estado?: Prisma.EnumEstadoImpresionFieldUpdateOperationsInput | $Enums.EstadoImpresion
   referencia?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   estacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -716,6 +745,7 @@ export type ImpresionTrabajoSelect<ExtArgs extends runtime.Types.Extensions.Inte
   id?: boolean
   tipo?: boolean
   contenido?: boolean
+  impresora?: boolean
   estado?: boolean
   referencia?: boolean
   estacionId?: boolean
@@ -732,6 +762,7 @@ export type ImpresionTrabajoSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   id?: boolean
   tipo?: boolean
   contenido?: boolean
+  impresora?: boolean
   estado?: boolean
   referencia?: boolean
   estacionId?: boolean
@@ -748,6 +779,7 @@ export type ImpresionTrabajoSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   id?: boolean
   tipo?: boolean
   contenido?: boolean
+  impresora?: boolean
   estado?: boolean
   referencia?: boolean
   estacionId?: boolean
@@ -764,6 +796,7 @@ export type ImpresionTrabajoSelectScalar = {
   id?: boolean
   tipo?: boolean
   contenido?: boolean
+  impresora?: boolean
   estado?: boolean
   referencia?: boolean
   estacionId?: boolean
@@ -775,7 +808,7 @@ export type ImpresionTrabajoSelectScalar = {
   negocioId?: boolean
 }
 
-export type ImpresionTrabajoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "contenido" | "estado" | "referencia" | "estacionId" | "error" | "intentos" | "createdAt" | "claimedAt" | "printedAt" | "negocioId", ExtArgs["result"]["impresionTrabajo"]>
+export type ImpresionTrabajoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "contenido" | "impresora" | "estado" | "referencia" | "estacionId" | "error" | "intentos" | "createdAt" | "claimedAt" | "printedAt" | "negocioId", ExtArgs["result"]["impresionTrabajo"]>
 export type ImpresionTrabajoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
@@ -795,6 +828,7 @@ export type $ImpresionTrabajoPayload<ExtArgs extends runtime.Types.Extensions.In
     id: number
     tipo: $Enums.TipoImpresion
     contenido: string
+    impresora: string | null
     estado: $Enums.EstadoImpresion
     referencia: string | null
     estacionId: string | null
@@ -1231,6 +1265,7 @@ export interface ImpresionTrabajoFieldRefs {
   readonly id: Prisma.FieldRef<"ImpresionTrabajo", 'Int'>
   readonly tipo: Prisma.FieldRef<"ImpresionTrabajo", 'TipoImpresion'>
   readonly contenido: Prisma.FieldRef<"ImpresionTrabajo", 'String'>
+  readonly impresora: Prisma.FieldRef<"ImpresionTrabajo", 'String'>
   readonly estado: Prisma.FieldRef<"ImpresionTrabajo", 'EstadoImpresion'>
   readonly referencia: Prisma.FieldRef<"ImpresionTrabajo", 'String'>
   readonly estacionId: Prisma.FieldRef<"ImpresionTrabajo", 'String'>
