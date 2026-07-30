@@ -45,10 +45,47 @@ using System;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Drawing.Printing;
+using System.Text;
 
 public static class GestionWindowsPrinter {
-  private static Font TicketFont(float size, FontStyle style, bool mono) {
-    return new Font(mono ? FontFamily.GenericMonospace : FontFamily.GenericSansSerif, size, style, GraphicsUnit.Point);
+  private static string StableTicketText(string text) {
+    var output = new StringBuilder();
+    string normalized = text.Replace("\r\n", "\n").Replace('\r', '\n');
+    foreach (string rawLine in normalized.Split('\n')) {
+      string line = rawLine;
+      string style = "BODY";
+      int markerEnd = rawLine.IndexOf("]]");
+      if (rawLine.StartsWith("[[") && markerEnd > 2) {
+        style = rawLine.Substring(2, markerEnd - 2).ToUpperInvariant();
+        line = rawLine.Substring(markerEnd + 2).TrimStart();
+      }
+
+      switch (style) {
+        case "HR":
+          output.AppendLine("--------------------------------");
+          break;
+        case "TITLE":
+          output.AppendLine(line.ToUpperInvariant());
+          break;
+        case "SUBTITLE":
+          output.AppendLine("=== " + line.ToUpperInvariant() + " ===");
+          break;
+        case "SECTION":
+          output.AppendLine("-- " + line.ToUpperInvariant() + " --");
+          break;
+        case "NOTE":
+          output.AppendLine();
+          output.AppendLine("********************************");
+          output.AppendLine(line.ToUpperInvariant());
+          output.AppendLine("********************************");
+          output.AppendLine();
+          break;
+        default:
+          output.AppendLine(line);
+          break;
+      }
+    }
+    return output.ToString();
   }
 
   public static void Print(string printerName, string text) {
@@ -73,71 +110,16 @@ public static class GestionWindowsPrinter {
         if (bounds.Width <= 0 || bounds.Height <= 0)
           bounds = new Rectangle(10, 3, Math.Max(100, e.PageBounds.Width - 20), Math.Max(100, e.PageBounds.Height - 13));
 
-        float y = bounds.Y;
-        string normalized = text.Replace("\r\n", "\n").Replace('\r', '\n');
-        foreach (string rawLine in normalized.Split('\n')) {
-          string line = rawLine;
-          string style = "BODY";
-          int markerEnd = rawLine.IndexOf("]]");
-          if (rawLine.StartsWith("[[") && markerEnd > 2) {
-            style = rawLine.Substring(2, markerEnd - 2).ToUpperInvariant();
-            line = rawLine.Substring(markerEnd + 2).TrimStart();
-          }
-
-          if (style == "HR") {
-            y += 4;
-            e.Graphics.DrawLine(Pens.Black, bounds.Left, y, bounds.Right, y);
-            y += 6;
-            continue;
-          }
-          if (String.IsNullOrWhiteSpace(line)) {
-            y += 6;
-            continue;
-          }
-
-          float size = 10;
-          FontStyle fontStyle = FontStyle.Regular;
-          bool mono = false;
-          bool center = false;
-          bool boxed = false;
-          float before = 0;
-          float after = 1;
-
-          switch (style) {
-            case "TITLE": size = 17; fontStyle = FontStyle.Bold; center = true; before = 1; after = 4; break;
-            case "SUBTITLE": size = 13; fontStyle = FontStyle.Bold; center = true; after = 3; break;
-            case "CENTER": size = 9; center = true; break;
-            case "SECTION": size = 10; fontStyle = FontStyle.Bold; before = 3; after = 2; break;
-            case "ITEM": size = 11; fontStyle = FontStyle.Bold; after = 0; break;
-            case "DETAIL": size = 8; mono = true; after = 2; break;
-            case "ROW": size = 10; fontStyle = FontStyle.Bold; mono = true; break;
-            case "TOTAL": size = 15; fontStyle = FontStyle.Bold; mono = true; before = 3; after = 4; break;
-            case "NOTE": size = 12; fontStyle = FontStyle.Bold; boxed = true; before = 4; after = 5; break;
-            case "FOOTER": size = 9; fontStyle = FontStyle.Italic; center = true; before = 4; break;
-          }
-
-          y += before;
-          using (var font = TicketFont(size, fontStyle, mono)) {
-            using (var format = new StringFormat(StringFormat.GenericTypographic)) {
-              format.Alignment = center ? StringAlignment.Center : StringAlignment.Near;
-              format.Trimming = StringTrimming.Word;
-              float inset = boxed ? 7 : 0;
-              float availableWidth = bounds.Width - inset * 2;
-              SizeF measured = e.Graphics.MeasureString(line, font, new SizeF(availableWidth, 1000), format);
-              float height = Math.Max(font.GetHeight(e.Graphics), measured.Height) + (boxed ? 10 : 1);
-              if (boxed) {
-                e.Graphics.DrawRectangle(Pens.Black, bounds.Left, y, bounds.Width - 1, height);
-              }
-              e.Graphics.DrawString(
-                line,
-                font,
-                Brushes.Black,
-                new RectangleF(bounds.Left + inset, y + (boxed ? 5 : 0), availableWidth, height),
-                format
-              );
-              y += height + after;
-            }
-          }
+        // Un único DrawString genera un trabajo de spool pequeño y estable. Algunos drivers
+        // térmicos aceptaban el trabajo con muchos bloques gráficos pero luego lo descartaban.
+        using (var font = new Font(FontFamily.GenericMonospace, 10, FontStyle.Bold, GraphicsUnit.Point)) {
+          e.Graphics.DrawString(
+            StableTicketText(text),
+            font,
+            Brushes.Black,
+            new RectangleF(bounds.X, bounds.Y, bounds.Width, bounds.Height),
+            StringFormat.GenericTypographic
+          );
         }
         e.HasMorePages = false;
       };
@@ -224,7 +206,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.0"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.1"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
