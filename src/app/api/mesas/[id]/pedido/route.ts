@@ -124,7 +124,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       for (const item of itemsDestino) {
         lineas.push(`[[ITEM]] ${item.cantidad} x ${item.producto.nombre}`);
         if (item.notas) {
-          const notaLimpia = item.notas.replace(/\s+/g, " ").trim().toUpperCase();
+          const notaLimpia = item.notas
+            .split(/\r?\n/)
+            .map((linea) => linea.replace(/[ \t]+/g, " ").trim())
+            .join("<<BR>>")
+            .toUpperCase();
           lineas.push(`[[NOTE]] NOTA: ${notaLimpia}`);
         }
       }

@@ -53,19 +53,24 @@ public static class GestionWindowsPrinter {
     string border = "+" + new string('-', innerWidth + 2) + "+";
     output.AppendLine(border);
 
-    string remaining = (text ?? "").Trim();
-    while (remaining.Length > 0) {
-      int take = Math.Min(innerWidth, remaining.Length);
-      if (take < remaining.Length) {
-        int lastSpace = remaining.LastIndexOf(' ', take - 1, take);
-        if (lastSpace > 0) take = lastSpace;
+    string[] paragraphs = (text ?? "").Split(new string[] { "<<BR>>" }, StringSplitOptions.None);
+    foreach (string paragraph in paragraphs) {
+      string remaining = paragraph.Trim();
+      if (remaining.Length == 0) {
+        output.AppendLine("| " + new string(' ', innerWidth) + " |");
+        continue;
       }
-      string part = remaining.Substring(0, take).Trim();
-      output.AppendLine("| " + part.PadRight(innerWidth) + " |");
-      remaining = remaining.Substring(take).TrimStart();
+      while (remaining.Length > 0) {
+        int take = Math.Min(innerWidth, remaining.Length);
+        if (take < remaining.Length) {
+          int lastSpace = remaining.LastIndexOf(' ', take - 1, take);
+          if (lastSpace > 0) take = lastSpace;
+        }
+        string part = remaining.Substring(0, take).Trim();
+        output.AppendLine("| " + part.PadRight(innerWidth) + " |");
+        remaining = remaining.Substring(take).TrimStart();
+      }
     }
-    if (String.IsNullOrWhiteSpace(text))
-      output.AppendLine("| " + new string(' ', innerWidth) + " |");
 
     output.AppendLine(border);
   }
@@ -226,7 +231,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.2"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.3"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
