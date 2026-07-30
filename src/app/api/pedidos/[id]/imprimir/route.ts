@@ -34,26 +34,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const trabajos = Array.from(itemsPorImpresora.entries()).map(([impresora, items]) => {
       const lineas: string[] = [];
-      lineas.push((configuracion?.nombrePrograma || "GESTION").toUpperCase());
-      lineas.push("COMANDA");
-      lineas.push("");
-      lineas.push(pedido.venta.mesa?.nombre || "Mostrador");
+      lineas.push(`[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`);
+      lineas.push("[[SUBTITLE]] COMANDA");
+      lineas.push("[[HR]]");
+      lineas.push(`[[TITLE]] ${(pedido.venta.mesa?.nombre || "Mostrador").toUpperCase()}`);
       lineas.push(
-        `${nombreUsuario.toUpperCase()}${rolUsuario ? ` - ${ROL_LABEL[rolUsuario]}` : ""}`
+        `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` · ${ROL_LABEL[rolUsuario]}` : ""}`
       );
-      lineas.push(new Date(pedido.createdAt).toLocaleString("es-AR"));
-      lineas.push("");
-      lineas.push("PEDIDO");
+      lineas.push(`[[CENTER]] ${new Date(pedido.createdAt).toLocaleString("es-AR")} · Pedido #${pedido.id}`);
+      lineas.push("[[HR]]");
+      lineas.push("[[SECTION]] PRODUCTOS");
 
       for (const item of items) {
-        lineas.push(`${item.cantidad}x ${item.producto.nombre}`);
+        lineas.push(`[[ITEM]] ${item.cantidad} x ${item.producto.nombre}`);
         if (item.notas) {
-          lineas.push("");
-          lineas.push("   >>> NOTA <<<");
-          lineas.push(`   ${item.notas.toUpperCase()}`);
-          lineas.push("");
+          lineas.push(`[[NOTE]] NOTA: ${item.notas.toUpperCase()}`);
         }
       }
+      lineas.push("[[HR]]");
+      lineas.push("[[FOOTER]] Comanda de cocina");
       lineas.push("");
 
       return prisma.impresionTrabajo.create({

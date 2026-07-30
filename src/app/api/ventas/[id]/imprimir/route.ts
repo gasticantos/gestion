@@ -32,38 +32,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const lineaImporte = (etiqueta: string, valor: number) =>
       `${etiqueta}${dinero(valor).padStart(Math.max(1, 36 - etiqueta.length))}`;
 
-    // Diseño compacto para papel térmico: pocas divisiones y jerarquía por espacios/títulos.
     const lineas: string[] = [];
-    lineas.push((configuracion?.nombrePrograma || "GESTION").toUpperCase());
-    lineas.push(venta.estado === "CERRADA" ? "TICKET FINAL" : "CUENTA PREVIA");
-    lineas.push("");
-    lineas.push(`${venta.mesa?.nombre || "Mostrador"}  |  Venta #${venta.id}`);
+    lineas.push(`[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`);
+    lineas.push(`[[SUBTITLE]] ${venta.estado === "CERRADA" ? "COMPROBANTE DE VENTA" : "CUENTA PREVIA"}`);
+    lineas.push("[[HR]]");
+    lineas.push(`[[CENTER]] ${venta.mesa?.nombre || "Mostrador"} · Venta #${venta.id}`);
     if (sesion) {
-      lineas.push(`${sesion.nombre.toUpperCase()} - ${ROL_LABEL[sesion.rol]}`);
+      lineas.push(`[[CENTER]] ${sesion.nombre.toUpperCase()} · ${ROL_LABEL[sesion.rol]}`);
     }
-    lineas.push(new Date(venta.createdAt).toLocaleString("es-AR"));
-    lineas.push("");
-    lineas.push("PRODUCTOS");
+    lineas.push(`[[CENTER]] ${new Date(venta.createdAt).toLocaleString("es-AR")}`);
+    lineas.push("[[HR]]");
+    lineas.push("[[SECTION]] DETALLE DEL PEDIDO");
 
     for (const pedido of venta.pedidos) {
       for (const item of pedido.items) {
-        lineas.push(`${item.cantidad}x ${item.producto.nombre}`);
-        lineas.push(`   ${dinero(item.precioUnitario)} c/u     ${dinero(item.subtotal)}`);
+        lineas.push(`[[ITEM]] ${item.producto.nombre}`);
+        lineas.push(`[[DETAIL]] ${item.cantidad} x ${dinero(item.precioUnitario)} c/u     ${dinero(item.subtotal)}`);
       }
     }
 
-    lineas.push("");
-    lineas.push(lineaImporte("SUBTOTAL", subtotal));
+    lineas.push("[[HR]]");
+    lineas.push(`[[ROW]] ${lineaImporte("SUBTOTAL", subtotal)}`);
     if (venta.descuentoPct > 0) {
       const desc = (subtotal * venta.descuentoPct) / 100;
-      lineas.push(lineaImporte(`DESCUENTO ${venta.descuentoPct}%`, -desc));
+      lineas.push(`[[ROW]] ${lineaImporte(`DESCUENTO ${venta.descuentoPct}%`, -desc)}`);
     }
-    lineas.push("");
-    lineas.push(lineaImporte("TOTAL", venta.total));
+    lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL", venta.total)}`);
 
     if (venta.estado === "CERRADA") {
-      lineas.push("");
-      lineas.push("PAGO");
+      lineas.push("[[HR]]");
+      lineas.push("[[SECTION]] FORMA DE PAGO");
     }
     for (const pago of venta.pagos) {
       const metodos: Record<string, string> = {
@@ -72,11 +70,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         TRANSFERENCIA: "Transferencia",
         FIADO: "Cuenta corriente",
       };
-      lineas.push(lineaImporte(metodos[pago.metodo] || pago.metodo, pago.monto));
+      lineas.push(`[[ROW]] ${lineaImporte(metodos[pago.metodo] || pago.metodo, pago.monto)}`);
     }
 
-    lineas.push("");
-    lineas.push("Gracias por su compra");
+    lineas.push("[[HR]]");
+    lineas.push("[[FOOTER]] Gracias por su compra");
     lineas.push("");
 
     const contenido = lineas.join("\n");
