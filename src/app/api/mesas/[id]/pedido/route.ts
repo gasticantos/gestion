@@ -116,14 +116,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         "[[SUBTITLE]] COMANDA",
         "[[HR]]",
         `[[TITLE]] ${(mesa.nombre || "Mostrador").toUpperCase()}`,
-        `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` · ${ROL_LABEL[rolUsuario]}` : ""}`,
-        `[[CENTER]] ${formatearFechaHora(created.createdAt)} · Pedido #${created.id}`,
+        `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` - ${ROL_LABEL[rolUsuario]}` : ""}`,
+        `[[CENTER]] ${formatearFechaHora(created.createdAt)} - Pedido #${created.id}`,
         "[[HR]]",
         "[[SECTION]] PRODUCTOS",
       ];
       for (const item of itemsDestino) {
         lineas.push(`[[ITEM]] ${item.cantidad} x ${item.producto.nombre}`);
-        if (item.notas) lineas.push(`[[NOTE]] NOTA: ${item.notas.toUpperCase()}`);
+        if (item.notas) {
+          const notaLimpia = item.notas.replace(/\s+/g, " ").trim().toUpperCase();
+          lineas.push(`[[NOTE]] NOTA: ${notaLimpia}`);
+        }
       }
       lineas.push("[[HR]]", "[[FOOTER]] Comanda de cocina", "");
       trabajos.push(

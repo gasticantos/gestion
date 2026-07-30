@@ -36,9 +36,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     lineas.push(`[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`);
     lineas.push(`[[SUBTITLE]] ${venta.estado === "CERRADA" ? "COMPROBANTE DE VENTA" : "CUENTA PREVIA"}`);
     lineas.push("[[HR]]");
-    lineas.push(`[[CENTER]] ${venta.mesa?.nombre || "Mostrador"} · Venta #${venta.id}`);
+    lineas.push(`[[CENTER]] ${venta.mesa?.nombre || "Mostrador"} - Venta #${venta.id}`);
     if (sesion) {
-      lineas.push(`[[CENTER]] ${sesion.nombre.toUpperCase()} · ${ROL_LABEL[sesion.rol]}`);
+      lineas.push(`[[CENTER]] ${sesion.nombre.toUpperCase()} - ${ROL_LABEL[sesion.rol]}`);
     }
     lineas.push(`[[CENTER]] ${formatearFechaHora(venta.createdAt)}`);
     lineas.push("[[HR]]");
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (venta.estado !== "CERRADA" && configuracion?.aliasTransferencia) {
       lineas.push("[[HR]]");
       lineas.push(
-        `[[NOTE]] TRANSFERENCIA · ALIAS: ${configuracion.aliasTransferencia.toUpperCase()}`
+        `[[NOTE]] TRANSFERENCIA - ALIAS: ${configuracion.aliasTransferencia.toUpperCase()}`
       );
     }
 

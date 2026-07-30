@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     "[[SUBTITLE]] CIERRE DE CAJA",
     "[[HR]]",
     `[[CENTER]] ${formatearFechaHora(new Date())}`,
-    `[[CENTER]] ${sesion.nombre.toUpperCase()} · ${sesion.rol}`,
+    `[[CENTER]] ${sesion.nombre.toUpperCase()} - ${sesion.rol}`,
     "[[HR]]",
     "[[SECTION]] RESUMEN DEL DIA",
     `[[ROW]] VENTAS REALIZADAS: ${reporte.cantidadVentas}`,
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   } else {
     for (const categoria of reporte.categorias) {
       lineas.push(
-        `[[ROW]] ${categoria.categoria}: ${categoria.cantidad} u. · ${dinero(categoria.importe)}`
+        `[[ROW]] ${categoria.categoria}: ${categoria.cantidad} u. - ${dinero(categoria.importe)}`
       );
     }
   }
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
   await registrarAuditoria(
     usuarioId,
     "cerrar_caja",
-    `Cierre ${fecha} · ${reporte.cantidadVentas} ventas · Total ${dinero(reporte.combinado.total)}`
+    `Cierre ${fecha} - ${reporte.cantidadVentas} ventas - Total ${dinero(reporte.combinado.total)}`
   );
 
   return NextResponse.json({
