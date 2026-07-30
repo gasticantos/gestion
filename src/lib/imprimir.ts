@@ -18,6 +18,11 @@ export type ImpresoraLocal = {
   estado: string;
 };
 
+export type EstadoAgenteImpresion = {
+  ok: boolean;
+  agente: string;
+};
+
 export const ERROR_IMPRESION_LOCAL =
   "No se pudo imprimir automáticamente. Elegí una impresora en Configuración y verificá que el agente esté iniciado. No se abrió el diálogo del navegador.";
 
@@ -68,6 +73,25 @@ export function obtenerImpresoraSeleccionada(): string {
 
 export function guardarImpresoraSeleccionada(nombre: string) {
   localStorage.setItem(CLAVE_IMPRESORA, nombre);
+}
+
+export async function obtenerEstadoAgenteImpresion(): Promise<EstadoAgenteImpresion> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch(`${agenteImpresionUrl()}/health`, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error("El agente local no respondió correctamente");
+    const data = await res.json();
+    return {
+      ok: data?.ok === true,
+      agente: typeof data?.agente === "string" ? data.agente : "",
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export async function listarImpresorasLocales(): Promise<ImpresoraLocal[]> {

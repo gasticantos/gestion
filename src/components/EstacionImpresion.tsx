@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import {
   imprimirLocal,
   listarImpresorasLocales,
+  obtenerEstadoAgenteImpresion,
   obtenerImpresoraSeleccionada,
 } from "@/lib/imprimir";
 
 const CLAVE_ESTACION = "gestion_estacion_impresion_id";
+const VERSION_MINIMA_AGENTE = "1.1.3";
 
 type TrabajoPendiente = {
   id: number;
@@ -26,7 +28,25 @@ function obtenerEstacionId() {
   return id;
 }
 
+function versionEsAnterior(actual: string, minima: string) {
+  const partesActual = actual.split(".").map((parte) => Number(parte));
+  const partesMinima = minima.split(".").map((parte) => Number(parte));
+  if (
+    partesActual.length < 3 ||
+    partesActual.some((parte) => !Number.isInteger(parte) || parte < 0)
+  ) {
+    return true;
+  }
+  for (let i = 0; i < Math.max(partesActual.length, partesMinima.length); i += 1) {
+    const diferencia = (partesActual[i] || 0) - (partesMinima[i] || 0);
+    if (diferencia !== 0) return diferencia < 0;
+  }
+  return false;
+}
+
 export default function EstacionImpresion() {
+  const [agenteDesactualizado, setAgenteDesactualizado] = useState("");
+
   useEffect(() => {
     if (!isTauri()) return;
 
@@ -35,11 +55,26 @@ export default function EstacionImpresion() {
     const estacionId = obtenerEstacionId();
     let impresorasDisponibles: string[] = [];
     let ultimaConsultaImpresoras = 0;
+    let ultimaConsultaAgente = 0;
+    let versionAgente = "";
 
     async function buscarEImprimir() {
       if (!activo || procesando || !obtenerImpresoraSeleccionada()) return;
       procesando = true;
       try {
+        if (Date.now() - ultimaConsultaAgente > 15_000) {
+          const estadoAgente = await obtenerEstadoAgenteImpresion();
+          versionAgente = estadoAgente.agente;
+          ultimaConsultaAgente = Date.now();
+          const desactualizado =
+            !estadoAgente.ok || versionEsAnterior(versionAgente, VERSION_MINIMA_AGENTE);
+          setAgenteDesactualizado(desactualizado ? versionAgente || "desconocida" : "");
+        }
+        // Una versión vieja podía responder OK al navegador aunque Windows descartara
+        // físicamente el trabajo. No tomarlo de la cola: así queda pendiente y se imprime
+        // después de actualizar, en vez de quedar falsamente marcado como impreso.
+        if (!versionAgente || versionEsAnterior(versionAgente, VERSION_MINIMA_AGENTE)) return;
+
         if (Date.now() - ultimaConsultaImpresoras > 30_000) {
           impresorasDisponibles = (await listarImpresorasLocales()).map((p) => p.nombre);
           ultimaConsultaImpresoras = Date.now();
@@ -87,5 +122,21 @@ export default function EstacionImpresion() {
     };
   }, []);
 
-  return null;
+  if (!agenteDesactualizado) return null;
+
+  return (
+    <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between dark:border-red-800 dark:bg-red-950 dark:text-red-50">
+      <span>
+        <strong>Impresión detenida:</strong> el agente instalado es {agenteDesactualizado} y se
+        necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
+        perderlas.
+      </span>
+      <a
+        href="/configuracion"
+        className="shrink-0 rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800"
+      >
+        Actualizar ahora
+      </a>
+    </div>
+  );
 }
