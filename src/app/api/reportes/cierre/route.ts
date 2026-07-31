@@ -90,10 +90,18 @@ export async function POST(req: NextRequest) {
     select: { id: true },
   });
 
-  // Reiniciar estado: marcar todas las mesas como LIBRE
-  await prisma.mesa.updateMany({
-    data: { estado: "LIBRE" },
-  });
+  // Reiniciar estado: marcar todas las ventas como CERRADA y todas las mesas como LIBRE
+  await Promise.all([
+    prisma.venta.updateMany({
+      where: {
+        createdAt: { gte: desde, lte: hasta },
+      },
+      data: { estado: "CERRADA", closedAt: new Date() },
+    }),
+    prisma.mesa.updateMany({
+      data: { estado: "LIBRE" },
+    }),
+  ]);
 
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
   await registrarAuditoria(

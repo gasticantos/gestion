@@ -187,25 +187,15 @@ function BuscadorProductoBase({
             />
           </div>
         )}
-        <div className={`grid ${precioMesaActivo ? "grid-cols-2" : "grid-cols-1"} gap-2`}>
+        <div className="grid grid-cols-1 gap-2">
           <button
             type="button"
             onClick={() => elegirPrecio("PARTICULAR")}
             className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
           >
-            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mostrador</span>
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio venta</span>
             <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMostrador)}</span>
           </button>
-          {precioMesaActivo && (
-            <button
-              type="button"
-              onClick={() => elegirPrecio("MESA")}
-              className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
-            >
-              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mesa</span>
-              <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMesa)}</span>
-            </button>
-          )}
         </div>
         <button type="button" onClick={cancelarEleccion} className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 self-start">
           ‹ Volver a buscar
