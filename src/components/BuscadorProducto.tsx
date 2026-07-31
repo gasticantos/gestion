@@ -5,6 +5,7 @@ import { input } from "@/components/ui/styles";
 import { Tarifa } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
 import VirtualKeyboard from "@/components/VirtualKeyboard";
+import { useData } from "@/hooks/useData";
 
 export type ProductoBusqueda = {
   id: number;
@@ -17,14 +18,14 @@ export type ProductoBusqueda = {
 };
 
 function BuscadorProductoBase({
-  productos,
+  productos: productosProp,
   onSeleccionar,
   elegirPrecio: pedirPrecio = true,
   precioMesaActivo = true,
   permitirNotas = false,
   placeholder,
 }: {
-  productos: ProductoBusqueda[];
+  productos?: ProductoBusqueda[];
   onSeleccionar: (
     p: ProductoBusqueda,
     tarifa: Tarifa,
@@ -38,6 +39,9 @@ function BuscadorProductoBase({
   permitirNotas?: boolean;
   placeholder?: string;
 }) {
+  // Usar caché de productos si no se pasan como prop
+  const { data: productosCache } = useData<ProductoBusqueda>("productos");
+  const productos = productosProp || productosCache || [];
   const [query, setQuery] = useState("");
   const [elegido, setElegido] = useState<ProductoBusqueda | null>(null);
   const [cantidad, setCantidad] = useState(1);

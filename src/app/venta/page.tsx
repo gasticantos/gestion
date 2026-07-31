@@ -17,8 +17,6 @@ import { th, td, trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
 
-type Producto = ProductoBusqueda & { stock: number };
-
 type ItemCarrito = {
   productoId: number;
   nombre: string;
@@ -30,7 +28,6 @@ type ItemCarrito = {
 
 export default function VentaPage() {
   const router = useRouter();
-  const [productos, setProductos] = useState<Producto[]>([]);
   const [clientes, setClientes] = useState<ClienteOpcion[]>([]);
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [pagos, setPagos] = useState<PagoLinea[]>([{ metodo: "EFECTIVO", monto: "0" }]);
@@ -41,20 +38,15 @@ export default function VentaPage() {
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
 
   useEffect(() => {
-    // Carga productos primero (crítico para búsqueda)
+    // Cargar clientes y configuración (productos se cargan del caché en BuscadorProducto)
     Promise.all([
-      fetch("/api/productos?venta=1").then((res) => res.json()),
       fetch("/api/clientes").then((res) => res.json()),
       fetch("/api/configuracion").then((res) => res.json()),
-    ]).then(([productos, clientes, configuracion]) => {
-      // /api/productos?venta=1 ya devuelve únicamente productos activos y no incluye
-      // el campo "activo". Volver a filtrarlo vaciaba por completo el buscador.
-      setProductos(Array.isArray(productos) ? productos : []);
+    ]).then(([clientes, configuracion]) => {
       setClientes(Array.isArray(clientes) ? clientes : []);
       setPrecioMesaActivo(configuracion?.precioMesaActivo !== false);
     }).catch((err) => {
       console.error("Error cargando datos iniciales:", err);
-      setProductos([]);
       setClientes([]);
     });
   }, []);
@@ -77,19 +69,7 @@ export default function VentaPage() {
     }
   }, [carrito]);
 
-  useEffect(() => {
-    if (precioMesaActivo || productos.length === 0) return;
-    setCarrito((actual) =>
-      actual.map((item) => {
-        const producto = productos.find((p) => p.id === item.productoId);
-        return {
-          ...item,
-          tarifa: "PARTICULAR",
-          precioUnitario: producto?.precioVenta ?? item.precioUnitario,
-        };
-      })
-    );
-  }, [precioMesaActivo, productos]);
+  // Este efecto se puede remover porque el precio se establece correctamente al agregar al carrito
 
   const subtotal = useMemo(() => carrito.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [carrito]);
   const descuento = useMemo(() => aplicarDescuento(subtotal, Number(descuentoPct)), [subtotal, descuentoPct]);
@@ -184,7 +164,7 @@ export default function VentaPage() {
     <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Venta (mostrador)</h1>
-        <BuscadorProducto productos={productos} onSeleccionar={agregar} precioMesaActivo={precioMesaActivo} />
+        <BuscadorProducto onSeleccionar={agregar} precioMesaActivo={precioMesaActivo} />
 
         {carrito.length > 0 && (
           <div className="text-xs text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">
