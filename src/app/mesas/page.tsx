@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, lazy } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
@@ -24,22 +24,18 @@ type Mesa = {
 
 export default function MesasPage() {
   const { data: mesasCache, loading: loadingCache } = useData<Mesa>("mesas");
-  const [mesas, setMesas] = useState<Mesa[]>([]);
+  const [mesasFrescas, setMesasFrescas] = useState<Mesa[] | null>(null);
   const [error, setError] = useState("");
   const [vista, setVista] = useState<"mapa" | "lista">("mapa");
   const [agragando, setAgregando] = useState(false);
 
-  useEffect(() => {
-    if (mesasCache) {
-      setMesas(mesasCache);
-    }
-  }, [mesasCache]);
+  // Mientras no se haya hecho un fetch propio (cargar()), mostrar lo que trae el caché.
+  const mesas = mesasFrescas ?? mesasCache ?? [];
 
   async function cargar() {
-    // Refrescar caché
     const mesasRes = await fetch("/api/mesas");
     const data = await mesasRes.json();
-    setMesas(data);
+    setMesasFrescas(data);
   }
 
   useEffect(() => {
@@ -113,7 +109,7 @@ export default function MesasPage() {
         {error && <span className="text-sm text-red-400">{error}</span>}
       </div>
 
-      {loading ? (
+      {loadingCache && mesas.length === 0 ? (
         <div className="text-sm text-neutral-500">Cargando...</div>
       ) : vista === "mapa" ? (
         <>

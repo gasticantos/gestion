@@ -22,6 +22,7 @@ function BuscadorProductoBase({
   onSeleccionar,
   elegirPrecio: pedirPrecio = true,
   precioMesaActivo = true,
+  soloPrecioVenta = false,
   permitirNotas = false,
   placeholder,
 }: {
@@ -36,6 +37,8 @@ function BuscadorProductoBase({
   /** Si es false, agrega directo al precio de mostrador sin mostrar el paso de elegir precio (uso en carga de stock). */
   elegirPrecio?: boolean;
   precioMesaActivo?: boolean;
+  /** Si es true, nunca ofrece el precio de mesa aunque precioMesaActivo esté activo (uso en venta de mostrador). */
+  soloPrecioVenta?: boolean;
   permitirNotas?: boolean;
   placeholder?: string;
 }) {
@@ -191,7 +194,7 @@ function BuscadorProductoBase({
             />
           </div>
         )}
-        <div className="grid grid-cols-1 gap-2">
+        <div className={`grid ${precioMesaActivo && !soloPrecioVenta ? "grid-cols-2" : "grid-cols-1"} gap-2`}>
           <button
             type="button"
             onClick={() => elegirPrecio("PARTICULAR")}
@@ -200,6 +203,16 @@ function BuscadorProductoBase({
             <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio venta</span>
             <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMostrador)}</span>
           </button>
+          {precioMesaActivo && !soloPrecioVenta && (
+            <button
+              type="button"
+              onClick={() => elegirPrecio("MESA")}
+              className="rounded-lg border-2 border-neutral-300 dark:border-neutral-700 hover:border-blue-600/70 bg-white dark:bg-neutral-900 px-3 py-3 flex flex-col items-center gap-1 transition-colors"
+            >
+              <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Precio mesa</span>
+              <span className="text-lg font-bold text-neutral-900 dark:text-neutral-50">${formatearMoneda(precioMesa)}</span>
+            </button>
+          )}
         </div>
         <button type="button" onClick={cancelarEleccion} className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 self-start">
           ‹ Volver a buscar

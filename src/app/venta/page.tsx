@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import BuscadorProducto, { ProductoBusqueda } from "@/components/BuscadorProducto";
 import PagoSelector, {
   PagoLinea,
@@ -27,7 +26,6 @@ type ItemCarrito = {
 };
 
 export default function VentaPage() {
-  const router = useRouter();
   const [clientes, setClientes] = useState<ClienteOpcion[]>([]);
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [pagos, setPagos] = useState<PagoLinea[]>([{ metodo: "EFECTIVO", monto: "0" }]);
@@ -81,8 +79,6 @@ export default function VentaPage() {
     precioUnitario: number,
     cantidad = 1
   ) {
-    const producto = productos.find((x) => x.id === p.id);
-    if (!producto) return;
     setCarrito((prev) => {
       const existe = prev.find((i) => i.productoId === p.id && i.tarifa === tarifa);
       if (existe) {
@@ -91,12 +87,12 @@ export default function VentaPage() {
       return [
         ...prev,
         {
-          productoId: producto.id,
-          nombre: producto.nombre,
+          productoId: p.id,
+          nombre: p.nombre,
           tarifa,
           precioUnitario,
           cantidad,
-          stockDisponible: producto.stock,
+          stockDisponible: p.stock ?? 0,
         },
       ];
     });
@@ -164,7 +160,7 @@ export default function VentaPage() {
     <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Venta (mostrador)</h1>
-        <BuscadorProducto onSeleccionar={agregar} precioMesaActivo={precioMesaActivo} />
+        <BuscadorProducto onSeleccionar={agregar} precioMesaActivo={precioMesaActivo} soloPrecioVenta />
 
         {carrito.length > 0 && (
           <div className="text-xs text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">
