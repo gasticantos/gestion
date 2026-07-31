@@ -112,11 +112,11 @@ function BuscadorProductoBase({
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     e.preventDefault();
-    const q = query.trim();
+    const q = query.trim().toLocaleLowerCase("es");
     if (!q) return;
 
     // Lector de código de barras: tipea el código exacto seguido de Enter.
-    const exacto = productos.find((p) => p.codigoBarras === q);
+    const exacto = productos.find((p) => p.codigoBarras?.toLocaleLowerCase("es") === q);
     if (exacto) {
       elegirProducto(exacto);
       return;
@@ -129,9 +129,9 @@ function BuscadorProductoBase({
 
   function entradaVirtual(char: string) {
     if (char === "\n") {
-      const q = query.trim();
+      const q = query.trim().toLocaleLowerCase("es");
       if (!q) return;
-      const exacto = productos.find((p) => p.codigoBarras === q);
+      const exacto = productos.find((p) => p.codigoBarras?.toLocaleLowerCase("es") === q);
       if (exacto) elegirProducto(exacto);
       else if (resultados.length === 1) elegirProducto(resultados[0]);
       return;
