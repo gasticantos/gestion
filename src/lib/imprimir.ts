@@ -85,6 +85,9 @@ export function obtenerImpresoraSeleccionada(): string {
 
 export function guardarImpresoraSeleccionada(nombre: string) {
   localStorage.setItem(CLAVE_IMPRESORA, nombre);
+  // Limpiar cache del agente para reconectar con la nueva impresora
+  urlAgenteActiva = "";
+  urlAgenteActivaHasta = 0;
 }
 
 export async function obtenerEstadoAgenteImpresion(): Promise<EstadoAgenteImpresion> {
@@ -100,7 +103,7 @@ export async function obtenerEstadoAgenteImpresion(): Promise<EstadoAgenteImpres
       if (!res.ok) throw new Error("El agente local no respondió correctamente");
       const data = await res.json();
       urlAgenteActiva = url;
-      urlAgenteActivaHasta = Date.now() + 15_000;
+      urlAgenteActivaHasta = Date.now() + 5_000;
       return {
         ok: data?.ok === true,
         agente: typeof data?.agente === "string" ? data.agente : "",
