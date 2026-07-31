@@ -127,6 +127,12 @@ export default function ReportesPage() {
       setEstadoCierre(
         `Cierre enviado: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}`
       );
+      // Limpiar el carrito de venta guardado
+      localStorage.removeItem("carrito-venta");
+      // Recargar los datos después de 1 segundo para reflejar el reset de mesas
+      setTimeout(() => {
+        cargar(rango.desde, rango.hasta);
+      }, 1000);
     } catch {
       setEstadoCierre("No se pudo conectar para generar el cierre");
     } finally {

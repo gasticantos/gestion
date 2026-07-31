@@ -79,16 +79,6 @@ export async function POST(req: NextRequest) {
     lineas.push(`[[ROW]] ${fila(METODOS[metodo], reporte.combinado.pagos[metodo])}`);
   }
 
-  lineas.push("[[HR]]", "[[SECTION]] CATEGORIAS");
-  if (reporte.categorias.length === 0) {
-    lineas.push("[[CENTER]] SIN MOVIMIENTOS");
-  } else {
-    for (const categoria of reporte.categorias) {
-      lineas.push(
-        `[[ROW]] ${categoria.categoria}: ${categoria.cantidad} u. - ${dinero(categoria.importe)}`
-      );
-    }
-  }
   lineas.push("[[HR]]", "[[FOOTER]] Fin del cierre de caja", "");
 
   const trabajo = await prisma.impresionTrabajo.create({
@@ -98,6 +88,11 @@ export async function POST(req: NextRequest) {
       impresora: null,
     },
     select: { id: true },
+  });
+
+  // Reiniciar estado: marcar todas las mesas como LIBRE
+  await prisma.mesa.updateMany({
+    data: { estado: "LIBRE" },
   });
 
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
