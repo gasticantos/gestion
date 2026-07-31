@@ -2,25 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { fechaArgentinaYMD, limitesDiaArgentino } from "@/lib/formato";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
 export async function GET() {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const mañana = new Date(hoy);
-  mañana.setDate(mañana.getDate() + 1);
+  // Límites del día "de hoy" en horario argentino, no en el timezone del servidor
+  // (Vercel corre en UTC: sin esto, ventas de la noche quedaban en el día equivocado).
+  const { desde: hoy, hasta: finDeHoy } = limitesDiaArgentino(fechaArgentinaYMD());
 
-  // Excluir ventas que fueron cerradas en un cierre de caja (closedAt ~ 23:59:59)
-  const cierreHora = new Date(hoy);
-  cierreHora.setHours(23, 59, 59, 0);
-  const cierreMax = new Date(cierreHora.getTime() + 1000);
+  // Excluir ventas que fueron archivadas por un cierre de caja (closedAt = 23:59:59 ART exacto)
+  const cierreHora = new Date(finDeHoy.getTime() - 999);
 
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
-      createdAt: { gte: hoy, lt: mañana },
+      createdAt: { gte: hoy, lte: finDeHoy },
       closedAt: { lt: cierreHora },
     },
     select: {

@@ -67,8 +67,6 @@ export default function VentaPage() {
     }
   }, [carrito]);
 
-  // Este efecto se puede remover porque el precio se establece correctamente al agregar al carrito
-
   const subtotal = useMemo(() => carrito.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [carrito]);
   const descuento = useMemo(() => aplicarDescuento(subtotal, Number(descuentoPct)), [subtotal, descuentoPct]);
   const total = descuento.total;

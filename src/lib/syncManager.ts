@@ -30,39 +30,35 @@ async function syncChanges(): Promise<void> {
     const queue = await getSyncQueue();
     const unsyncedChanges = queue.filter((item) => !item.synced);
 
-    if (unsyncedChanges.length === 0) {
-      syncing = false;
-      return;
-    }
+    if (unsyncedChanges.length > 0) {
+      console.log(`[Sync] Subiendo ${unsyncedChanges.length} cambios...`);
 
-    console.log(`[Sync] Subiendo ${unsyncedChanges.length} cambios...`);
+      // Agrupar por tabla
+      const byTable = unsyncedChanges.reduce(
+        (acc, item) => {
+          if (!acc[item.table]) acc[item.table] = [];
+          acc[item.table].push(item);
+          return acc;
+        },
+        {} as Record<string, (typeof unsyncedChanges)[0][]>
+      );
 
-    // Agrupar por tabla
-    const byTable = unsyncedChanges.reduce(
-      (acc, item) => {
-        if (!acc[item.table]) acc[item.table] = [];
-        acc[item.table].push(item);
-        return acc;
-      },
-      {} as Record<string, (typeof unsyncedChanges)[0][]>
-    );
-
-    // Procesar tabla por tabla
-    for (const [table, items] of Object.entries(byTable)) {
-      for (const item of items) {
-        try {
-          await syncSingleChange(item.operation, table, item.data, item.id);
-        } catch (error) {
-          console.warn(`[Sync] Error sincronizando ${table}:`, error);
-          // No marcar como synced si hay error, reintentar después
+      // Procesar tabla por tabla
+      for (const [table, items] of Object.entries(byTable)) {
+        for (const item of items) {
+          try {
+            await syncSingleChange(item.operation, table, item.data, item.id);
+          } catch (error) {
+            console.warn(`[Sync] Error sincronizando ${table}:`, error);
+            // No marcar como synced si hay error, reintentar después
+          }
         }
       }
     }
 
-    // Actualizar caché de lectura desde el servidor
+    // Actualizar caché de lectura desde el servidor en cada ciclo,
+    // haya o no cambios pendientes en la cola de escritura.
     await refreshCacheFromServer();
-
-    console.log("[Sync] Sincronización completada");
   } catch (error) {
     console.error("[Sync] Error general de sincronización:", error);
   } finally {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { obtenerReporteVentas } from "@/lib/reportes";
-import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
+import { formatearFechaHora, formatearMoneda, fechaArgentinaYMD, limitesDiaArgentino } from "@/lib/formato";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
@@ -11,15 +11,6 @@ const METODOS = {
   TRANSFERENCIA: "TRANSFERENCIA",
   FIADO: "CUENTA CORRIENTE",
 } as const;
-
-function fechaArgentinaYMD() {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Argentina/Cordoba",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
 
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
@@ -49,8 +40,7 @@ export async function POST(req: NextRequest) {
   }
 
   const fecha = fechaArgentinaYMD();
-  const desde = new Date(`${fecha}T00:00:00-03:00`);
-  const hasta = new Date(`${fecha}T23:59:59.999-03:00`);
+  const { desde, hasta } = limitesDiaArgentino(fecha);
   const [reporte, configuracion] = await Promise.all([
     obtenerReporteVentas(desde, hasta, { limiteProductos: 0 }),
     prisma.configuracion.findFirst({ select: { nombrePrograma: true } }),
