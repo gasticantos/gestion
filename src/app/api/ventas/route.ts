@@ -7,8 +7,22 @@ type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
 export async function GET() {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const mañana = new Date(hoy);
+  mañana.setDate(mañana.getDate() + 1);
+
+  // Excluir ventas que fueron cerradas en un cierre de caja (closedAt ~ 23:59:59)
+  const cierreHora = new Date(hoy);
+  cierreHora.setHours(23, 59, 59, 0);
+  const cierreMax = new Date(cierreHora.getTime() + 1000);
+
   const ventas = await prisma.venta.findMany({
-    where: { estado: "CERRADA" },
+    where: {
+      estado: "CERRADA",
+      createdAt: { gte: hoy, lt: mañana },
+      closedAt: { lt: cierreHora },
+    },
     select: {
       id: true,
       tipo: true,
