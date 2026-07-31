@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
 import { formatearMoneda } from "@/lib/formato";
+import { useData } from "@/hooks/useData";
 
 const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () => <div className="h-96 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" /> });
 
@@ -22,23 +23,26 @@ type Mesa = {
 };
 
 export default function MesasPage() {
+  const { data: mesasCache, loading: loadingCache } = useData<Mesa>("mesas");
   const [mesas, setMesas] = useState<Mesa[]>([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
   const [vista, setVista] = useState<"mapa" | "lista">("mapa");
   const [agragando, setAgregando] = useState(false);
 
+  useEffect(() => {
+    if (mesasCache) {
+      setMesas(mesasCache);
+    }
+  }, [mesasCache]);
+
   async function cargar() {
-    setLoading(true);
+    // Refrescar caché
     const mesasRes = await fetch("/api/mesas");
-    setMesas(await mesasRes.json());
-    setLoading(false);
+    const data = await mesasRes.json();
+    setMesas(data);
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar la página
-    cargar();
-
     // Recargar cuando el usuario vuelve a la pestaña (tab activo)
     const handleVisibilityChange = () => {
       if (!document.hidden) {

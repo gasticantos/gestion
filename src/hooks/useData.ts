@@ -79,7 +79,7 @@ export function useData<T>(
 }
 
 // Hook para búsqueda en caché en tiempo real
-export function useSearchCache(
+export function useSearchCache<T>(
   table: "productos" | "clientes" | "mesas" | "configuracion" | "categorias",
   query: string,
   fields: string[]

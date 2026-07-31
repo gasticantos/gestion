@@ -116,6 +116,20 @@ async function refreshCacheFromServer(): Promise<void> {
       const config = await configRes.json();
       await setInCache("configuracion", config, 3600000);
     }
+
+    // Actualizar mesas
+    const mesasRes = await fetch("/api/mesas");
+    if (mesasRes.ok) {
+      const mesas = await mesasRes.json();
+      await setInCache("mesas", mesas, 3600000);
+    }
+
+    // Actualizar categorías
+    const categoriasRes = await fetch("/api/categorias");
+    if (categoriasRes.ok) {
+      const categorias = await categoriasRes.json();
+      await setInCache("categorias", categorias, 3600000);
+    }
   } catch (error) {
     console.warn("[Sync] No se pudo refrescar caché del servidor:", error);
     // Continuar con caché viejo si hay error
