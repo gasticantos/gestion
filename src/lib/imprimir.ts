@@ -11,6 +11,10 @@ function agentesImpresionUrls() {
     : ["http://127.0.0.1:9847"];
 }
 const CLAVE_IMPRESORA = "gestion_impresora_seleccionada";
+// Se guarda solo mientras el usuario decidió cambiar la impresora a propósito.
+// Así, cualquier instalación que ya tenía una impresora elegida queda fija
+// (bloqueada) de entrada, sin depender de que alguien la vuelva a elegir.
+const CLAVE_DESBLOQUEADA = "gestion_impresora_desbloqueada";
 let ultimoErrorImpresion = "";
 let urlAgenteActiva = "";
 let urlAgenteActivaHasta = 0;
@@ -83,8 +87,24 @@ export function obtenerImpresoraSeleccionada(): string {
   return typeof window === "undefined" ? "" : localStorage.getItem(CLAVE_IMPRESORA) || "";
 }
 
+// Bloqueada = hay una impresora guardada y nadie pidió desbloquearla a propósito.
+// Por defecto queda fija (inclusive las instalaciones que ya tenían una elegida
+// antes de este cambio); para tocarla hay que desbloquear primero.
+export function impresoraBloqueada(): boolean {
+  return typeof window === "undefined"
+    ? false
+    : Boolean(localStorage.getItem(CLAVE_IMPRESORA)) && localStorage.getItem(CLAVE_DESBLOQUEADA) !== "1";
+}
+
+export function desbloquearImpresora() {
+  localStorage.setItem(CLAVE_DESBLOQUEADA, "1");
+}
+
+// Guarda la impresora elegida y la bloquea de inmediato en este dispositivo, para que
+// no se pueda pisar por error (por ejemplo, con el valor de otra computadora).
 export function guardarImpresoraSeleccionada(nombre: string) {
   localStorage.setItem(CLAVE_IMPRESORA, nombre);
+  localStorage.removeItem(CLAVE_DESBLOQUEADA);
   // Limpiar cache del agente para reconectar con la nueva impresora
   urlAgenteActiva = "";
   urlAgenteActivaHasta = 0;
