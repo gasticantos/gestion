@@ -311,6 +311,8 @@ model Venta {
   @@index([mesaId])
   @@index([clienteId])
   @@index([estado])
+  @@index([estado, closedAt])
+  @@index([estado, createdAt])
 }
 
 model Pedido {
