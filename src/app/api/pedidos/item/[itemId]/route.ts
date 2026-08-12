@@ -8,7 +8,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
   const { cantidad, precioUnitario } = body as { cantidad?: number; precioUnitario?: number };
 
   try {
-    const item = await prisma.pedidoItem.findUnique({ where: { id: Number(itemId) } });
+    const item = await prisma.pedidoItem.findUnique({
+      where: { id: Number(itemId) },
+      include: { pedido: { select: { ventaId: true } } },
+    });
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
     }
@@ -21,22 +24,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
     }
 
     const nuevoSubtotal = cantidadFinal * precioFinal;
-    const updated = await prisma.pedidoItem.update({
-      where: { id: Number(itemId) },
-      data: { cantidad: cantidadFinal, precioUnitario: precioFinal, subtotal: nuevoSubtotal },
-    });
+    // Ajustar el total de la venta por la diferencia exacta que causa esta edición, no
+    // recalcularlo sumando solo los ítems de ESTE pedido: cada producto agregado a una
+    // mesa crea su propio pedido independiente (uno por comanda), así que sumar nada más
+    // que "pedido.items" descartaba el total de todos los demás pedidos de la misma cuenta.
+    const deltaSubtotal = nuevoSubtotal - item.subtotal;
+    const deltaCantidad = cantidadFinal - item.cantidad;
 
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: item.pedidoId },
-      include: { items: true },
-    });
-    if (pedido) {
-      const nuevoTotal = pedido.items.reduce((acc, i) => acc + (i.id === Number(itemId) ? nuevoSubtotal : i.subtotal), 0);
-      await prisma.venta.update({
-        where: { id: pedido.ventaId },
-        data: { total: nuevoTotal },
-      });
-    }
+    const [updated] = await prisma.$transaction([
+      prisma.pedidoItem.update({
+        where: { id: Number(itemId) },
+        data: { cantidad: cantidadFinal, precioUnitario: precioFinal, subtotal: nuevoSubtotal },
+      }),
+      prisma.venta.update({
+        where: { id: item.pedido.ventaId },
+        data: { total: { increment: deltaSubtotal } },
+      }),
+      prisma.producto.update({
+        where: { id: item.productoId },
+        data: { stock: { decrement: deltaCantidad } },
+      }),
+    ]);
 
     return NextResponse.json(updated);
   } catch (err) {

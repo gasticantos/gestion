@@ -255,18 +255,25 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   }
 
   function eliminarItemPedido(itemId: number) {
-    // Actualizar local inmediatamente
+    // Actualizar local inmediatamente, descontando también el total de la venta
+    // (si no, queda mostrando el total viejo hasta el próximo sondeo).
     setMesa((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        ventas: prev.ventas.map((v) => ({
-          ...v,
-          pedidos: v.pedidos.map((p) => ({
+        ventas: prev.ventas.map((v, index) => {
+          if (index !== 0) return v;
+          let subtotalQuitado = 0;
+          const pedidos = v.pedidos.map((p) => ({
             ...p,
-            items: p.items.filter((i) => i.id !== itemId),
-          })),
-        })),
+            items: p.items.filter((i) => {
+              if (i.id !== itemId) return true;
+              subtotalQuitado = i.subtotal;
+              return false;
+            }),
+          }));
+          return { ...v, pedidos, total: v.total - subtotalQuitado };
+        }),
       };
     });
 
