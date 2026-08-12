@@ -495,6 +495,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                         }
                                       }
                                     }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                    }}
                                   />
                                 ) : (
                                   <span className="text-sm font-medium">{cantidadActual}x</span>
@@ -508,6 +511,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                     className="w-20 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                     value={precioActual}
                                     onChange={(e) => actualizarItemPedido(item.id, undefined, Number(e.target.value) || 0)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                    }}
                                   />
                                 ) : (
                                   <span>${formatearMoneda(precioActual)}</span>
