@@ -162,7 +162,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   async function agregarARonda(
     p: ProductoBusqueda,
     tarifa: Tarifa,
-    _precioUnitario: number,
+    precioUnitario: number,
     cantidad = 1,
     notas = ""
   ) {
@@ -178,7 +178,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [{ productoId: producto.id, cantidad, tarifa, notas }],
+          items: [{ productoId: producto.id, cantidad, tarifa, notas, precioUnitario }],
         }),
       });
       if (!res.ok) {
@@ -589,6 +589,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 productos={productos}
                 onSeleccionar={agregarARonda}
                 precioMesaActivo={precioMesaActivo}
+                permitirPrecioLibre
                 permitirNotas
               />
             </Card>

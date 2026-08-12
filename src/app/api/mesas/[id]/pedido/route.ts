@@ -6,7 +6,7 @@ import { sesionActual } from "@/lib/sesionServidor";
 import { ROL_LABEL } from "@/lib/permisos";
 import { formatearFechaHora } from "@/lib/formato";
 
-type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
+type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string; precioUnitario?: number };
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
@@ -57,9 +57,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const itemTarifa = (item: ItemInput): Tarifa =>
     precioMesaActivo && item.tarifa !== "PARTICULAR" ? "MESA" : "PARTICULAR";
 
+  // Si el mozo/cajero eligió un precio a mano al agregar el producto, respetarlo
+  // en lugar de recalcularlo por tarifa.
+  const precioItem = (item: ItemInput, producto: (typeof productos)[number]) =>
+    typeof item.precioUnitario === "number" && Number.isFinite(item.precioUnitario) && item.precioUnitario >= 0
+      ? item.precioUnitario
+      : precioSegunTarifa(producto, itemTarifa(item));
+
   const subtotalPedido = items.reduce((acc, item) => {
     const producto = porId.get(Number(item.productoId))!;
-    return acc + precioSegunTarifa(producto, itemTarifa(item)) * Number(item.cantidad);
+    return acc + precioItem(item, producto) * Number(item.cantidad);
   }, 0);
 
   const pedido = await prisma.$transaction(async (tx) => {
@@ -70,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         items: {
           create: items.map((item) => {
             const producto = porId.get(Number(item.productoId))!;
-            const precioUnitario = precioSegunTarifa(producto, itemTarifa(item));
+            const precioUnitario = precioItem(item, producto);
             return {
               productoId: producto.id,
               cantidad: Number(item.cantidad),
