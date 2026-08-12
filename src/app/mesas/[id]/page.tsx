@@ -463,7 +463,19 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                           const cantidadActual = itemsActualizados.get(item.id) ?? item.cantidad;
                           const precioActual = preciosActualizados.get(item.id) ?? item.precioUnitario;
                           return (
-                            <tr key={item.id} className={trHover}>
+                            <tr
+                              key={item.id}
+                              className={trHover}
+                              onBlur={(e) => {
+                                // Solo cerrar la edición cuando el foco realmente sale de la fila
+                                // (no al pasar de "cantidad" a "precio" dentro de la misma fila).
+                                if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                                if (cantidadActual === 0) {
+                                  actualizarItemPedido(item.id, item.cantidad);
+                                }
+                                setEditandoItems((s) => { const n = new Set(s); n.delete(item.id); return n; });
+                              }}
+                            >
                               <td className={td}>{item.producto.nombre}</td>
                               <td className={td}>
                                 {editandoItems.has(item.id) ? (
@@ -482,12 +494,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                           actualizarItemPedido(item.id, num);
                                         }
                                       }
-                                    }}
-                                    onBlur={() => {
-                                      if (cantidadActual === 0) {
-                                        actualizarItemPedido(item.id, item.cantidad);
-                                      }
-                                      setEditandoItems((s) => { const n = new Set(s); n.delete(item.id); return n; });
                                     }}
                                   />
                                 ) : (
