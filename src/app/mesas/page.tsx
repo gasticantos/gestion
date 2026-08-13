@@ -28,6 +28,8 @@ export default function MesasPage() {
   const [error, setError] = useState("");
   const [vista, setVista] = useState<"mapa" | "lista">("mapa");
   const [agragando, setAgregando] = useState(false);
+  const [moviendoDesde, setMoviendoDesde] = useState<number | null>(null);
+  const [moviendo, setMoviendo] = useState(false);
 
   // Mientras no se haya hecho un fetch propio (cargar()), mostrar lo que trae el caché.
   const mesas = mesasFrescas ?? mesasCache ?? [];
@@ -73,6 +75,24 @@ export default function MesasPage() {
     if (!res.ok) {
       const data = await res.json();
       setError(data.error || "Ocurrió un error");
+      return;
+    }
+    await cargar();
+  }
+
+  async function moverMesa(origenId: number, destinoId: number) {
+    setError("");
+    setMoviendo(true);
+    const res = await fetch(`/api/mesas/${origenId}/mover`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ destinoId }),
+    });
+    setMoviendo(false);
+    setMoviendoDesde(null);
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error || "No se pudo mover la mesa");
       return;
     }
     await cargar();
@@ -140,7 +160,7 @@ export default function MesasPage() {
             return (
             <div
               key={mesa.id}
-              className={`rounded-xl p-4 border text-center transition-colors ${
+              className={`relative rounded-xl p-4 border text-center transition-colors ${
                 ticketImpreso
                   ? "bg-amber-500/10 border-amber-500/30"
                   : mesa.estado === "OCUPADA"
@@ -148,6 +168,44 @@ export default function MesasPage() {
                     : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/50"
               }`}
             >
+              {mesa.estado === "OCUPADA" && (
+                <div className="absolute top-1.5 right-1.5 z-10">
+                  <button
+                    onClick={() => setMoviendoDesde(moviendoDesde === mesa.id ? null : mesa.id)}
+                    title="Cambiar de mesa"
+                    className="w-6 h-6 flex items-center justify-center rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-100 text-xs"
+                  >
+                    ⇄
+                  </button>
+                  {moviendoDesde === mesa.id && (
+                    <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-2 flex flex-col gap-1 text-left">
+                      <div className="text-xs text-neutral-500 px-1 pb-1">Mover a...</div>
+                      {mesas.filter((m) => m.estado === "LIBRE").length === 0 ? (
+                        <div className="text-xs text-neutral-500 px-1 py-2">No hay mesas libres</div>
+                      ) : (
+                        mesas
+                          .filter((m) => m.estado === "LIBRE")
+                          .map((libre) => (
+                            <button
+                              key={libre.id}
+                              disabled={moviendo}
+                              onClick={() => moverMesa(mesa.id, libre.id)}
+                              className="text-left text-sm px-2 py-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-50"
+                            >
+                              {libre.apodo || libre.nombre}
+                            </button>
+                          ))
+                      )}
+                      <button
+                        onClick={() => setMoviendoDesde(null)}
+                        className="text-left text-xs text-neutral-500 px-2 py-1 hover:text-neutral-700 dark:hover:text-neutral-300"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               <Link
                 href={`/mesas/${mesa.id}`}
                 className="block hover:opacity-70 transition-opacity"

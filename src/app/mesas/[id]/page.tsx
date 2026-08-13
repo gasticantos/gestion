@@ -63,12 +63,14 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [rol, setRol] = useState<string | null>(null);
-  const [editandoItemId, setEditandoItemId] = useState<number | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [itemsActualizados, setItemsActualizados] = useState<Map<number, number>>(new Map());
-  const [preciosActualizados, setPreciosActualizados] = useState<Map<number, number>>(new Map());
   const [ticketImpreso, setTicketImpreso] = useState(false);
-  const [editandoItems, setEditandoItems] = useState<Set<number>>(new Set());
+  // Los productos cargados se agrupan por producto+precio (ver itemsAgrupados): agregar el
+  // mismo producto varias veces suma a un solo renglón en vez de listarlo duplicado. La edición
+  // de un grupo se guarda como borrador local (edicionCantidad/edicionPrecio) hasta que el foco
+  // sale de la fila, y ahí se aplica de una sola vez (ver guardarEdicionGrupo).
+  const [editandoGrupos, setEditandoGrupos] = useState<Set<string>>(new Set());
+  const [edicionCantidad, setEdicionCantidad] = useState<Map<string, number>>(new Map());
+  const [edicionPrecio, setEdicionPrecio] = useState<Map<string, number>>(new Map());
   const [editandoApodo, setEditandoApodo] = useState(false);
   const [apodoInput, setApodoInput] = useState("");
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
@@ -155,6 +157,45 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   const totalRonda = useMemo(() => ronda.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [ronda]);
 
+  type GrupoItem = {
+    clave: string;
+    productoId: number;
+    nombre: string;
+    precioUnitario: number;
+    cantidad: number;
+    subtotal: number;
+    itemIds: number[];
+  };
+
+  // Agrupa los PedidoItem por producto+precio: agregar el mismo producto varias veces
+  // (cada adición es un Pedido independiente, para que cada una imprima su comanda) suma
+  // a un solo renglón en la cuenta en vez de listarlo como filas duplicadas.
+  const itemsAgrupados = useMemo<GrupoItem[]>(() => {
+    const grupos = new Map<string, GrupoItem>();
+    for (const pedido of venta?.pedidos ?? []) {
+      for (const item of pedido.items) {
+        const clave = `${item.productoId}::${item.precioUnitario}`;
+        const existente = grupos.get(clave);
+        if (existente) {
+          existente.cantidad += item.cantidad;
+          existente.subtotal += item.subtotal;
+          existente.itemIds.push(item.id);
+        } else {
+          grupos.set(clave, {
+            clave,
+            productoId: item.productoId,
+            nombre: item.producto.nombre,
+            precioUnitario: item.precioUnitario,
+            cantidad: item.cantidad,
+            subtotal: item.subtotal,
+            itemIds: [item.id],
+          });
+        }
+      }
+    }
+    return [...grupos.values()];
+  }, [venta?.pedidos]);
+
   // Sincronizar ticketImpreso desde la venta
   useEffect(() => {
     if (venta?.ticketImpreso) {
@@ -233,31 +274,56 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     setRonda((prev) => prev.filter((i) => !(i.productoId === productoId && i.tarifa === tarifa)));
   }
 
-  function actualizarItemPedido(itemId: number, cantidad?: number, precioUnitario?: number) {
-    if (cantidad !== undefined && cantidad <= 0) return;
-    // Actualizar local inmediatamente (sin esperar)
-    if (cantidad !== undefined) setItemsActualizados((prev) => new Map(prev).set(itemId, cantidad));
-    if (precioUnitario !== undefined) setPreciosActualizados((prev) => new Map(prev).set(itemId, precioUnitario));
+  // Aplica una edición de cantidad/precio a un grupo (puede representar varios PedidoItem
+  // del mismo producto+precio). El primer ítem absorbe el total editado y el resto se borra:
+  // así el grupo queda como un solo renglón real a partir de ahora. Gracias a que tanto el
+  // PUT como el DELETE ajustan el total por delta (no recalculan), hacerlos en secuencia da
+  // el resultado correcto sin importar cuántos ítems tenía el grupo.
+  async function guardarEdicionGrupo(grupo: GrupoItem, nuevaCantidad: number, nuevoPrecio: number) {
+    if (nuevaCantidad <= 0) nuevaCantidad = grupo.cantidad;
+    const [primero, ...resto] = grupo.itemIds;
+    const nuevoSubtotal = nuevaCantidad * nuevoPrecio;
 
-    // Cancelar timer anterior
-    if (timerRef.current) clearTimeout(timerRef.current);
+    setMesa((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ventas: prev.ventas.map((v, index) => {
+          if (index !== 0) return v;
+          return {
+            ...v,
+            pedidos: v.pedidos.map((p) => ({
+              ...p,
+              items: p.items
+                .filter((i) => !resto.includes(i.id))
+                .map((i) =>
+                  i.id === primero
+                    ? { ...i, cantidad: nuevaCantidad, precioUnitario: nuevoPrecio, subtotal: nuevoSubtotal }
+                    : i
+                ),
+            })),
+            total: v.total - grupo.subtotal + nuevoSubtotal,
+          };
+        }),
+      };
+    });
+    setEditandoGrupos((s) => { const n = new Set(s); n.delete(grupo.clave); return n; });
 
-    // Enviar al servidor sin esperar (debounce 500ms)
-    timerRef.current = setTimeout(() => {
-      const body: { cantidad?: number; precioUnitario?: number } = {};
-      if (cantidad !== undefined) body.cantidad = cantidad;
-      if (precioUnitario !== undefined) body.precioUnitario = precioUnitario;
-      fetch(`/api/pedidos/item/${itemId}`, {
+    try {
+      await fetch(`/api/pedidos/item/${primero}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      }).catch(() => {
-        // Si falla, no importa por ahora
+        body: JSON.stringify({ cantidad: nuevaCantidad, precioUnitario: nuevoPrecio }),
       });
-    }, 500);
+      for (const itemId of resto) {
+        await fetch(`/api/pedidos/item/${itemId}`, { method: "DELETE" });
+      }
+    } catch {
+      cargar();
+    }
   }
 
-  function eliminarItemPedido(itemId: number) {
+  function eliminarGrupo(grupo: GrupoItem) {
     // Actualizar local inmediatamente, descontando también el total de la venta
     // (si no, queda mostrando el total viejo hasta el próximo sondeo).
     setMesa((prev) => {
@@ -266,25 +332,22 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         ...prev,
         ventas: prev.ventas.map((v, index) => {
           if (index !== 0) return v;
-          let subtotalQuitado = 0;
-          const pedidos = v.pedidos.map((p) => ({
-            ...p,
-            items: p.items.filter((i) => {
-              if (i.id !== itemId) return true;
-              subtotalQuitado = i.subtotal;
-              return false;
-            }),
-          }));
-          return { ...v, pedidos, total: v.total - subtotalQuitado };
+          return {
+            ...v,
+            pedidos: v.pedidos.map((p) => ({
+              ...p,
+              items: p.items.filter((i) => !grupo.itemIds.includes(i.id)),
+            })),
+            total: v.total - grupo.subtotal,
+          };
         }),
       };
     });
 
     // Enviar al servidor en background sin esperar
-    fetch(`/api/pedidos/item/${itemId}`, { method: "DELETE" }).catch(() => {
-      // Si falla, recargar
-      cargar();
-    });
+    for (const itemId of grupo.itemIds) {
+      fetch(`/api/pedidos/item/${itemId}`, { method: "DELETE" }).catch(() => cargar());
+    }
   }
 
   async function abrirMesa() {
@@ -541,88 +604,83 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       </tr>
                     </thead>
                     <tbody>
-                      {venta?.pedidos.flatMap((pedido) =>
-                        pedido.items.map((item) => {
-                          const cantidadActual = itemsActualizados.get(item.id) ?? item.cantidad;
-                          const precioActual = preciosActualizados.get(item.id) ?? item.precioUnitario;
-                          return (
-                            <tr
-                              key={item.id}
-                              className={trHover}
-                              onBlur={(e) => {
-                                // Solo cerrar la edición cuando el foco realmente sale de la fila
-                                // (no al pasar de "cantidad" a "precio" dentro de la misma fila).
-                                if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-                                if (cantidadActual === 0) {
-                                  actualizarItemPedido(item.id, item.cantidad);
-                                }
-                                setEditandoItems((s) => { const n = new Set(s); n.delete(item.id); return n; });
-                              }}
-                            >
-                              <td className={td}>{item.producto.nombre}</td>
-                              <td className={td}>
-                                {editandoItems.has(item.id) ? (
-                                  <input
-                                    type="number"
-                                    autoFocus
-                                    className="w-12 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
-                                    value={cantidadActual}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      if (val === "") {
-                                        setItemsActualizados((prev) => new Map(prev).set(item.id, 0));
-                                      } else {
-                                        const num = Number(val);
-                                        if (!isNaN(num) && num > 0) {
-                                          actualizarItemPedido(item.id, num);
-                                        }
-                                      }
-                                    }}
-                                    onKeyDown={(e) => {
-                                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                    }}
-                                  />
-                                ) : (
-                                  <span className="text-sm font-medium">{cantidadActual}x</span>
-                                )}
-                              </td>
-                              <td className={td}>
-                                {editandoItems.has(item.id) ? (
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    className="w-20 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
-                                    value={precioActual}
-                                    onChange={(e) => actualizarItemPedido(item.id, undefined, Number(e.target.value) || 0)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                    }}
-                                  />
-                                ) : (
-                                  <span>${formatearMoneda(precioActual)}</span>
-                                )}
-                              </td>
-                              <td className={td}>${formatearMoneda(precioActual * cantidadActual)}</td>
-                              <td className={`${td} text-right whitespace-nowrap`}>
-                                {!editandoItems.has(item.id) && (
-                                  <button
-                                    className="text-xs px-2 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-2"
-                                    onClick={() => setEditandoItems((s) => new Set(s).add(item.id))}
-                                  >
-                                    Editar
-                                  </button>
-                                )}
+                      {itemsAgrupados.map((grupo) => {
+                        const editando = editandoGrupos.has(grupo.clave);
+                        const cantidadActual = edicionCantidad.get(grupo.clave) ?? grupo.cantidad;
+                        const precioActual = edicionPrecio.get(grupo.clave) ?? grupo.precioUnitario;
+                        return (
+                          <tr
+                            key={grupo.clave}
+                            className={trHover}
+                            onBlur={(e) => {
+                              // Solo cerrar la edición cuando el foco realmente sale de la fila
+                              // (no al pasar de "cantidad" a "precio" dentro de la misma fila).
+                              if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                              guardarEdicionGrupo(grupo, cantidadActual, precioActual);
+                            }}
+                          >
+                            <td className={td}>{grupo.nombre}</td>
+                            <td className={td}>
+                              {editando ? (
+                                <input
+                                  type="number"
+                                  autoFocus
+                                  className="w-12 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                  value={cantidadActual}
+                                  onChange={(e) => {
+                                    const num = Number(e.target.value);
+                                    setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, isNaN(num) ? 0 : num));
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-sm font-medium">{cantidadActual}x</span>
+                              )}
+                            </td>
+                            <td className={td}>
+                              {editando ? (
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  className="w-20 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                  value={precioActual}
+                                  onChange={(e) =>
+                                    setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, Number(e.target.value) || 0))
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                  }}
+                                />
+                              ) : (
+                                <span>${formatearMoneda(precioActual)}</span>
+                              )}
+                            </td>
+                            <td className={td}>${formatearMoneda(precioActual * cantidadActual)}</td>
+                            <td className={`${td} text-right whitespace-nowrap`}>
+                              {!editando && (
                                 <button
-                                  className="text-red-400 hover:text-red-300 text-xs"
-                                  onClick={() => eliminarItemPedido(item.id)}
+                                  className="text-xs px-2 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-2"
+                                  onClick={() => {
+                                    setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, grupo.cantidad));
+                                    setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, grupo.precioUnitario));
+                                    setEditandoGrupos((s) => new Set(s).add(grupo.clave));
+                                  }}
                                 >
-                                  Quitar
+                                  Editar
                                 </button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
+                              )}
+                              <button
+                                className="text-red-400 hover:text-red-300 text-xs"
+                                onClick={() => eliminarGrupo(grupo)}
+                              >
+                                Quitar
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                       {ronda.map((i) => (
                         <tr key={`${i.productoId}-${i.tarifa}`} className={trHover}>
                           <td className={td}>
