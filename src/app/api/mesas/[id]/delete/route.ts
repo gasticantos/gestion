@@ -13,7 +13,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   const mesa = await prisma.mesa.findUnique({
     where: { id: mesaId },
-    include: { ventas: { include: { pedidos: { include: { items: true } } } } },
+    include: { ventas: { select: { estado: true } } },
   });
 
   if (!mesa) {
@@ -26,23 +26,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ error: "No se puede borrar una mesa con ventas abiertas" }, { status: 409 });
   }
 
-  // Borrar mesa y revertir stock en una transacción
-  await prisma.$transaction(async (tx) => {
-    // Devolver stock de todas las ventas cerradas
-    for (const venta of mesa.ventas) {
-      for (const pedido of venta.pedidos) {
-        for (const item of pedido.items) {
-          await tx.producto.update({
-            where: { id: item.productoId },
-            data: { stock: { increment: item.cantidad } },
-          });
-        }
-      }
-    }
-
-    // Borrar la mesa
-    await tx.mesa.delete({ where: { id: mesaId } });
-  });
+  // Acá solo pueden quedar ventas CERRADA (ya cobradas): no hay que devolverles el
+  // stock, esas ventas fueron reales y ya se cobraron. Borrar la mesa no deshace
+  // ventas pasadas; el historial queda intacto y su mesaId pasa a null (ON DELETE
+  // SET NULL en la base).
+  await prisma.mesa.delete({ where: { id: mesaId } });
 
   return NextResponse.json({ success: true });
 }

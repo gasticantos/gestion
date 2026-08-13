@@ -72,6 +72,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [editandoApodo, setEditandoApodo] = useState(false);
   const [apodoInput, setApodoInput] = useState("");
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
+  const [mostrarMover, setMostrarMover] = useState(false);
+  const [mesasLibres, setMesasLibres] = useState<{ id: number; nombre: string; apodo: string | null }[] | null>(null);
+  const [moviendo, setMoviendo] = useState(false);
 
   async function cargar() {
     const mesaRes = await fetch(`/api/mesas/${id}`, { cache: "no-store" });
@@ -319,6 +322,40 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  async function abrirMover() {
+    setError("");
+    setMostrarMover(true);
+    setMesasLibres(null);
+    const res = await fetch("/api/mesas");
+    if (!res.ok) {
+      setError("No se pudo cargar la lista de mesas");
+      return;
+    }
+    const todas: { id: number; nombre: string; apodo: string | null; estado: "LIBRE" | "OCUPADA" }[] = await res.json();
+    setMesasLibres(
+      todas
+        .filter((m) => m.estado === "LIBRE" && m.id !== Number(id))
+        .map((m) => ({ id: m.id, nombre: m.nombre, apodo: m.apodo }))
+    );
+  }
+
+  async function moverA(destinoId: number) {
+    setError("");
+    setMoviendo(true);
+    const res = await fetch(`/api/mesas/${id}/mover`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ destinoId }),
+    });
+    setMoviendo(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error || "No se pudo mover la mesa");
+      return;
+    }
+    router.push(`/mesas/${destinoId}`);
+  }
+
   async function imprimirTicket() {
     setError("");
     if (!venta) return;
@@ -424,9 +461,48 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
             </button>
           </div>
         )}
-        <Link href="/mesas" className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200">
-          Volver a mesas
-        </Link>
+        <div className="flex items-center gap-3">
+          {mesa.estado === "OCUPADA" && rol !== "MOZO" && (
+            <div className="relative">
+              <button
+                onClick={() => (mostrarMover ? setMostrarMover(false) : abrirMover())}
+                className="text-xs px-2 py-1 rounded border border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                Cambiar de mesa
+              </button>
+              {mostrarMover && (
+                <div className="absolute right-0 top-full mt-1 z-10 w-56 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-2 flex flex-col gap-1">
+                  <div className="text-xs text-neutral-500 px-1 pb-1">Mover esta cuenta a...</div>
+                  {mesasLibres === null ? (
+                    <div className="text-xs text-neutral-500 px-1 py-2">Cargando...</div>
+                  ) : mesasLibres.length === 0 ? (
+                    <div className="text-xs text-neutral-500 px-1 py-2">No hay mesas libres</div>
+                  ) : (
+                    mesasLibres.map((m) => (
+                      <button
+                        key={m.id}
+                        disabled={moviendo}
+                        onClick={() => moverA(m.id)}
+                        className="text-left text-sm px-2 py-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-50"
+                      >
+                        {m.apodo || m.nombre}
+                      </button>
+                    ))
+                  )}
+                  <button
+                    onClick={() => setMostrarMover(false)}
+                    className="text-left text-xs text-neutral-500 px-2 py-1 hover:text-neutral-700 dark:hover:text-neutral-300"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <Link href="/mesas" className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200">
+            Volver a mesas
+          </Link>
+        </div>
       </div>
 
       {error && <div className="text-sm text-red-400">{error}</div>}

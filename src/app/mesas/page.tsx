@@ -68,7 +68,7 @@ export default function MesasPage() {
   }
 
   async function borrarMesa(id: number) {
-    if (!confirm("¿Estás seguro? Se devolverá el stock de todas las ventas")) return;
+    if (!confirm("¿Estás seguro? Se borra la mesa; el historial de ventas ya cobradas queda intacto.")) return;
     const res = await fetch(`/api/mesas/${id}/delete`, { method: "DELETE" });
     if (!res.ok) {
       const data = await res.json();
