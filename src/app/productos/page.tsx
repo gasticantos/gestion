@@ -109,6 +109,76 @@ function MargenBadge({
   );
 }
 
+const OTRA_IMPRESORA = "__otra__";
+
+// Select para elegir la impresora de un producto. Siempre muestra "Predeterminada" y
+// "No imprimir" como opciones visibles (antes eran un input de texto libre con
+// autocompletado, y "No imprimir" quedaba escondido si no sabías que existía). Para una
+// impresora nueva que todavía no está en la lista, "Otra impresora..." abre un campo de texto.
+function SelectorImpresora({
+  value,
+  onChange,
+  opciones,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  opciones: string[];
+  className?: string;
+}) {
+  const esConocida = value === "" || value === "No imprimir" || opciones.includes(value);
+  const [modoLibre, setModoLibre] = useState(!esConocida);
+
+  if (modoLibre) {
+    return (
+      <div className="flex items-center gap-1">
+        <input
+          className={`${input} min-w-[140px] ${className || ""}`}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Nombre de la impresora"
+          autoFocus
+        />
+        <button
+          type="button"
+          title="Elegir de la lista"
+          className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+          onClick={() => {
+            onChange("");
+            setModoLibre(false);
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <select
+      className={`${input} ${className || ""}`}
+      value={value}
+      onChange={(e) => {
+        if (e.target.value === OTRA_IMPRESORA) {
+          onChange("");
+          setModoLibre(true);
+          return;
+        }
+        onChange(e.target.value);
+      }}
+    >
+      <option value="">Predeterminada</option>
+      <option value="No imprimir">No imprimir</option>
+      {opciones.map((nombre) => (
+        <option key={nombre} value={nombre}>
+          {nombre}
+        </option>
+      ))}
+      <option value={OTRA_IMPRESORA}>Otra impresora...</option>
+    </select>
+  );
+}
+
 export default function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
@@ -515,12 +585,10 @@ export default function ProductosPage() {
           </div>
           <div>
             <label className={label}>Impresora de comanda</label>
-            <input
-              className={input}
-              list="impresoras-productos"
+            <SelectorImpresora
               value={form.impresora}
-              onChange={(e) => setForm({ ...form, impresora: e.target.value })}
-              placeholder="Predeterminada"
+              onChange={(v) => setForm({ ...form, impresora: v })}
+              opciones={opcionesImpresora}
             />
           </div>
           <div className="flex items-end pb-1.5">
@@ -533,13 +601,6 @@ export default function ProductosPage() {
               Es comida (agrupar antes de enviar a cocina)
             </label>
           </div>
-
-          <datalist id="impresoras-productos">
-            <option value="No imprimir" />
-            {opcionesImpresora.map((nombre) => (
-              <option key={nombre} value={nombre} />
-            ))}
-          </datalist>
 
           <div className="col-span-2 md:col-span-4 flex items-center gap-3 pt-1">
             <Button type="submit" variant="primary">
@@ -773,12 +834,11 @@ export default function ProductosPage() {
                         </select>
                       </td>
                       <td className={td}>
-                        <input
-                          className={`${input} min-w-[180px]`}
-                          list="impresoras-productos"
+                        <SelectorImpresora
                           value={edicion.impresora}
-                          onChange={(e) => actualizarEdicion(p.id, { impresora: e.target.value })}
-                          placeholder="Predeterminada"
+                          onChange={(v) => actualizarEdicion(p.id, { impresora: v })}
+                          opciones={opcionesImpresora}
+                          className="min-w-[180px]"
                         />
                       </td>
                       <td className={`${td} text-center`}>

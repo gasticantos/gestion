@@ -51,6 +51,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     for (const pedido of venta.pedidos) {
       for (const item of pedido.items) {
+        // Productos marcados "No imprimir" (ver /productos) no aparecen en ningún ticket
+        // impreso, ni comanda ni comprobante, aunque su importe sigue formando parte del total.
+        if (item.producto.impresora?.trim() === "No imprimir") continue;
         lineas.push(`[[RECEIPT_ITEM]] ${item.producto.nombre}`);
         lineas.push(`[[DETAIL]] ${lineaDetalle(item.cantidad, item.precioUnitario, item.subtotal)}`);
       }
