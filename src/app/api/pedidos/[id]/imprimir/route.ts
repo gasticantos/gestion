@@ -25,8 +25,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const configuracion = await prisma.configuracion.findFirst();
     const nombreUsuario = pedido.creadoPor?.nombre || sesion?.nombre || "Usuario";
     const rolUsuario = pedido.creadoPor?.rol || sesion?.rol;
+    // Productos marcados "No imprimir" (ver /productos) no generan comanda en absoluto.
     const itemsPorImpresora = new Map<string, typeof pedido.items>();
     for (const item of pedido.items) {
+      if (item.producto.impresora?.trim() === "No imprimir") continue;
       const destino = item.producto.impresora?.trim() || "";
       const grupo = itemsPorImpresora.get(destino) || [];
       grupo.push(item);

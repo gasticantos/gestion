@@ -106,8 +106,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // La comanda se crea dentro de la misma transacción que el pedido. Antes el navegador
     // hacía una segunda llamada y, si se cortaba la conexión entre ambas, el producto quedaba
     // agregado pero sin trabajo de impresión.
+    // Productos marcados "No imprimir" (ver /productos) no generan comanda en absoluto.
     const itemsPorImpresora = new Map<string, typeof created.items>();
     for (const item of created.items) {
+      if (item.producto.impresora?.trim() === "No imprimir") continue;
       const destino = item.producto.impresora?.trim() || "";
       const grupo = itemsPorImpresora.get(destino) || [];
       grupo.push(item);

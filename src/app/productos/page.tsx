@@ -512,6 +512,7 @@ export default function ProductosPage() {
           </div>
 
           <datalist id="impresoras-productos">
+            <option value="No imprimir" />
             {opcionesImpresora.map((nombre) => (
               <option key={nombre} value={nombre} />
             ))}
@@ -577,6 +578,7 @@ export default function ProductosPage() {
                   >
                     <option value="">Asignar impresora...</option>
                     <option value="__predeterminada__">Predeterminada</option>
+                    <option value="No imprimir">No imprimir</option>
                     {opcionesImpresora.map((nombre) => (
                       <option key={nombre} value={nombre}>
                         {nombre}
