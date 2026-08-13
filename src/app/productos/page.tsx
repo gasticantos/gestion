@@ -6,10 +6,15 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Plegable from "@/components/ui/Plegable";
-import { input, label, th, td, trHover } from "@/components/ui/styles";
+import { input, label, trHover } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 import { redondearPrecio } from "@/lib/precio";
 import { listarImpresorasLocales } from "@/lib/imprimir";
+
+// Versiones más angostas de th/td, solo para esta tabla: tiene muchas columnas y el
+// objetivo es que entre la fila completa en pantalla sin scroll horizontal.
+const thC = "text-left text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-500 px-2 py-1.5";
+const tdC = "px-2 py-1.5 text-sm text-neutral-700 dark:text-neutral-200";
 
 const ImportarProductos = dynamic(() => import("@/components/ImportarProductos"), {
   loading: () => <div className="h-48 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
@@ -749,7 +754,7 @@ export default function ProductosPage() {
             <table className="w-full">
               <thead className="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
                 <tr>
-                  <th className={`${th} w-10`}>
+                  <th className={`${thC} w-10`}>
                     <input
                       ref={seleccionarTodosRef}
                       type="checkbox"
@@ -758,51 +763,48 @@ export default function ProductosPage() {
                       onChange={alternarVisibles}
                     />
                   </th>
-                  <th className={th}>Nombre</th>
-                  <th className={th}>Costo</th>
-                  <th className={th}>Precio venta</th>
-                  {precioMesaActivo && <th className={th}>Precio venta mesa</th>}
-                  <th className={th}>Stock</th>
-                  <th className={th}>Código</th>
-                  <th className={th}>Categoría</th>
-                  <th className={th}>Unidad</th>
-                  <th className={th}>Proveedor</th>
-                  <th className={th}>Impresora</th>
-                  <th className={th}>Comida</th>
-                  <th className={th}>Última modificación</th>
-                  <th className={`${th} w-40 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}></th>
+                  <th className={thC}>Nombre</th>
+                  <th className={thC}>Costo</th>
+                  <th className={thC}>Precio venta</th>
+                  {precioMesaActivo && <th className={thC}>Precio venta mesa</th>}
+                  <th className={thC}>Stock</th>
+                  <th className={thC}>Código</th>
+                  <th className={thC}>Proveedor</th>
+                  <th className={thC}>Comida</th>
+                  <th className={thC}>Última modificación</th>
+                  <th className={thC}>Impresora</th>
+                  <th className={`${thC} w-40 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}></th>
                 </tr>
               </thead>
               <tbody>
                 {listado.map((p) => {
                   const edicion = ediciones[p.id];
-                  const opcionesCategoria = categorias.filter((c) => c.activo || String(c.id) === edicion?.categoriaId);
                   return edicion ? (
                     <tr key={p.id} className={trHover}>
-                      <td className={td}>
+                      <td className={tdC}>
                         <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => alternarSeleccion(p.id)} aria-label={`Seleccionar ${p.nombre}`} />
                       </td>
-                      <td className={td}>
+                      <td className={tdC}>
                         <input
                           className={`${input} min-w-[220px]`}
                           value={edicion.nombre}
                           onChange={(e) => actualizarEdicion(p.id, { nombre: e.target.value })}
                         />
                       </td>
-                      <td className={td}>
+                      <td className={tdC}>
                         <input
                           type="number"
                           step="0.01"
-                          className={`${input} min-w-[100px]`}
+                          className={`${input} min-w-[80px]`}
                           value={edicion.precioCosto}
                           onChange={(e) => cambiarCostoEdit(p.id, e.target.value)}
                         />
                       </td>
-                      <td className={td}>
+                      <td className={tdC}>
                         <input
                           type="number"
                           step="0.01"
-                          className={`${input} min-w-[100px]`}
+                          className={`${input} min-w-[80px]`}
                           value={edicion.precioVenta}
                           onChange={(e) => cambiarVentaEdit(p.id, e.target.value)}
                         />
@@ -811,17 +813,17 @@ export default function ProductosPage() {
                         </div>
                       </td>
                       {precioMesaActivo && (
-                        <td className={td}>
+                        <td className={tdC}>
                           <input
                             type="number"
                             step="0.01"
-                            className={`${input} min-w-[100px]`}
+                            className={`${input} min-w-[80px]`}
                             value={edicion.precioVentaMesa}
                             onChange={(e) => cambiarVentaMesaEdit(p.id, e.target.value)}
                           />
                         </td>
                       )}
-                      <td className={td}>
+                      <td className={tdC}>
                         <input
                           type="number"
                           step="0.01"
@@ -830,35 +832,14 @@ export default function ProductosPage() {
                           onChange={(e) => actualizarEdicion(p.id, { stock: e.target.value })}
                         />
                       </td>
-                      <td className={td}>
+                      <td className={tdC}>
                         <input
                           className={input}
                           value={edicion.codigoBarras}
                           onChange={(e) => actualizarEdicion(p.id, { codigoBarras: e.target.value })}
                         />
                       </td>
-                      <td className={td}>
-                        <select
-                          className={input}
-                          value={edicion.categoriaId}
-                          onChange={(e) => actualizarEdicion(p.id, { categoriaId: e.target.value })}
-                        >
-                          <option value="">-</option>
-                          {opcionesCategoria.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.nombre}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className={td}>
-                        <input
-                          className={`${input} min-w-[80px]`}
-                          value={edicion.unidad}
-                          onChange={(e) => actualizarEdicion(p.id, { unidad: e.target.value })}
-                        />
-                      </td>
-                      <td className={td}>
+                      <td className={tdC}>
                         <select
                           className={input}
                           value={edicion.proveedorId}
@@ -872,15 +853,7 @@ export default function ProductosPage() {
                           ))}
                         </select>
                       </td>
-                      <td className={td}>
-                        <SelectorImpresora
-                          value={edicion.impresora}
-                          onChange={(v) => actualizarEdicion(p.id, { impresora: v })}
-                          opciones={opcionesImpresora}
-                          className="min-w-[180px]"
-                        />
-                      </td>
-                      <td className={`${td} text-center`}>
+                      <td className={`${tdC} text-center`}>
                         <input
                           type="checkbox"
                           checked={edicion.requiereConfirmacion}
@@ -888,52 +861,55 @@ export default function ProductosPage() {
                           aria-label={`Es comida - ${p.nombre}`}
                         />
                       </td>
-                      <td className={`${td} text-xs text-neutral-500`}>
+                      <td className={`${tdC} text-xs text-neutral-500`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
+                      <td className={tdC}>
+                        <SelectorImpresora
+                          value={edicion.impresora}
+                          onChange={(v) => actualizarEdicion(p.id, { impresora: v })}
+                          opciones={opcionesImpresora}
+                          className="min-w-[150px]"
+                        />
+                      </td>
                       <td
-                        className={`${td} text-right whitespace-nowrap gap-3 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
+                        className={`${tdC} text-right whitespace-nowrap gap-3 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
                       >
                         <span className="text-xs text-blue-500">En edición</span>
                       </td>
                     </tr>
                   ) : (
                     <tr key={p.id} className={`${trHover} ${!p.activo ? "opacity-40" : ""}`}>
-                      <td className={td}>
+                      <td className={tdC}>
                         <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => alternarSeleccion(p.id)} aria-label={`Seleccionar ${p.nombre}`} />
                       </td>
                       <td
-                        className={`${td} text-neutral-900 dark:text-neutral-50 font-medium max-w-[220px] truncate`}
+                        className={`${tdC} text-neutral-900 dark:text-neutral-50 font-medium max-w-[220px] truncate`}
                         title={p.nombre}
                       >
                         {p.nombre}
                       </td>
-                      <td className={`${td} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
-                      <td className={`${td} text-emerald-400 font-medium`}>
+                      <td className={`${tdC} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
+                      <td className={`${tdC} text-emerald-400 font-medium`}>
                         ${formatearMoneda(p.precioVenta)}{" "}
                         <MargenBadge costo={p.precioCosto} venta={p.precioVenta} compacto small />
                       </td>
                       {precioMesaActivo && (
-                        <td className={`${td} text-blue-400 font-medium`}>
+                        <td className={`${tdC} text-blue-400 font-medium`}>
                           ${formatearMoneda(p.precioVentaMesa)}{" "}
                           <MargenBadge costo={p.precioCosto} venta={p.precioVentaMesa} compacto small />
                         </td>
                       )}
                       <td
-                        className={`${td} font-medium ${
+                        className={`${tdC} font-medium ${
                           p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-700 dark:text-neutral-200"
                         }`}
                       >
                         {p.stock}
                       </td>
-                      <td className={`${td} font-mono text-xs text-neutral-500`}>{p.codigoBarras || "-"}</td>
-                      <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.categoria?.nombre || "-"}</td>
-                      <td className={`${td} text-neutral-500`}>{p.unidad}</td>
-                      <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
-                      <td className={`${td} text-neutral-500 dark:text-neutral-400 whitespace-nowrap`}>
-                        {p.impresora || "Predeterminada"}
-                      </td>
-                      <td className={`${td} text-center`}>
+                      <td className={`${tdC} font-mono text-xs text-neutral-500`}>{p.codigoBarras || "-"}</td>
+                      <td className={`${tdC} text-neutral-500 dark:text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
+                      <td className={`${tdC} text-center`}>
                         <input
                           type="checkbox"
                           checked={p.requiereConfirmacion}
@@ -942,11 +918,14 @@ export default function ProductosPage() {
                           aria-label={`Es comida - ${p.nombre}`}
                         />
                       </td>
-                      <td className={`${td} text-xs text-neutral-500 whitespace-nowrap`}>
+                      <td className={`${tdC} text-xs text-neutral-500 whitespace-nowrap`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
+                      <td className={`${tdC} text-neutral-500 dark:text-neutral-400 whitespace-nowrap`}>
+                        {p.impresora || "Predeterminada"}
+                      </td>
                       <td
-                        className={`${td} text-right whitespace-nowrap sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
+                        className={`${tdC} text-right whitespace-nowrap sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}
                       >
                         <button
                           className="text-blue-500 hover:text-blue-400 mr-3"
