@@ -1,6 +1,6 @@
 [package]
 name = "gestion-escritorio"
-version = "0.1.31"
+version = "0.1.32"
 description = "Aplicación de escritorio y estación de impresión de Gestión"
 authors = ["Gestión"]
 edition = "2021"
