@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     lineas.push(`[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`);
     lineas.push(`[[SUBTITLE]] ${venta.estado === "CERRADA" ? "COMPROBANTE DE VENTA" : "CUENTA PREVIA"}`);
     lineas.push("[[HR]]");
-    lineas.push(`[[CENTER]] ${venta.mesa?.nombre || "Mostrador"} - Venta #${venta.id}`);
+    lineas.push(`[[CENTER]] ${venta.mesa?.apodo || venta.mesa?.nombre || "Mostrador"} - Venta #${venta.id}`);
     if (sesion) {
       lineas.push(`[[CENTER]] ${sesion.nombre.toUpperCase()} - ${ROL_LABEL[sesion.rol]}`);
     }

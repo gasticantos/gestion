@@ -22,8 +22,17 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const cantidad = await prisma.mesa.count();
-    const maxNumero = await prisma.mesa.aggregate({ _max: { numero: true } });
-    const siguienteNumero = (maxNumero._max.numero ?? 0) + 1;
+    // Ocupa el número libre más bajo (1, 2, 3...) en vez de seguir siempre desde el
+    // más alto: así, si una mesa numerada se renombra con un apodo (ver
+    // /api/mesas/[id]/apodo, que la pasa a un número negativo para liberar su lugar) o
+    // se borra, ese número vuelve a estar disponible para la próxima mesa nueva.
+    const ocupados = await prisma.mesa.findMany({
+      where: { numero: { gt: 0 } },
+      select: { numero: true },
+    });
+    const usados = new Set(ocupados.map((m) => m.numero));
+    let siguienteNumero = 1;
+    while (usados.has(siguienteNumero)) siguienteNumero++;
     const nombre = `Mesa ${siguienteNumero}`;
 
     const columnas = 5;

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       lineas.push(`[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`);
       lineas.push("[[SUBTITLE]] COMANDA");
       lineas.push("[[HR]]");
-      lineas.push(`[[HERO]] ${(pedido.venta.mesa?.nombre || "Mostrador").toUpperCase()}`);
+      lineas.push(`[[HERO]] ${(pedido.venta.mesa?.apodo || pedido.venta.mesa?.nombre || "Mostrador").toUpperCase()}`);
       lineas.push(
         `[[CENTER]] ${nombreUsuario.toUpperCase()}${rolUsuario ? ` - ${ROL_LABEL[rolUsuario]}` : ""}`
       );
