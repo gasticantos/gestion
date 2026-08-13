@@ -48,6 +48,7 @@ type ItemRonda = {
   precioUnitario: number;
   cantidad: number;
   stockDisponible: number;
+  notas?: string;
 };
 
 export default function MesaDetallePage({ params }: { params: Promise<{ id: string }> }) {
@@ -203,7 +204,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }, [venta?.ticketImpreso]);
 
-  async function agregarARonda(
+  function agregarARonda(
     p: ProductoBusqueda,
     tarifa: Tarifa,
     precioUnitario: number,
@@ -214,20 +215,54 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     if (!producto) return;
     ultimoCambioLocalRef.current = Date.now();
     setError("");
+    // Solo se agrega al pedido en curso (local). No imprime ni se guarda en el servidor
+    // hasta tocar "Enviar a cocina": así se puede cargar varios productos y mandarlos
+    // todos juntos en una sola comanda, en vez de una comanda por cada producto agregado.
+    setRonda((prev) => {
+      const existente = prev.find(
+        (i) => i.productoId === p.id && i.tarifa === tarifa && i.precioUnitario === precioUnitario
+      );
+      if (existente) {
+        return prev.map((i) =>
+          i === existente ? { ...i, cantidad: i.cantidad + cantidad, notas: notas || i.notas } : i
+        );
+      }
+      return [
+        ...prev,
+        {
+          productoId: producto.id,
+          nombre: producto.nombre,
+          tarifa,
+          precioUnitario,
+          cantidad,
+          stockDisponible: producto.stock,
+          notas,
+        },
+      ];
+    });
+  }
+
+  async function enviarRonda() {
+    if (ronda.length === 0) return;
+    setError("");
     setEnviando(true);
     try {
-      // Cada selección se guarda como un pedido independiente para que produzca
-      // exactamente una comanda, incluso si el producto ya estaba en la mesa.
       const res = await fetch(`/api/mesas/${id}/pedido`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [{ productoId: producto.id, cantidad, tarifa, notas, precioUnitario }],
+          items: ronda.map((i) => ({
+            productoId: i.productoId,
+            cantidad: i.cantidad,
+            tarifa: i.tarifa,
+            precioUnitario: i.precioUnitario,
+            notas: i.notas,
+          })),
         }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        setError(data?.error || "Error al agregar producto");
+        setError(data?.error || "Error al enviar el pedido");
         return;
       }
 
@@ -249,10 +284,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         };
       });
       setProductos((actuales) =>
-        actuales.map((item) =>
-          item.id === producto.id ? { ...item, stock: item.stock - cantidad } : item
-        )
+        actuales.map((item) => {
+          const enRonda = ronda.find((r) => r.productoId === item.id);
+          return enRonda ? { ...item, stock: item.stock - enRonda.cantidad } : item;
+        })
       );
+      ultimoCambioLocalRef.current = Date.now();
       ultimoSincronizadoRef.current = "[]";
       setRonda([]);
     } finally {
@@ -422,6 +459,10 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   async function imprimirTicket() {
     setError("");
     if (!venta) return;
+    if (ronda.length > 0) {
+      setError('Hay productos pendientes de enviar a cocina. Tocá "Enviar a cocina" antes de cobrar.');
+      return;
+    }
     setEnviando(true);
     try {
       const res = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
@@ -682,9 +723,10 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                         );
                       })}
                       {ronda.map((i) => (
-                        <tr key={`${i.productoId}-${i.tarifa}`} className={trHover}>
+                        <tr key={`${i.productoId}-${i.tarifa}`} className={`${trHover} bg-blue-600/5`}>
                           <td className={td}>
                             {i.nombre}
+                            <Badge variant="accent" className="ml-1">Pendiente</Badge>
                             {precioMesaActivo && (
                               <Badge variant={i.tarifa === "MESA" ? "accent" : "neutral"} className="ml-1">
                                 {i.tarifa === "MESA" ? "Mesa" : "Mostrador"}
@@ -728,6 +770,17 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+              {ronda.length > 0 && (
+                <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-between items-center gap-3">
+                  <div className="text-sm">
+                    <span className="text-blue-500 font-medium">Pendiente de enviar: </span>
+                    <span className="text-neutral-800 dark:text-neutral-100">${formatearMoneda(totalRonda)}</span>
+                  </div>
+                  <Button variant="primary" size="sm" onClick={enviarRonda} disabled={enviando}>
+                    {enviando ? "Enviando..." : "Enviar a cocina"}
+                  </Button>
                 </div>
               )}
               <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-between font-semibold text-neutral-800 dark:text-neutral-100">
