@@ -14,9 +14,15 @@ import PagoSelector, {
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import { th, td, trHover } from "@/components/ui/styles";
+import { trHover } from "@/components/ui/styles";
 import { Tarifa, aplicarDescuento } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
+
+// Versiones más angostas de th/td para la tabla de "Productos cargados": esta tarjeta
+// vive en la mitad de la pantalla (junto al buscador/cobro), así que necesita que todo
+// entre sin scroll horizontal.
+const thM = "text-left text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-500 px-2 py-1.5";
+const tdM = "px-2 py-1.5 text-sm text-neutral-700 dark:text-neutral-200";
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -692,11 +698,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                   <table className="w-full text-sm">
                     <thead>
                       <tr>
-                        <th className={th}>Producto</th>
-                        <th className={`${th} w-16`}>Cant.</th>
-                        <th className={`${th} w-20`}>Precio</th>
-                        <th className={`${th} w-24`}>Subtotal</th>
-                        <th className={th}></th>
+                        <th className={thM}>Producto</th>
+                        <th className={`${thM} w-14`}>Cant.</th>
+                        <th className={`${thM} w-16`}>Precio</th>
+                        <th className={`${thM} w-16`}>Subtotal</th>
+                        <th className={`${thM} w-24`}></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -715,13 +721,15 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                               guardarEdicionGrupo(grupo, cantidadActual, precioActual);
                             }}
                           >
-                            <td className={td}>{grupo.nombre}</td>
-                            <td className={td}>
+                            <td className={`${tdM} max-w-[130px] truncate`} title={grupo.nombre}>
+                              {grupo.nombre}
+                            </td>
+                            <td className={tdM}>
                               {editando ? (
                                 <input
                                   type="number"
                                   autoFocus
-                                  className="w-12 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                  className="w-11 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                   value={cantidadActual}
                                   onChange={(e) => {
                                     const num = Number(e.target.value);
@@ -735,7 +743,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                 <span className="text-sm font-medium">{cantidadActual}x</span>
                               )}
                             </td>
-                            <td className={td}>
+                            <td className={tdM}>
                               {editando ? (
                                 <input
                                   type="number"
@@ -753,11 +761,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                 <span>${formatearMoneda(precioActual)}</span>
                               )}
                             </td>
-                            <td className={td}>${formatearMoneda(precioActual * cantidadActual)}</td>
-                            <td className={`${td} text-right whitespace-nowrap`}>
+                            <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
+                            <td className={`${tdM} text-right whitespace-nowrap`}>
                               {!editando && (
                                 <button
-                                  className="text-xs px-2 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-2"
+                                  className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
                                   onClick={() => {
                                     setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, grupo.cantidad));
                                     setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, grupo.precioUnitario));
@@ -768,7 +776,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                 </button>
                               )}
                               <button
-                                className="text-red-400 hover:text-red-300 text-xs"
+                                className="text-red-400 hover:text-red-300 text-xs px-1"
                                 onClick={() => eliminarGrupo(grupo)}
                               >
                                 Quitar
@@ -779,19 +787,21 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       })}
                       {ronda.map((i) => (
                         <tr key={`${i.productoId}-${i.tarifa}`} className={`${trHover} bg-blue-600/5`}>
-                          <td className={td}>
-                            {i.nombre}
-                            <Badge variant="accent" className="ml-1">Pendiente</Badge>
+                          <td className={`${tdM} max-w-[130px]`}>
+                            <span className="truncate inline-block max-w-full align-bottom" title={i.nombre}>
+                              {i.nombre}
+                            </span>
+                            <Badge variant="accent" className="ml-1">Pend.</Badge>
                             {precioMesaActivo && (
                               <Badge variant={i.tarifa === "MESA" ? "accent" : "neutral"} className="ml-1">
-                                {i.tarifa === "MESA" ? "Mesa" : "Mostrador"}
+                                {i.tarifa === "MESA" ? "Mesa" : "Most."}
                               </Badge>
                             )}
                           </td>
-                          <td className={`${td} text-center`}>
-                            <div className="flex items-center justify-center gap-1">
+                          <td className={`${tdM} text-center`}>
+                            <div className="flex items-center justify-center gap-0.5">
                               <button
-                                className="w-6 h-6 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                className="w-5 h-5 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                 onClick={() => cambiarCantidad(i.productoId, i.tarifa, Math.max(1, i.cantidad - 1))}
                               >
                                 −
@@ -799,23 +809,23 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                               <input
                                 type="number"
                                 inputMode="numeric"
-                                className="w-12 text-center rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+                                className="w-9 text-center rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-0.5 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
                                 value={i.cantidad}
                                 onChange={(e) => cambiarCantidad(i.productoId, i.tarifa, Number(e.target.value) || 1)}
                               />
                               <button
-                                className="w-6 h-6 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                className="w-5 h-5 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                 onClick={() => cambiarCantidad(i.productoId, i.tarifa, i.cantidad + 1)}
                               >
                                 +
                               </button>
                             </div>
                           </td>
-                          <td className={td}>${formatearMoneda(i.precioUnitario)}</td>
-                          <td className={td}>${formatearMoneda(i.precioUnitario * i.cantidad)}</td>
-                          <td className={`${td} text-right`}>
+                          <td className={tdM}>${formatearMoneda(i.precioUnitario)}</td>
+                          <td className={tdM}>${formatearMoneda(i.precioUnitario * i.cantidad)}</td>
+                          <td className={`${tdM} text-right`}>
                             <button
-                              className="text-red-400 hover:text-red-300 text-xs"
+                              className="text-red-400 hover:text-red-300 text-xs px-1"
                               onClick={() => quitarDeRonda(i.productoId, i.tarifa)}
                             >
                               Quitar
