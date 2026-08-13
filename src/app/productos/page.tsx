@@ -784,7 +784,7 @@ export default function ProductosPage() {
                       </td>
                       <td className={td}>
                         <input
-                          className={input}
+                          className={`${input} min-w-[220px]`}
                           value={edicion.nombre}
                           onChange={(e) => actualizarEdicion(p.id, { nombre: e.target.value })}
                         />
@@ -902,7 +902,12 @@ export default function ProductosPage() {
                       <td className={td}>
                         <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => alternarSeleccion(p.id)} aria-label={`Seleccionar ${p.nombre}`} />
                       </td>
-                      <td className={`${td} text-neutral-900 dark:text-neutral-50 font-medium`}>{p.nombre}</td>
+                      <td
+                        className={`${td} text-neutral-900 dark:text-neutral-50 font-medium max-w-[220px] truncate`}
+                        title={p.nombre}
+                      >
+                        {p.nombre}
+                      </td>
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
                       <td className={`${td} text-emerald-400 font-medium`}>
                         ${formatearMoneda(p.precioVenta)}{" "}
