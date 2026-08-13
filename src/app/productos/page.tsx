@@ -307,6 +307,42 @@ export default function ProductosPage() {
     setEdiciones({ [p.id]: productoAEditForm(p) });
   }
 
+  // Tildar "Es comida" directo desde la fila, sin entrar al modo edición completo.
+  async function toggleComida(p: Producto) {
+    const nuevoValor = !p.requiereConfirmacion;
+    setProductos((actuales) =>
+      actuales.map((x) => (x.id === p.id ? { ...x, requiereConfirmacion: nuevoValor } : x))
+    );
+    try {
+      const res = await fetch("/api/productos", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          actualizaciones: [
+            {
+              id: p.id,
+              nombre: p.nombre,
+              codigoBarras: p.codigoBarras,
+              categoriaId: p.categoriaId,
+              precioCosto: p.precioCosto,
+              precioVenta: p.precioVenta,
+              precioVentaMesa: p.precioVentaMesa,
+              precioVentaMesaManual: p.precioVentaMesaManual,
+              stock: p.stock,
+              unidad: p.unidad,
+              impresora: p.impresora,
+              requiereConfirmacion: nuevoValor,
+              proveedorId: p.proveedorId,
+            },
+          ],
+        }),
+      });
+      if (!res.ok) await cargar();
+    } catch {
+      await cargar();
+    }
+  }
+
   function actualizarEdicion(id: number, cambios: Partial<EditForm>) {
     setEdiciones((actuales) => ({
       ...actuales,
@@ -591,14 +627,17 @@ export default function ProductosPage() {
               opciones={opcionesImpresora}
             />
           </div>
-          <div className="flex items-end pb-1.5">
-            <label className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+          <div className="flex items-end pb-2">
+            <label
+              className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400"
+              title="Se agrupa como pendiente en la mesa hasta enviar a cocina, en vez de imprimir al instante"
+            >
               <input
                 type="checkbox"
                 checked={form.requiereConfirmacion}
                 onChange={(e) => setForm({ ...form, requiereConfirmacion: e.target.checked })}
               />
-              Es comida (agrupar antes de enviar a cocina)
+              Es comida
             </label>
           </div>
 
@@ -890,7 +929,13 @@ export default function ProductosPage() {
                         {p.impresora || "Predeterminada"}
                       </td>
                       <td className={`${td} text-center`}>
-                        {p.requiereConfirmacion && <Badge variant="accent">Comida</Badge>}
+                        <input
+                          type="checkbox"
+                          checked={p.requiereConfirmacion}
+                          onChange={() => toggleComida(p)}
+                          title="Es comida: agrupar antes de enviar a cocina"
+                          aria-label={`Es comida - ${p.nombre}`}
+                        />
                       </td>
                       <td className={`${td} text-xs text-neutral-500 whitespace-nowrap`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
