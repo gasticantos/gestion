@@ -10,7 +10,9 @@ export async function GET() {
           select: { id: true, total: true, ticketImpreso: true },
         },
       },
-      orderBy: { nombre: "asc" },
+      // Por número real (1, 2, 3...), no alfabético por nombre ("Mesa 1", "Mesa 10",
+      // "Mesa 11"... "Mesa 2" quedaba mal ordenado con orderBy nombre).
+      orderBy: { numero: "asc" },
     });
     return NextResponse.json(mesas);
   } catch (error) {
