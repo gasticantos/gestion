@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
       stock: true,
       unidad: true,
       impresora: true,
+      requiereConfirmacion: true,
       activo: true,
       updatedAt: true,
       proveedor: { select: { id: true, nombre: true } },
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
     stock,
     unidad,
     impresora,
+    requiereConfirmacion,
     proveedorId,
   } = body;
 
@@ -90,6 +92,7 @@ export async function POST(req: NextRequest) {
         stock: stock ? Number(stock) : 0,
         unidad: unidad || "unidad",
         impresora: impresora ? String(impresora).trim() : null,
+        requiereConfirmacion: Boolean(requiereConfirmacion),
         proveedorId: proveedorId ? Number(proveedorId) : null,
       },
     });
@@ -120,6 +123,7 @@ export async function PATCH(req: NextRequest) {
     stock: unknown;
     unidad: unknown;
     impresora: unknown;
+    requiereConfirmacion: unknown;
     proveedorId: unknown;
   };
   const actualizaciones: ActualizacionProducto[] = Array.isArray(body.actualizaciones)
@@ -162,6 +166,7 @@ export async function PATCH(req: NextRequest) {
             stock: Number(item.stock),
             unidad: String(item.unidad).trim(),
             impresora: item.impresora ? String(item.impresora).trim() : null,
+            requiereConfirmacion: Boolean(item.requiereConfirmacion),
             proveedorId: item.proveedorId ? Number(item.proveedorId) : null,
           },
         })

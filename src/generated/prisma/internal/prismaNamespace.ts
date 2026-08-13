@@ -1902,6 +1902,7 @@ export const ProductoScalarFieldEnum = {
   stock: 'stock',
   unidad: 'unidad',
   impresora: 'impresora',
+  requiereConfirmacion: 'requiereConfirmacion',
   activo: 'activo',
   proveedorId: 'proveedorId',
   createdAt: 'createdAt',

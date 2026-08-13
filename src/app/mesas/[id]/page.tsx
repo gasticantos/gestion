@@ -215,9 +215,16 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     if (!producto) return;
     ultimoCambioLocalRef.current = Date.now();
     setError("");
-    // Solo se agrega al pedido en curso (local). No imprime ni se guarda en el servidor
-    // hasta tocar "Enviar a cocina": así se puede cargar varios productos y mandarlos
-    // todos juntos en una sola comanda, en vez de una comanda por cada producto agregado.
+
+    if (!producto.requiereConfirmacion) {
+      // No es "comida": se agrega e imprime al instante, como antes.
+      enviarItemInmediato(producto, tarifa, precioUnitario, cantidad, notas);
+      return;
+    }
+
+    // Es "comida": solo se agrega al pedido en curso (local). No imprime ni se guarda en
+    // el servidor hasta tocar "Enviar a cocina", así se puede cargar varios platos y
+    // mandarlos todos juntos en una sola comanda.
     setRonda((prev) => {
       const existente = prev.find(
         (i) => i.productoId === p.id && i.tarifa === tarifa && i.precioUnitario === precioUnitario
@@ -240,6 +247,54 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         },
       ];
     });
+  }
+
+  async function enviarItemInmediato(
+    producto: Producto,
+    tarifa: Tarifa,
+    precioUnitario: number,
+    cantidad: number,
+    notas: string
+  ) {
+    setEnviando(true);
+    try {
+      const res = await fetch(`/api/mesas/${id}/pedido`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: [{ productoId: producto.id, cantidad, tarifa, notas, precioUnitario }],
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error || "Error al agregar producto");
+        return;
+      }
+
+      const pedido = await res.json();
+      setMesa((actual) => {
+        if (!actual?.ventas[0]) return actual;
+        return {
+          ...actual,
+          ventas: actual.ventas.map((ventaActual, index) =>
+            index === 0
+              ? {
+                  ...ventaActual,
+                  total: pedido.ventaTotal,
+                  pedidos: [...ventaActual.pedidos, pedido],
+                }
+              : ventaActual
+          ),
+        };
+      });
+      setProductos((actuales) =>
+        actuales.map((item) =>
+          item.id === producto.id ? { ...item, stock: item.stock - cantidad } : item
+        )
+      );
+    } finally {
+      setEnviando(false);
+    }
   }
 
   async function enviarRonda() {
@@ -797,6 +852,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 precioMesaActivo={precioMesaActivo}
                 permitirPrecioLibre
                 permitirNotas
+                soloConfirmacionPendiente={ronda.length > 0}
               />
             </Card>
           </div>

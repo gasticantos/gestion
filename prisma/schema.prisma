@@ -195,6 +195,10 @@ model Producto {
   stock                 Float            @default(0)
   unidad                String           @default("unidad")
   impresora             String?
+  // Si es true, agregarlo a una mesa lo suma como pendiente en vez de imprimir y guardar
+  // al instante: hay que confirmar el envío para que salga la comanda (uso: comida, que
+  // conviene mandar junta a cocina en vez de una impresión por cada plato agregado).
+  requiereConfirmacion  Boolean          @default(false)
   activo                Boolean          @default(true)
   proveedorId           Int?
   proveedor             Proveedor?       @relation(fields: [proveedorId], references: [id])

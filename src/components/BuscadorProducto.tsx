@@ -15,6 +15,7 @@ export type ProductoBusqueda = {
   stock?: number;
   precioVenta: number;
   precioVentaMesa?: number;
+  requiereConfirmacion?: boolean;
 };
 
 function BuscadorProductoBase({
@@ -25,6 +26,7 @@ function BuscadorProductoBase({
   soloPrecioVenta = false,
   permitirPrecioLibre = false,
   permitirNotas = false,
+  soloConfirmacionPendiente = false,
   placeholder,
 }: {
   productos?: ProductoBusqueda[];
@@ -43,11 +45,17 @@ function BuscadorProductoBase({
   /** Si es true, además de los presets de precio, permite escribir un precio a mano antes de agregar. */
   permitirPrecioLibre?: boolean;
   permitirNotas?: boolean;
+  /** Si es true, la búsqueda solo devuelve productos con requiereConfirmacion (hay un pedido de
+   * "comida" pendiente de enviar: no se puede agregar otra cosa hasta mandarlo). */
+  soloConfirmacionPendiente?: boolean;
   placeholder?: string;
 }) {
   // Usar caché de productos si no se pasan como prop
   const { data: productosCache } = useData<ProductoBusqueda>("productos");
-  const productos = productosProp || productosCache || [];
+  const productosBase = productosProp || productosCache || [];
+  const productos = soloConfirmacionPendiente
+    ? productosBase.filter((p) => p.requiereConfirmacion)
+    : productosBase;
   const [query, setQuery] = useState("");
   const [elegido, setElegido] = useState<ProductoBusqueda | null>(null);
   const [cantidad, setCantidad] = useState(1);
@@ -337,6 +345,11 @@ function BuscadorProductoBase({
 
   return (
     <div className="flex flex-col gap-2">
+      {soloConfirmacionPendiente && (
+        <div className="text-xs text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-1.5">
+          Hay comida pendiente de enviar: solo se puede seguir agregando comida hasta mandarla a cocina.
+        </div>
+      )}
       <input
         ref={inputRef}
         type="text"

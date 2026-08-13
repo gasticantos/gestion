@@ -62,6 +62,7 @@ export type ProductoMinAggregateOutputType = {
   stock: number | null
   unidad: string | null
   impresora: string | null
+  requiereConfirmacion: boolean | null
   activo: boolean | null
   proveedorId: number | null
   createdAt: Date | null
@@ -83,6 +84,7 @@ export type ProductoMaxAggregateOutputType = {
   stock: number | null
   unidad: string | null
   impresora: string | null
+  requiereConfirmacion: boolean | null
   activo: boolean | null
   proveedorId: number | null
   createdAt: Date | null
@@ -104,6 +106,7 @@ export type ProductoCountAggregateOutputType = {
   stock: number
   unidad: number
   impresora: number
+  requiereConfirmacion: number
   activo: number
   proveedorId: number
   createdAt: number
@@ -149,6 +152,7 @@ export type ProductoMinAggregateInputType = {
   stock?: true
   unidad?: true
   impresora?: true
+  requiereConfirmacion?: true
   activo?: true
   proveedorId?: true
   createdAt?: true
@@ -170,6 +174,7 @@ export type ProductoMaxAggregateInputType = {
   stock?: true
   unidad?: true
   impresora?: true
+  requiereConfirmacion?: true
   activo?: true
   proveedorId?: true
   createdAt?: true
@@ -191,6 +196,7 @@ export type ProductoCountAggregateInputType = {
   stock?: true
   unidad?: true
   impresora?: true
+  requiereConfirmacion?: true
   activo?: true
   proveedorId?: true
   createdAt?: true
@@ -299,6 +305,7 @@ export type ProductoGroupByOutputType = {
   stock: number
   unidad: string
   impresora: string | null
+  requiereConfirmacion: boolean
   activo: boolean
   proveedorId: number | null
   createdAt: Date
@@ -343,6 +350,7 @@ export type ProductoWhereInput = {
   stock?: Prisma.FloatFilter<"Producto"> | number
   unidad?: Prisma.StringFilter<"Producto"> | string
   impresora?: Prisma.StringNullableFilter<"Producto"> | string | null
+  requiereConfirmacion?: Prisma.BoolFilter<"Producto"> | boolean
   activo?: Prisma.BoolFilter<"Producto"> | boolean
   proveedorId?: Prisma.IntNullableFilter<"Producto"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Producto"> | Date | string
@@ -369,6 +377,7 @@ export type ProductoOrderByWithRelationInput = {
   stock?: Prisma.SortOrder
   unidad?: Prisma.SortOrder
   impresora?: Prisma.SortOrderInput | Prisma.SortOrder
+  requiereConfirmacion?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -400,6 +409,7 @@ export type ProductoWhereUniqueInput = Prisma.AtLeast<{
   stock?: Prisma.FloatFilter<"Producto"> | number
   unidad?: Prisma.StringFilter<"Producto"> | string
   impresora?: Prisma.StringNullableFilter<"Producto"> | string | null
+  requiereConfirmacion?: Prisma.BoolFilter<"Producto"> | boolean
   activo?: Prisma.BoolFilter<"Producto"> | boolean
   proveedorId?: Prisma.IntNullableFilter<"Producto"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Producto"> | Date | string
@@ -426,6 +436,7 @@ export type ProductoOrderByWithAggregationInput = {
   stock?: Prisma.SortOrder
   unidad?: Prisma.SortOrder
   impresora?: Prisma.SortOrderInput | Prisma.SortOrder
+  requiereConfirmacion?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -455,6 +466,7 @@ export type ProductoScalarWhereWithAggregatesInput = {
   stock?: Prisma.FloatWithAggregatesFilter<"Producto"> | number
   unidad?: Prisma.StringWithAggregatesFilter<"Producto"> | string
   impresora?: Prisma.StringNullableWithAggregatesFilter<"Producto"> | string | null
+  requiereConfirmacion?: Prisma.BoolWithAggregatesFilter<"Producto"> | boolean
   activo?: Prisma.BoolWithAggregatesFilter<"Producto"> | boolean
   proveedorId?: Prisma.IntNullableWithAggregatesFilter<"Producto"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Producto"> | Date | string
@@ -474,6 +486,7 @@ export type ProductoCreateInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -498,6 +511,7 @@ export type ProductoUncheckedCreateInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -519,6 +533,7 @@ export type ProductoUpdateInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -543,6 +558,7 @@ export type ProductoUncheckedUpdateInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -566,6 +582,7 @@ export type ProductoCreateManyInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -585,6 +602,7 @@ export type ProductoUpdateManyMutationInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -604,6 +622,7 @@ export type ProductoUncheckedUpdateManyInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -645,6 +664,7 @@ export type ProductoCountOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   unidad?: Prisma.SortOrder
   impresora?: Prisma.SortOrder
+  requiereConfirmacion?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -677,6 +697,7 @@ export type ProductoMaxOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   unidad?: Prisma.SortOrder
   impresora?: Prisma.SortOrder
+  requiereConfirmacion?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -698,6 +719,7 @@ export type ProductoMinOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   unidad?: Prisma.SortOrder
   impresora?: Prisma.SortOrder
+  requiereConfirmacion?: Prisma.SortOrder
   activo?: Prisma.SortOrder
   proveedorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -895,6 +917,7 @@ export type ProductoCreateWithoutNegocioInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -918,6 +941,7 @@ export type ProductoUncheckedCreateWithoutNegocioInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -969,6 +993,7 @@ export type ProductoScalarWhereInput = {
   stock?: Prisma.FloatFilter<"Producto"> | number
   unidad?: Prisma.StringFilter<"Producto"> | string
   impresora?: Prisma.StringNullableFilter<"Producto"> | string | null
+  requiereConfirmacion?: Prisma.BoolFilter<"Producto"> | boolean
   activo?: Prisma.BoolFilter<"Producto"> | boolean
   proveedorId?: Prisma.IntNullableFilter<"Producto"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Producto"> | Date | string
@@ -988,6 +1013,7 @@ export type ProductoCreateWithoutCategoriaInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1010,6 +1036,7 @@ export type ProductoUncheckedCreateWithoutCategoriaInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -1057,6 +1084,7 @@ export type ProductoCreateWithoutProveedorInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1080,6 +1108,7 @@ export type ProductoUncheckedCreateWithoutProveedorInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1126,6 +1155,7 @@ export type ProductoCreateWithoutStockEntryItemsInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1149,6 +1179,7 @@ export type ProductoUncheckedCreateWithoutStockEntryItemsInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -1185,6 +1216,7 @@ export type ProductoUpdateWithoutStockEntryItemsInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1208,6 +1240,7 @@ export type ProductoUncheckedUpdateWithoutStockEntryItemsInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1228,6 +1261,7 @@ export type ProductoCreateWithoutPedidoItemsInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1251,6 +1285,7 @@ export type ProductoUncheckedCreateWithoutPedidoItemsInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -1287,6 +1322,7 @@ export type ProductoUpdateWithoutPedidoItemsInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1310,6 +1346,7 @@ export type ProductoUncheckedUpdateWithoutPedidoItemsInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1332,6 +1369,7 @@ export type ProductoCreateManyNegocioInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -1350,6 +1388,7 @@ export type ProductoUpdateWithoutNegocioInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1373,6 +1412,7 @@ export type ProductoUncheckedUpdateWithoutNegocioInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1395,6 +1435,7 @@ export type ProductoUncheckedUpdateManyWithoutNegocioInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1414,6 +1455,7 @@ export type ProductoCreateManyCategoriaInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: number | null
   createdAt?: Date | string
@@ -1433,6 +1475,7 @@ export type ProductoUpdateWithoutCategoriaInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1455,6 +1498,7 @@ export type ProductoUncheckedUpdateWithoutCategoriaInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1477,6 +1521,7 @@ export type ProductoUncheckedUpdateManyWithoutCategoriaInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1498,6 +1543,7 @@ export type ProductoCreateManyProveedorInput = {
   stock?: number
   unidad?: string
   impresora?: string | null
+  requiereConfirmacion?: boolean
   activo?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1516,6 +1562,7 @@ export type ProductoUpdateWithoutProveedorInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1539,6 +1586,7 @@ export type ProductoUncheckedUpdateWithoutProveedorInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1561,6 +1609,7 @@ export type ProductoUncheckedUpdateManyWithoutProveedorInput = {
   stock?: Prisma.FloatFieldUpdateOperationsInput | number
   unidad?: Prisma.StringFieldUpdateOperationsInput | string
   impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
   activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1621,6 +1670,7 @@ export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   stock?: boolean
   unidad?: boolean
   impresora?: boolean
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: boolean
   createdAt?: boolean
@@ -1648,6 +1698,7 @@ export type ProductoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   stock?: boolean
   unidad?: boolean
   impresora?: boolean
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: boolean
   createdAt?: boolean
@@ -1672,6 +1723,7 @@ export type ProductoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   stock?: boolean
   unidad?: boolean
   impresora?: boolean
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: boolean
   createdAt?: boolean
@@ -1696,6 +1748,7 @@ export type ProductoSelectScalar = {
   stock?: boolean
   unidad?: boolean
   impresora?: boolean
+  requiereConfirmacion?: boolean
   activo?: boolean
   proveedorId?: boolean
   createdAt?: boolean
@@ -1703,7 +1756,7 @@ export type ProductoSelectScalar = {
   negocioId?: boolean
 }
 
-export type ProductoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "codigoInterno" | "codigoBarras" | "marca" | "categoriaId" | "precioVenta" | "precioVentaMesa" | "precioVentaMesaManual" | "precioCosto" | "stock" | "unidad" | "impresora" | "activo" | "proveedorId" | "createdAt" | "updatedAt" | "negocioId", ExtArgs["result"]["producto"]>
+export type ProductoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "codigoInterno" | "codigoBarras" | "marca" | "categoriaId" | "precioVenta" | "precioVentaMesa" | "precioVentaMesaManual" | "precioCosto" | "stock" | "unidad" | "impresora" | "requiereConfirmacion" | "activo" | "proveedorId" | "createdAt" | "updatedAt" | "negocioId", ExtArgs["result"]["producto"]>
 export type ProductoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   categoria?: boolean | Prisma.Producto$categoriaArgs<ExtArgs>
   proveedor?: boolean | Prisma.Producto$proveedorArgs<ExtArgs>
@@ -1746,6 +1799,7 @@ export type $ProductoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     stock: number
     unidad: string
     impresora: string | null
+    requiereConfirmacion: boolean
     activo: boolean
     proveedorId: number | null
     createdAt: Date
@@ -2192,6 +2246,7 @@ export interface ProductoFieldRefs {
   readonly stock: Prisma.FieldRef<"Producto", 'Float'>
   readonly unidad: Prisma.FieldRef<"Producto", 'String'>
   readonly impresora: Prisma.FieldRef<"Producto", 'String'>
+  readonly requiereConfirmacion: Prisma.FieldRef<"Producto", 'Boolean'>
   readonly activo: Prisma.FieldRef<"Producto", 'Boolean'>
   readonly proveedorId: Prisma.FieldRef<"Producto", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Producto", 'DateTime'>

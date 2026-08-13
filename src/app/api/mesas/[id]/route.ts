@@ -48,6 +48,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           precioVenta: true,
           precioVentaMesa: true,
           stock: true,
+          requiereConfirmacion: true,
         },
         orderBy: { nombre: "asc" },
       }),

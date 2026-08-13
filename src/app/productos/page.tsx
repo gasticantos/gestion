@@ -37,6 +37,7 @@ type Producto = {
   stock: number;
   unidad: string;
   impresora: string | null;
+  requiereConfirmacion: boolean;
   activo: boolean;
   proveedorId: number | null;
   proveedor: Proveedor | null;
@@ -53,6 +54,7 @@ const emptyForm = {
   stock: "",
   unidad: "unidad",
   impresora: "",
+  requiereConfirmacion: false,
   proveedorId: "",
 };
 
@@ -174,6 +176,7 @@ export default function ProductosPage() {
         stock: form.stock,
         unidad: form.unidad,
         impresora: form.impresora || null,
+        requiereConfirmacion: form.requiereConfirmacion,
         proveedorId: form.proveedorId || null,
       }),
     });
@@ -224,6 +227,7 @@ export default function ProductosPage() {
       stock: String(p.stock),
       unidad: p.unidad,
       impresora: p.impresora || "",
+      requiereConfirmacion: p.requiereConfirmacion,
       proveedorId: p.proveedorId ? String(p.proveedorId) : "",
     };
   }
@@ -280,6 +284,7 @@ export default function ProductosPage() {
       stock: edit.stock,
       unidad: edit.unidad,
       impresora: edit.impresora || null,
+      requiereConfirmacion: edit.requiereConfirmacion,
       proveedorId: edit.proveedorId || null,
     }));
     if (actualizaciones.length === 0) return;
@@ -381,6 +386,14 @@ export default function ProductosPage() {
             impresora: impresoraMasiva === "__predeterminada__" ? "" : impresoraMasiva,
           },
         ])
+      )
+    );
+  }
+
+  function aplicarComidaMasiva(valor: boolean) {
+    setEdiciones((actuales) =>
+      Object.fromEntries(
+        Object.entries(actuales).map(([id, edicion]) => [id, { ...edicion, requiereConfirmacion: valor }])
       )
     );
   }
@@ -510,6 +523,16 @@ export default function ProductosPage() {
               placeholder="Predeterminada"
             />
           </div>
+          <div className="flex items-end pb-1.5">
+            <label className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+              <input
+                type="checkbox"
+                checked={form.requiereConfirmacion}
+                onChange={(e) => setForm({ ...form, requiereConfirmacion: e.target.checked })}
+              />
+              Es comida (agrupar antes de enviar a cocina)
+            </label>
+          </div>
 
           <datalist id="impresoras-productos">
             <option value="No imprimir" />
@@ -593,6 +616,12 @@ export default function ProductosPage() {
                   >
                     Aplicar a selección
                   </Button>
+                  <Button type="button" size="sm" onClick={() => aplicarComidaMasiva(true)} disabled={guardandoEdiciones}>
+                    Marcar como comida
+                  </Button>
+                  <Button type="button" size="sm" onClick={() => aplicarComidaMasiva(false)} disabled={guardandoEdiciones}>
+                    Quitar marca de comida
+                  </Button>
                   <Button type="button" size="sm" variant="primary" onClick={guardarEdiciones} disabled={guardandoEdiciones}>
                     {guardandoEdiciones ? "Guardando..." : "Guardar todo"}
                   </Button>
@@ -639,6 +668,7 @@ export default function ProductosPage() {
                   <th className={th}>Unidad</th>
                   <th className={th}>Proveedor</th>
                   <th className={th}>Impresora</th>
+                  <th className={th}>Comida</th>
                   <th className={th}>Última modificación</th>
                   <th className={`${th} w-40 sticky right-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800`}></th>
                 </tr>
@@ -751,6 +781,14 @@ export default function ProductosPage() {
                           placeholder="Predeterminada"
                         />
                       </td>
+                      <td className={`${td} text-center`}>
+                        <input
+                          type="checkbox"
+                          checked={edicion.requiereConfirmacion}
+                          onChange={(e) => actualizarEdicion(p.id, { requiereConfirmacion: e.target.checked })}
+                          aria-label={`Es comida - ${p.nombre}`}
+                        />
+                      </td>
                       <td className={`${td} text-xs text-neutral-500`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
                       </td>
@@ -790,6 +828,9 @@ export default function ProductosPage() {
                       <td className={`${td} text-neutral-500 dark:text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
                       <td className={`${td} text-neutral-500 dark:text-neutral-400 whitespace-nowrap`}>
                         {p.impresora || "Predeterminada"}
+                      </td>
+                      <td className={`${td} text-center`}>
+                        {p.requiereConfirmacion && <Badge variant="accent">Comida</Badge>}
                       </td>
                       <td className={`${td} text-xs text-neutral-500 whitespace-nowrap`}>
                         {new Date(p.updatedAt).toLocaleString("es-AR")}
