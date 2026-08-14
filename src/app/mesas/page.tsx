@@ -30,9 +30,18 @@ export default function MesasPage() {
   const [agragando, setAgregando] = useState(false);
   const [moviendoDesde, setMoviendoDesde] = useState<number | null>(null);
   const [moviendo, setMoviendo] = useState(false);
+  const [rol, setRol] = useState<string | null>(null);
 
   // Mientras no se haya hecho un fetch propio (cargar()), mostrar lo que trae el caché.
   const mesas = mesasFrescas ?? mesasCache ?? [];
+  const subtotalSinCobrar = mesas.reduce((acc, m) => acc + (m.ventas[0]?.total ?? 0), 0);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setRol(data?.rol ?? null))
+      .catch(() => setRol(null));
+  }, []);
 
   async function cargar() {
     const mesasRes = await fetch("/api/mesas");
@@ -121,6 +130,15 @@ export default function MesasPage() {
           </button>
         </div>
       </div>
+
+      {rol === "DUENIO" && (
+        <div className="flex justify-center">
+          <div className="text-center px-6 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <span className="text-xs text-amber-500 font-medium">Total mesas sin cobrar: </span>
+            <span className="text-lg font-bold text-amber-500">${formatearMoneda(subtotalSinCobrar)}</span>
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-2">
         <Button onClick={agregarMesa} variant="primary" disabled={agragando}>
