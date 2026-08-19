@@ -25,18 +25,48 @@ export async function GET(req: NextRequest) {
     data: { estado: "PENDIENTE", estacionId: null, claimedAt: null },
   });
 
+  if (siguiente) {
+    // Busca y toma el trabajo en la misma consulta: antes la estación hacía un segundo viaje
+    // de red (POST "tomar") solo para reservarlo, y ese round-trip extra a la base era la
+    // mayor parte de la demora entre mandar a imprimir y que salga el ticket.
+    const candidatos = await prisma.impresionTrabajo.findMany({
+      where: {
+        estado: "PENDIENTE",
+        OR: [
+          { impresora: null },
+          ...(impresorasDisponibles.length
+            ? [{ impresora: { in: impresorasDisponibles } }]
+            : []),
+        ],
+      },
+      select: { id: true },
+      orderBy: { createdAt: "asc" },
+      take: 5,
+    });
+
+    for (const { id } of candidatos) {
+      const tomado = await prisma.impresionTrabajo.updateMany({
+        where: { id, estado: "PENDIENTE" },
+        data: {
+          estado: "IMPRIMIENDO",
+          estacionId,
+          claimedAt: new Date(),
+          intentos: { increment: 1 },
+          error: null,
+        },
+      });
+      if (tomado.count === 1) {
+        const trabajo = await prisma.impresionTrabajo.findUnique({
+          where: { id },
+          select: { id: true, tipo: true, contenido: true, impresora: true },
+        });
+        return NextResponse.json({ trabajos: trabajo ? [trabajo] : [] });
+      }
+    }
+    return NextResponse.json({ trabajos: [] });
+  }
+
   const trabajos = await prisma.impresionTrabajo.findMany({
-    where: siguiente
-      ? {
-          estado: "PENDIENTE",
-          OR: [
-            { impresora: null },
-            ...(impresorasDisponibles.length
-              ? [{ impresora: { in: impresorasDisponibles } }]
-              : []),
-          ],
-        }
-      : undefined,
     select: {
       id: true,
       tipo: true,
@@ -50,7 +80,7 @@ export async function GET(req: NextRequest) {
       createdAt: true,
       printedAt: true,
     },
-    orderBy: { createdAt: siguiente ? "asc" : "desc" },
+    orderBy: { createdAt: "desc" },
     take: limite,
   });
 

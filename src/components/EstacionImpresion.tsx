@@ -47,6 +47,7 @@ function versionEsAnterior(actual: string, minima: string) {
 export default function EstacionImpresion() {
   const [agenteDesactualizado, setAgenteDesactualizado] = useState("");
   const [esEstacionPrincipal, setEsEstacionPrincipal] = useState<boolean | null>(null);
+  const [hayOtraCajaConfigurada, setHayOtraCajaConfigurada] = useState(false);
   const [guardandoEstacion, setGuardandoEstacion] = useState(false);
   const [actualizando, setActualizando] = useState(false);
   const [errorActualizacion, setErrorActualizacion] = useState("");
@@ -63,6 +64,16 @@ export default function EstacionImpresion() {
   }
 
   async function establecerComoPrincipal() {
+    // Ya hay otra caja fijada: confirmar para no pisarla sin querer desde otra
+    // computadora (eso dejó a la caja real sin poder imprimir).
+    if (
+      hayOtraCajaConfigurada &&
+      !window.confirm(
+        "Ya hay otra computadora fijada como caja principal. Si continuás, esa computadora dejará de imprimir y pasará a imprimir esta. ¿Confirmás el cambio?"
+      )
+    ) {
+      return;
+    }
     setGuardandoEstacion(true);
     try {
       const res = await fetch("/api/impresion/estacion", {
@@ -96,6 +107,7 @@ export default function EstacionImpresion() {
         if (res.ok) {
           const data = await res.json();
           setEsEstacionPrincipal(data.principal === true);
+          setHayOtraCajaConfigurada(data.configurada === true && data.principal !== true);
         }
       } catch {
         setEsEstacionPrincipal(false);
@@ -123,21 +135,15 @@ export default function EstacionImpresion() {
           impresorasDisponibles = (await listarImpresorasLocales()).map((p) => p.nombre);
           ultimaConsultaImpresoras = Date.now();
         }
+        // La ruta ya busca y toma el trabajo en una sola consulta (evita el viaje de red
+        // extra que antes hacía falta para reservarlo con un POST "tomar" aparte).
         const params = new URLSearchParams({ siguiente: "1", estacionId });
         impresorasDisponibles.forEach((nombre) => params.append("impresora", nombre));
         const listaRes = await fetch(`/api/impresion/cola?${params}`, { cache: "no-store" });
         if (!listaRes.ok) return;
         const lista = await listaRes.json();
-        const candidato = lista.trabajos?.[0] as TrabajoPendiente | undefined;
-        if (!candidato) return;
-
-        const tomarRes = await fetch("/api/impresion/cola", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accion: "tomar", id: candidato.id, estacionId }),
-        });
-        if (!tomarRes.ok) return;
-        const trabajo = (await tomarRes.json()) as TrabajoPendiente;
+        const trabajo = lista.trabajos?.[0] as TrabajoPendiente | undefined;
+        if (!trabajo) return;
 
         const ok = await imprimirLocal(trabajo.contenido, trabajo.impresora);
         await fetch("/api/impresion/cola", {
@@ -161,7 +167,9 @@ export default function EstacionImpresion() {
     comprobarEstacion();
     const intervaloEstacion = window.setInterval(comprobarEstacion, 15_000);
     buscarEImprimir();
-    const intervalo = window.setInterval(buscarEImprimir, 1500);
+    // 500ms en vez de 1500ms: la mitad del tiempo que tarda un ticket en salir desde que
+    // se manda a imprimir era la espera promedio hasta el próximo sondeo.
+    const intervalo = window.setInterval(buscarEImprimir, 500);
     return () => {
       activo = false;
       window.clearInterval(intervalo);
@@ -197,8 +205,10 @@ export default function EstacionImpresion() {
     return (
       <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
         <span>
-          <strong>Esta computadora no es la caja principal.</strong> Activala para que todas las
-          comandas y tickets se impriman únicamente acá.
+          <strong>Esta computadora no es la caja principal.</strong>{" "}
+          {hayOtraCajaConfigurada
+            ? "Ya hay otra caja fijada; solo cambiala acá si es a propósito."
+            : "Activala para que todas las comandas y tickets se impriman únicamente acá."}
         </span>
         <button
           type="button"
