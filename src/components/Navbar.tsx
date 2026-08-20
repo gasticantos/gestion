@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { isTauri } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { puedeAcceder, ROL_LABEL } from "@/lib/permisos";
 import { Rol } from "@/generated/prisma/enums";
 
@@ -74,6 +76,42 @@ export default function Navbar() {
     }
     window.addEventListener("identidad-actualizada", actualizar);
     return () => window.removeEventListener("identidad-actualizada", actualizar);
+  }, []);
+
+  // La caja es un equipo compartido: al cerrar la app de escritorio, invalidar la
+  // cookie para que la próxima apertura siempre solicite las credenciales.
+  useEffect(() => {
+    if (!isTauri()) return;
+
+    let cerrando = false;
+    let quitarListener: (() => void) | undefined;
+    void getCurrentWindow()
+      .onCloseRequested(async (evento) => {
+        if (cerrando) return;
+        evento.preventDefault();
+        cerrando = true;
+
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 2_000);
+        try {
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          localStorage.clear();
+        } catch {
+          // El cierre no debe quedar bloqueado si no hay conexión en ese instante.
+        } finally {
+          window.clearTimeout(timeout);
+          await getCurrentWindow().close();
+        }
+      })
+      .then((unlisten) => {
+        quitarListener = unlisten;
+      });
+
+    return () => quitarListener?.();
   }, []);
 
   if (pathname === "/login") return null;
