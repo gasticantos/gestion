@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
+import { sesionActual } from "@/lib/sesionServidor";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para editar productos cargados" }, { status: 403 });
+  }
   const { itemId } = await params;
   const body = await req.json();
   const { cantidad, precioUnitario } = body as { cantidad?: number; precioUnitario?: number };
@@ -53,6 +58,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
+  const sesion = await sesionActual();
+  if (!sesion || sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para quitar productos cargados" }, { status: 403 });
+  }
   const { itemId } = await params;
 
   try {
