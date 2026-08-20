@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { obtenerReporteVentas } from "@/lib/reportes";
-import { formatearFechaHora, formatearMoneda, fechaArgentinaYMD, limitesDiaArgentino } from "@/lib/formato";
-import { prisma } from "@/lib/prisma";
+import { cerrarJornadaCaja } from "@/lib/cierreCaja";
+import { formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
 import { sesionActual } from "@/lib/sesionServidor";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
-
-const METODOS = {
-  EFECTIVO: "EFECTIVO",
-  TARJETA: "TARJETA",
-  TRANSFERENCIA: "TRANSFERENCIA",
-  FIADO: "CUENTA CORRIENTE",
-} as const;
 
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
@@ -18,95 +10,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No tenés permiso para cerrar la caja" }, { status: 403 });
   }
 
-  const mesasAbiertas = await prisma.mesa.findMany({
-    where: {
-      OR: [
-        { estado: "OCUPADA" },
-        { ventas: { some: { estado: "ABIERTA" } } },
-      ],
-    },
-    select: { nombre: true, apodo: true },
-    orderBy: { numero: "asc" },
+  const { fecha, desde, hasta } = limitesJornadaArgentina();
+  const resultado = await cerrarJornadaCaja({
+    negocioId: sesion.negocioId,
+    fecha,
+    desde,
+    hasta,
+    operador: { nombre: sesion.nombre, rol: sesion.rol },
   });
-  if (mesasAbiertas.length > 0) {
-    const nombres = mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre);
+
+  if (resultado.estado === "YA_CERRADO") {
+    return NextResponse.json({ error: "La caja de esta jornada ya fue cerrada" }, { status: 409 });
+  }
+  if (resultado.estado === "MESAS_ABIERTAS") {
     return NextResponse.json(
       {
-        error: `No se puede cerrar la caja. Hay ${mesasAbiertas.length} mesa(s) abierta(s): ${nombres.join(", ")}`,
-        mesasAbiertas: nombres,
+        error: `No se puede cerrar la caja. Hay ${resultado.mesasAbiertas.length} mesa(s) abierta(s): ${resultado.mesasAbiertas.join(", ")}`,
+        mesasAbiertas: resultado.mesasAbiertas,
       },
       { status: 409 }
     );
   }
 
-  const fecha = fechaArgentinaYMD();
-  const { desde, hasta } = limitesDiaArgentino(fecha);
-  const [reporte, configuracion] = await Promise.all([
-    obtenerReporteVentas(desde, hasta, { limiteProductos: 0 }),
-    prisma.configuracion.findFirst({ select: { nombrePrograma: true } }),
-  ]);
-
-  const dinero = (valor: number) => `$${formatearMoneda(valor)}`;
-  const fila = (nombre: string, valor: number) =>
-    `${nombre}${dinero(valor).padStart(Math.max(1, 32 - nombre.length))}`;
-  const lineas: string[] = [
-    `[[TITLE]] ${(configuracion?.nombrePrograma || "GESTION").toUpperCase()}`,
-    "[[SUBTITLE]] CIERRE DE CAJA",
-    "[[HR]]",
-    `[[CENTER]] ${formatearFechaHora(new Date())}`,
-    `[[CENTER]] ${sesion.nombre.toUpperCase()} - ${sesion.rol}`,
-    "[[HR]]",
-    "[[SECTION]] RESUMEN DEL DIA",
-    `[[ROW]] VENTAS REALIZADAS: ${reporte.cantidadVentas}`,
-    `[[ROW]] ${fila("MOSTRADOR", reporte.porCanal.MOSTRADOR.total)}`,
-    `[[ROW]] ${fila("MESAS", reporte.porCanal.MESA.total)}`,
-    `[[TOTAL]] ${fila("TOTAL VENDIDO", reporte.combinado.total)}`,
-    "[[HR]]",
-    "[[SECTION]] MEDIOS DE PAGO",
-  ];
-
-  for (const metodo of Object.keys(METODOS) as (keyof typeof METODOS)[]) {
-    lineas.push(`[[ROW]] ${fila(METODOS[metodo], reporte.combinado.pagos[metodo])}`);
-  }
-
-  lineas.push("[[HR]]", "[[FOOTER]] Fin del cierre de caja", "");
-
-  const trabajo = await prisma.impresionTrabajo.create({
-    data: {
-      tipo: "TICKET",
-      contenido: lineas.join("\n"),
-      impresora: null,
-    },
-    select: { id: true },
-  });
-
-  // Reiniciar estado: marcar todas las ventas como CERRADA con fecha de cierre
-  // y todas las mesas como LIBRE
-  const cierreFecha = new Date(`${fecha}T23:59:59-03:00`);
-  await Promise.all([
-    prisma.venta.updateMany({
-      where: {
-        createdAt: { gte: desde, lte: hasta },
-      },
-      data: { estado: "CERRADA", closedAt: cierreFecha },
-    }),
-    prisma.mesa.updateMany({
-      data: { estado: "LIBRE" },
-    }),
-  ]);
-
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
   await registrarAuditoria(
     usuarioId,
     "cerrar_caja",
-    `Cierre ${fecha} - ${reporte.cantidadVentas} ventas - Total ${dinero(reporte.combinado.total)}`
+    `Cierre ${fecha} - ${resultado.cantidadVentas} ventas - Total $${formatearMoneda(resultado.total)}`
   );
-
-  return NextResponse.json({
-    success: true,
-    trabajoId: trabajo.id,
-    fecha,
-    cantidadVentas: reporte.cantidadVentas,
-    total: reporte.combinado.total,
-  });
+  return NextResponse.json({ success: true, fecha, ...resultado });
 }

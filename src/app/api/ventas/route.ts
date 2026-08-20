@@ -2,24 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
-import { fechaArgentinaYMD, limitesDiaArgentino } from "@/lib/formato";
+import { limitesJornadaArgentina } from "@/lib/formato";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
 export async function GET() {
-  // Límites del día "de hoy" en horario argentino, no en el timezone del servidor
-  // (Vercel corre en UTC: sin esto, ventas de la noche quedaban en el día equivocado).
-  const { desde: hoy, hasta: finDeHoy } = limitesDiaArgentino(fechaArgentinaYMD());
-
-  // Excluir ventas que fueron archivadas por un cierre de caja (closedAt = 23:59:59 ART exacto)
-  const cierreHora = new Date(finDeHoy.getTime() - 999);
+  // La lista diaria sigue la misma jornada comercial que el cierre: 06:00 a 05:59.
+  const { desde: inicioJornada, hasta: finJornada } = limitesJornadaArgentina();
 
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
-      createdAt: { gte: hoy, lte: finDeHoy },
-      closedAt: { lt: cierreHora },
+      createdAt: { gte: inicioJornada, lte: finJornada },
+      // El cierre archiva las ventas con closedAt exactamente al final de jornada.
+      closedAt: { lt: finJornada },
     },
     select: {
       id: true,

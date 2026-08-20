@@ -21,12 +21,13 @@ function pagosVacio(): Record<Metodo, number> {
 export async function obtenerReporteVentas(
   desde: Date,
   hasta: Date,
-  opciones?: { limiteProductos?: number }
+  opciones?: { limiteProductos?: number; negocioId?: number }
 ): Promise<ReporteVentas> {
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
       closedAt: { gte: desde, lte: hasta },
+      ...(opciones?.negocioId ? { negocioId: opciones.negocioId } : {}),
     },
     include: {
       pagos: true,
