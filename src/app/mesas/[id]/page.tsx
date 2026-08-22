@@ -274,7 +274,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
               cantidad,
               tarifa,
               notas,
-              ...(rol === "MOZO" ? {} : { precioUnitario }),
+              precioUnitario,
             },
           ],
         }),
@@ -324,7 +324,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
             productoId: i.productoId,
             cantidad: i.cantidad,
             tarifa: i.tarifa,
-            ...(rol === "MOZO" ? {} : { precioUnitario: i.precioUnitario }),
+            precioUnitario: i.precioUnitario,
             notas: i.notas,
           })),
         }),
@@ -722,7 +722,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                           <tr
                             key={grupo.clave}
                             className={trHover}
-                            onBlur={rol === "MOZO" ? undefined : (e) => {
+                            onBlur={(e) => {
                               // Solo cerrar la edición cuando el foco realmente sale de la fila
                               // (no al pasar de "cantidad" a "precio" dentro de la misma fila).
                               if (e.currentTarget.contains(e.relatedTarget as Node)) return;
@@ -733,7 +733,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                               {grupo.nombre}
                             </td>
                             <td className={tdM}>
-                              {editando ? (
+                              {editando && rol !== "MOZO" ? (
                                 <input
                                   type="number"
                                   autoFocus
@@ -771,7 +771,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                             </td>
                             <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
                             <td className={`${tdM} text-right whitespace-nowrap`}>
-                              {rol !== "MOZO" && !editando && (
+                              {!editando && (
                                 <button
                                   className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
                                   onClick={() => {
@@ -783,14 +783,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                   Editar
                                 </button>
                               )}
-                              {rol !== "MOZO" && (
-                                <button
-                                  className="text-red-400 hover:text-red-300 text-xs px-1"
-                                  onClick={() => eliminarGrupo(grupo)}
-                                >
-                                  Quitar
-                                </button>
-                              )}
+                              <button
+                                className="text-red-400 hover:text-red-300 text-xs px-1"
+                                onClick={() => eliminarGrupo(grupo)}
+                              >
+                                Quitar
+                              </button>
                             </td>
                           </tr>
                         );
@@ -809,9 +807,6 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                             )}
                           </td>
                           <td className={`${tdM} text-center`}>
-                            {rol === "MOZO" ? (
-                              <span className="text-sm font-medium">{i.cantidad}x</span>
-                            ) : (
                             <div className="flex items-center justify-center gap-0.5">
                               <button
                                 className="w-5 h-5 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -833,19 +828,16 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                 +
                               </button>
                             </div>
-                            )}
                           </td>
                           <td className={tdM}>${formatearMoneda(i.precioUnitario)}</td>
                           <td className={tdM}>${formatearMoneda(i.precioUnitario * i.cantidad)}</td>
                           <td className={`${tdM} text-right`}>
-                            {rol !== "MOZO" && (
-                              <button
-                                className="text-red-400 hover:text-red-300 text-xs px-1"
-                                onClick={() => quitarDeRonda(i.productoId, i.tarifa)}
-                              >
-                                Quitar
-                              </button>
-                            )}
+                            <button
+                              className="text-red-400 hover:text-red-300 text-xs px-1"
+                              onClick={() => quitarDeRonda(i.productoId, i.tarifa)}
+                            >
+                              Quitar
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -876,8 +868,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 productos={productos}
                 onSeleccionar={agregarARonda}
                 precioMesaActivo={precioMesaActivo}
-                elegirPrecio={rol !== "MOZO"}
-                permitirPrecioLibre={rol !== "MOZO"}
+                permitirPrecioLibre
                 permitirNotas
                 soloConfirmacionPendiente={ronda.length > 0}
               />

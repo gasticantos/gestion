@@ -17,14 +17,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "Agregá al menos un producto" }, { status: 400 });
   }
-  // El mozo solo puede cargar unidades nuevas. El precio siempre se calcula del
-  // producto en el servidor: nunca se acepta una cantidad o precio manipulados.
-  if (
-    sesion?.rol === "MOZO" &&
-    items.some((item) => Number(item.cantidad) !== 1 || item.precioUnitario !== undefined)
-  ) {
-    return NextResponse.json({ error: "El mozo solo puede agregar un producto por vez al precio configurado" }, { status: 403 });
-  }
   if (
     items.some(
       (item) =>
@@ -65,10 +57,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const itemTarifa = (item: ItemInput): Tarifa =>
     precioMesaActivo && item.tarifa !== "PARTICULAR" ? "MESA" : "PARTICULAR";
 
-  // Los mozos nunca pueden fijar un precio manual: se toma el precio configurado.
-  // Cajero y dueño conservan la posibilidad de cargar un precio a mano.
+  // Si el mozo/cajero eligió un precio a mano al agregar el producto, respetarlo
+  // en lugar de recalcularlo por tarifa.
   const precioItem = (item: ItemInput, producto: (typeof productos)[number]) =>
-    sesion?.rol !== "MOZO" &&
     typeof item.precioUnitario === "number" && Number.isFinite(item.precioUnitario) && item.precioUnitario >= 0
       ? item.precioUnitario
       : precioSegunTarifa(producto, itemTarifa(item));

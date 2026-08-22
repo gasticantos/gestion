@@ -4,10 +4,6 @@ import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditori
 import { sesionActual } from "@/lib/sesionServidor";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
-  const sesion = await sesionActual();
-  if (!sesion || sesion.rol === "MOZO") {
-    return NextResponse.json({ error: "No tenés permiso para editar productos cargados" }, { status: 403 });
-  }
   const { itemId } = await params;
   const body = await req.json();
   const { cantidad, precioUnitario } = body as { cantidad?: number; precioUnitario?: number };
@@ -19,6 +15,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
     });
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
+    }
+
+    // El mozo puede seguir corrigiendo el precio, pero no la cantidad de un producto ya
+    // cargado en la mesa: evita que la "corrija" a un número que no es el real. Se compara
+    // contra el valor guardado (no solo si vino en el body) para no bloquear un cambio de
+    // precio que reenvía la misma cantidad sin tocarla.
+    if (cantidad !== undefined && cantidad !== item.cantidad) {
+      const sesion = await sesionActual();
+      if (sesion?.rol === "MOZO") {
+        return NextResponse.json(
+          { error: "No tenés permiso para cambiar la cantidad de un producto ya cargado" },
+          { status: 403 }
+        );
+      }
     }
 
     const cantidadFinal = cantidad ?? item.cantidad;
@@ -58,10 +68,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
-  const sesion = await sesionActual();
-  if (!sesion || sesion.rol === "MOZO") {
-    return NextResponse.json({ error: "No tenés permiso para quitar productos cargados" }, { status: 403 });
-  }
   const { itemId } = await params;
 
   try {
