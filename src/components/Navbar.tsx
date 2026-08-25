@@ -15,6 +15,8 @@ const links = [
   { href: "/reservas", label: "Reservas" },
   { href: "/stock", label: "Stock" },
   { href: "/productos", label: "Productos" },
+  { href: "/promos", label: "Promos" },
+  { href: "/presupuestos", label: "Presupuestos" },
   { href: "/proveedores", label: "Proveedores" },
   { href: "/clientes", label: "Clientes" },
   { href: "/reportes", label: "Reportes" },

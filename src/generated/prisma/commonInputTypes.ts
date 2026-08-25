@@ -307,6 +307,23 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
 }
 
+export type EnumEstadoPresupuestoFilter<$PrismaModel = never> = {
+  equals?: $Enums.EstadoPresupuesto | Prisma.EnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  in?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEstadoPresupuestoFilter<$PrismaModel> | $Enums.EstadoPresupuesto
+}
+
+export type EnumEstadoPresupuestoWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EstadoPresupuesto | Prisma.EnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  in?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEstadoPresupuestoWithAggregatesFilter<$PrismaModel> | $Enums.EstadoPresupuesto
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEstadoPresupuestoFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEstadoPresupuestoFilter<$PrismaModel>
+}
+
 export type EnumTipoStockEntryFilter<$PrismaModel = never> = {
   equals?: $Enums.TipoStockEntry | Prisma.EnumTipoStockEntryFieldRefInput<$PrismaModel>
   in?: $Enums.TipoStockEntry[] | Prisma.ListEnumTipoStockEntryFieldRefInput<$PrismaModel>
@@ -802,6 +819,23 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumEstadoPresupuestoFilter<$PrismaModel = never> = {
+  equals?: $Enums.EstadoPresupuesto | Prisma.EnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  in?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEstadoPresupuestoFilter<$PrismaModel> | $Enums.EstadoPresupuesto
+}
+
+export type NestedEnumEstadoPresupuestoWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EstadoPresupuesto | Prisma.EnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  in?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EstadoPresupuesto[] | Prisma.ListEnumEstadoPresupuestoFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEstadoPresupuestoWithAggregatesFilter<$PrismaModel> | $Enums.EstadoPresupuesto
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEstadoPresupuestoFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEstadoPresupuestoFilter<$PrismaModel>
 }
 
 export type NestedEnumTipoStockEntryFilter<$PrismaModel = never> = {

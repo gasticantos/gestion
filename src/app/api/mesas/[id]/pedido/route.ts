@@ -52,6 +52,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!producto) {
       return NextResponse.json({ error: "Producto no encontrado" }, { status: 400 });
     }
+    const ahora = new Date();
+    if (!producto.activo || (producto.esPromo && (!producto.promoDesde || !producto.promoHasta || producto.promoDesde > ahora || producto.promoHasta < ahora))) {
+      return NextResponse.json({ error: producto.esPromo ? `La promoción "${producto.nombre}" ya no está vigente` : `El producto "${producto.nombre}" no está activo` }, { status: 409 });
+    }
   }
 
   const itemTarifa = (item: ItemInput): Tarifa =>

@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
 import { formatearMoneda } from "@/lib/formato";
 import { useData } from "@/hooks/useData";
-
-const MapaMesas = dynamic(() => import("@/components/MapaMesas"), { loading: () => <div className="h-96 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" /> });
 
 type Mesa = {
   id: number;
@@ -15,10 +12,6 @@ type Mesa = {
   numero: number;
   apodo: string | null;
   estado: "LIBRE" | "OCUPADA";
-  posX: number;
-  posY: number;
-  ancho: number;
-  alto: number;
   ventas: { total: number; ticketImpreso: boolean }[];
 };
 
@@ -26,7 +19,6 @@ export default function MesasPage() {
   const { data: mesasCache, loading: loadingCache } = useData<Mesa>("mesas");
   const [mesasFrescas, setMesasFrescas] = useState<Mesa[] | null>(null);
   const [error, setError] = useState("");
-  const [vista, setVista] = useState<"mapa" | "lista">("mapa");
   const [agragando, setAgregando] = useState(false);
   const [moviendoDesde, setMoviendoDesde] = useState<number | null>(null);
   const [moviendo, setMoviendo] = useState(false);
@@ -111,24 +103,6 @@ export default function MesasPage() {
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Mesas</h1>
-        <div className="flex gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-1">
-          <button
-            onClick={() => setVista("mapa")}
-            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-              vista === "mapa" ? "bg-blue-600 text-neutral-950" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-            }`}
-          >
-            Mapa
-          </button>
-          <button
-            onClick={() => setVista("lista")}
-            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-              vista === "lista" ? "bg-blue-600 text-neutral-950" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-            }`}
-          >
-            Lista
-          </button>
-        </div>
       </div>
 
       {rol === "DUENIO" && (
@@ -149,26 +123,6 @@ export default function MesasPage() {
 
       {loadingCache && mesas.length === 0 ? (
         <div className="text-sm text-neutral-500">Cargando...</div>
-      ) : vista === "mapa" ? (
-        <>
-          <p className="text-xs text-neutral-500 -mt-2">
-            Arrastrá las mesas para acomodarlas como están en el local. Un click simple sobre una mesa la
-            abre. El mostrador y la puerta quedan siempre fijos.
-          </p>
-          <MapaMesas
-            mesas={mesas.map((m) => ({
-              id: m.id,
-              nombre: m.apodo || m.nombre,
-              estado: m.estado,
-              posX: m.posX,
-              posY: m.posY,
-              ancho: m.ancho,
-              alto: m.alto,
-              total: m.ventas[0]?.total ?? 0,
-              ticketImpreso: m.ventas[0]?.ticketImpreso ?? false,
-            }))}
-          />
-        </>
       ) : mesas.length === 0 ? (
         <div className="text-sm text-neutral-500">Todavía no hay mesas cargadas</div>
       ) : (

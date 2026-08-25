@@ -59,6 +59,8 @@ export const ModelName = {
   AuditoriaLog: 'AuditoriaLog',
   Proveedor: 'Proveedor',
   Producto: 'Producto',
+  Presupuesto: 'Presupuesto',
+  PresupuestoItem: 'PresupuestoItem',
   StockEntry: 'StockEntry',
   StockEntryItem: 'StockEntryItem',
   Mesa: 'Mesa',
@@ -199,6 +201,9 @@ export const ProductoScalarFieldEnum = {
   impresora: 'impresora',
   requiereConfirmacion: 'requiereConfirmacion',
   activo: 'activo',
+  esPromo: 'esPromo',
+  promoDesde: 'promoDesde',
+  promoHasta: 'promoHasta',
   proveedorId: 'proveedorId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -206,6 +211,37 @@ export const ProductoScalarFieldEnum = {
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
+
+
+export const PresupuestoScalarFieldEnum = {
+  id: 'id',
+  clienteNombre: 'clienteNombre',
+  clienteTelefono: 'clienteTelefono',
+  validoHasta: 'validoHasta',
+  descuentoPct: 'descuentoPct',
+  subtotal: 'subtotal',
+  total: 'total',
+  notas: 'notas',
+  estado: 'estado',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  negocioId: 'negocioId'
+} as const
+
+export type PresupuestoScalarFieldEnum = (typeof PresupuestoScalarFieldEnum)[keyof typeof PresupuestoScalarFieldEnum]
+
+
+export const PresupuestoItemScalarFieldEnum = {
+  id: 'id',
+  presupuestoId: 'presupuestoId',
+  productoId: 'productoId',
+  nombre: 'nombre',
+  cantidad: 'cantidad',
+  precioUnitario: 'precioUnitario',
+  subtotal: 'subtotal'
+} as const
+
+export type PresupuestoItemScalarFieldEnum = (typeof PresupuestoItemScalarFieldEnum)[keyof typeof PresupuestoItemScalarFieldEnum]
 
 
 export const StockEntryScalarFieldEnum = {

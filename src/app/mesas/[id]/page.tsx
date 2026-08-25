@@ -23,6 +23,7 @@ import { formatearMoneda } from "@/lib/formato";
 // entre sin scroll horizontal.
 const thM = "text-left text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-500 px-2 py-1.5";
 const tdM = "px-2 py-1.5 text-sm text-neutral-700 dark:text-neutral-200";
+const comparadorAlfabetico = new Intl.Collator("es", { sensitivity: "base", numeric: true });
 
 type Producto = ProductoBusqueda & { stock: number };
 
@@ -200,8 +201,13 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         }
       }
     }
-    return [...grupos.values()];
+    return [...grupos.values()].sort((a, b) => comparadorAlfabetico.compare(a.nombre, b.nombre));
   }, [venta?.pedidos]);
+
+  const rondaOrdenada = useMemo(
+    () => [...ronda].sort((a, b) => comparadorAlfabetico.compare(a.nombre, b.nombre)),
+    [ronda]
+  );
 
   // Sincronizar ticketImpreso desde la venta
   useEffect(() => {
@@ -793,7 +799,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                           </tr>
                         );
                       })}
-                      {ronda.map((i) => (
+                      {rondaOrdenada.map((i) => (
                         <tr key={`${i.productoId}-${i.tarifa}`} className={`${trHover} bg-blue-600/5`}>
                           <td className={`${tdM} max-w-[130px]`}>
                             <span className="truncate inline-block max-w-full align-bottom" title={i.nombre}>

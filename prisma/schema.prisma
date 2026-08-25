@@ -27,6 +27,7 @@ model Negocio {
   reservas        Reserva[]
   ventas          Venta[]
   clientes        Cliente[]
+  presupuestos    Presupuesto[]
 }
 
 model Categoria {
@@ -104,16 +105,16 @@ enum TarifaPrecio {
 }
 
 model Configuracion {
-  id                 Int     @id @default(autoincrement())
-  negocioId          Int     @unique @default(1)
-  negocio            Negocio @relation(fields: [negocioId], references: [id])
-  margenVentaBasePct Float   @default(30)
-  nombrePrograma     String  @default("Gestión")
-  logoPrograma       String? @db.Text
-  aliasTransferencia String?
+  id                  Int     @id @default(autoincrement())
+  negocioId           Int     @unique @default(1)
+  negocio             Negocio @relation(fields: [negocioId], references: [id])
+  margenVentaBasePct  Float   @default(30)
+  nombrePrograma      String  @default("Gestión")
+  logoPrograma        String? @db.Text
+  aliasTransferencia  String?
   estacionImpresionId String?
-  precioMesaActivo   Boolean @default(true)
-  recargoMesaPct     Float   @default(0)
+  precioMesaActivo    Boolean @default(true)
+  recargoMesaPct      Float   @default(0)
 }
 
 enum TipoImpresion {
@@ -181,40 +182,87 @@ model Proveedor {
 }
 
 model Producto {
-  id                    Int              @id @default(autoincrement())
+  id                    Int               @id @default(autoincrement())
   nombre                String
   codigoInterno         String?
   codigoBarras          String?
   marca                 String?
   categoriaId           Int?
-  categoria             Categoria?       @relation(fields: [categoriaId], references: [id])
+  categoria             Categoria?        @relation(fields: [categoriaId], references: [id])
   precioVenta           Float
-  precioVentaMesa       Float            @default(0)
-  precioVentaMesaManual Boolean          @default(false)
-  precioCosto           Float            @default(0)
-  stock                 Float            @default(0)
-  unidad                String           @default("unidad")
+  precioVentaMesa       Float             @default(0)
+  precioVentaMesaManual Boolean           @default(false)
+  precioCosto           Float             @default(0)
+  stock                 Float             @default(0)
+  unidad                String            @default("unidad")
   impresora             String?
   // Si es true, agregarlo a una mesa lo suma como pendiente en vez de imprimir y guardar
   // al instante: hay que confirmar el envío para que salga la comanda (uso: comida, que
   // conviene mandar junta a cocina en vez de una impresión por cada plato agregado).
-  requiereConfirmacion  Boolean          @default(false)
-  activo                Boolean          @default(true)
+  requiereConfirmacion  Boolean           @default(false)
+  activo                Boolean           @default(true)
+  esPromo               Boolean           @default(false)
+  promoDesde            DateTime?
+  promoHasta            DateTime?
   proveedorId           Int?
-  proveedor             Proveedor?       @relation(fields: [proveedorId], references: [id])
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
+  proveedor             Proveedor?        @relation(fields: [proveedorId], references: [id])
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
   stockEntryItems       StockEntryItem[]
   pedidoItems           PedidoItem[]
-  negocioId             Int              @default(1)
-  negocio               Negocio          @relation(fields: [negocioId], references: [id])
+  presupuestoItems      PresupuestoItem[]
+  negocioId             Int               @default(1)
+  negocio               Negocio           @relation(fields: [negocioId], references: [id])
 
   @@unique([negocioId, codigoInterno])
   @@unique([negocioId, codigoBarras])
   @@index([negocioId])
+  @@index([negocioId, esPromo, promoDesde, promoHasta])
   @@index([negocioId, impresora])
   @@index([proveedorId])
   @@index([categoriaId])
+}
+
+enum EstadoPresupuesto {
+  BORRADOR
+  ACEPTADO
+  VENCIDO
+  CANCELADO
+}
+
+model Presupuesto {
+  id              Int               @id @default(autoincrement())
+  clienteNombre   String
+  clienteTelefono String?
+  validoHasta     DateTime
+  descuentoPct    Float             @default(0)
+  subtotal        Float
+  total           Float
+  notas           String?
+  estado          EstadoPresupuesto @default(BORRADOR)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  items           PresupuestoItem[]
+  negocioId       Int               @default(1)
+  negocio         Negocio           @relation(fields: [negocioId], references: [id])
+
+  @@index([negocioId, createdAt])
+  @@index([negocioId, estado])
+}
+
+model PresupuestoItem {
+  id             Int         @id @default(autoincrement())
+  presupuestoId  Int
+  presupuesto    Presupuesto @relation(fields: [presupuestoId], references: [id], onDelete: Cascade)
+  productoId     Int?
+  producto       Producto?   @relation(fields: [productoId], references: [id], onDelete: SetNull)
+  nombre         String
+  cantidad       Float
+  precioUnitario Float
+  subtotal       Float
+
+  @@index([presupuestoId])
+  @@index([productoId])
 }
 
 model StockEntry {

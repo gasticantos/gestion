@@ -96,6 +96,16 @@ export const EstadoImpresion = {
 export type EstadoImpresion = (typeof EstadoImpresion)[keyof typeof EstadoImpresion]
 
 
+export const EstadoPresupuesto = {
+  BORRADOR: 'BORRADOR',
+  ACEPTADO: 'ACEPTADO',
+  VENCIDO: 'VENCIDO',
+  CANCELADO: 'CANCELADO'
+} as const
+
+export type EstadoPresupuesto = (typeof EstadoPresupuesto)[keyof typeof EstadoPresupuesto]
+
+
 export const EstadoReserva = {
   PENDIENTE: 'PENDIENTE',
   CUMPLIDA: 'CUMPLIDA',

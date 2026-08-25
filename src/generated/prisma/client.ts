@@ -82,6 +82,16 @@ export type Proveedor = Prisma.ProveedorModel
  */
 export type Producto = Prisma.ProductoModel
 /**
+ * Model Presupuesto
+ * 
+ */
+export type Presupuesto = Prisma.PresupuestoModel
+/**
+ * Model PresupuestoItem
+ * 
+ */
+export type PresupuestoItem = Prisma.PresupuestoItemModel
+/**
  * Model StockEntry
  * 
  */

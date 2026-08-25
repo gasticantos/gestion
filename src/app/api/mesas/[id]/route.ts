@@ -37,10 +37,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   });
 
   if (req.nextUrl.searchParams.get("inicial") === "1") {
+    const ahora = new Date();
     const [mesa, productos, clientes, configuracion, sesion] = await Promise.all([
       consultaMesa,
       prisma.producto.findMany({
-        where: { activo: true },
+        where: {
+          activo: true,
+          OR: [
+            { esPromo: false },
+            { esPromo: true, promoDesde: { lte: ahora }, promoHasta: { gte: ahora } },
+          ],
+        },
         select: {
           id: true,
           nombre: true,

@@ -5,8 +5,15 @@ import { sesionActual } from "@/lib/sesionServidor";
 
 export async function GET(req: NextRequest) {
   if (req.nextUrl.searchParams.get("venta") === "1") {
+    const ahora = new Date();
     const productos = await prisma.producto.findMany({
-      where: { activo: true },
+      where: {
+        activo: true,
+        OR: [
+          { esPromo: false },
+          { esPromo: true, promoDesde: { lte: ahora }, promoHasta: { gte: ahora } },
+        ],
+      },
       select: {
         id: true,
         nombre: true,
@@ -21,6 +28,7 @@ export async function GET(req: NextRequest) {
   }
 
   const productos = await prisma.producto.findMany({
+    where: { esPromo: false },
     select: {
       id: true,
       nombre: true,

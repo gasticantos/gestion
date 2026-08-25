@@ -220,6 +220,7 @@ export type NegocioWhereInput = {
   reservas?: Prisma.ReservaListRelationFilter
   ventas?: Prisma.VentaListRelationFilter
   clientes?: Prisma.ClienteListRelationFilter
+  presupuestos?: Prisma.PresupuestoListRelationFilter
 }
 
 export type NegocioOrderByWithRelationInput = {
@@ -239,6 +240,7 @@ export type NegocioOrderByWithRelationInput = {
   reservas?: Prisma.ReservaOrderByRelationAggregateInput
   ventas?: Prisma.VentaOrderByRelationAggregateInput
   clientes?: Prisma.ClienteOrderByRelationAggregateInput
+  presupuestos?: Prisma.PresupuestoOrderByRelationAggregateInput
 }
 
 export type NegocioWhereUniqueInput = Prisma.AtLeast<{
@@ -261,6 +263,7 @@ export type NegocioWhereUniqueInput = Prisma.AtLeast<{
   reservas?: Prisma.ReservaListRelationFilter
   ventas?: Prisma.VentaListRelationFilter
   clientes?: Prisma.ClienteListRelationFilter
+  presupuestos?: Prisma.PresupuestoListRelationFilter
 }, "id">
 
 export type NegocioOrderByWithAggregationInput = {
@@ -301,6 +304,7 @@ export type NegocioCreateInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateInput = {
@@ -320,6 +324,7 @@ export type NegocioUncheckedCreateInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUpdateInput = {
@@ -338,6 +343,7 @@ export type NegocioUpdateInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateInput = {
@@ -357,6 +363,7 @@ export type NegocioUncheckedUpdateInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateManyInput = {
@@ -531,6 +538,20 @@ export type NegocioUpdateOneRequiredWithoutProductosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.NegocioUpdateToOneWithWhereWithoutProductosInput, Prisma.NegocioUpdateWithoutProductosInput>, Prisma.NegocioUncheckedUpdateWithoutProductosInput>
 }
 
+export type NegocioCreateNestedOneWithoutPresupuestosInput = {
+  create?: Prisma.XOR<Prisma.NegocioCreateWithoutPresupuestosInput, Prisma.NegocioUncheckedCreateWithoutPresupuestosInput>
+  connectOrCreate?: Prisma.NegocioCreateOrConnectWithoutPresupuestosInput
+  connect?: Prisma.NegocioWhereUniqueInput
+}
+
+export type NegocioUpdateOneRequiredWithoutPresupuestosNestedInput = {
+  create?: Prisma.XOR<Prisma.NegocioCreateWithoutPresupuestosInput, Prisma.NegocioUncheckedCreateWithoutPresupuestosInput>
+  connectOrCreate?: Prisma.NegocioCreateOrConnectWithoutPresupuestosInput
+  upsert?: Prisma.NegocioUpsertWithoutPresupuestosInput
+  connect?: Prisma.NegocioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.NegocioUpdateToOneWithWhereWithoutPresupuestosInput, Prisma.NegocioUpdateWithoutPresupuestosInput>, Prisma.NegocioUncheckedUpdateWithoutPresupuestosInput>
+}
+
 export type NegocioCreateNestedOneWithoutStockEntriesInput = {
   create?: Prisma.XOR<Prisma.NegocioCreateWithoutStockEntriesInput, Prisma.NegocioUncheckedCreateWithoutStockEntriesInput>
   connectOrCreate?: Prisma.NegocioCreateOrConnectWithoutStockEntriesInput
@@ -616,6 +637,7 @@ export type NegocioCreateWithoutCategoriasInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutCategoriasInput = {
@@ -634,6 +656,7 @@ export type NegocioUncheckedCreateWithoutCategoriasInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutCategoriasInput = {
@@ -667,6 +690,7 @@ export type NegocioUpdateWithoutCategoriasInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutCategoriasInput = {
@@ -685,6 +709,7 @@ export type NegocioUncheckedUpdateWithoutCategoriasInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutUsuariosInput = {
@@ -702,6 +727,7 @@ export type NegocioCreateWithoutUsuariosInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutUsuariosInput = {
@@ -720,6 +746,7 @@ export type NegocioUncheckedCreateWithoutUsuariosInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutUsuariosInput = {
@@ -753,6 +780,7 @@ export type NegocioUpdateWithoutUsuariosInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutUsuariosInput = {
@@ -771,6 +799,7 @@ export type NegocioUncheckedUpdateWithoutUsuariosInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutConfiguracionesInput = {
@@ -788,6 +817,7 @@ export type NegocioCreateWithoutConfiguracionesInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutConfiguracionesInput = {
@@ -806,6 +836,7 @@ export type NegocioUncheckedCreateWithoutConfiguracionesInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutConfiguracionesInput = {
@@ -839,6 +870,7 @@ export type NegocioUpdateWithoutConfiguracionesInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutConfiguracionesInput = {
@@ -857,6 +889,7 @@ export type NegocioUncheckedUpdateWithoutConfiguracionesInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutImpresionesInput = {
@@ -874,6 +907,7 @@ export type NegocioCreateWithoutImpresionesInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutImpresionesInput = {
@@ -892,6 +926,7 @@ export type NegocioUncheckedCreateWithoutImpresionesInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutImpresionesInput = {
@@ -925,6 +960,7 @@ export type NegocioUpdateWithoutImpresionesInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutImpresionesInput = {
@@ -943,6 +979,7 @@ export type NegocioUncheckedUpdateWithoutImpresionesInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutAuditoriasInput = {
@@ -960,6 +997,7 @@ export type NegocioCreateWithoutAuditoriasInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutAuditoriasInput = {
@@ -978,6 +1016,7 @@ export type NegocioUncheckedCreateWithoutAuditoriasInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutAuditoriasInput = {
@@ -1011,6 +1050,7 @@ export type NegocioUpdateWithoutAuditoriasInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutAuditoriasInput = {
@@ -1029,6 +1069,7 @@ export type NegocioUncheckedUpdateWithoutAuditoriasInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutProveedoresInput = {
@@ -1046,6 +1087,7 @@ export type NegocioCreateWithoutProveedoresInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutProveedoresInput = {
@@ -1064,6 +1106,7 @@ export type NegocioUncheckedCreateWithoutProveedoresInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutProveedoresInput = {
@@ -1097,6 +1140,7 @@ export type NegocioUpdateWithoutProveedoresInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutProveedoresInput = {
@@ -1115,6 +1159,7 @@ export type NegocioUncheckedUpdateWithoutProveedoresInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutProductosInput = {
@@ -1132,6 +1177,7 @@ export type NegocioCreateWithoutProductosInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutProductosInput = {
@@ -1150,6 +1196,7 @@ export type NegocioUncheckedCreateWithoutProductosInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutProductosInput = {
@@ -1183,6 +1230,7 @@ export type NegocioUpdateWithoutProductosInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutProductosInput = {
@@ -1196,6 +1244,97 @@ export type NegocioUncheckedUpdateWithoutProductosInput = {
   impresiones?: Prisma.ImpresionTrabajoUncheckedUpdateManyWithoutNegocioNestedInput
   auditorias?: Prisma.AuditoriaLogUncheckedUpdateManyWithoutNegocioNestedInput
   proveedores?: Prisma.ProveedorUncheckedUpdateManyWithoutNegocioNestedInput
+  stockEntries?: Prisma.StockEntryUncheckedUpdateManyWithoutNegocioNestedInput
+  mesas?: Prisma.MesaUncheckedUpdateManyWithoutNegocioNestedInput
+  reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
+  ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
+  clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
+}
+
+export type NegocioCreateWithoutPresupuestosInput = {
+  nombre: string
+  activo?: boolean
+  createdAt?: Date | string
+  categorias?: Prisma.CategoriaCreateNestedManyWithoutNegocioInput
+  usuarios?: Prisma.UsuarioCreateNestedManyWithoutNegocioInput
+  configuraciones?: Prisma.ConfiguracionCreateNestedManyWithoutNegocioInput
+  impresiones?: Prisma.ImpresionTrabajoCreateNestedManyWithoutNegocioInput
+  auditorias?: Prisma.AuditoriaLogCreateNestedManyWithoutNegocioInput
+  proveedores?: Prisma.ProveedorCreateNestedManyWithoutNegocioInput
+  productos?: Prisma.ProductoCreateNestedManyWithoutNegocioInput
+  stockEntries?: Prisma.StockEntryCreateNestedManyWithoutNegocioInput
+  mesas?: Prisma.MesaCreateNestedManyWithoutNegocioInput
+  reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
+  ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
+  clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+}
+
+export type NegocioUncheckedCreateWithoutPresupuestosInput = {
+  id?: number
+  nombre: string
+  activo?: boolean
+  createdAt?: Date | string
+  categorias?: Prisma.CategoriaUncheckedCreateNestedManyWithoutNegocioInput
+  usuarios?: Prisma.UsuarioUncheckedCreateNestedManyWithoutNegocioInput
+  configuraciones?: Prisma.ConfiguracionUncheckedCreateNestedManyWithoutNegocioInput
+  impresiones?: Prisma.ImpresionTrabajoUncheckedCreateNestedManyWithoutNegocioInput
+  auditorias?: Prisma.AuditoriaLogUncheckedCreateNestedManyWithoutNegocioInput
+  proveedores?: Prisma.ProveedorUncheckedCreateNestedManyWithoutNegocioInput
+  productos?: Prisma.ProductoUncheckedCreateNestedManyWithoutNegocioInput
+  stockEntries?: Prisma.StockEntryUncheckedCreateNestedManyWithoutNegocioInput
+  mesas?: Prisma.MesaUncheckedCreateNestedManyWithoutNegocioInput
+  reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
+  ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
+  clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+}
+
+export type NegocioCreateOrConnectWithoutPresupuestosInput = {
+  where: Prisma.NegocioWhereUniqueInput
+  create: Prisma.XOR<Prisma.NegocioCreateWithoutPresupuestosInput, Prisma.NegocioUncheckedCreateWithoutPresupuestosInput>
+}
+
+export type NegocioUpsertWithoutPresupuestosInput = {
+  update: Prisma.XOR<Prisma.NegocioUpdateWithoutPresupuestosInput, Prisma.NegocioUncheckedUpdateWithoutPresupuestosInput>
+  create: Prisma.XOR<Prisma.NegocioCreateWithoutPresupuestosInput, Prisma.NegocioUncheckedCreateWithoutPresupuestosInput>
+  where?: Prisma.NegocioWhereInput
+}
+
+export type NegocioUpdateToOneWithWhereWithoutPresupuestosInput = {
+  where?: Prisma.NegocioWhereInput
+  data: Prisma.XOR<Prisma.NegocioUpdateWithoutPresupuestosInput, Prisma.NegocioUncheckedUpdateWithoutPresupuestosInput>
+}
+
+export type NegocioUpdateWithoutPresupuestosInput = {
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categorias?: Prisma.CategoriaUpdateManyWithoutNegocioNestedInput
+  usuarios?: Prisma.UsuarioUpdateManyWithoutNegocioNestedInput
+  configuraciones?: Prisma.ConfiguracionUpdateManyWithoutNegocioNestedInput
+  impresiones?: Prisma.ImpresionTrabajoUpdateManyWithoutNegocioNestedInput
+  auditorias?: Prisma.AuditoriaLogUpdateManyWithoutNegocioNestedInput
+  proveedores?: Prisma.ProveedorUpdateManyWithoutNegocioNestedInput
+  productos?: Prisma.ProductoUpdateManyWithoutNegocioNestedInput
+  stockEntries?: Prisma.StockEntryUpdateManyWithoutNegocioNestedInput
+  mesas?: Prisma.MesaUpdateManyWithoutNegocioNestedInput
+  reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
+  ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
+  clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+}
+
+export type NegocioUncheckedUpdateWithoutPresupuestosInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categorias?: Prisma.CategoriaUncheckedUpdateManyWithoutNegocioNestedInput
+  usuarios?: Prisma.UsuarioUncheckedUpdateManyWithoutNegocioNestedInput
+  configuraciones?: Prisma.ConfiguracionUncheckedUpdateManyWithoutNegocioNestedInput
+  impresiones?: Prisma.ImpresionTrabajoUncheckedUpdateManyWithoutNegocioNestedInput
+  auditorias?: Prisma.AuditoriaLogUncheckedUpdateManyWithoutNegocioNestedInput
+  proveedores?: Prisma.ProveedorUncheckedUpdateManyWithoutNegocioNestedInput
+  productos?: Prisma.ProductoUncheckedUpdateManyWithoutNegocioNestedInput
   stockEntries?: Prisma.StockEntryUncheckedUpdateManyWithoutNegocioNestedInput
   mesas?: Prisma.MesaUncheckedUpdateManyWithoutNegocioNestedInput
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
@@ -1218,6 +1357,7 @@ export type NegocioCreateWithoutStockEntriesInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutStockEntriesInput = {
@@ -1236,6 +1376,7 @@ export type NegocioUncheckedCreateWithoutStockEntriesInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutStockEntriesInput = {
@@ -1269,6 +1410,7 @@ export type NegocioUpdateWithoutStockEntriesInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutStockEntriesInput = {
@@ -1287,6 +1429,7 @@ export type NegocioUncheckedUpdateWithoutStockEntriesInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutMesasInput = {
@@ -1304,6 +1447,7 @@ export type NegocioCreateWithoutMesasInput = {
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutMesasInput = {
@@ -1322,6 +1466,7 @@ export type NegocioUncheckedCreateWithoutMesasInput = {
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutMesasInput = {
@@ -1355,6 +1500,7 @@ export type NegocioUpdateWithoutMesasInput = {
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutMesasInput = {
@@ -1373,6 +1519,7 @@ export type NegocioUncheckedUpdateWithoutMesasInput = {
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutReservasInput = {
@@ -1390,6 +1537,7 @@ export type NegocioCreateWithoutReservasInput = {
   mesas?: Prisma.MesaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutReservasInput = {
@@ -1408,6 +1556,7 @@ export type NegocioUncheckedCreateWithoutReservasInput = {
   mesas?: Prisma.MesaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutReservasInput = {
@@ -1441,6 +1590,7 @@ export type NegocioUpdateWithoutReservasInput = {
   mesas?: Prisma.MesaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutReservasInput = {
@@ -1459,6 +1609,7 @@ export type NegocioUncheckedUpdateWithoutReservasInput = {
   mesas?: Prisma.MesaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutVentasInput = {
@@ -1476,6 +1627,7 @@ export type NegocioCreateWithoutVentasInput = {
   mesas?: Prisma.MesaCreateNestedManyWithoutNegocioInput
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutVentasInput = {
@@ -1494,6 +1646,7 @@ export type NegocioUncheckedCreateWithoutVentasInput = {
   mesas?: Prisma.MesaUncheckedCreateNestedManyWithoutNegocioInput
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   clientes?: Prisma.ClienteUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutVentasInput = {
@@ -1527,6 +1680,7 @@ export type NegocioUpdateWithoutVentasInput = {
   mesas?: Prisma.MesaUpdateManyWithoutNegocioNestedInput
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutVentasInput = {
@@ -1545,6 +1699,7 @@ export type NegocioUncheckedUpdateWithoutVentasInput = {
   mesas?: Prisma.MesaUncheckedUpdateManyWithoutNegocioNestedInput
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   clientes?: Prisma.ClienteUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioCreateWithoutClientesInput = {
@@ -1562,6 +1717,7 @@ export type NegocioCreateWithoutClientesInput = {
   mesas?: Prisma.MesaCreateNestedManyWithoutNegocioInput
   reservas?: Prisma.ReservaCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioUncheckedCreateWithoutClientesInput = {
@@ -1580,6 +1736,7 @@ export type NegocioUncheckedCreateWithoutClientesInput = {
   mesas?: Prisma.MesaUncheckedCreateNestedManyWithoutNegocioInput
   reservas?: Prisma.ReservaUncheckedCreateNestedManyWithoutNegocioInput
   ventas?: Prisma.VentaUncheckedCreateNestedManyWithoutNegocioInput
+  presupuestos?: Prisma.PresupuestoUncheckedCreateNestedManyWithoutNegocioInput
 }
 
 export type NegocioCreateOrConnectWithoutClientesInput = {
@@ -1613,6 +1770,7 @@ export type NegocioUpdateWithoutClientesInput = {
   mesas?: Prisma.MesaUpdateManyWithoutNegocioNestedInput
   reservas?: Prisma.ReservaUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUpdateManyWithoutNegocioNestedInput
 }
 
 export type NegocioUncheckedUpdateWithoutClientesInput = {
@@ -1631,6 +1789,7 @@ export type NegocioUncheckedUpdateWithoutClientesInput = {
   mesas?: Prisma.MesaUncheckedUpdateManyWithoutNegocioNestedInput
   reservas?: Prisma.ReservaUncheckedUpdateManyWithoutNegocioNestedInput
   ventas?: Prisma.VentaUncheckedUpdateManyWithoutNegocioNestedInput
+  presupuestos?: Prisma.PresupuestoUncheckedUpdateManyWithoutNegocioNestedInput
 }
 
 
@@ -1651,6 +1810,7 @@ export type NegocioCountOutputType = {
   reservas: number
   ventas: number
   clientes: number
+  presupuestos: number
 }
 
 export type NegocioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1666,6 +1826,7 @@ export type NegocioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   reservas?: boolean | NegocioCountOutputTypeCountReservasArgs
   ventas?: boolean | NegocioCountOutputTypeCountVentasArgs
   clientes?: boolean | NegocioCountOutputTypeCountClientesArgs
+  presupuestos?: boolean | NegocioCountOutputTypeCountPresupuestosArgs
 }
 
 /**
@@ -1762,6 +1923,13 @@ export type NegocioCountOutputTypeCountClientesArgs<ExtArgs extends runtime.Type
   where?: Prisma.ClienteWhereInput
 }
 
+/**
+ * NegocioCountOutputType without action
+ */
+export type NegocioCountOutputTypeCountPresupuestosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PresupuestoWhereInput
+}
+
 
 export type NegocioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1780,6 +1948,7 @@ export type NegocioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   reservas?: boolean | Prisma.Negocio$reservasArgs<ExtArgs>
   ventas?: boolean | Prisma.Negocio$ventasArgs<ExtArgs>
   clientes?: boolean | Prisma.Negocio$clientesArgs<ExtArgs>
+  presupuestos?: boolean | Prisma.Negocio$presupuestosArgs<ExtArgs>
   _count?: boolean | Prisma.NegocioCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["negocio"]>
 
@@ -1818,6 +1987,7 @@ export type NegocioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   reservas?: boolean | Prisma.Negocio$reservasArgs<ExtArgs>
   ventas?: boolean | Prisma.Negocio$ventasArgs<ExtArgs>
   clientes?: boolean | Prisma.Negocio$clientesArgs<ExtArgs>
+  presupuestos?: boolean | Prisma.Negocio$presupuestosArgs<ExtArgs>
   _count?: boolean | Prisma.NegocioCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type NegocioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1838,6 +2008,7 @@ export type $NegocioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     reservas: Prisma.$ReservaPayload<ExtArgs>[]
     ventas: Prisma.$VentaPayload<ExtArgs>[]
     clientes: Prisma.$ClientePayload<ExtArgs>[]
+    presupuestos: Prisma.$PresupuestoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2250,6 +2421,7 @@ export interface Prisma__NegocioClient<T, Null = never, ExtArgs extends runtime.
   reservas<T extends Prisma.Negocio$reservasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Negocio$reservasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ventas<T extends Prisma.Negocio$ventasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Negocio$ventasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VentaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clientes<T extends Prisma.Negocio$clientesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Negocio$clientesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  presupuestos<T extends Prisma.Negocio$presupuestosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Negocio$presupuestosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PresupuestoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2961,6 +3133,30 @@ export type Negocio$clientesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ClienteScalarFieldEnum | Prisma.ClienteScalarFieldEnum[]
+}
+
+/**
+ * Negocio.presupuestos
+ */
+export type Negocio$presupuestosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Presupuesto
+   */
+  select?: Prisma.PresupuestoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Presupuesto
+   */
+  omit?: Prisma.PresupuestoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PresupuestoInclude<ExtArgs> | null
+  where?: Prisma.PresupuestoWhereInput
+  orderBy?: Prisma.PresupuestoOrderByWithRelationInput | Prisma.PresupuestoOrderByWithRelationInput[]
+  cursor?: Prisma.PresupuestoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PresupuestoScalarFieldEnum | Prisma.PresupuestoScalarFieldEnum[]
 }
 
 /**
