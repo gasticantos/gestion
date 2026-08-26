@@ -28,6 +28,8 @@ export default function ConfiguracionPage() {
   const [ok, setOk] = useState("");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [probandoTelegram, setProbandoTelegram] = useState(false);
+  const [estadoTelegram, setEstadoTelegram] = useState("");
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [nombreCategoria, setNombreCategoria] = useState("");
@@ -145,6 +147,20 @@ export default function ConfiguracionPage() {
     }
   }
 
+  async function probarTelegram() {
+    setProbandoTelegram(true);
+    setEstadoTelegram("");
+    try {
+      const res = await fetch("/api/telegram/prueba", { method: "POST" });
+      const data = await res.json().catch(() => null);
+      setEstadoTelegram(res.ok ? "Mensaje enviado. Revisá tu Telegram." : data?.error || "No se pudo enviar la prueba");
+    } catch {
+      setEstadoTelegram("No se pudo conectar para enviar la prueba");
+    } finally {
+      setProbandoTelegram(false);
+    }
+  }
+
   async function guardarCategoria(e: FormEvent) {
     e.preventDefault();
     setErrorCategoria("");
@@ -221,6 +237,21 @@ export default function ConfiguracionPage() {
 
       <Card className="p-4">
         <ActualizadorWindows />
+      </Card>
+
+      <Card className="p-4 flex flex-col gap-3">
+        <div>
+          <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Alertas por Telegram</div>
+          <p className="mt-1 text-xs text-neutral-500">
+            Envía cierres de caja, descuentos, productos eliminados, cambios de cantidades y errores de impresión al chat privado configurado.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" size="sm" onClick={probarTelegram} disabled={probandoTelegram}>
+            {probandoTelegram ? "Enviando..." : "Enviar alerta de prueba"}
+          </Button>
+          {estadoTelegram && <span className="text-sm text-neutral-500">{estadoTelegram}</span>}
+        </div>
       </Card>
 
       <Card className="p-4">

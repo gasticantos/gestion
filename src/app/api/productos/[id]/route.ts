@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redondearPrecio } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { enviarAlertaTelegram } from "@/lib/telegram";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
@@ -75,5 +76,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     where: { id: Number(id) },
     data: { activo: false },
   });
+  await enviarAlertaTelegram(
+    `🗑️ Producto eliminado\n${producto.nombre}\nRealizado por: ${sesion.nombre} (${sesion.rol})`
+  );
   return NextResponse.json(producto);
 }

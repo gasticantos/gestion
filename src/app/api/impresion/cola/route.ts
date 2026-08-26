@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
+import { enviarAlertaTelegram } from "@/lib/telegram";
 
 async function negocioDeEstacion(estacionId: string) {
   if (!estacionId) return null;
@@ -172,7 +173,7 @@ export async function PUT(req: NextRequest) {
   }
   const trabajo = await prisma.impresionTrabajo.findFirst({
     where: { id: Number(body.id), negocioId },
-    select: { intentos: true },
+    select: { intentos: true, tipo: true },
   });
   const reintentar = !ok && Boolean(trabajo && trabajo.intentos < 3);
   const resultado = await prisma.impresionTrabajo.updateMany({
@@ -193,6 +194,11 @@ export async function PUT(req: NextRequest) {
 
   if (resultado.count === 0) {
     return NextResponse.json({ error: "El trabajo no pertenece a esta estación" }, { status: 409 });
+  }
+  if (!ok && !reintentar) {
+    await enviarAlertaTelegram(
+      `🖨️ Error de impresión\nTrabajo #${Number(body.id)} (${trabajo?.tipo || "desconocido"})\nFalló después de ${trabajo?.intentos || 0} intentos.\n${String(body.error || "El agente local no pudo completar la impresión")}`
+    );
   }
   return NextResponse.json({ success: true });
 }

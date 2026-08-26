@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
 import { obtenerReporteVentas } from "@/lib/reportes";
+import { enviarAlertaTelegram, enviarDocumentoTelegram } from "@/lib/telegram";
+import { generarPdfCierreCaja } from "@/lib/pdfCierreCaja";
 
 const METODOS = {
   EFECTIVO: "EFECTIVO",
@@ -46,11 +48,14 @@ export async function cerrarJornadaCaja({
     orderBy: { numero: "asc" },
   });
   if (mesasAbiertas.length > 0) {
+    await enviarAlertaTelegram(
+      `⚠️ Cierre de caja bloqueado\nJornada: ${fecha}\nOperador: ${operador.nombre} (${operador.rol})\nMesas abiertas: ${mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre).join(", ")}`
+    );
     return { estado: "MESAS_ABIERTAS", mesasAbiertas: mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre) };
   }
 
   const [reporte, configuracion] = await Promise.all([
-    obtenerReporteVentas(desde, hasta, { limiteProductos: 0, negocioId }),
+    obtenerReporteVentas(desde, hasta, { limiteProductos: null, negocioId }),
     prisma.configuracion.findUnique({ where: { negocioId }, select: { nombrePrograma: true } }),
   ]);
   const dinero = (valor: number) => `$${formatearMoneda(valor)}`;
@@ -89,6 +94,21 @@ export async function cerrarJornadaCaja({
       await tx.mesa.updateMany({ where: { negocioId }, data: { estado: "LIBRE" } });
       return creado;
     });
+    try {
+      const pdf = generarPdfCierreCaja({
+        nombreNegocio: configuracion?.nombrePrograma || "Gestión",
+        fechaJornada: fecha,
+        operador,
+        reporte,
+      });
+      await enviarDocumentoTelegram(
+        pdf,
+        `cierre-caja-${fecha}.pdf`,
+        `Cierre de caja · ${fecha}\n${reporte.cantidadVentas} ventas · $${formatearMoneda(reporte.combinado.total)}`
+      );
+    } catch (error) {
+      console.error("No se pudo generar o enviar el PDF del cierre:", error);
+    }
     return { estado: "CERRADO", trabajoId: trabajo.id, cantidadVentas: reporte.cantidadVentas, total: reporte.combinado.total };
   } catch (error) {
     // Dos solicitudes simultáneas (por ejemplo el cajero y el cron) compiten por la

@@ -7,7 +7,7 @@ export type ReporteVentas = {
   desde: string;
   hasta: string;
   cantidadVentas: number;
-  porCanal: Record<"MOSTRADOR" | "MESA", { total: number; pagos: Record<Metodo, number> }>;
+  porCanal: Record<"MOSTRADOR" | "MESA", { cantidad: number; total: number; pagos: Record<Metodo, number> }>;
   combinado: { total: number; pagos: Record<Metodo, number> };
   categorias: { categoria: string; cantidad: number; importe: number }[];
   productos: { nombre: string; cantidad: number; importe: number }[];
@@ -21,7 +21,7 @@ function pagosVacio(): Record<Metodo, number> {
 export async function obtenerReporteVentas(
   desde: Date,
   hasta: Date,
-  opciones?: { limiteProductos?: number; negocioId?: number }
+  opciones?: { limiteProductos?: number | null; negocioId?: number }
 ): Promise<ReporteVentas> {
   const ventas = await prisma.venta.findMany({
     where: {
@@ -36,8 +36,8 @@ export async function obtenerReporteVentas(
   });
 
   const porCanal = {
-    MOSTRADOR: { total: 0, pagos: pagosVacio() },
-    MESA: { total: 0, pagos: pagosVacio() },
+    MOSTRADOR: { cantidad: 0, total: 0, pagos: pagosVacio() },
+    MESA: { cantidad: 0, total: 0, pagos: pagosVacio() },
   };
   const combinado = { total: 0, pagos: pagosVacio() };
   const categoriaMap = new Map<string, { cantidad: number; importe: number }>();
@@ -46,6 +46,7 @@ export async function obtenerReporteVentas(
 
   for (const venta of ventas) {
     const canal = porCanal[venta.tipo];
+    canal.cantidad += 1;
     canal.total += venta.total;
     combinado.total += venta.total;
 
@@ -81,7 +82,9 @@ export async function obtenerReporteVentas(
     .map(([nombre, v]) => ({ nombre, ...v }))
     .sort((a, b) => b.importe - a.importe);
   const productos =
-    opciones?.limiteProductos === undefined
+    opciones?.limiteProductos === null
+      ? productosOrdenados
+      : opciones?.limiteProductos === undefined
       ? productosOrdenados.slice(0, 10)
       : productosOrdenados.slice(0, opciones.limiteProductos);
 

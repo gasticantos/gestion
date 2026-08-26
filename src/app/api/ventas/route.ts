@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
-import { limitesJornadaArgentina } from "@/lib/formato";
+import { formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
+import { enviarAlertaTelegram } from "@/lib/telegram";
 
 type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
     const producto = porId.get(Number(item.productoId))!;
     return acc + precioSegunTarifa(producto, itemTarifa(item)) * Number(item.cantidad);
   }, 0);
-  const { pct, total } = aplicarDescuento(subtotal, Number(descuentoPct) || 0);
+  const { pct, monto: montoDescuento, total } = aplicarDescuento(subtotal, Number(descuentoPct) || 0);
 
   const totalPagos = pagos.reduce((acc, p) => acc + Number(p.monto), 0);
   if (Math.abs(totalPagos - total) > 0.01) {
@@ -168,6 +169,12 @@ export async function POST(req: NextRequest) {
 
     return created;
   });
+
+  if (pct > 0) {
+    await enviarAlertaTelegram(
+      `🏷️ Descuento aplicado\nMostrador · Venta #${venta.id}\nSubtotal: $${formatearMoneda(subtotal)}\nDescuento: ${pct}% (-$${formatearMoneda(montoDescuento)})\nTotal: $${formatearMoneda(total)}\nRealizado por: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
+    );
+  }
 
   return NextResponse.json(venta, { status: 201 });
 }

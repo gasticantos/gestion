@@ -14,8 +14,12 @@ export const REGLAS_RUTA: { prefix: string; roles: Rol[] }[] = [
   { prefix: "/api/usuarios", roles: ["DUENIO"] },
   { prefix: "/configuracion", roles: ["DUENIO"] },
   { prefix: "/api/configuracion", roles: ["DUENIO", "CAJERO", "MOZO"] },
+  { prefix: "/cierre-caja", roles: ["DUENIO", "CAJERO"] },
+  // El cajero puede cerrar la jornada, pero no acceder al resto de los reportes.
+  { prefix: "/api/reportes/cierre", roles: ["DUENIO", "CAJERO"] },
   { prefix: "/flyers", roles: ["DUENIO", "CAJERO", "MOZO"] },
   { prefix: "/api/flyers", roles: ["DUENIO", "CAJERO", "MOZO"] },
+  { prefix: "/api/telegram", roles: ["DUENIO"] },
   // Solo dueño/cajero pueden tocar qué computadora es la caja principal de impresión.
   // Antes cualquier rol (incluida una moza) podía pisarla sin querer con un solo clic.
   { prefix: "/api/impresion", roles: ["DUENIO", "CAJERO"] },

@@ -11,6 +11,7 @@ import { Rol } from "@/generated/prisma/enums";
 const links = [
   { href: "/venta", label: "Vender" },
   { href: "/ventas", label: "Ventas" },
+  { href: "/cierre-caja", label: "Cierre de caja" },
   { href: "/mesas", label: "Mesas" },
   { href: "/reservas", label: "Reservas" },
   { href: "/stock", label: "Stock" },

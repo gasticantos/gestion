@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
 import { aplicarDescuento } from "@/lib/precio";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
+import { enviarAlertaTelegram } from "@/lib/telegram";
+import { formatearMoneda } from "@/lib/formato";
 
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Elegí un cliente para la parte fiada" }, { status: 400 });
   }
 
-  const { pct, total } = aplicarDescuento(venta.total, Number(descuentoPct) || 0);
+  const { pct, monto: montoDescuento, total } = aplicarDescuento(venta.total, Number(descuentoPct) || 0);
 
   const totalPagos = pagos.reduce((acc, p) => acc + Number(p.monto), 0);
   if (Math.abs(totalPagos - total) > 0.01) {
@@ -79,6 +81,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
   const detallesPago = pagos.map((p) => `${p.metodo}: $${p.monto}`).join(", ");
   await registrarAuditoria(usuarioId, "cerrar_mesa", `Mesa ${mesa.nombre} - Total: $${total} - Pagos: ${detallesPago}`);
+
+  if (pct > 0) {
+    await enviarAlertaTelegram(
+      `🏷️ Descuento aplicado\n${mesa.apodo || mesa.nombre} · Venta #${cerrada.id}\nSubtotal: $${formatearMoneda(venta.total)}\nDescuento: ${pct}% (-$${formatearMoneda(montoDescuento)})\nTotal: $${formatearMoneda(total)}\nRealizado por: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
+    );
+  }
 
   return NextResponse.json(cerrada);
 }
