@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const mesa = await prisma.mesa.findUnique({
     where: { id: Number(id) },
-    include: { ventas: { where: { estado: "ABIERTA" } } },
+    include: { ventas: { where: { estado: "ABIERTA" }, include: { pagos: true } } },
   });
   if (!mesa) {
     return NextResponse.json({ error: "Mesa no encontrada" }, { status: 404 });
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!venta) {
     return NextResponse.json({ error: "La mesa no tiene una cuenta abierta" }, { status: 409 });
   }
-  if (!Array.isArray(pagos) || pagos.length === 0) {
+  if (!Array.isArray(pagos)) {
     return NextResponse.json({ error: "Falta indicar el pago" }, { status: 400 });
   }
 
@@ -42,9 +42,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Elegí un cliente para la parte fiada" }, { status: 400 });
   }
 
-  const { pct, monto: montoDescuento, total } = aplicarDescuento(venta.total, Number(descuentoPct) || 0);
+  const pctSolicitado = venta.pagos.length > 0 ? venta.descuentoPct : Number(descuentoPct) || 0;
+  const { pct, monto: montoDescuento, total } = aplicarDescuento(venta.total, pctSolicitado);
 
-  const totalPagos = pagos.reduce((acc, p) => acc + Number(p.monto), 0);
+  const totalPagosPrevios = venta.pagos.reduce((acc, p) => acc + p.monto, 0);
+  const totalPagos = totalPagosPrevios + pagos.reduce((acc, p) => acc + Number(p.monto), 0);
   if (Math.abs(totalPagos - total) > 0.01) {
     return NextResponse.json({ error: "El total pagado no coincide con el total de la cuenta" }, { status: 400 });
   }
@@ -79,7 +81,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   });
 
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
-  const detallesPago = pagos.map((p) => `${p.metodo}: $${p.monto}`).join(", ");
+  const detallesPago = [
+    ...venta.pagos.map((p) => `${p.metodo}: $${p.monto}`),
+    ...pagos.map((p) => `${p.metodo}: $${p.monto}`),
+  ].join(", ");
   await registrarAuditoria(usuarioId, "cerrar_mesa", `Mesa ${mesa.nombre} - Total: $${total} - Pagos: ${detallesPago}`);
 
   if (pct > 0) {

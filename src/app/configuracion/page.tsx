@@ -243,7 +243,7 @@ export default function ConfiguracionPage() {
         <div>
           <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Alertas por Telegram</div>
           <p className="mt-1 text-xs text-neutral-500">
-            Envía cierres de caja, descuentos, productos eliminados, cambios de cantidades y errores de impresión al chat privado configurado.
+            Envía cierres de caja, descuentos y presupuestos en PDF al chat privado configurado.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

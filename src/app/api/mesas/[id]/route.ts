@@ -7,8 +7,13 @@ const ventaAbierta = {
   select: {
     id: true,
     total: true,
+    descuentoPct: true,
     ticketImpreso: true,
     borradorRonda: true,
+    pagos: {
+      select: { id: true, metodo: true, monto: true, createdAt: true },
+      orderBy: { createdAt: "asc" as const },
+    },
     pedidos: {
       select: {
         id: true,

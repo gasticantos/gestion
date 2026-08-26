@@ -38,7 +38,16 @@ type PedidoItem = {
 
 type Pedido = { id: number; createdAt: string; items: PedidoItem[] };
 
-type Venta = { id: number; total: number; pedidos: Pedido[]; borradorRonda: ItemRonda[] | null; ticketImpreso: boolean };
+type PagoRegistrado = { id: number; metodo: PagoLinea["metodo"]; monto: number; createdAt: string };
+type Venta = {
+  id: number;
+  total: number;
+  descuentoPct: number;
+  pagos: PagoRegistrado[];
+  pedidos: Pedido[];
+  borradorRonda: ItemRonda[] | null;
+  ticketImpreso: boolean;
+};
 
 type Mesa = {
   id: number;
@@ -68,6 +77,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [pagos, setPagos] = useState<PagoLinea[]>([{ metodo: "EFECTIVO", monto: "0" }]);
   const [clienteId, setClienteId] = useState("");
   const [descuentoPct, setDescuentoPct] = useState("0");
+  const [montoParcial, setMontoParcial] = useState("");
+  const [metodoParcial, setMetodoParcial] = useState<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA">("EFECTIVO");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [rol, setRol] = useState<string | null>(null);
@@ -88,7 +99,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   async function cargar() {
     const mesaRes = await fetch(`/api/mesas/${id}`, { cache: "no-store" });
-    if (mesaRes.ok) setMesa(await mesaRes.json());
+    if (mesaRes.ok) {
+      const data: Mesa = await mesaRes.json();
+      setMesa(data);
+      if (data.ventas[0]?.pagos.length) setDescuentoPct(String(data.ventas[0].descuentoPct));
+    }
   }
 
   useEffect(() => {
@@ -98,6 +113,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       .then((data) => {
         if (!activo) return;
         setMesa(data.mesa);
+        if (data.mesa.ventas[0]?.pagos.length) {
+          setDescuentoPct(String(data.mesa.ventas[0].descuentoPct));
+        }
         setProductos(data.productos);
         setClientes(data.clientes);
         setPrecioMesaActivo(data.precioMesaActivo);
@@ -147,6 +165,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       if (!res.ok) return;
       const data: Mesa = await res.json();
       setMesa(data);
+      if (data.ventas[0]?.pagos.length) setDescuentoPct(String(data.ventas[0].descuentoPct));
       const remoto = data.ventas[0]?.borradorRonda ?? [];
       const json = JSON.stringify(remoto);
       const inactivoLocal = Date.now() - ultimoCambioLocalRef.current > 3000;
@@ -162,6 +181,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const total = venta?.total ?? 0;
   const descuento = useMemo(() => aplicarDescuento(total, Number(descuentoPct)), [total, descuentoPct]);
   const totalFinal = descuento.total;
+  const pagadoParcial = useMemo(
+    () => (venta?.pagos ?? []).reduce((suma, pago) => suma + pago.monto, 0),
+    [venta?.pagos]
+  );
+  const saldoPendiente = Math.max(0, Math.round((totalFinal - pagadoParcial) * 100) / 100);
 
   const totalRonda = useMemo(() => ronda.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [ronda]);
 
@@ -560,22 +584,22 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   async function cerrarMesa() {
     setError("");
-    if (!pagosCuadran(pagos, totalFinal)) {
+    if (saldoPendiente > 0.01 && !pagosCuadran(pagos, saldoPendiente)) {
       setError("El total pagado no coincide con el total de la cuenta");
       return;
     }
-    if (requiereCliente(pagos) && !clienteId) {
+    if (saldoPendiente > 0.01 && requiereCliente(pagos) && !clienteId) {
       setError("Elegí un cliente para la parte fiada");
       return;
     }
-    const pagosFinales = resolvePagos(pagos, totalFinal);
+    const pagosFinales = saldoPendiente > 0.01 ? resolvePagos(pagos, saldoPendiente) : [];
     setEnviando(true);
     const res = await fetch(`/api/mesas/${id}/cerrar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto) })),
-        clienteId: requiereCliente(pagos) ? Number(clienteId) : null,
+        clienteId: pagosFinales.length && requiereCliente(pagosFinales) ? Number(clienteId) : null,
         descuentoPct: Number(descuentoPct) || 0,
       }),
     });
@@ -593,6 +617,34 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
     // Volver a mesas
     router.push("/mesas");
+  }
+
+  async function registrarPagoParcial() {
+    const monto = Number(montoParcial);
+    if (!Number.isFinite(monto) || monto <= 0) {
+      setError("Ingresá un monto parcial válido");
+      return;
+    }
+    setError("");
+    setEnviando(true);
+    try {
+      const res = await fetch(`/api/mesas/${id}/pago-parcial`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ metodo: metodoParcial, monto, descuentoPct: Number(descuentoPct) || 0 }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.error || "No se pudo registrar el pago parcial");
+        return;
+      }
+      setMontoParcial("");
+      await cargar();
+    } catch {
+      setError("No se pudo conectar para registrar el pago parcial");
+    } finally {
+      setEnviando(false);
+    }
   }
 
   if (!mesa) {
@@ -709,6 +761,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
               <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400">
                 Productos cargados ({venta?.pedidos.reduce((acc, p) => acc + p.items.length, 0) ?? 0})
               </div>
+              {ticketImpreso && (
+                <div className="border-b border-blue-600/30 bg-blue-600/10 px-3 py-2 text-xs text-blue-600 dark:text-blue-300">
+                  Preticket emitido: los productos cargados ya no se pueden editar ni quitar. Podés seguir agregando productos nuevos.
+                </div>
+              )}
               {!venta?.pedidos.length && ronda.length === 0 ? (
                 <div className="p-4 text-sm text-neutral-500">Sin productos cargados todavía</div>
               ) : (
@@ -781,7 +838,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                             </td>
                             <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
                             <td className={`${tdM} text-right whitespace-nowrap`}>
-                              {!editando && (
+                              {!ticketImpreso && !editando && (
                                 <button
                                   className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
                                   onClick={() => {
@@ -793,12 +850,14 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                   Editar
                                 </button>
                               )}
-                              <button
-                                className="text-red-400 hover:text-red-300 text-xs px-1"
-                                onClick={() => eliminarGrupo(grupo)}
-                              >
-                                Quitar
-                              </button>
+                              {!ticketImpreso && (
+                                <button
+                                  className="text-red-400 hover:text-red-300 text-xs px-1"
+                                  onClick={() => eliminarGrupo(grupo)}
+                                >
+                                  Quitar
+                                </button>
+                              )}
                             </td>
                           </tr>
                         );
@@ -900,6 +959,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                     max="100"
                     step="0.1"
                     value={descuentoPct}
+                    disabled={pagadoParcial > 0}
                     onChange={(e) => setDescuentoPct(e.target.value)}
                     className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
                   />
@@ -925,16 +985,72 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
               ) : (
                 <>
                   <div className="text-sm text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">
-                    ✓ Ticket impreso - Ahora selecciona cómo cobrar
+                    ✓ Preticket impreso · Podés registrar pagos parciales o cobrar el saldo final
                   </div>
-                  <PagoSelector
-                    total={totalFinal}
-                    pagos={pagos}
-                    setPagos={setPagos}
-                    clientes={clientes}
-                    clienteId={clienteId}
-                    setClienteId={setClienteId}
-                  />
+                  {pagadoParcial > 0 && (
+                    <div className="rounded-lg border border-emerald-600/30 bg-emerald-600/10 p-3 text-sm">
+                      <div className="mb-2 font-medium text-emerald-700 dark:text-emerald-300">Pagos parciales registrados</div>
+                      {venta?.pagos.map((pago) => (
+                        <div key={pago.id} className="flex justify-between py-0.5 text-neutral-600 dark:text-neutral-300">
+                          <span>{pago.metodo === "EFECTIVO" ? "Efectivo" : pago.metodo === "TARJETA" ? "Tarjeta" : pago.metodo === "TRANSFERENCIA" ? "Transferencia" : "Cuenta corriente"}</span>
+                          <span>${formatearMoneda(pago.monto)}</span>
+                        </div>
+                      ))}
+                      <div className="mt-2 flex justify-between border-t border-emerald-600/20 pt-2 font-semibold">
+                        <span>Saldo pendiente</span>
+                        <span>${formatearMoneda(saldoPendiente)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {saldoPendiente > 0.01 && (
+                    <div className="flex flex-col gap-2 rounded-lg border border-neutral-200 p-3 dark:border-neutral-700">
+                      <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Registrar pago parcial</div>
+                      <div className="grid grid-cols-[1fr_auto] gap-2">
+                        <select
+                          className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+                          value={metodoParcial}
+                          onChange={(e) => setMetodoParcial(e.target.value as typeof metodoParcial)}
+                        >
+                          <option value="EFECTIVO">Efectivo</option>
+                          <option value="TARJETA">Tarjeta</option>
+                          <option value="TRANSFERENCIA">Transferencia</option>
+                        </select>
+                        <input
+                          type="number"
+                          min="0.01"
+                          max={saldoPendiente}
+                          step="0.01"
+                          placeholder="Monto"
+                          value={montoParcial}
+                          onChange={(e) => setMontoParcial(e.target.value)}
+                          className="w-32 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+                        />
+                      </div>
+                      <Button type="button" size="sm" onClick={registrarPagoParcial} disabled={enviando || !montoParcial}>
+                        Guardar pago parcial
+                      </Button>
+                      {pagadoParcial > 0 && (
+                        <p className="text-xs text-neutral-500">El descuento quedó fijado al registrar el primer pago.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {saldoPendiente > 0.01 && (
+                    <>
+                      <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                        Cobro final del saldo: ${formatearMoneda(saldoPendiente)}
+                      </div>
+                      <PagoSelector
+                        total={saldoPendiente}
+                        pagos={pagos}
+                        setPagos={setPagos}
+                        clientes={clientes}
+                        clienteId={clienteId}
+                        setClienteId={setClienteId}
+                      />
+                    </>
+                  )}
                   <div className="flex gap-2">
                     <Button
                       onClick={imprimirTicket}
@@ -946,11 +1062,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                     </Button>
                     <Button
                       onClick={cerrarMesa}
-                      disabled={enviando || totalFinal <= 0 || !pagosCuadran(pagos, totalFinal)}
+                      disabled={enviando || totalFinal <= 0 || (saldoPendiente > 0.01 && !pagosCuadran(pagos, saldoPendiente))}
                       variant="primary"
                       className="flex-1"
                     >
-                      Cobrar y cerrar
+                      {saldoPendiente <= 0.01 ? "Cerrar mesa (pagada)" : "Cobrar saldo y cerrar"}
                     </Button>
                   </div>
                 </>

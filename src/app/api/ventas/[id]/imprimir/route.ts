@@ -77,14 +77,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
     lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL", descuento.total)}`);
 
+    const totalPagado = venta.pagos.reduce((suma, pago) => suma + pago.monto, 0);
+    if (totalPagado > 0 && venta.estado !== "CERRADA") {
+      lineas.push(`[[ROW]] ${lineaImporte("PAGADO", -totalPagado)}`);
+      lineas.push(`[[TOTAL]] ${lineaImporte("SALDO PENDIENTE", Math.max(0, descuento.total - totalPagado))}`);
+    }
+
     if (venta.estado !== "CERRADA" && configuracion?.aliasTransferencia) {
       lineas.push("[[HR]]");
       lineas.push(`[[NOTE]] Alias: ${configuracion.aliasTransferencia}`);
     }
 
-    if (venta.estado === "CERRADA") {
+    if (venta.pagos.length > 0) {
       lineas.push("[[HR]]");
-      lineas.push("[[SECTION]] FORMA DE PAGO");
+      lineas.push(`[[SECTION]] ${venta.estado === "CERRADA" ? "FORMA DE PAGO" : "PAGOS PARCIALES"}`);
     }
     for (const pago of venta.pagos) {
       const metodos: Record<string, string> = {

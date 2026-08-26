@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { aplicarDescuento } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { generarPdfPresupuesto } from "@/lib/pdfPresupuesto";
+import { enviarDocumentoTelegram } from "@/lib/telegram";
+import { formatearMoneda } from "@/lib/formato";
 
 type ItemEntrada = { productoId?: number; nombre: string; cantidad: number; precioUnitario: number };
 
@@ -47,5 +50,19 @@ export async function POST(req: NextRequest) {
       })) },
     }, include: { items: true },
   });
+  try {
+    const pdf = generarPdfPresupuesto(
+      presupuesto,
+      sesion.negocioNombre,
+      `${sesion.nombre} (${sesion.rol})`
+    );
+    await enviarDocumentoTelegram(
+      pdf,
+      `presupuesto-${presupuesto.id}.pdf`,
+      `Presupuesto #${presupuesto.id}\nCliente: ${presupuesto.clienteNombre}\nTotal: $${formatearMoneda(presupuesto.total)}`
+    );
+  } catch (error) {
+    console.error("No se pudo generar o enviar el PDF del presupuesto:", error);
+  }
   return NextResponse.json(presupuesto, { status: 201 });
 }

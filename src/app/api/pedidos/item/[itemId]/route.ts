@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 import { sesionActual } from "@/lib/sesionServidor";
-import { enviarAlertaTelegram } from "@/lib/telegram";
-import { formatearMoneda } from "@/lib/formato";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
   const sesion = await sesionActual();
@@ -14,18 +12,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
   try {
     const item = await prisma.pedidoItem.findUnique({
       where: { id: Number(itemId) },
-      include: {
-        producto: { select: { nombre: true } },
-        pedido: {
-          select: {
-            ventaId: true,
-            venta: { select: { mesa: { select: { nombre: true, apodo: true } } } },
-          },
-        },
-      },
+      include: { pedido: { select: { ventaId: true, venta: { select: { ticketImpreso: true } } } } },
     });
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
+    }
+    if (item.pedido.venta.ticketImpreso) {
+      return NextResponse.json(
+        { error: "No se puede editar un producto después de emitir el preticket" },
+        { status: 409 }
+      );
     }
 
     // El mozo puede seguir corrigiendo el precio, pero no la cantidad de un producto ya
@@ -71,14 +67,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
       }),
     ]);
 
-    if (cantidadFinal !== item.cantidad) {
-      const mesa = item.pedido.venta.mesa;
-      const ubicacion = mesa?.apodo || mesa?.nombre || "Mostrador";
-      await enviarAlertaTelegram(
-        `✏️ Cantidad modificada\n${ubicacion} · Venta #${item.pedido.ventaId}\nProducto: ${item.producto.nombre}\nAntes: ${item.cantidad}\nAhora: ${cantidadFinal}\nRealizado por: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
-      );
-    }
-
     return NextResponse.json(updated);
   } catch (err) {
     return NextResponse.json({ error: "No se pudo actualizar el item" }, { status: 500 });
@@ -98,6 +86,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
             ventaId: true,
             venta: {
               select: {
+                ticketImpreso: true,
                 mesa: { select: { id: true, nombre: true, apodo: true } },
               },
             },
@@ -107,6 +96,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     });
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
+    }
+    if (item.pedido.venta.ticketImpreso) {
+      return NextResponse.json(
+        { error: "No se puede quitar un producto después de emitir el preticket" },
+        { status: 409 }
+      );
     }
 
     await prisma.$transaction([
@@ -129,11 +124,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       "quitar_producto_mesa",
       `${item.cantidad} x ${item.producto.nombre} quitado de ${nombreMesa} · Venta #${item.pedido.ventaId}`
     );
-    const sesion = await sesionActual();
-    await enviarAlertaTelegram(
-      `🗑️ Producto quitado de una cuenta\n${nombreMesa} · Venta #${item.pedido.ventaId}\nProducto: ${item.producto.nombre}\nCantidad: ${item.cantidad}\nImporte retirado: $${formatearMoneda(item.subtotal)}\nRealizado por: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
-    );
-
     return NextResponse.json({
       success: true,
       totalDescontado: item.subtotal,
