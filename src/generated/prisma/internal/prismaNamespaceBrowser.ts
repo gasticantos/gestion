@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Negocio: 'Negocio',
+  Flyer: 'Flyer',
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
@@ -97,6 +98,16 @@ export const NegocioScalarFieldEnum = {
 } as const
 
 export type NegocioScalarFieldEnum = (typeof NegocioScalarFieldEnum)[keyof typeof NegocioScalarFieldEnum]
+
+
+export const FlyerScalarFieldEnum = {
+  id: 'id',
+  imagen: 'imagen',
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
+} as const
+
+export type FlyerScalarFieldEnum = (typeof FlyerScalarFieldEnum)[keyof typeof FlyerScalarFieldEnum]
 
 
 export const CategoriaScalarFieldEnum = {

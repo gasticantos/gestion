@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Negocio: 'Negocio',
+  Flyer: 'Flyer',
   Categoria: 'Categoria',
   Usuario: 'Usuario',
   Configuracion: 'Configuracion',
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "negocio" | "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "presupuesto" | "presupuestoItem" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
+    modelProps: "negocio" | "flyer" | "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "presupuesto" | "presupuestoItem" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "cliente" | "movimientoCuentaCorriente"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -494,6 +495,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NegocioCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NegocioCountAggregateOutputType> | number
+        }
+      }
+    }
+    Flyer: {
+      payload: Prisma.$FlyerPayload<ExtArgs>
+      fields: Prisma.FlyerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FlyerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FlyerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>
+        }
+        findFirst: {
+          args: Prisma.FlyerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FlyerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>
+        }
+        findMany: {
+          args: Prisma.FlyerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>[]
+        }
+        create: {
+          args: Prisma.FlyerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>
+        }
+        createMany: {
+          args: Prisma.FlyerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FlyerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>[]
+        }
+        delete: {
+          args: Prisma.FlyerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>
+        }
+        update: {
+          args: Prisma.FlyerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>
+        }
+        deleteMany: {
+          args: Prisma.FlyerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FlyerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FlyerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>[]
+        }
+        upsert: {
+          args: Prisma.FlyerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlyerPayload>
+        }
+        aggregate: {
+          args: Prisma.FlyerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFlyer>
+        }
+        groupBy: {
+          args: Prisma.FlyerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FlyerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FlyerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FlyerCountAggregateOutputType> | number
         }
       }
     }
@@ -1952,6 +2027,16 @@ export const NegocioScalarFieldEnum = {
 export type NegocioScalarFieldEnum = (typeof NegocioScalarFieldEnum)[keyof typeof NegocioScalarFieldEnum]
 
 
+export const FlyerScalarFieldEnum = {
+  id: 'id',
+  imagen: 'imagen',
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
+} as const
+
+export type FlyerScalarFieldEnum = (typeof FlyerScalarFieldEnum)[keyof typeof FlyerScalarFieldEnum]
+
+
 export const CategoriaScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
@@ -2635,6 +2720,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   negocio?: Prisma.NegocioOmit
+  flyer?: Prisma.FlyerOmit
   categoria?: Prisma.CategoriaOmit
   usuario?: Prisma.UsuarioOmit
   configuracion?: Prisma.ConfiguracionOmit

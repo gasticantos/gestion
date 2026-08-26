@@ -4,14 +4,17 @@ import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditori
 import { sesionActual } from "@/lib/sesionServidor";
 import { ROL_LABEL } from "@/lib/permisos";
 import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
+import { aplicarDescuento } from "@/lib/precio";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
   const { id } = await params;
 
   try {
-    const venta = await prisma.venta.findUnique({
-      where: { id: Number(id) },
+    if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    const body = await req.json().catch(() => ({}));
+    const venta = await prisma.venta.findFirst({
+      where: { id: Number(id), negocioId: sesion.negocioId },
       include: {
         mesa: true,
         pagos: true,
@@ -23,10 +26,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
     }
 
-    const configuracion = await prisma.configuracion.findFirst();
+    const configuracion = await prisma.configuracion.findUnique({
+      where: { negocioId: sesion.negocioId },
+    });
     const subtotal = venta.pedidos.reduce(
       (total, pedido) => total + pedido.items.reduce((suma, item) => suma + item.subtotal, 0),
       0
+    );
+    // En la cuenta previa el descuento todavía no está persistido: usar el valor que
+    // está viendo el cajero. En el comprobante final, usar siempre el descuento guardado.
+    const descuento = aplicarDescuento(
+      subtotal,
+      venta.estado === "CERRADA" ? venta.descuentoPct : Number(body.descuentoPct) || 0
     );
     const dinero = (valor: number) => `$${formatearMoneda(valor)}`;
     const lineaImporte = (etiqueta: string, valor: number) =>
@@ -61,11 +72,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     lineas.push("[[HR]]");
     lineas.push(`[[ROW]] ${lineaImporte("SUBTOTAL", subtotal)}`);
-    if (venta.descuentoPct > 0) {
-      const desc = (subtotal * venta.descuentoPct) / 100;
-      lineas.push(`[[ROW]] ${lineaImporte(`DESCUENTO ${venta.descuentoPct}%`, -desc)}`);
+    if (descuento.monto > 0) {
+      lineas.push(`[[ROW]] ${lineaImporte(`DESCUENTO ${descuento.pct}%`, -descuento.monto)}`);
     }
-    lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL", venta.total)}`);
+    lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL", descuento.total)}`);
 
     if (venta.estado !== "CERRADA" && configuracion?.aliasTransferencia) {
       lineas.push("[[HR]]");
@@ -94,7 +104,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const [trabajo] = await prisma.$transaction([
       prisma.impresionTrabajo.create({
-        data: { tipo: "TICKET", contenido },
+        data: { tipo: "TICKET", contenido, negocioId: sesion.negocioId },
         select: { id: true },
       }),
       // Conservamos este indicador como "ticket enviado a impresión". El resultado físico

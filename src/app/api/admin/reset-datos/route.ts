@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
   await prisma.cliente.deleteMany();
   await prisma.categoria.deleteMany();
   await prisma.impresionTrabajo.deleteMany();
+  await prisma.flyer.deleteMany();
 
   return NextResponse.json({ ok: true });
 }

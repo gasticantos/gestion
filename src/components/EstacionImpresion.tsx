@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import {
+  guardarImpresoraSeleccionada,
   imprimirLocal,
   listarImpresorasLocales,
   obtenerEstadoAgenteImpresion,
@@ -98,6 +99,22 @@ export default function EstacionImpresion() {
     let ultimaConsultaAgente = 0;
     let versionAgente = "";
 
+    async function asegurarImpresoraSeleccionada() {
+      const guardada = obtenerImpresoraSeleccionada();
+      if (guardada) return guardada;
+
+      const disponibles = await listarImpresorasLocales();
+      const elegida =
+        disponibles.find((impresora) => impresora.predeterminada && !impresora.desconectada) ||
+        disponibles.find((impresora) => !impresora.desconectada) ||
+        disponibles.find((impresora) => impresora.predeterminada) ||
+        disponibles[0];
+
+      if (!elegida) return "";
+      guardarImpresoraSeleccionada(elegida.nombre);
+      return elegida.nombre;
+    }
+
     async function comprobarEstacion() {
       try {
         const res = await fetch(
@@ -115,9 +132,14 @@ export default function EstacionImpresion() {
     }
 
     async function buscarEImprimir() {
-      if (!activo || procesando || !obtenerImpresoraSeleccionada() || esEstacionPrincipal !== true) return;
+      if (!activo || procesando || esEstacionPrincipal !== true) return;
       procesando = true;
       try {
+        // La primera vez que abre la aplicación en esta computadora, tomar y guardar
+        // automáticamente la impresora predeterminada de Windows. Antes esto ocurría
+        // recién al entrar a Configuración y obligaba a repetir ese paso al iniciar.
+        if (!(await asegurarImpresoraSeleccionada())) return;
+
         if (Date.now() - ultimaConsultaAgente > 15_000) {
           const estadoAgente = await obtenerEstadoAgenteImpresion();
           versionAgente = estadoAgente.agente;

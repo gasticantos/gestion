@@ -41,8 +41,8 @@ export function limitesDiaArgentino(fechaYMD: string): { desde: Date; hasta: Dat
 }
 
 /**
- * Jornada comercial argentina: comienza a las 06:00 y termina a las 05:59:59.999
- * del día siguiente. Entre medianoche y las 05:59, las ventas siguen perteneciendo
+ * Jornada comercial argentina: comienza a las 07:00 y termina a las 06:59:59.999
+ * del día siguiente. Entre medianoche y las 06:59, las ventas siguen perteneciendo
  * a la jornada que comenzó el día anterior.
  */
 export function limitesJornadaArgentina(ahora: Date = new Date()): {
@@ -59,10 +59,10 @@ export function limitesJornadaArgentina(ahora: Date = new Date()): {
     }).format(ahora)
   );
   const inicioJornada =
-    horaActual < 6
+    horaActual < 7
       ? fechaArgentinaYMD(new Date(new Date(`${fechaActual}T12:00:00-03:00`).getTime() - 24 * 60 * 60 * 1000))
       : fechaActual;
-  const desde = new Date(`${inicioJornada}T06:00:00-03:00`);
+  const desde = new Date(`${inicioJornada}T07:00:00-03:00`);
   return {
     fecha: inicioJornada,
     desde,

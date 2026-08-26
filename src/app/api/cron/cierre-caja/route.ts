@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  // El cron corre a las 06:00 ART; se cierra la jornada que acaba de terminar,
+  // El cron corre a las 07:00 ART; se cierra la jornada que acaba de terminar,
   // no la que empieza en ese instante.
   const jornada = jornadaTerminada(new Date());
   const negocios = await prisma.negocio.findMany({ where: { activo: true }, select: { id: true } });

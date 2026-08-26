@@ -28,6 +28,17 @@ model Negocio {
   ventas          Venta[]
   clientes        Cliente[]
   presupuestos    Presupuesto[]
+  flyers          Flyer[]
+}
+
+model Flyer {
+  id        Int      @id @default(autoincrement())
+  imagen    String   @db.Text
+  createdAt DateTime @default(now())
+  negocioId Int      @default(1)
+  negocio   Negocio  @relation(fields: [negocioId], references: [id], onDelete: Cascade)
+
+  @@index([negocioId, createdAt])
 }
 
 model Categoria {

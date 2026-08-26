@@ -16,6 +16,7 @@ const links = [
   { href: "/stock", label: "Stock" },
   { href: "/productos", label: "Productos" },
   { href: "/promos", label: "Promos" },
+  { href: "/flyers", label: "Flyers" },
   { href: "/presupuestos", label: "Presupuestos" },
   { href: "/proveedores", label: "Proveedores" },
   { href: "/clientes", label: "Clientes" },
@@ -101,7 +102,9 @@ export default function Navbar() {
             cache: "no-store",
             signal: controller.signal,
           });
-          localStorage.clear();
+          // La sesión se invalida con la cookie. La impresora y la identidad de la
+          // estación pertenecen a esta computadora y deben sobrevivir al cierre.
+          localStorage.removeItem("carrito-venta");
         } catch {
           // El cierre no debe quedar bloqueado si no hay conexión en ese instante.
         } finally {
@@ -120,8 +123,9 @@ export default function Navbar() {
 
   async function cerrarSesion() {
     await fetch("/api/auth/logout", { method: "POST" });
-    // Limpiar todo localStorage
-    localStorage.clear();
+    // Limpiar datos del usuario, conservando la impresora y la identidad física
+    // de esta computadora para que pueda imprimir aun en la pantalla de login.
+    localStorage.removeItem("carrito-venta");
     router.push("/login");
     router.refresh();
   }

@@ -191,7 +191,7 @@ export default function ConfiguracionPage() {
   async function borrarDatos() {
     setErrorBorrado("");
     setOkBorrado("");
-    if (!confirm("Esto borra productos, categorías, proveedores, mesas, clientes, ventas, pedidos y cuentas corrientes. No borra usuarios ni te desloguea. ¿Confirmás?")) {
+    if (!confirm("Esto borra productos, categorías, proveedores, mesas, clientes, ventas, pedidos, cuentas corrientes y flyers. No borra usuarios ni te desloguea. ¿Confirmás?")) {
       return;
     }
     setBorrando(true);

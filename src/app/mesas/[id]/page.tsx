@@ -540,7 +540,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
     setEnviando(true);
     try {
-      const res = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" });
+      const res = await fetch(`/api/ventas/${venta.id}/imprimir`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ descuentoPct: descuento.pct }),
+      });
       if (!res.ok) {
         setError("No se pudo enviar el ticket a la estación de impresión.");
         return;

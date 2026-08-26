@@ -8,7 +8,7 @@ type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
 export async function GET() {
-  // La lista diaria sigue la misma jornada comercial que el cierre: 06:00 a 05:59.
+  // La lista diaria sigue la misma jornada comercial que el cierre: 07:00 a 06:59.
   const { desde: inicioJornada, hasta: finJornada } = limitesJornadaArgentina();
 
   const ventas = await prisma.venta.findMany({

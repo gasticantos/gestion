@@ -9,6 +9,10 @@ const PUBLICAS = [
   "/api/auth/logout",
   "/api/cron/cierre-caja",
   "/api/impresion/reparar",
+  // La caja física debe seguir procesando impresiones aunque todavía nadie haya
+  // iniciado sesión. Estas rutas validan el identificador privado de la estación.
+  "/api/impresion/estacion",
+  "/api/impresion/cola",
   "/manifest.webmanifest",
   "/actualizacion.json",
   "/icons",

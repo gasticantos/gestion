@@ -47,6 +47,11 @@ export { Prisma }
  */
 export type Negocio = Prisma.NegocioModel
 /**
+ * Model Flyer
+ * 
+ */
+export type Flyer = Prisma.FlyerModel
+/**
  * Model Categoria
  * 
  */

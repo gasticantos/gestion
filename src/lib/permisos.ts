@@ -14,6 +14,8 @@ export const REGLAS_RUTA: { prefix: string; roles: Rol[] }[] = [
   { prefix: "/api/usuarios", roles: ["DUENIO"] },
   { prefix: "/configuracion", roles: ["DUENIO"] },
   { prefix: "/api/configuracion", roles: ["DUENIO", "CAJERO", "MOZO"] },
+  { prefix: "/flyers", roles: ["DUENIO", "CAJERO", "MOZO"] },
+  { prefix: "/api/flyers", roles: ["DUENIO", "CAJERO", "MOZO"] },
   // Solo dueño/cajero pueden tocar qué computadora es la caja principal de impresión.
   // Antes cualquier rol (incluida una moza) podía pisarla sin querer con un solo clic.
   { prefix: "/api/impresion", roles: ["DUENIO", "CAJERO"] },

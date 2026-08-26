@@ -17,6 +17,7 @@ const adapter = new PrismaPg(pool);
 const MODELOS_NEGOCIO = new Set([
   "Categoria", "Usuario", "Configuracion", "ImpresionTrabajo", "AuditoriaLog",
   "Proveedor", "Producto", "StockEntry", "Mesa", "Reserva", "Venta", "Cliente",
+  "Flyer",
 ]);
 const FILTROS_RELACIONALES: Record<string, (negocioId: number) => object> = {
   StockEntryItem: (negocioId) => ({ stockEntry: { negocioId } }),

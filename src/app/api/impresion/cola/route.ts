@@ -1,18 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sesionActual } from "@/lib/sesionServidor";
+
+async function negocioDeEstacion(estacionId: string) {
+  if (!estacionId) return null;
+  const configuracion = await prisma.configuracion.findFirst({
+    where: { estacionImpresionId: estacionId },
+    select: { negocioId: true },
+  });
+  return configuracion?.negocioId ?? null;
+}
 
 // La estación consulta esta ruta periódicamente. Los trabajos que quedaron tomados por
 // una estación cerrada vuelven a estar disponibles después de dos minutos.
 export async function GET(req: NextRequest) {
   const estacionId = req.nextUrl.searchParams.get("estacionId")?.trim();
-  const configuracion = await prisma.configuracion.findFirst({
-    select: { estacionImpresionId: true },
-  });
-  if (!estacionId || configuracion?.estacionImpresionId !== estacionId) {
+  const negocioId = await negocioDeEstacion(estacionId || "");
+  if (!estacionId || !negocioId) {
     return NextResponse.json({ trabajos: [] });
   }
 
   const siguiente = req.nextUrl.searchParams.get("siguiente") === "1";
+  if (!siguiente) {
+    const sesion = await sesionActual();
+    if (!sesion || sesion.negocioId !== negocioId) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+    if (sesion.rol !== "DUENIO" && sesion.rol !== "CAJERO") {
+      return NextResponse.json({ error: "No tenés permiso para consultar la cola" }, { status: 403 });
+    }
+  }
   const limite = siguiente ? 1 : 20;
   const impresorasDisponibles = req.nextUrl.searchParams
     .getAll("impresora")
@@ -21,7 +38,7 @@ export async function GET(req: NextRequest) {
   const haceDosMinutos = new Date(Date.now() - 2 * 60 * 1000);
 
   await prisma.impresionTrabajo.updateMany({
-    where: { estado: "IMPRIMIENDO", claimedAt: { lt: haceDosMinutos } },
+    where: { negocioId, estado: "IMPRIMIENDO", claimedAt: { lt: haceDosMinutos } },
     data: { estado: "PENDIENTE", estacionId: null, claimedAt: null },
   });
 
@@ -31,6 +48,7 @@ export async function GET(req: NextRequest) {
     // mayor parte de la demora entre mandar a imprimir y que salga el ticket.
     const candidatos = await prisma.impresionTrabajo.findMany({
       where: {
+        negocioId,
         estado: "PENDIENTE",
         OR: [
           { impresora: null },
@@ -46,7 +64,7 @@ export async function GET(req: NextRequest) {
 
     for (const { id } of candidatos) {
       const tomado = await prisma.impresionTrabajo.updateMany({
-        where: { id, estado: "PENDIENTE" },
+        where: { id, negocioId, estado: "PENDIENTE" },
         data: {
           estado: "IMPRIMIENDO",
           estacionId,
@@ -67,6 +85,7 @@ export async function GET(req: NextRequest) {
   }
 
   const trabajos = await prisma.impresionTrabajo.findMany({
+    where: { negocioId },
     select: {
       id: true,
       tipo: true,
@@ -91,10 +110,16 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
 
   if (body.accion === "prueba") {
+    const sesion = await sesionActual();
+    if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    if (sesion.rol !== "DUENIO" && sesion.rol !== "CAJERO") {
+      return NextResponse.json({ error: "No tenés permiso para imprimir una prueba" }, { status: 403 });
+    }
     const trabajo = await prisma.impresionTrabajo.create({
       data: {
         tipo: "PRUEBA",
         contenido: String(body.contenido || "PRUEBA DE IMPRESION"),
+        negocioId: sesion.negocioId,
       },
       select: { id: true },
     });
@@ -105,18 +130,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Solicitud inválida" }, { status: 400 });
   }
 
-  const configuracion = await prisma.configuracion.findFirst({
-    select: { estacionImpresionId: true },
-  });
-  if (configuracion?.estacionImpresionId !== String(body.estacionId)) {
+  const estacionId = String(body.estacionId);
+  const negocioId = await negocioDeEstacion(estacionId);
+  if (!negocioId) {
     return NextResponse.json({ error: "Esta computadora no es la estación principal" }, { status: 409 });
   }
 
   const resultado = await prisma.impresionTrabajo.updateMany({
-    where: { id: Number(body.id), estado: "PENDIENTE" },
+    where: { id: Number(body.id), negocioId, estado: "PENDIENTE" },
     data: {
       estado: "IMPRIMIENDO",
-      estacionId: String(body.estacionId),
+      estacionId,
       claimedAt: new Date(),
       intentos: { increment: 1 },
       error: null,
@@ -127,8 +151,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "El trabajo ya fue tomado" }, { status: 409 });
   }
 
-  const trabajo = await prisma.impresionTrabajo.findUnique({
-    where: { id: Number(body.id) },
+  const trabajo = await prisma.impresionTrabajo.findFirst({
+    where: { id: Number(body.id), negocioId },
     select: { id: true, tipo: true, contenido: true, impresora: true },
   });
   return NextResponse.json(trabajo);
@@ -141,16 +165,22 @@ export async function PUT(req: NextRequest) {
   }
 
   const ok = body.ok === true;
-  const trabajo = await prisma.impresionTrabajo.findUnique({
-    where: { id: Number(body.id) },
+  const estacionId = String(body.estacionId);
+  const negocioId = await negocioDeEstacion(estacionId);
+  if (!negocioId) {
+    return NextResponse.json({ error: "Esta computadora no es la estación principal" }, { status: 409 });
+  }
+  const trabajo = await prisma.impresionTrabajo.findFirst({
+    where: { id: Number(body.id), negocioId },
     select: { intentos: true },
   });
   const reintentar = !ok && Boolean(trabajo && trabajo.intentos < 3);
   const resultado = await prisma.impresionTrabajo.updateMany({
     where: {
       id: Number(body.id),
+      negocioId,
       estado: "IMPRIMIENDO",
-      estacionId: String(body.estacionId),
+      estacionId,
     },
     data: {
       estado: ok ? "IMPRESO" : reintentar ? "PENDIENTE" : "ERROR",
