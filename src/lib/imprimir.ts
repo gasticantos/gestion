@@ -17,7 +17,6 @@ const CLAVE_IMPRESORA = "gestion_impresora_seleccionada";
 const CLAVE_DESBLOQUEADA = "gestion_impresora_desbloqueada";
 let ultimoErrorImpresion = "";
 let urlAgenteActiva = "";
-let urlAgenteActivaHasta = 0;
 
 export type ImpresoraLocal = {
   nombre: string;
@@ -35,7 +34,7 @@ export const ERROR_IMPRESION_LOCAL =
   "No se pudo imprimir automáticamente. Elegí una impresora en Configuración y verificá que el agente esté iniciado. No se abrió el diálogo del navegador.";
 
 async function resolverAgenteImpresionUrl(): Promise<string> {
-  if (urlAgenteActiva && Date.now() < urlAgenteActivaHasta) return urlAgenteActiva;
+  if (urlAgenteActiva) return urlAgenteActiva;
   await obtenerEstadoAgenteImpresion();
   if (!urlAgenteActiva) throw new Error("No se encontró un agente de impresión");
   return urlAgenteActiva;
@@ -46,6 +45,7 @@ async function resolverAgenteImpresionUrl(): Promise<string> {
 // Nunca llama a window.print(): la aplicación debe imprimir sin confirmaciones.
 export async function imprimirLocal(contenido: string, impresoraDestino?: string | null): Promise<boolean> {
   ultimoErrorImpresion = "";
+  const inicio = performance.now();
   try {
     const impresora = impresoraDestino?.trim() || localStorage.getItem(CLAVE_IMPRESORA);
     if (!impresora) {
@@ -61,16 +61,19 @@ export async function imprimirLocal(contenido: string, impresoraDestino?: string
     const res = await fetch(`${agenteUrl}/imprimir`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contenido, impresora }),
+      body: JSON.stringify({ contenido, impresora, modo: "auto" }),
       signal: controller.signal,
     });
     clearTimeout(timeout);
+    const data = await res.json().catch(() => null);
     if (!res.ok) {
-      const data = await res.json().catch(() => null);
       ultimoErrorImpresion = data?.error || `Windows respondió con error ${res.status}`;
       console.warn("Agente de impresión local respondió con error:", data?.error || res.status);
       return false;
     }
+    console.info(
+      `[Impresión] agente=${Math.round(performance.now() - inicio)}ms modo=${data?.modo || "windows"}`
+    );
     return true;
   } catch (err) {
     ultimoErrorImpresion = err instanceof Error ? err.message : "No se pudo contactar al agente local";
@@ -107,7 +110,6 @@ export function guardarImpresoraSeleccionada(nombre: string) {
   localStorage.removeItem(CLAVE_DESBLOQUEADA);
   // Limpiar cache del agente para reconectar con la nueva impresora
   urlAgenteActiva = "";
-  urlAgenteActivaHasta = 0;
 }
 
 export async function obtenerEstadoAgenteImpresion(): Promise<EstadoAgenteImpresion> {
@@ -123,7 +125,6 @@ export async function obtenerEstadoAgenteImpresion(): Promise<EstadoAgenteImpres
       if (!res.ok) throw new Error("El agente local no respondió correctamente");
       const data = await res.json();
       urlAgenteActiva = url;
-      urlAgenteActivaHasta = Date.now() + 5_000;
       return {
         ok: data?.ok === true,
         agente: typeof data?.agente === "string" ? data.agente : "",

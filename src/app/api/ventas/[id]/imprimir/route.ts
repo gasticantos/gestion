@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
 import { prisma } from "@/lib/prisma";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 import { sesionActual } from "@/lib/sesionServidor";
@@ -123,6 +124,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
     await registrarAuditoria(usuarioId, "imprimir_ticket", `Venta #${venta.id}`);
+    await notificarNuevaImpresion();
 
     return NextResponse.json({ success: true, encolado: true, trabajoId: trabajo.id });
   } catch (err) {

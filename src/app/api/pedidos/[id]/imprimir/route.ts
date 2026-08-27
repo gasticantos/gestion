@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
 import { ROL_LABEL } from "@/lib/permisos";
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }),
     ]);
     const trabajosCreados = resultado.slice(0, trabajos.length);
+    await notificarNuevaImpresion();
 
     return NextResponse.json({
       success: true,

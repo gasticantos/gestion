@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
+import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
+
+const ultimaRecuperacion = new Map<number, number>();
+
+type TrabajoTomado = {
+  id: number;
+  tipo: "TICKET" | "COMANDA" | "PRUEBA";
+  contenido: string;
+  impresora: string | null;
+};
 
 async function negocioDeEstacion(estacionId: string) {
   if (!estacionId) return null;
@@ -35,53 +45,44 @@ export async function GET(req: NextRequest) {
     .getAll("impresora")
     .map((nombre) => nombre.trim())
     .filter(Boolean);
-  const haceDosMinutos = new Date(Date.now() - 2 * 60 * 1000);
-
-  await prisma.impresionTrabajo.updateMany({
-    where: { negocioId, estado: "IMPRIMIENDO", claimedAt: { lt: haceDosMinutos } },
-    data: { estado: "PENDIENTE", estacionId: null, claimedAt: null },
-  });
+  const ahora = Date.now();
+  if (ahora - (ultimaRecuperacion.get(negocioId) || 0) > 30_000) {
+    ultimaRecuperacion.set(negocioId, ahora);
+    const haceDosMinutos = new Date(ahora - 2 * 60 * 1000);
+    await prisma.impresionTrabajo.updateMany({
+      where: { negocioId, estado: "IMPRIMIENDO", claimedAt: { lt: haceDosMinutos } },
+      data: { estado: "PENDIENTE", estacionId: null, claimedAt: null },
+    });
+  }
 
   if (siguiente) {
-    // Busca y toma el trabajo en la misma consulta: antes la estación hacía un segundo viaje
-    // de red (POST "tomar") solo para reservarlo, y ese round-trip extra a la base era la
-    // mayor parte de la demora entre mandar a imprimir y que salga el ticket.
-    const candidatos = await prisma.impresionTrabajo.findMany({
-      where: {
-        negocioId,
-        estado: "PENDIENTE",
-        OR: [
-          { impresora: null },
-          ...(impresorasDisponibles.length
-            ? [{ impresora: { in: impresorasDisponibles } }]
-            : []),
-        ],
-      },
-      select: { id: true },
-      orderBy: { createdAt: "asc" },
-      take: 5,
-    });
-
-    for (const { id } of candidatos) {
-      const tomado = await prisma.impresionTrabajo.updateMany({
-        where: { id, negocioId, estado: "PENDIENTE" },
-        data: {
-          estado: "IMPRIMIENDO",
-          estacionId,
-          claimedAt: new Date(),
-          intentos: { increment: 1 },
-          error: null,
-        },
-      });
-      if (tomado.count === 1) {
-        const trabajo = await prisma.impresionTrabajo.findUnique({
-          where: { id },
-          select: { id: true, tipo: true, contenido: true, impresora: true },
-        });
-        return NextResponse.json({ trabajos: trabajo ? [trabajo] : [] });
-      }
-    }
-    return NextResponse.json({ trabajos: [] });
+    // Un único viaje a PostgreSQL encuentra, bloquea y devuelve el trabajo. SKIP LOCKED
+    // conserva la seguridad si dos pedidos llegan juntos o se reconecta otra instancia.
+    const trabajos = await prisma.$queryRaw<TrabajoTomado[]>`
+      WITH candidato AS (
+        SELECT id
+        FROM "ImpresionTrabajo"
+        WHERE "negocioId" = ${negocioId}
+          AND estado = 'PENDIENTE'::"EstadoImpresion"
+          AND (
+            impresora IS NULL
+            OR (cardinality(${impresorasDisponibles}::text[]) > 0 AND impresora = ANY(${impresorasDisponibles}::text[]))
+          )
+        ORDER BY "createdAt" ASC
+        FOR UPDATE SKIP LOCKED
+        LIMIT 1
+      )
+      UPDATE "ImpresionTrabajo" AS trabajo
+      SET estado = 'IMPRIMIENDO'::"EstadoImpresion",
+          "estacionId" = ${estacionId},
+          "claimedAt" = NOW(),
+          intentos = trabajo.intentos + 1,
+          error = NULL
+      FROM candidato
+      WHERE trabajo.id = candidato.id
+      RETURNING trabajo.id, trabajo.tipo, trabajo.contenido, trabajo.impresora
+    `;
+    return NextResponse.json({ trabajos });
   }
 
   const trabajos = await prisma.impresionTrabajo.findMany({
@@ -123,6 +124,7 @@ export async function POST(req: NextRequest) {
       },
       select: { id: true },
     });
+    await notificarNuevaImpresion();
     return NextResponse.json(trabajo, { status: 201 });
   }
 

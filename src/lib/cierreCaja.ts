@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
 import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
 import { obtenerReporteVentas } from "@/lib/reportes";
 import { enviarAlertaTelegram, enviarDocumentoTelegram } from "@/lib/telegram";
@@ -94,6 +95,7 @@ export async function cerrarJornadaCaja({
       await tx.mesa.updateMany({ where: { negocioId }, data: { estado: "LIBRE" } });
       return creado;
     });
+    await notificarNuevaImpresion();
     try {
       const pdf = generarPdfCierreCaja({
         nombreNegocio: configuracion?.nombrePrograma || "Gestión",

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { precioSegunTarifa, Tarifa } from "@/lib/precio";
@@ -169,6 +170,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       ventaTotal: venta.total + subtotalPedido,
     };
   });
+
+  if (pedido.trabajoIds.length > 0) await notificarNuevaImpresion();
 
   return NextResponse.json(pedido, { status: 201 });
 }

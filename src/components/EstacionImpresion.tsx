@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createClient, type RealtimeChannel } from "@supabase/supabase-js";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import {
   guardarImpresoraSeleccionada,
@@ -11,7 +12,8 @@ import {
 } from "@/lib/imprimir";
 
 const CLAVE_ESTACION = "gestion_estacion_impresion_id";
-const VERSION_MINIMA_AGENTE = "1.1.7";
+const TOPICO_REALTIME_IMPRESION = "gestion-impresion";
+const VERSION_MINIMA_AGENTE = "1.2.0";
 
 type TrabajoPendiente = {
   id: number;
@@ -98,6 +100,7 @@ export default function EstacionImpresion() {
     let ultimaConsultaImpresoras = 0;
     let ultimaConsultaAgente = 0;
     let versionAgente = "";
+    let canalRealtime: RealtimeChannel | null = null;
 
     async function asegurarImpresoraSeleccionada() {
       const guardada = obtenerImpresoraSeleccionada();
@@ -189,11 +192,23 @@ export default function EstacionImpresion() {
     comprobarEstacion();
     const intervaloEstacion = window.setInterval(comprobarEstacion, 15_000);
     buscarEImprimir();
-    // 500ms en vez de 1500ms: la mitad del tiempo que tarda un ticket en salir desde que
-    // se manda a imprimir era la espera promedio hasta el próximo sondeo.
-    const intervalo = window.setInterval(buscarEImprimir, 500);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+      const realtime = createClient(supabaseUrl, supabaseKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      canalRealtime = realtime
+        .channel(TOPICO_REALTIME_IMPRESION)
+        .on("broadcast", { event: "nueva_impresion" }, () => void buscarEImprimir())
+        .subscribe();
+    }
+    // Realtime despierta la estación al instante. Este sondeo lento es solo un seguro ante
+    // cortes de WebSocket o avisos perdidos; la cola persistente nunca depende del canal.
+    const intervalo = window.setInterval(buscarEImprimir, 5_000);
     return () => {
       activo = false;
+      if (canalRealtime) void canalRealtime.unsubscribe();
       window.clearInterval(intervalo);
       window.clearInterval(intervaloEstacion);
     };
@@ -208,7 +223,7 @@ export default function EstacionImpresion() {
             necesita la versión {VERSION_MINIMA_AGENTE}. Las comandas quedarán pendientes para no
             perderlas.
           </span>
-          <p className="mt-1 font-medium">La actualización 0.1.18 centra y corrige los acentos.</p>
+          <p className="mt-1 font-medium">La actualización incorpora impresión rápida y respaldo automático.</p>
           {errorActualizacion && <p className="mt-1 font-medium">{errorActualizacion}</p>}
         </div>
         <button
@@ -217,7 +232,7 @@ export default function EstacionImpresion() {
           disabled={actualizando}
           className="rounded-lg bg-red-700 px-3 py-2 text-center font-semibold text-white hover:bg-red-800 disabled:opacity-60"
         >
-          {actualizando ? "Actualizando..." : "Instalar actualización 0.1.18"}
+          {actualizando ? "Actualizando..." : "Instalar actualización"}
         </button>
       </div>
     );

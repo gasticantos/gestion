@@ -284,6 +284,108 @@ function Send-TextWithWindowsDriver {
   [GestionWindowsPrinter]::Print($PrinterName, $Text)
 }
 
+function ConvertTo-EscPosTicket {
+  param([string]$Text)
+
+  $stream = New-Object System.IO.MemoryStream
+  $encoding = [System.Text.Encoding]::GetEncoding(858)
+
+  function Write-Bytes([byte[]]$value) { $stream.Write($value, 0, $value.Length) }
+  function Write-Text([string]$value) {
+    $bytes = $encoding.GetBytes($value)
+    $stream.Write($bytes, 0, $bytes.Length)
+  }
+  function Set-Style([bool]$center, [bool]$bold, [byte]$size) {
+    Write-Bytes ([byte[]](0x1B, 0x61, $(if ($center) { 1 } else { 0 })))
+    Write-Bytes ([byte[]](0x1B, 0x45, $(if ($bold) { 1 } else { 0 })))
+    Write-Bytes ([byte[]](0x1D, 0x21, $size))
+  }
+
+  # Inicializar, seleccionar PC858 (acentos + símbolo de moneda) y espaciado normal.
+  Write-Bytes ([byte[]](0x1B, 0x40))
+  Write-Bytes ([byte[]](0x1B, 0x74, 19))
+  $normalizado = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  foreach ($lineaOriginal in $normalizado.Split("`n")) {
+    $linea = $lineaOriginal
+    $estilo = "BODY"
+    if ($lineaOriginal -match '^\[\[([^\]]+)\]\]\s?(.*)$') {
+      $estilo = $Matches[1].ToUpperInvariant()
+      $linea = $Matches[2]
+    }
+
+    switch ($estilo) {
+      "HR" {
+        Set-Style $false $false 0
+        Write-Text ("-" * 42 + "`n")
+      }
+      "TITLE" {
+        Set-Style $true $true 0x11
+        Write-Text ($linea.ToUpperInvariant() + "`n")
+      }
+      "HERO" {
+        Set-Style $true $true 0x22
+        Write-Text ($linea.ToUpperInvariant() + "`n")
+      }
+      "SUBTITLE" {
+        Set-Style $true $true 0x01
+        Write-Text ($linea.ToUpperInvariant() + "`n")
+      }
+      "CENTER" {
+        Set-Style $true $false 0
+        Write-Text ($linea + "`n")
+      }
+      "SECTION" {
+        Set-Style $false $true 0
+        Write-Text ($linea.ToUpperInvariant() + "`n")
+      }
+      "ITEM" {
+        Set-Style $false $true 0x01
+        Write-Text ($linea + "`n")
+      }
+      "RECEIPT_ITEM" {
+        Set-Style $false $true 0
+        Write-Text ($linea + "`n")
+      }
+      "DETAIL" {
+        Set-Style $false $true 0
+        Write-Text ($linea + "`n")
+      }
+      "ROW" {
+        Set-Style $false $true 0
+        Write-Text ($linea + "`n")
+      }
+      "TOTAL" {
+        Set-Style $false $true 0x11
+        Write-Text ($linea + "`n")
+      }
+      "NOTE" {
+        Set-Style $false $true 0x01
+        Write-Text ("*** " + $linea.Replace("<<BR>>", "`n") + " ***`n")
+      }
+      "FOOTER" {
+        Set-Style $true $false 0
+        Write-Text ($linea + "`n")
+      }
+      default {
+        Set-Style $false $false 0
+        Write-Text ($linea + "`n")
+      }
+    }
+  }
+
+  Set-Style $false $false 0
+  Write-Bytes ([byte[]](0x0A, 0x0A, 0x0A, 0x0A))
+  Write-Bytes ([byte[]](0x1D, 0x56, 0))
+  $resultado = $stream.ToArray()
+  $stream.Dispose()
+  return $resultado
+}
+
+function Test-ImpresoraEscPos {
+  param([string]$PrinterName)
+  return $PrinterName -match '(?i)(EPSON|TM[-_ ]|ESC.?POS|POS[-_ ]|THERMAL|TERMICA|TICKET)'
+}
+
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://127.0.0.1:$Puerto/")
 $listener.Start()
@@ -314,7 +416,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.1.7"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.2.0"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
@@ -382,12 +484,27 @@ while ($listener.IsListening) {
       }
 
       try {
-        # Se imprime por el controlador de Windows. Esto funciona tanto con impresoras
-        # termicas ESC/POS como con colas que no aceptan correctamente trabajos RAW.
-        Send-TextWithWindowsDriver -PrinterName $impresoraElegida -Text "$contenido`r`n`r`n"
+        $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
+        $modoPedido = [string]$json.modo
+        $usarRapido = $modoPedido -eq "escpos" -or ($modoPedido -eq "auto" -and (Test-ImpresoraEscPos $impresoraElegida))
+        $modoUsado = "windows"
+        if ($usarRapido) {
+          try {
+            $datos = ConvertTo-EscPosTicket -Text "$contenido"
+            Send-RawDataToPrinter -PrinterName $impresoraElegida -Bytes $datos
+            $modoUsado = "escpos"
+          } catch {
+            Write-Host "ESC/POS rapido fallo; usando controlador Windows: $_"
+            Send-TextWithWindowsDriver -PrinterName $impresoraElegida -Text "$contenido`r`n`r`n"
+          }
+        } else {
+          Send-TextWithWindowsDriver -PrinterName $impresoraElegida -Text "$contenido`r`n`r`n"
+        }
+
+        $cronometro.Stop()
 
         $response.StatusCode = 200
-        $okBytes = [System.Text.Encoding]::UTF8.GetBytes('{"success":true}')
+        $okBytes = [System.Text.Encoding]::UTF8.GetBytes("{`"success`":true,`"modo`":`"$modoUsado`",`"duracionMs`":$($cronometro.ElapsedMilliseconds)}")
         $response.ContentType = "application/json"
         $response.OutputStream.Write($okBytes, 0, $okBytes.Length)
       } catch {
