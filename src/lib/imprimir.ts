@@ -61,7 +61,10 @@ export async function imprimirLocal(contenido: string, impresoraDestino?: string
     const res = await fetch(`${agenteUrl}/imprimir`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contenido, impresora, modo: "auto" }),
+      // El modo ESC/POS de texto altera tipografías, recuadros y proporciones porque usa
+      // las fuentes internas de cada térmica. Conservamos las mejoras de cola/Realtime,
+      // pero renderizamos con Windows para respetar exactamente el diseño configurado.
+      body: JSON.stringify({ contenido, impresora, modo: "windows" }),
       signal: controller.signal,
     });
     clearTimeout(timeout);
