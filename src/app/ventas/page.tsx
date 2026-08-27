@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Plegable from "@/components/ui/Plegable";
@@ -37,29 +37,31 @@ export default function VentasPage() {
     cargar();
   }, []);
 
-  const hoy = useMemo(() => new Date().toDateString(), []);
-  const ventasHoy = ventas.filter((v) => v.closedAt && new Date(v.closedAt).toDateString() === hoy);
-  const mostrador = ventasHoy.filter((v) => v.tipo === "MOSTRADOR");
-  const mesas = ventasHoy.filter((v) => v.tipo === "MESA");
+  // La API ya devuelve exclusivamente la jornada comercial vigente (07:00 a 06:59)
+  // y excluye lo archivado por un cierre manual. No volver a filtrar por fecha calendario:
+  // hacerlo reiniciaba visualmente todo a medianoche aunque la caja siguiera abierta.
+  const ventasJornada = ventas;
+  const mostrador = ventasJornada.filter((v) => v.tipo === "MOSTRADOR");
+  const mesas = ventasJornada.filter((v) => v.tipo === "MESA");
 
-  const totalHoy = ventasHoy.reduce((acc, v) => acc + v.total, 0);
-  const descuentoTotal = ventasHoy.reduce((acc, v) => acc + (v.total * v.descuentoPct) / 100, 0);
+  const totalJornada = ventasJornada.reduce((acc, v) => acc + v.total, 0);
+  const descuentoTotal = ventasJornada.reduce((acc, v) => acc + (v.total * v.descuentoPct) / 100, 0);
 
   if (loading) return <div className="text-sm text-neutral-500">Cargando...</div>;
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Ventas del día</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Ventas de la jornada</h1>
 
       <Card className="p-4">
         <div className="grid grid-cols-3 gap-4">
           <div>
             <div className="text-xs text-neutral-500">Total de ventas</div>
-            <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalHoy)}</div>
+            <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalJornada)}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500">Cantidad</div>
-            <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">{ventasHoy.length}</div>
+            <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">{ventasJornada.length}</div>
           </div>
           <div>
             <div className="text-xs text-neutral-500">Descuentos aplicados</div>
