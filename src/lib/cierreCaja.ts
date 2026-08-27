@@ -56,7 +56,12 @@ export async function cerrarJornadaCaja({
   }
 
   const [reporte, configuracion] = await Promise.all([
-    obtenerReporteVentas(desde, hasta, { limiteProductos: null, negocioId }),
+    obtenerReporteVentas(desde, hasta, {
+      limiteProductos: null,
+      negocioId,
+      etiquetaDesde: fecha,
+      etiquetaHasta: fecha,
+    }),
     prisma.configuracion.findUnique({ where: { negocioId }, select: { nombrePrograma: true } }),
   ]);
   const dinero = (valor: number) => `$${formatearMoneda(valor)}`;

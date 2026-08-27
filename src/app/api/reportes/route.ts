@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { obtenerReporteVentas } from "@/lib/reportes";
+import { limitesRangoJornadasArgentina } from "@/lib/formato";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -10,13 +11,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Faltan los parámetros desde/hasta" }, { status: 400 });
   }
 
-  const desde = new Date(`${desdeStr}T00:00:00-03:00`);
-  const hasta = new Date(`${hastaStr}T23:59:59.999-03:00`);
+  const { desde, hasta } = limitesRangoJornadasArgentina(desdeStr, hastaStr);
 
   if (isNaN(desde.getTime()) || isNaN(hasta.getTime())) {
     return NextResponse.json({ error: "Fechas inválidas" }, { status: 400 });
   }
 
-  const reporte = await obtenerReporteVentas(desde, hasta);
+  const reporte = await obtenerReporteVentas(desde, hasta, {
+    etiquetaDesde: desdeStr,
+    etiquetaHasta: hastaStr,
+  });
   return NextResponse.json(reporte);
 }

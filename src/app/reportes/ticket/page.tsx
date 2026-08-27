@@ -1,7 +1,7 @@
 import Link from "next/link";
 import AutoPrint from "@/components/AutoPrint";
 import { obtenerReporteVentas } from "@/lib/reportes";
-import { formatearMoneda } from "@/lib/formato";
+import { fechaArgentinaYMD, formatearMoneda, limitesRangoJornadasArgentina } from "@/lib/formato";
 
 const METODO_LABEL: Record<string, string> = {
   EFECTIVO: "Efectivo",
@@ -16,11 +16,15 @@ export default async function ReporteTicketPage({
   searchParams: Promise<{ desde?: string; hasta?: string }>;
 }) {
   const { desde: desdeStr, hasta: hastaStr } = await searchParams;
-  const hoy = new Date().toISOString().slice(0, 10);
-  const desde = new Date(`${desdeStr || hoy}T00:00:00`);
-  const hasta = new Date(`${hastaStr || hoy}T23:59:59.999`);
+  const hoy = fechaArgentinaYMD();
+  const etiquetaDesde = desdeStr || hoy;
+  const etiquetaHasta = hastaStr || hoy;
+  const { desde, hasta } = limitesRangoJornadasArgentina(etiquetaDesde, etiquetaHasta);
 
-  const reporte = await obtenerReporteVentas(desde, hasta);
+  const reporte = await obtenerReporteVentas(desde, hasta, {
+    etiquetaDesde,
+    etiquetaHasta,
+  });
   const metodos = Object.keys(METODO_LABEL);
 
   return (

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { obtenerReporteVentas } from "@/lib/reportes";
-import { formatearMoneda } from "@/lib/formato";
+import { fechaArgentinaYMD, formatearMoneda, limitesRangoJornadasArgentina } from "@/lib/formato";
 
 const METODO_LABEL = {
   EFECTIVO: "Efectivo",
@@ -12,12 +12,14 @@ const METODO_LABEL = {
 } as const;
 
 export async function GET(req: NextRequest) {
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = fechaArgentinaYMD();
   const desdeStr = req.nextUrl.searchParams.get("desde") || hoy;
   const hastaStr = req.nextUrl.searchParams.get("hasta") || hoy;
-  const desde = new Date(`${desdeStr}T00:00:00`);
-  const hasta = new Date(`${hastaStr}T23:59:59.999`);
-  const reporte = await obtenerReporteVentas(desde, hasta);
+  const { desde, hasta } = limitesRangoJornadasArgentina(desdeStr, hastaStr);
+  const reporte = await obtenerReporteVentas(desde, hasta, {
+    etiquetaDesde: desdeStr,
+    etiquetaHasta: hastaStr,
+  });
 
   const doc = new jsPDF();
   const moneda = (valor: number) => `$${formatearMoneda(valor)}`;

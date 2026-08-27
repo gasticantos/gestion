@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { fechaJornadaArgentina } from "@/lib/formato";
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 type Metodo = (typeof METODOS)[number];
@@ -21,12 +22,20 @@ function pagosVacio(): Record<Metodo, number> {
 export async function obtenerReporteVentas(
   desde: Date,
   hasta: Date,
-  opciones?: { limiteProductos?: number | null; negocioId?: number }
+  opciones?: {
+    limiteProductos?: number | null;
+    negocioId?: number;
+    etiquetaDesde?: string;
+    etiquetaHasta?: string;
+  }
 ): Promise<ReporteVentas> {
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
-      closedAt: { gte: desde, lte: hasta },
+      // El cierre de caja puede mover closedAt para marcar una jornada archivada.
+      // createdAt conserva cuándo nació realmente la venta y evita que el cierre anterior
+      // vuelva a aparecer en el reporte de la jornada siguiente.
+      createdAt: { gte: desde, lte: hasta },
       ...(opciones?.negocioId ? { negocioId: opciones.negocioId } : {}),
     },
     include: {
@@ -55,7 +64,7 @@ export async function obtenerReporteVentas(
       combinado.pagos[pago.metodo] += pago.monto;
     }
 
-    const fechaKey = (venta.closedAt ?? venta.createdAt).toISOString().slice(0, 10);
+    const fechaKey = fechaJornadaArgentina(venta.createdAt);
     diaMap.set(fechaKey, (diaMap.get(fechaKey) ?? 0) + venta.total);
 
     for (const pedido of venta.pedidos) {
@@ -93,8 +102,8 @@ export async function obtenerReporteVentas(
     .sort((a, b) => a.fecha.localeCompare(b.fecha));
 
   return {
-    desde: desde.toISOString().slice(0, 10),
-    hasta: hasta.toISOString().slice(0, 10),
+    desde: opciones?.etiquetaDesde ?? fechaJornadaArgentina(desde),
+    hasta: opciones?.etiquetaHasta ?? fechaJornadaArgentina(hasta),
     cantidadVentas: ventas.length,
     porCanal,
     combinado,

@@ -69,3 +69,22 @@ export function limitesJornadaArgentina(ahora: Date = new Date()): {
     hasta: new Date(desde.getTime() + 24 * 60 * 60 * 1000 - 1),
   };
 }
+
+/** Límites inclusivos de una o varias jornadas comerciales identificadas por su fecha de inicio. */
+export function limitesRangoJornadasArgentina(
+  desdeYMD: string,
+  hastaYMD: string
+): { desde: Date; hasta: Date } {
+  const desde = new Date(`${desdeYMD}T07:00:00-03:00`);
+  const inicioUltimaJornada = new Date(`${hastaYMD}T07:00:00-03:00`);
+  return {
+    desde,
+    hasta: new Date(inicioUltimaJornada.getTime() + 24 * 60 * 60 * 1000 - 1),
+  };
+}
+
+/** Fecha de jornada de un instante: de 00:00 a 06:59 pertenece al día anterior. */
+export function fechaJornadaArgentina(fecha: Date): string {
+  // Argentina es UTC-3; restar otras 7 horas permite leer como UTC la fecha comercial.
+  return new Date(fecha.getTime() - 10 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}

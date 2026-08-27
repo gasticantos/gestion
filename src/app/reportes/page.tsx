@@ -40,8 +40,12 @@ const METODO_COLOR: Record<Metodo, string> = {
 const PALETA_CATEGORIAS = ["#3987e5", "#c98500", "#d55181", "#9085e9"];
 
 function toYMD(d: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Argentina/Cordoba",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
 }
 
 function sumarDias(d: Date, n: number) {
@@ -53,7 +57,17 @@ function sumarDias(d: Date, n: number) {
 type Preset = "hoy" | "ayer" | "semana" | "mes" | "mesAnterior" | "custom";
 
 function rangoPreset(preset: Preset): { desde: string; hasta: string } {
-  const hoy = new Date();
+  const ahora = new Date();
+  const fechaArgentina = toYMD(ahora);
+  const horaArgentina = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Argentina/Cordoba",
+      hour: "2-digit",
+      hourCycle: "h23",
+    }).format(ahora)
+  );
+  const hoy = new Date(`${fechaArgentina}T12:00:00-03:00`);
+  if (horaArgentina < 7) hoy.setDate(hoy.getDate() - 1);
   switch (preset) {
     case "hoy":
       return { desde: toYMD(hoy), hasta: toYMD(hoy) };
@@ -176,6 +190,9 @@ export default function ReportesPage() {
       )}
 
       <Card className="p-4 flex flex-col gap-3">
+        <p className="text-xs text-neutral-500">
+          Cada fecha corresponde a la jornada comercial de 07:00 a 06:59 del día siguiente.
+        </p>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button
