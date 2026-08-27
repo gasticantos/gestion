@@ -13,7 +13,7 @@ import {
 
 const CLAVE_ESTACION = "gestion_estacion_impresion_id";
 const TOPICO_REALTIME_IMPRESION = "gestion-impresion";
-const VERSION_MINIMA_AGENTE = "1.2.0";
+const VERSION_MINIMA_AGENTE = "1.3.0";
 
 type TrabajoPendiente = {
   id: number;

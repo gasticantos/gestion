@@ -43,7 +43,9 @@ Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @"
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Runtime.InteropServices;
 using System.Drawing.Printing;
 using System.Text;
 
@@ -117,7 +119,7 @@ public static class GestionWindowsPrinter {
     return new Font(mono ? FontFamily.GenericMonospace : FontFamily.GenericSansSerif, size, style, GraphicsUnit.Point);
   }
 
-  private static void DrawStyledTicket(Graphics graphics, Rectangle bounds, string text) {
+  private static float DrawStyledTicket(Graphics graphics, Rectangle bounds, string text) {
     float y = bounds.Y;
     string normalized = text.Replace("\r\n", "\n").Replace('\r', '\n');
     foreach (string rawLine in normalized.Split('\n')) {
@@ -192,6 +194,70 @@ public static class GestionWindowsPrinter {
           format
         );
         y += height + after;
+      }
+    }
+    return y;
+  }
+
+  public static byte[] RenderEscPosRaster(string text) {
+    if (String.IsNullOrWhiteSpace(text))
+      throw new ArgumentException("El ticket llego sin contenido");
+
+    const int width = 576; // 80 mm a 203 dpi (Epson TM-T20II)
+    const int maxHeight = 6000;
+    using (var bitmap = new Bitmap(width, maxHeight, PixelFormat.Format24bppRgb)) {
+      bitmap.SetResolution(203, 203);
+      float usedHeight;
+      using (var graphics = Graphics.FromImage(bitmap)) {
+        graphics.Clear(Color.White);
+        graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+        usedHeight = DrawStyledTicket(
+          graphics,
+          new Rectangle(10, 3, width - 20, maxHeight - 6),
+          text
+        );
+      }
+
+      int height = Math.Min(maxHeight, Math.Max(1, (int)Math.Ceiling(usedHeight + 12)));
+      int bytesPerRow = (width + 7) / 8;
+      using (var output = new System.IO.MemoryStream()) {
+        byte[] init = new byte[] { 0x1B, 0x40 };
+        output.Write(init, 0, init.Length);
+        byte[] header = new byte[] {
+          0x1D, 0x76, 0x30, 0x00,
+          (byte)(bytesPerRow & 0xFF), (byte)((bytesPerRow >> 8) & 0xFF),
+          (byte)(height & 0xFF), (byte)((height >> 8) & 0xFF)
+        };
+        output.Write(header, 0, header.Length);
+
+        var area = new Rectangle(0, 0, width, height);
+        BitmapData data = bitmap.LockBits(area, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+        try {
+          int stride = Math.Abs(data.Stride);
+          byte[] pixels = new byte[stride * height];
+          Marshal.Copy(data.Scan0, pixels, 0, pixels.Length);
+          byte[] row = new byte[bytesPerRow];
+          for (int y = 0; y < height; y++) {
+            Array.Clear(row, 0, row.Length);
+            int sourceY = data.Stride > 0 ? y : height - 1 - y;
+            int rowOffset = sourceY * stride;
+            for (int x = 0; x < width; x++) {
+              int offset = rowOffset + x * 3;
+              int blue = pixels[offset];
+              int green = pixels[offset + 1];
+              int red = pixels[offset + 2];
+              int luminance = (red * 299 + green * 587 + blue * 114) / 1000;
+              if (luminance < 180) row[x / 8] |= (byte)(0x80 >> (x % 8));
+            }
+            output.Write(row, 0, row.Length);
+          }
+        } finally {
+          bitmap.UnlockBits(data);
+        }
+
+        byte[] finalizar = new byte[] { 0x0A, 0x0A, 0x0A, 0x0A, 0x1D, 0x56, 0x00 };
+        output.Write(finalizar, 0, finalizar.Length);
+        return output.ToArray();
       }
     }
   }
@@ -386,6 +452,11 @@ function Test-ImpresoraEscPos {
   return $PrinterName -match '(?i)(EPSON|TM[-_ ]|ESC.?POS|POS[-_ ]|THERMAL|TERMICA|TICKET)'
 }
 
+function ConvertTo-EscPosRaster {
+  param([string]$Text)
+  return [GestionWindowsPrinter]::RenderEscPosRaster($Text)
+}
+
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://127.0.0.1:$Puerto/")
 $listener.Start()
@@ -416,7 +487,7 @@ while ($listener.IsListening) {
     }
 
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/health") {
-      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.2.0"}')
+      $bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"agente":"1.3.0"}')
       $response.ContentType = "application/json"
       $response.OutputStream.Write($bytes, 0, $bytes.Length)
       $response.Close()
@@ -486,9 +557,19 @@ while ($listener.IsListening) {
       try {
         $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
         $modoPedido = [string]$json.modo
+        $usarRaster = $modoPedido -eq "raster" -and (Test-ImpresoraEscPos $impresoraElegida)
         $usarRapido = $modoPedido -eq "escpos" -or ($modoPedido -eq "auto" -and (Test-ImpresoraEscPos $impresoraElegida))
         $modoUsado = "windows"
-        if ($usarRapido) {
+        if ($usarRaster) {
+          try {
+            $datos = ConvertTo-EscPosRaster -Text "$contenido"
+            Send-RawDataToPrinter -PrinterName $impresoraElegida -Bytes $datos
+            $modoUsado = "raster"
+          } catch {
+            Write-Host "ESC/POS raster fallo; usando controlador Windows: $_"
+            Send-TextWithWindowsDriver -PrinterName $impresoraElegida -Text "$contenido`r`n`r`n"
+          }
+        } elseif ($usarRapido) {
           try {
             $datos = ConvertTo-EscPosTicket -Text "$contenido"
             Send-RawDataToPrinter -PrinterName $impresoraElegida -Bytes $datos
