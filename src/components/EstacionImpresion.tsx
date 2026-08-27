@@ -137,14 +137,13 @@ export default function EstacionImpresion() {
     async function buscarEImprimir() {
       if (!activo || procesando || esEstacionPrincipal !== true) return;
       procesando = true;
-      let huboTrabajo = false;
       try {
         // La primera vez que abre la aplicación en esta computadora, tomar y guardar
         // automáticamente la impresora predeterminada de Windows. Antes esto ocurría
         // recién al entrar a Configuración y obligaba a repetir ese paso al iniciar.
         if (!(await asegurarImpresoraSeleccionada())) return;
 
-        if (Date.now() - ultimaConsultaAgente > 60_000) {
+        if (Date.now() - ultimaConsultaAgente > 15_000) {
           const estadoAgente = await obtenerEstadoAgenteImpresion();
           versionAgente = estadoAgente.agente;
           ultimaConsultaAgente = Date.now();
@@ -157,9 +156,7 @@ export default function EstacionImpresion() {
         // después de actualizar, en vez de quedar falsamente marcado como impreso.
         if (!versionAgente || versionEsAnterior(versionAgente, VERSION_MINIMA_AGENTE)) return;
 
-        // Consultar Win32_Printer mediante CIM puede tardar bastante en algunas PCs.
-        // La selección ya está guardada: refrescar la lista solo cada cinco minutos.
-        if (Date.now() - ultimaConsultaImpresoras > 5 * 60_000) {
+        if (Date.now() - ultimaConsultaImpresoras > 30_000) {
           impresorasDisponibles = (await listarImpresorasLocales()).map((p) => p.nombre);
           ultimaConsultaImpresoras = Date.now();
         }
@@ -172,7 +169,6 @@ export default function EstacionImpresion() {
         const lista = await listaRes.json();
         const trabajo = lista.trabajos?.[0] as TrabajoPendiente | undefined;
         if (!trabajo) return;
-        huboTrabajo = true;
 
         const ok = await imprimirLocal(trabajo.contenido, trabajo.impresora);
         await fetch("/api/impresion/cola", {
@@ -190,9 +186,6 @@ export default function EstacionImpresion() {
         console.warn("Error procesando la cola de impresión:", error);
       } finally {
         procesando = false;
-        // Un pedido puede crear varias comandas (por ejemplo barra y cocina). Procesarlas
-        // consecutivamente evita esperar el sondeo de respaldo entre un trabajo y el próximo.
-        if (activo && huboTrabajo) window.setTimeout(() => void buscarEImprimir(), 0);
       }
     }
 
