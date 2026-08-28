@@ -41,6 +41,7 @@ export default function Navbar() {
   useEffect(() => {
     const saved = localStorage.getItem("theme") as "light" | "dark" | null;
     const initialTheme = saved || "light";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hidrata una preferencia externa guardada en localStorage
     setTheme(initialTheme);
 
     // Aplicar tema al HTML
@@ -56,21 +57,47 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/login" || usuario) return;
-    Promise.all([
-      fetch("/api/auth/me").then((res) => (res.ok ? res.json() : null)),
-      fetch("/api/configuracion").then((res) => (res.ok ? res.json() : null)),
-    ]).then(([usuarioActual, configuracion]) => {
+    if (pathname === "/login") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- al entrar al login debe descartarse de inmediato la identidad previa
+      setUsuario(null);
+      return;
+    }
+
+    let cancelado = false;
+    async function sincronizarUsuario() {
+      const [respuestaUsuario, respuestaConfiguracion] = await Promise.all([
+        fetch("/api/auth/me", { cache: "no-store" }),
+        fetch("/api/configuracion", { cache: "no-store" }),
+      ]);
+      if (cancelado) return;
+      if (!respuestaUsuario.ok) {
+        setUsuario(null);
+        router.replace("/login");
+        router.refresh();
+        return;
+      }
+      const usuarioActual = await respuestaUsuario.json();
       setUsuario(usuarioActual);
-      if (configuracion) {
+      if (respuestaConfiguracion.ok) {
+        const configuracion = await respuestaConfiguracion.json();
         setIdentidad({
           nombrePrograma: configuracion.nombrePrograma || "Gestión",
           logoPrograma: configuracion.logoPrograma || null,
         });
         document.title = configuracion.nombrePrograma || "Gestión";
       }
-    });
-  }, [pathname, usuario]);
+    }
+
+    void sincronizarUsuario();
+    const intervalo = window.setInterval(sincronizarUsuario, 60_000);
+    const alRecuperarFoco = () => void sincronizarUsuario();
+    window.addEventListener("focus", alRecuperarFoco);
+    return () => {
+      cancelado = true;
+      window.clearInterval(intervalo);
+      window.removeEventListener("focus", alRecuperarFoco);
+    };
+  }, [pathname, router]);
 
   useEffect(() => {
     function actualizar(evento: Event) {
