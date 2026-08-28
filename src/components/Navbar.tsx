@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { isTauri } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { puedeAcceder, ROL_LABEL } from "@/lib/permisos";
@@ -28,7 +28,6 @@ const links = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const [usuario, setUsuario] = useState<{ nombre: string; rol: Rol } | null>(null);
   const [identidad, setIdentidad] = useState<{ nombrePrograma: string; logoPrograma: string | null }>({
     nombrePrograma: "Gestión",
@@ -57,56 +56,24 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/login") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- al entrar al login debe descartarse de inmediato la identidad previa
-      setUsuario(null);
-      return;
-    }
+    // Login y logout hacen navegación completa. Por eso esta sincronización se monta
+    // una sola vez y jamás vuelve a ejecutarse por tocar Ventas u otra sección.
+    if (window.location.pathname === "/login") return;
 
-    let cancelado = false;
-    async function sincronizarUsuario() {
-      try {
-        const [respuestaUsuario, respuestaConfiguracion] = await Promise.all([
-          fetch("/api/auth/me", { cache: "no-store" }),
-          fetch("/api/configuracion", { cache: "no-store" }),
-        ]);
-        if (cancelado) return;
-        if (respuestaUsuario.status === 401) {
-          setUsuario(null);
-          router.replace("/login");
-          router.refresh();
-          return;
-        }
-        // Un error transitorio del servidor o la red no equivale a cerrar sesión.
-        // Conservamos la identidad actual y volveremos a validar al recuperar foco.
-        if (!respuestaUsuario.ok) return;
-
-        const usuarioActual = await respuestaUsuario.json();
-        setUsuario(usuarioActual);
-        if (respuestaConfiguracion.ok) {
-          const configuracion = await respuestaConfiguracion.json();
-          setIdentidad({
-            nombrePrograma: configuracion.nombrePrograma || "Gestión",
-            logoPrograma: configuracion.logoPrograma || null,
-          });
-          document.title = configuracion.nombrePrograma || "Gestión";
-        }
-      } catch {
-        // La sincronización periódica volverá a intentarlo. Nunca expulsar a alguien
-        // solamente porque una petición se cortó al navegar entre pantallas.
+    Promise.all([
+      fetch("/api/auth/me", { cache: "no-store" }).then((res) => (res.ok ? res.json() : null)),
+      fetch("/api/configuracion", { cache: "no-store" }).then((res) => (res.ok ? res.json() : null)),
+    ]).then(([usuarioActual, configuracion]) => {
+      setUsuario(usuarioActual);
+      if (configuracion) {
+        setIdentidad({
+          nombrePrograma: configuracion.nombrePrograma || "Gestión",
+          logoPrograma: configuracion.logoPrograma || null,
+        });
+        document.title = configuracion.nombrePrograma || "Gestión";
       }
-    }
-
-    void sincronizarUsuario();
-    const intervalo = window.setInterval(sincronizarUsuario, 60_000);
-    const alRecuperarFoco = () => void sincronizarUsuario();
-    window.addEventListener("focus", alRecuperarFoco);
-    return () => {
-      cancelado = true;
-      window.clearInterval(intervalo);
-      window.removeEventListener("focus", alRecuperarFoco);
-    };
-  }, [pathname, router]);
+    });
+  }, []);
 
   useEffect(() => {
     function actualizar(evento: Event) {
@@ -163,8 +130,7 @@ export default function Navbar() {
     // Limpiar datos del usuario, conservando la impresora y la identidad física
     // de esta computadora para que pueda imprimir aun en la pantalla de login.
     localStorage.removeItem("carrito-venta");
-    router.push("/login");
-    router.refresh();
+    window.location.assign("/login");
   }
 
   const linksVisibles = usuario ? links.filter((l) => puedeAcceder(l.href, usuario.rol)) : [];

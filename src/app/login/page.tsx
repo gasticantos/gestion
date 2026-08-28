@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { input, label } from "@/components/ui/styles";
@@ -9,7 +8,6 @@ import { HOME_POR_ROL } from "@/lib/permisos";
 import { Rol } from "@/generated/prisma/enums";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -31,8 +29,9 @@ export default function LoginPage() {
       return;
     }
     const data = await res.json();
-    router.push(HOME_POR_ROL[data.rol as Rol]);
-    router.refresh();
+    // Una navegación completa reinicia el estado compartido y garantiza que la barra
+    // lea exclusivamente la cookie recién creada, sin arrastrar al usuario anterior.
+    window.location.assign(HOME_POR_ROL[data.rol as Rol]);
   }
 
   return (
