@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cerrarJornadaCaja } from "@/lib/cierreCaja";
-import { formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
+import { fechaArgentinaYMD, formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
 import { sesionActual } from "@/lib/sesionServidor";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 
@@ -10,7 +10,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No tenés permiso para cerrar la caja" }, { status: 403 });
   }
 
-  const { fecha, desde, hasta } = limitesJornadaArgentina();
+  const body = await req.json().catch(() => ({}));
+  const actual = limitesJornadaArgentina();
+  const recuperarAnterior = body?.recuperarAnterior === true;
+  const desde = recuperarAnterior
+    ? new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000)
+    : actual.desde;
+  const hasta = recuperarAnterior
+    ? new Date(actual.desde.getTime() - 1)
+    : actual.hasta;
+  const fecha = recuperarAnterior ? fechaArgentinaYMD(desde) : actual.fecha;
   const resultado = await cerrarJornadaCaja({
     negocioId: sesion.negocioId,
     fecha,

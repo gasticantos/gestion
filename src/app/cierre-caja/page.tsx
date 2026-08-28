@@ -10,14 +10,21 @@ export default function CierreCajaPage() {
   const [resultado, setResultado] = useState("");
   const [error, setError] = useState("");
 
-  async function cerrarCaja() {
-    if (!confirm("¿Cerrar la jornada e imprimir el cierre completo en la ticketera principal?")) return;
+  async function cerrarCaja(recuperarAnterior = false) {
+    const pregunta = recuperarAnterior
+      ? "¿Recuperar el cierre anterior, enviarlo a impresión y mandar su PDF a Telegram?"
+      : "¿Cerrar la jornada e imprimir el cierre completo en la ticketera principal?";
+    if (!confirm(pregunta)) return;
 
     setCerrando(true);
     setResultado("");
     setError("");
     try {
-      const res = await fetch("/api/reportes/cierre", { method: "POST" });
+      const res = await fetch("/api/reportes/cierre", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recuperarAnterior }),
+      });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         setError(data?.error || "No se pudo generar el cierre de caja");
@@ -53,11 +60,20 @@ export default function CierreCajaPage() {
         <Button
           type="button"
           variant="primary"
-          onClick={cerrarCaja}
+          onClick={() => cerrarCaja(false)}
           disabled={cerrando}
           className="w-full py-3"
         >
           {cerrando ? "Generando cierre..." : "Cerrar caja e imprimir"}
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => cerrarCaja(true)}
+          disabled={cerrando}
+          className="w-full py-3"
+        >
+          Recuperar cierre anterior
         </Button>
         {resultado && (
           <p className="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
