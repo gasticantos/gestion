@@ -113,7 +113,10 @@ export default function Navbar() {
           // El cierre no debe quedar bloqueado si no hay conexión en ese instante.
         } finally {
           window.clearTimeout(timeout);
-          await getCurrentWindow().close();
+          // close() vuelve a emitir onCloseRequested y puede dejar la aplicación en
+          // un ciclo. destroy() es la salida forzada documentada por Tauri y garantiza
+          // que la X cierre el proceso aun si el logout o la red fallaron.
+          await getCurrentWindow().destroy();
         }
       })
       .then((unlisten) => {
