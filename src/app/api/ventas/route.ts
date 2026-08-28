@@ -5,7 +5,13 @@ import { sesionActual } from "@/lib/sesionServidor";
 import { formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
 import { enviarAlertaTelegram } from "@/lib/telegram";
 
-type ItemInput = { productoId: number; cantidad: number; tarifa?: Tarifa; notas?: string };
+type ItemInput = {
+  productoId: number;
+  cantidad: number;
+  tarifa?: Tarifa;
+  notas?: string;
+  precioUnitario?: number;
+};
 type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
 
 export async function GET() {
@@ -89,14 +95,30 @@ export async function POST(req: NextRequest) {
     if (!producto.activo || (producto.esPromo && (!producto.promoDesde || !producto.promoHasta || producto.promoDesde > ahora || producto.promoHasta < ahora))) {
       return NextResponse.json({ error: producto.esPromo ? `La promoción "${producto.nombre}" ya no está vigente` : `El producto "${producto.nombre}" no está activo` }, { status: 409 });
     }
+    if (!Number.isFinite(Number(item.cantidad)) || Number(item.cantidad) <= 0) {
+      return NextResponse.json({ error: `La cantidad de "${producto.nombre}" no es válida` }, { status: 400 });
+    }
+    if (
+      item.precioUnitario !== undefined &&
+      (!Number.isFinite(Number(item.precioUnitario)) || Number(item.precioUnitario) < 0)
+    ) {
+      return NextResponse.json({ error: `El precio de "${producto.nombre}" no es válido` }, { status: 400 });
+    }
   }
 
   const itemTarifa = (item: ItemInput): Tarifa =>
     precioMesaActivo && item.tarifa === "MESA" ? "MESA" : "PARTICULAR";
+  const precioDelItem = (item: ItemInput) => {
+    const producto = porId.get(Number(item.productoId))!;
+    const precio =
+      item.precioUnitario === undefined
+        ? precioSegunTarifa(producto, itemTarifa(item))
+        : Number(item.precioUnitario);
+    return Math.round(precio * 100) / 100;
+  };
 
   const subtotal = items.reduce((acc, item) => {
-    const producto = porId.get(Number(item.productoId))!;
-    return acc + precioSegunTarifa(producto, itemTarifa(item)) * Number(item.cantidad);
+    return acc + precioDelItem(item) * Number(item.cantidad);
   }, 0);
   const { pct, monto: montoDescuento, total } = aplicarDescuento(subtotal, Number(descuentoPct) || 0);
 
@@ -125,7 +147,7 @@ export async function POST(req: NextRequest) {
             items: {
               create: items.map((item) => {
                 const producto = porId.get(Number(item.productoId))!;
-                const precioUnitario = precioSegunTarifa(producto, itemTarifa(item));
+                const precioUnitario = precioDelItem(item);
                 return {
                   productoId: producto.id,
                   cantidad: Number(item.cantidad),
