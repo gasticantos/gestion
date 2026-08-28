@@ -27,12 +27,23 @@ type Venta = {
 export default function VentasPage() {
   const [ventas, setVentas] = useState<Venta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function cargar() {
-      const res = await fetch("/api/ventas");
-      setVentas(await res.json());
-      setLoading(false);
+      try {
+        const res = await fetch("/api/ventas", { cache: "no-store" });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !Array.isArray(data)) {
+          setError(data?.error || "No se pudo cargar el listado de ventas");
+          return;
+        }
+        setVentas(data);
+      } catch {
+        setError("No se pudo conectar para cargar las ventas");
+      } finally {
+        setLoading(false);
+      }
     }
     cargar();
   }, []);
@@ -48,6 +59,9 @@ export default function VentasPage() {
   const descuentoTotal = ventasJornada.reduce((acc, v) => acc + (v.total * v.descuentoPct) / 100, 0);
 
   if (loading) return <div className="text-sm text-neutral-500">Cargando...</div>;
+  if (error) {
+    return <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-700">{error}</div>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">

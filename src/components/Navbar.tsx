@@ -65,26 +65,35 @@ export default function Navbar() {
 
     let cancelado = false;
     async function sincronizarUsuario() {
-      const [respuestaUsuario, respuestaConfiguracion] = await Promise.all([
-        fetch("/api/auth/me", { cache: "no-store" }),
-        fetch("/api/configuracion", { cache: "no-store" }),
-      ]);
-      if (cancelado) return;
-      if (!respuestaUsuario.ok) {
-        setUsuario(null);
-        router.replace("/login");
-        router.refresh();
-        return;
-      }
-      const usuarioActual = await respuestaUsuario.json();
-      setUsuario(usuarioActual);
-      if (respuestaConfiguracion.ok) {
-        const configuracion = await respuestaConfiguracion.json();
-        setIdentidad({
-          nombrePrograma: configuracion.nombrePrograma || "Gestión",
-          logoPrograma: configuracion.logoPrograma || null,
-        });
-        document.title = configuracion.nombrePrograma || "Gestión";
+      try {
+        const [respuestaUsuario, respuestaConfiguracion] = await Promise.all([
+          fetch("/api/auth/me", { cache: "no-store" }),
+          fetch("/api/configuracion", { cache: "no-store" }),
+        ]);
+        if (cancelado) return;
+        if (respuestaUsuario.status === 401) {
+          setUsuario(null);
+          router.replace("/login");
+          router.refresh();
+          return;
+        }
+        // Un error transitorio del servidor o la red no equivale a cerrar sesión.
+        // Conservamos la identidad actual y volveremos a validar al recuperar foco.
+        if (!respuestaUsuario.ok) return;
+
+        const usuarioActual = await respuestaUsuario.json();
+        setUsuario(usuarioActual);
+        if (respuestaConfiguracion.ok) {
+          const configuracion = await respuestaConfiguracion.json();
+          setIdentidad({
+            nombrePrograma: configuracion.nombrePrograma || "Gestión",
+            logoPrograma: configuracion.logoPrograma || null,
+          });
+          document.title = configuracion.nombrePrograma || "Gestión";
+        }
+      } catch {
+        // La sincronización periódica volverá a intentarlo. Nunca expulsar a alguien
+        // solamente porque una petición se cortó al navegar entre pantallas.
       }
     }
 
