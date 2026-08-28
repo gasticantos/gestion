@@ -22,6 +22,9 @@ export async function POST(req: NextRequest) {
   if (resultado.estado === "YA_CERRADO") {
     return NextResponse.json({ error: "La caja de esta jornada ya fue cerrada" }, { status: 409 });
   }
+  if (resultado.estado === "SIN_VENTAS") {
+    return NextResponse.json({ error: "No hay ventas nuevas para cerrar" }, { status: 409 });
+  }
   if (resultado.estado === "MESAS_ABIERTAS") {
     return NextResponse.json(
       {

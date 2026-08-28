@@ -23,9 +23,10 @@ export default function CierreCajaPage() {
         setError(data?.error || "No se pudo generar el cierre de caja");
         return;
       }
-      setResultado(
-        `Cierre enviado a impresión: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}`
-      );
+      const telegram = data.telegramEnviado
+        ? " · PDF enviado a Telegram"
+        : ` · Telegram no enviado${data.telegramError ? ` (${data.telegramError})` : ""}`;
+      setResultado(`Cierre enviado a impresión: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}${telegram}`);
       localStorage.removeItem("carrito-venta");
     } catch {
       setError("No se pudo conectar para generar el cierre de caja");
@@ -47,16 +48,16 @@ export default function CierreCajaPage() {
 
       <Card className="flex flex-col gap-4 p-5">
         <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
-          Antes de cerrar, verificá que no queden mesas abiertas. El cierre solo puede realizarse una vez por jornada.
+          Antes de cerrar, verificá que no queden mesas abiertas. Si luego se realizan ventas nuevas, podés generar otro cierre dentro de la misma jornada.
         </div>
         <Button
           type="button"
           variant="primary"
           onClick={cerrarCaja}
-          disabled={cerrando || Boolean(resultado)}
+          disabled={cerrando}
           className="w-full py-3"
         >
-          {cerrando ? "Generando cierre..." : resultado ? "Caja cerrada" : "Cerrar caja e imprimir"}
+          {cerrando ? "Generando cierre..." : "Cerrar caja e imprimir"}
         </Button>
         {resultado && (
           <p className="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">

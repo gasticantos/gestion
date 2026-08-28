@@ -22,8 +22,16 @@ type CierreCajaParams = {
 
 export type ResultadoCierreCaja =
   | { estado: "YA_CERRADO" }
+  | { estado: "SIN_VENTAS" }
   | { estado: "MESAS_ABIERTAS"; mesasAbiertas: string[] }
-  | { estado: "CERRADO"; trabajoId: number; cantidadVentas: number; total: number };
+  | {
+      estado: "CERRADO";
+      trabajoId: number;
+      cantidadVentas: number;
+      total: number;
+      telegramEnviado: boolean;
+      telegramError?: string;
+    };
 
 /** Cierra una jornada una sola vez. La referencia única evita duplicados manuales o automáticos. */
 export async function cerrarJornadaCaja({
@@ -33,13 +41,6 @@ export async function cerrarJornadaCaja({
   hasta,
   operador,
 }: CierreCajaParams): Promise<ResultadoCierreCaja> {
-  const referencia = `cierre-caja:${fecha}`;
-  const cierreExistente = await prisma.impresionTrabajo.findUnique({
-    where: { negocioId_referencia: { negocioId, referencia } },
-    select: { id: true },
-  });
-  if (cierreExistente) return { estado: "YA_CERRADO" };
-
   const mesasAbiertas = await prisma.mesa.findMany({
     where: {
       negocioId,
@@ -55,15 +56,40 @@ export async function cerrarJornadaCaja({
     return { estado: "MESAS_ABIERTAS", mesasAbiertas: mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre) };
   }
 
+  // La última venta pendiente identifica de forma estable este lote. Así dos cierres
+  // simultáneos no lo duplican, pero una venta posterior habilita un cierre nuevo.
+  const ultimaVentaPendiente = await prisma.venta.findFirst({
+    where: {
+      negocioId,
+      estado: "CERRADA",
+      createdAt: { gte: desde, lte: hasta },
+      closedAt: { lt: hasta },
+    },
+    orderBy: { id: "desc" },
+    select: { id: true },
+  });
+  if (!ultimaVentaPendiente) return { estado: "SIN_VENTAS" };
+
+  const referencia = `cierre-caja:${fecha}:hasta-venta:${ultimaVentaPendiente.id}`;
+  const cierreExistente = await prisma.impresionTrabajo.findUnique({
+    where: { negocioId_referencia: { negocioId, referencia } },
+    select: { id: true },
+  });
+  if (cierreExistente) return { estado: "YA_CERRADO" };
+
   const [reporte, configuracion] = await Promise.all([
     obtenerReporteVentas(desde, hasta, {
       limiteProductos: null,
       negocioId,
       etiquetaDesde: fecha,
       etiquetaHasta: fecha,
+      soloPendientesCierre: true,
     }),
     prisma.configuracion.findUnique({ where: { negocioId }, select: { nombrePrograma: true } }),
   ]);
+  // No crear referencias, tickets ni PDFs vacíos: un cierre sin ventas no debe impedir
+  // cerrar las ventas que se realicen más tarde durante esa misma noche.
+  if (reporte.cantidadVentas === 0) return { estado: "SIN_VENTAS" };
   const dinero = (valor: number) => `$${formatearMoneda(valor)}`;
   const fila = (nombre: string, valor: number) =>
     `${nombre}${dinero(valor).padStart(Math.max(1, 32 - nombre.length))}`;
@@ -94,13 +120,20 @@ export async function cerrarJornadaCaja({
         select: { id: true },
       });
       await tx.venta.updateMany({
-        where: { negocioId, estado: "CERRADA", closedAt: { gte: desde, lte: hasta } },
+        where: {
+          negocioId,
+          estado: "CERRADA",
+          createdAt: { gte: desde, lte: hasta },
+          closedAt: { lt: hasta },
+        },
         data: { closedAt: hasta },
       });
       await tx.mesa.updateMany({ where: { negocioId }, data: { estado: "LIBRE" } });
       return creado;
     });
     await notificarNuevaImpresion();
+    let telegramEnviado = false;
+    let telegramError: string | undefined;
     try {
       const pdf = generarPdfCierreCaja({
         nombreNegocio: configuracion?.nombrePrograma || "Gestión",
@@ -108,15 +141,25 @@ export async function cerrarJornadaCaja({
         operador,
         reporte,
       });
-      await enviarDocumentoTelegram(
+      const envioTelegram = await enviarDocumentoTelegram(
         pdf,
         `cierre-caja-${fecha}.pdf`,
         `Cierre de caja · ${fecha}\n${reporte.cantidadVentas} ventas · $${formatearMoneda(reporte.combinado.total)}`
       );
+      telegramEnviado = envioTelegram.ok;
+      if (!envioTelegram.ok) telegramError = envioTelegram.error;
     } catch (error) {
       console.error("No se pudo generar o enviar el PDF del cierre:", error);
+      telegramError = error instanceof Error ? error.message : "No se pudo generar el PDF";
     }
-    return { estado: "CERRADO", trabajoId: trabajo.id, cantidadVentas: reporte.cantidadVentas, total: reporte.combinado.total };
+    return {
+      estado: "CERRADO",
+      trabajoId: trabajo.id,
+      cantidadVentas: reporte.cantidadVentas,
+      total: reporte.combinado.total,
+      telegramEnviado,
+      ...(telegramError ? { telegramError } : {}),
+    };
   } catch (error) {
     // Dos solicitudes simultáneas (por ejemplo el cajero y el cron) compiten por la
     // referencia única: una gana y la otra se considera correctamente ya cerrada.

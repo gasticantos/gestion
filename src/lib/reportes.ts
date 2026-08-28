@@ -27,6 +27,7 @@ export async function obtenerReporteVentas(
     negocioId?: number;
     etiquetaDesde?: string;
     etiquetaHasta?: string;
+    soloPendientesCierre?: boolean;
   }
 ): Promise<ReporteVentas> {
   const ventas = await prisma.venta.findMany({
@@ -36,6 +37,7 @@ export async function obtenerReporteVentas(
       // createdAt conserva cuándo nació realmente la venta y evita que el cierre anterior
       // vuelva a aparecer en el reporte de la jornada siguiente.
       createdAt: { gte: desde, lte: hasta },
+      ...(opciones?.soloPendientesCierre ? { closedAt: { lt: hasta } } : {}),
       ...(opciones?.negocioId ? { negocioId: opciones.negocioId } : {}),
     },
     include: {
