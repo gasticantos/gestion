@@ -118,8 +118,6 @@ export default function ReportesPage() {
   const [rango, setRango] = useState(() => rangoPreset("hoy"));
   const [reporte, setReporte] = useState<ReporteVentas | null>(null);
   const [loading, setLoading] = useState(true);
-  const [cerrandoCaja, setCerrandoCaja] = useState(false);
-  const [estadoCierre, setEstadoCierre] = useState("");
   const [cierres, setCierres] = useState<CierreHistorico[]>([]);
   const [enviandoCierreId, setEnviandoCierreId] = useState<number | null>(null);
   const [estadoHistorial, setEstadoHistorial] = useState("");
@@ -151,34 +149,6 @@ export default function ReportesPage() {
     setPreset(p);
     if (p !== "custom") {
       setRango(rangoPreset(p));
-    }
-  }
-
-  async function cerrarCaja() {
-    if (!confirm("¿Imprimir el cierre completo de caja del día en la ticketera principal?")) return;
-    setCerrandoCaja(true);
-    setEstadoCierre("");
-    try {
-      const res = await fetch("/api/reportes/cierre", { method: "POST" });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setEstadoCierre(data?.error || "No se pudo generar el cierre de caja");
-        return;
-      }
-      setEstadoCierre(
-        `Cierre enviado: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}`
-      );
-      // Limpiar el carrito de venta guardado
-      localStorage.removeItem("carrito-venta");
-      // Recargar los datos después de 1 segundo para reflejar el reset de mesas
-      setTimeout(() => {
-        cargar(rango.desde, rango.hasta);
-        cargarCierres();
-      }, 1000);
-    } catch {
-      setEstadoCierre("No se pudo conectar para generar el cierre");
-    } finally {
-      setCerrandoCaja(false);
     }
   }
 
@@ -216,20 +186,10 @@ export default function ReportesPage() {
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reportes de ventas</h1>
-        <div className="flex items-center gap-2">
-          <Button onClick={cerrarCaja} disabled={cerrandoCaja} variant="secondary">
-            {cerrandoCaja ? "Generando..." : "Cerrar caja"}
-          </Button>
-          <a href={`/api/reportes/pdf?desde=${rango.desde}&hasta=${rango.hasta}`} download>
-            <Button variant="primary" disabled={!reporte || loading}>Descargar PDF</Button>
-          </a>
-        </div>
+        <a href={`/api/reportes/pdf?desde=${rango.desde}&hasta=${rango.hasta}`} download>
+          <Button variant="primary" disabled={!reporte || loading}>Descargar PDF</Button>
+        </a>
       </div>
-      {estadoCierre && (
-        <div className="text-sm text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">
-          {estadoCierre}
-        </div>
-      )}
 
       <Card className="p-4 flex flex-col gap-3">
         <p className="text-xs text-neutral-500">
