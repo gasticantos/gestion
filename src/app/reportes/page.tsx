@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import Plegable from "@/components/ui/Plegable";
 import { input, th, td, trHover } from "@/components/ui/styles";
 import TrendArea from "@/components/charts/TrendArea";
 import CategoricalBarChart, { BarDatum } from "@/components/charts/CategoricalBarChart";
@@ -268,21 +269,18 @@ export default function ReportesPage() {
         )}
       </Card>
 
-      <Card>
-        <div className="flex items-center justify-between gap-3 border-b border-neutral-200 p-4 dark:border-neutral-800">
-          <div>
-            <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Historial de cierres de caja</h2>
-            <p className="text-xs text-neutral-500">Cierres registrados, impresión y copias en PDF.</p>
-          </div>
+      <Plegable titulo={`Historial de cierres de caja (${cierres.length})`}>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-neutral-500">Cierres registrados, impresión y copias en PDF.</p>
           <Button variant="secondary" onClick={cargarCierres}>Actualizar</Button>
         </div>
         {estadoHistorial && (
-          <div className="mx-4 mt-3 rounded-lg border border-blue-600/30 bg-blue-600/10 px-3 py-2 text-sm text-blue-500">
+          <div className="rounded-lg border border-blue-600/30 bg-blue-600/10 px-3 py-2 text-sm text-blue-500">
             {estadoHistorial}
           </div>
         )}
         {cierres.length === 0 ? (
-          <div className="p-4 text-sm text-neutral-500">Todavía no hay cierres registrados.</div>
+          <div className="text-sm text-neutral-500">Todavía no hay cierres registrados.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -343,7 +341,7 @@ export default function ReportesPage() {
             </table>
           </div>
         )}
-      </Card>
+      </Plegable>
 
       {loading || !reporte ? (
         <div className="text-sm text-neutral-500">Cargando...</div>
