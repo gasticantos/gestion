@@ -95,6 +95,14 @@ export default function ControlCajaPage() {
     }
   }
 
+  async function eliminarMovimiento(movimiento: Movimiento) {
+    if (!confirm(`¿Eliminar el ${movimiento.tipo === "INGRESO" ? "ingreso" : "egreso"} de $${formatearMoneda(movimiento.monto)}?`)) return;
+    await guardar(
+      { accion: "eliminar_movimiento", movimientoId: movimiento.id },
+      "Movimiento eliminado y caja recalculada"
+    );
+  }
+
   if (!estado) return <div className="text-sm text-neutral-500">Cargando control de caja...</div>;
   const cerrado = Boolean(estado.control?.cerradoAt);
 
@@ -182,7 +190,7 @@ export default function ControlCajaPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead><tr><th className={th}>Hora</th><th className={th}>Tipo</th><th className={th}>Concepto</th><th className={th}>Responsable</th><th className={th}>Monto</th></tr></thead>
+                  <thead><tr><th className={th}>Hora</th><th className={th}>Tipo</th><th className={th}>Concepto</th><th className={th}>Responsable</th><th className={th}>Monto</th><th className={th}></th></tr></thead>
                   <tbody>{estado.control.movimientos.map((movimiento) => (
                     <tr key={movimiento.id} className={trHover}>
                       <td className={td}>{new Date(movimiento.createdAt).toLocaleTimeString("es-AR")}</td>
@@ -190,6 +198,16 @@ export default function ControlCajaPage() {
                       <td className={td}>{movimiento.concepto}</td>
                       <td className={td}>{movimiento.operador}</td>
                       <td className={`${td} font-semibold ${movimiento.tipo === "INGRESO" ? "text-emerald-600" : "text-red-500"}`}>{movimiento.tipo === "INGRESO" ? "+" : "−"}${formatearMoneda(movimiento.monto)}</td>
+                      <td className={`${td} text-right`}>
+                        <button
+                          type="button"
+                          disabled={procesando || cerrado}
+                          onClick={() => eliminarMovimiento(movimiento)}
+                          className="rounded-lg px-2 py-1 text-xs font-medium text-red-500 hover:bg-red-500/10 disabled:opacity-50"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
                     </tr>
                   ))}</tbody>
                 </table>

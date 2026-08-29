@@ -122,6 +122,18 @@ export async function POST(req: NextRequest) {
         saldoSiguiente: redondear(saldoSiguiente),
       },
     });
+  } else if (body.accion === "eliminar_movimiento") {
+    if (!existente) return NextResponse.json({ error: "La caja no está iniciada" }, { status: 409 });
+    const movimientoId = Number(body.movimientoId);
+    if (!Number.isInteger(movimientoId)) {
+      return NextResponse.json({ error: "Movimiento inválido" }, { status: 400 });
+    }
+    const eliminado = await prisma.movimientoCaja.deleteMany({
+      where: { id: movimientoId, controlCajaId: existente.id },
+    });
+    if (eliminado.count === 0) {
+      return NextResponse.json({ error: "El movimiento no existe en esta jornada" }, { status: 404 });
+    }
   } else {
     return NextResponse.json({ error: "Acción inválida" }, { status: 400 });
   }
