@@ -44,7 +44,16 @@ export async function cerrarJornadaCaja({
   const mesasAbiertas = await prisma.mesa.findMany({
     where: {
       negocioId,
-      OR: [{ estado: "OCUPADA" }, { ventas: { some: { estado: "ABIERTA" } } }],
+      ventas: {
+        some: {
+          estado: "ABIERTA",
+          OR: [
+            { total: { gt: 0 } },
+            { pedidos: { some: { items: { some: {} } } } },
+            { pagos: { some: {} } },
+          ],
+        },
+      },
     },
     select: { nombre: true, apodo: true },
     orderBy: { numero: "asc" },
@@ -118,6 +127,17 @@ export async function cerrarJornadaCaja({
       const creado = await tx.impresionTrabajo.create({
         data: { tipo: "TICKET", contenido: lineas.join("\n"), impresora: null, referencia, negocioId },
         select: { id: true },
+      });
+      // Una doble pulsación o dos dispositivos podían dejar una segunda cuenta vacía
+      // abierta en una mesa ya liberada. No representa consumo y no debe sobrevivir al cierre.
+      await tx.venta.deleteMany({
+        where: {
+          negocioId,
+          estado: "ABIERTA",
+          total: { lte: 0 },
+          pedidos: { none: { items: { some: {} } } },
+          pagos: { none: {} },
+        },
       });
       await tx.venta.updateMany({
         where: {

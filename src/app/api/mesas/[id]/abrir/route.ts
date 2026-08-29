@@ -10,19 +10,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const tarifa: Tarifa =
     configuracion?.precioMesaActivo !== false && body.tarifa !== "PARTICULAR" ? "MESA" : "PARTICULAR";
 
-  const mesa = await prisma.mesa.findUnique({ where: { id: Number(id) } });
+  const mesaId = Number(id);
+  const mesa = await prisma.mesa.findUnique({ where: { id: mesaId } });
 
   if (!mesa) {
     return NextResponse.json({ error: "Mesa no encontrada" }, { status: 404 });
   }
-  if (mesa.estado === "OCUPADA") {
+  const venta = await prisma.$transaction(async (tx) => {
+    // La actualización condicional bloquea la fila: si llegan dos aperturas juntas,
+    // solamente una puede pasar de LIBRE a OCUPADA y crear una cuenta.
+    const ocupada = await tx.mesa.updateMany({
+      where: { id: mesaId, estado: "LIBRE" },
+      data: { estado: "OCUPADA" },
+    });
+    if (ocupada.count === 0) return null;
+    return tx.venta.create({
+      data: { tipo: "MESA", mesaId, estado: "ABIERTA", total: 0, tarifa },
+    });
+  });
+
+  if (!venta) {
     return NextResponse.json({ error: "La mesa ya está ocupada" }, { status: 409 });
   }
-
-  const [venta] = await prisma.$transaction([
-    prisma.venta.create({ data: { tipo: "MESA", mesaId: mesa.id, estado: "ABIERTA", total: 0, tarifa } }),
-    prisma.mesa.update({ where: { id: mesa.id }, data: { estado: "OCUPADA" } }),
-  ]);
 
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
   await registrarAuditoria(usuarioId, "abrir_mesa", `Mesa ${mesa.nombre} (ID: ${mesa.id})`);
