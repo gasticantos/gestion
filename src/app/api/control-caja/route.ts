@@ -7,21 +7,18 @@ const redondear = (valor: number) => Math.round(valor * 100) / 100;
 
 async function obtenerEstado(negocioId: number) {
   const jornada = limitesJornadaArgentina();
-  const [control, efectivoVentas, anterior] = await Promise.all([
+  const [control, ventasConEfectivo, anterior] = await Promise.all([
     prisma.controlCaja.findUnique({
       where: { negocioId_fechaJornada: { negocioId, fechaJornada: jornada.fecha } },
       include: { movimientos: { orderBy: { createdAt: "desc" } } },
     }),
-    prisma.pago.aggregate({
+    prisma.venta.findMany({
       where: {
-        metodo: "EFECTIVO",
-        venta: {
-          negocioId,
-          estado: "CERRADA",
-          createdAt: { gte: jornada.desde, lte: jornada.hasta },
-        },
+        negocioId,
+        estado: "CERRADA",
+        createdAt: { gte: jornada.desde, lte: jornada.hasta },
       },
-      _sum: { monto: true },
+      select: { pagos: { where: { metodo: "EFECTIVO" }, select: { monto: true } } },
     }),
     prisma.controlCaja.findFirst({
       where: { negocioId, fechaJornada: { lt: jornada.fecha }, saldoSiguiente: { not: null } },
@@ -35,7 +32,12 @@ async function obtenerEstado(negocioId: number) {
   const egresos = control?.movimientos
     .filter((movimiento) => movimiento.tipo === "EGRESO")
     .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
-  const ventasEfectivo = efectivoVentas._sum.monto ?? 0;
+  // Consultar desde Venta conserva el filtro de jornada y negocio. Una consulta directa
+  // sobre Pago podía perder el rango al aplicar el aislamiento multinegocio y sumar el histórico.
+  const ventasEfectivo = ventasConEfectivo.reduce(
+    (total, venta) => total + venta.pagos.reduce((subtotal, pago) => subtotal + pago.monto, 0),
+    0
+  );
   const saldoInicial = control?.saldoInicial ?? anterior?.saldoSiguiente ?? 0;
   const efectivoEsperado = redondear(saldoInicial + ventasEfectivo + ingresos - egresos);
   return {
