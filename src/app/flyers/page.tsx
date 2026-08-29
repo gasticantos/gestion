@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
@@ -39,6 +39,14 @@ export default function FlyersPage() {
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState("");
   const [abierto, setAbierto] = useState<number | null>(null);
+  const inicioToque = useRef<{ x: number; y: number } | null>(null);
+
+  const cambiarFlyer = useCallback((direccion: -1 | 1) => {
+    if (abierto === null || flyers.length < 2) return;
+    const indice = flyers.findIndex((flyer) => flyer.id === abierto);
+    const siguiente = (indice + direccion + flyers.length) % flyers.length;
+    setAbierto(flyers[siguiente].id);
+  }, [abierto, flyers]);
 
   async function cargar() {
     const [flyersRes, usuarioRes] = await Promise.all([
@@ -59,12 +67,14 @@ export default function FlyersPage() {
 
   useEffect(() => {
     if (abierto === null) return;
-    const cerrarConEscape = (evento: KeyboardEvent) => {
+    const navegarConTeclado = (evento: KeyboardEvent) => {
       if (evento.key === "Escape") setAbierto(null);
+      if (evento.key === "ArrowLeft") cambiarFlyer(-1);
+      if (evento.key === "ArrowRight") cambiarFlyer(1);
     };
-    window.addEventListener("keydown", cerrarConEscape);
-    return () => window.removeEventListener("keydown", cerrarConEscape);
-  }, [abierto]);
+    window.addEventListener("keydown", navegarConTeclado);
+    return () => window.removeEventListener("keydown", navegarConTeclado);
+  }, [abierto, cambiarFlyer]);
 
   async function subir(evento: ChangeEvent<HTMLInputElement>) {
     const archivos = Array.from(evento.target.files || []);
@@ -107,7 +117,19 @@ export default function FlyersPage() {
     if (abierto === id) setAbierto(null);
   }
 
+  function terminarDeslizamiento(evento: React.TouchEvent) {
+    const inicio = inicioToque.current;
+    inicioToque.current = null;
+    if (!inicio) return;
+    const toque = evento.changedTouches[0];
+    const desplazamientoX = toque.clientX - inicio.x;
+    const desplazamientoY = toque.clientY - inicio.y;
+    if (Math.abs(desplazamientoX) < 45 || Math.abs(desplazamientoX) <= Math.abs(desplazamientoY)) return;
+    cambiarFlyer(desplazamientoX < 0 ? 1 : -1);
+  }
+
   const flyerAbierto = flyers.find((flyer) => flyer.id === abierto);
+  const indiceAbierto = flyers.findIndex((flyer) => flyer.id === abierto);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-5">
@@ -168,8 +190,13 @@ export default function FlyersPage() {
           role="dialog"
           aria-modal="true"
           aria-label="Flyer promocional"
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-3 sm:p-6"
+          className="fixed inset-0 z-[200] flex touch-pan-y select-none items-center justify-center bg-black/95 p-3 sm:p-6"
           onClick={() => setAbierto(null)}
+          onTouchStart={(evento) => {
+            const toque = evento.touches[0];
+            inicioToque.current = { x: toque.clientX, y: toque.clientY };
+          }}
+          onTouchEnd={terminarDeslizamiento}
         >
           <button
             type="button"
@@ -179,6 +206,35 @@ export default function FlyersPage() {
           >
             ×
           </button>
+          {flyers.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(evento) => {
+                  evento.stopPropagation();
+                  cambiarFlyer(-1);
+                }}
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/15 px-4 py-3 text-2xl text-white hover:bg-white/25 sm:left-5"
+                aria-label="Flyer anterior"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(evento) => {
+                  evento.stopPropagation();
+                  cambiarFlyer(1);
+                }}
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/15 px-4 py-3 text-2xl text-white hover:bg-white/25 sm:right-5"
+                aria-label="Flyer siguiente"
+              >
+                ›
+              </button>
+              <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
+                {indiceAbierto + 1} / {flyers.length} · Deslizá para cambiar
+              </div>
+            </>
+          )}
           {/* eslint-disable-next-line @next/next/no-img-element -- imagen cargada por el negocio */}
           <img
             src={flyerAbierto.imagen}
