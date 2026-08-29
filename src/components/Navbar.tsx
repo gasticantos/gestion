@@ -8,22 +8,32 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { puedeAcceder, ROL_LABEL } from "@/lib/permisos";
 import { Rol } from "@/generated/prisma/enums";
 
-const links = [
-  { href: "/venta", label: "Vender" },
-  { href: "/ventas", label: "Ventas" },
-  { href: "/cierre-caja", label: "Cierre de caja" },
-  { href: "/mesas", label: "Mesas" },
-  { href: "/reservas", label: "Reservas" },
-  { href: "/stock", label: "Stock" },
-  { href: "/productos", label: "Productos" },
-  { href: "/promos", label: "Promos" },
-  { href: "/flyers", label: "Flyers" },
-  { href: "/presupuestos", label: "Presupuestos" },
-  { href: "/proveedores", label: "Proveedores" },
-  { href: "/clientes", label: "Clientes" },
-  { href: "/reportes", label: "Reportes" },
-  { href: "/usuarios", label: "Usuarios" },
-  { href: "/configuracion", label: "Configuración" },
+const gruposLinks = [
+  [
+    { href: "/venta", label: "Vender" },
+    { href: "/ventas", label: "Ventas" },
+    { href: "/mesas", label: "Mesas" },
+    { href: "/reservas", label: "Reservas" },
+    { href: "/clientes", label: "Clientes" },
+  ],
+  [
+    { href: "/stock", label: "Stock" },
+    { href: "/productos", label: "Productos" },
+  ],
+  [
+    { href: "/promos", label: "Promos" },
+    { href: "/flyers", label: "Flyers" },
+    { href: "/presupuestos", label: "Presupuestos" },
+  ],
+  [
+    { href: "/cierre-caja", label: "Cierre de caja" },
+    { href: "/reportes", label: "Reportes" },
+  ],
+  [
+    { href: "/proveedores", label: "Proveedores" },
+    { href: "/usuarios", label: "Usuarios" },
+    { href: "/configuracion", label: "Configuración" },
+  ],
 ];
 
 export default function Navbar() {
@@ -136,7 +146,11 @@ export default function Navbar() {
     window.location.assign("/login");
   }
 
-  const linksVisibles = usuario ? links.filter((l) => puedeAcceder(l.href, usuario.rol)) : [];
+  const gruposVisibles = usuario
+    ? gruposLinks
+        .map((grupo) => grupo.filter((link) => puedeAcceder(link.href, usuario.rol)))
+        .filter((grupo) => grupo.length > 0)
+    : [];
 
   return (
     <nav className="print:hidden sticky top-0 z-20 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-3 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 flex-wrap transition-colors text-sm sm:text-base">
@@ -155,23 +169,32 @@ export default function Navbar() {
       </Link>
 
       <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto">
-        {linksVisibles.map((link) => {
-          const active = pathname.startsWith(link.href);
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              prefetch={true}
-              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors border whitespace-nowrap ${
-                active
-                  ? "bg-blue-600 dark:bg-blue-600 text-white border-blue-600"
-                  : "text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              }`}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
+        {gruposVisibles.map((grupo, indiceGrupo) => (
+          <div
+            key={grupo[0].href}
+            className={`flex items-center gap-0.5 sm:gap-1 ${
+              indiceGrupo > 0 ? "ml-1 border-l border-neutral-200 pl-1 dark:border-neutral-800 sm:ml-2 sm:pl-2" : ""
+            }`}
+          >
+            {grupo.map((link) => {
+              const active = pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  prefetch={true}
+                  className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors border whitespace-nowrap ${
+                    active
+                      ? "bg-blue-600 dark:bg-blue-600 text-white border-blue-600"
+                      : "text-neutral-600 dark:text-neutral-400 border-transparent hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       {usuario && (
