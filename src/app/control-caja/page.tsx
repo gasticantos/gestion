@@ -103,8 +103,58 @@ export default function ControlCajaPage() {
     );
   }
 
+  async function cerrarCaja() {
+    if (!estado) return;
+    const contado = Number(efectivoContado);
+    const siguiente = Number(saldoSiguiente);
+    if (![contado, siguiente].every((valor) => Number.isFinite(valor) && valor >= 0)) {
+      setError("Completá el efectivo contado y el inicio de la próxima caja");
+      return;
+    }
+    const diferencia = contado - estado.efectivoEsperado;
+    const detalle = diferencia === 0
+      ? "La caja coincide exactamente."
+      : diferencia > 0
+        ? `Hay un sobrante de $${formatearMoneda(diferencia)}.`
+        : `Hay un faltante de $${formatearMoneda(Math.abs(diferencia))}.`;
+    if (!confirm(`${detalle}\nLa próxima caja iniciará con $${formatearMoneda(siguiente)}.\n\n¿Cerrar caja, imprimir y enviar el PDF a Telegram?`)) return;
+
+    const arqueoGuardado = await guardar(
+      { accion: "arqueo", efectivoContado: contado, saldoSiguiente: siguiente },
+      "Arqueo guardado"
+    );
+    if (!arqueoGuardado) return;
+
+    setProcesando(true);
+    setError("");
+    setMensaje("");
+    try {
+      const res = await fetch("/api/reportes/cierre", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.error || "No se pudo cerrar la caja");
+        return;
+      }
+      await cargar();
+      const telegram = data.telegramEnviado ? " PDF enviado a Telegram." : " El PDF de Telegram quedó pendiente.";
+      setMensaje(`Caja cerrada: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}.${telegram} Se inició una caja nueva en cero.`);
+    } catch {
+      setError("No se pudo conectar para cerrar la caja");
+    } finally {
+      setProcesando(false);
+    }
+  }
+
   if (!estado) return <div className="text-sm text-neutral-500">Cargando control de caja...</div>;
   const cerrado = Boolean(estado.control?.cerradoAt);
+  const contadoActual = efectivoContado.trim() === "" ? null : Number(efectivoContado);
+  const diferenciaActual = contadoActual == null || !Number.isFinite(contadoActual)
+    ? null
+    : contadoActual - estado.efectivoEsperado;
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-5">
@@ -173,13 +223,20 @@ export default function ControlCajaPage() {
                 <p className="text-xs text-neutral-500">Contá el efectivo real y prepará con cuánto comenzará el turno siguiente.</p>
               </div>
               <label className="text-sm text-neutral-600 dark:text-neutral-300">Efectivo contado<input className={`${input} mt-1`} type="number" min="0" step="0.01" value={efectivoContado} onChange={(e) => setEfectivoContado(e.target.value)} /></label>
-              {estado.diferencia != null && (
-                <div className={`rounded-lg px-3 py-2 text-sm ${estado.diferencia === 0 ? "bg-emerald-600/10 text-emerald-700" : "bg-amber-500/10 text-amber-700"}`}>
-                  Diferencia: ${formatearMoneda(estado.diferencia)}
+              {diferenciaActual != null && (
+                <div className={`rounded-lg px-3 py-2 text-sm font-medium ${diferenciaActual === 0 ? "bg-emerald-600/10 text-emerald-700" : "bg-amber-500/10 text-amber-700"}`}>
+                  {diferenciaActual === 0
+                    ? "La caja coincide exactamente"
+                    : diferenciaActual > 0
+                      ? `Sobrante: $${formatearMoneda(diferenciaActual)}`
+                      : `Faltante: $${formatearMoneda(Math.abs(diferenciaActual))}`}
                 </div>
               )}
               <label className="text-sm text-neutral-600 dark:text-neutral-300">Efectivo inicial del próximo turno<input className={`${input} mt-1`} type="number" min="0" step="0.01" value={saldoSiguiente} onChange={(e) => setSaldoSiguiente(e.target.value)} /></label>
               <Button variant="secondary" disabled={procesando || cerrado} onClick={() => guardar({ accion: "arqueo", efectivoContado, saldoSiguiente }, "Arqueo guardado para el cierre")}>Guardar arqueo</Button>
+              <Button disabled={procesando || cerrado || diferenciaActual == null || saldoSiguiente.trim() === ""} onClick={cerrarCaja}>
+                {procesando ? "Cerrando caja..." : "Cerrar caja, imprimir y enviar PDF"}
+              </Button>
             </Card>
           </div>
 

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
-import { fechaArgentinaYMD, formatearFechaHora, formatearMoneda } from "@/lib/formato";
+import { formatearFechaHora, formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
 import { obtenerReporteVentas } from "@/lib/reportes";
 import { enviarAlertaTelegram, enviarDocumentoTelegram } from "@/lib/telegram";
 import { generarPdfCierreCaja } from "@/lib/pdfCierreCaja";
@@ -23,6 +23,7 @@ type CierreCajaParams = {
 export type ResultadoCierreCaja =
   | { estado: "YA_CERRADO" }
   | { estado: "SIN_VENTAS" }
+  | { estado: "ARQUEO_PENDIENTE" }
   | { estado: "MESAS_ABIERTAS"; mesasAbiertas: string[] }
   | {
       estado: "CERRADO";
@@ -41,6 +42,15 @@ export async function cerrarJornadaCaja({
   hasta,
   operador,
 }: CierreCajaParams): Promise<ResultadoCierreCaja> {
+  const controlPendiente = await prisma.controlCaja.findFirst({
+    where: { negocioId, fechaJornada: fecha, cerradoAt: null },
+    include: { movimientos: true },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!controlPendiente || controlPendiente.efectivoContado == null || controlPendiente.saldoSiguiente == null) {
+    return { estado: "ARQUEO_PENDIENTE" };
+  }
+
   const mesasAbiertas = await prisma.mesa.findMany({
     where: {
       negocioId,
@@ -80,7 +90,7 @@ export async function cerrarJornadaCaja({
   });
   if (cierreExistente) return { estado: "YA_CERRADO" };
 
-  const [reporte, configuracion, control] = await Promise.all([
+  const [reporte, configuracion] = await Promise.all([
     obtenerReporteVentas(desde, hasta, {
       limiteProductos: null,
       negocioId,
@@ -89,10 +99,6 @@ export async function cerrarJornadaCaja({
       soloPendientesCierre: true,
     }),
     prisma.configuracion.findUnique({ where: { negocioId }, select: { nombrePrograma: true } }),
-    prisma.controlCaja.findUnique({
-      where: { negocioId_fechaJornada: { negocioId, fechaJornada: fecha } },
-      include: { movimientos: true },
-    }),
   ]);
   // No crear referencias, tickets ni PDFs vacíos: un cierre sin ventas no debe impedir
   // cerrar las ventas que se realicen más tarde durante esa misma noche.
@@ -118,7 +124,6 @@ export async function cerrarJornadaCaja({
   for (const metodo of Object.keys(METODOS) as (keyof typeof METODOS)[]) {
     lineas.push(`[[ROW]] ${fila(METODOS[metodo], reporte.combinado.pagos[metodo])}`);
   }
-  const controlPendiente = control && !control.cerradoAt ? control : null;
   const ingresosCaja = controlPendiente?.movimientos
     .filter((movimiento) => movimiento.tipo === "INGRESO")
     .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
@@ -183,12 +188,16 @@ export async function cerrarJornadaCaja({
           where: { id: controlPendiente.id },
           data: { cerradoAt: new Date() },
         });
-        const fechaSiguiente = fechaArgentinaYMD(new Date(hasta.getTime() + 1));
-        await tx.controlCaja.upsert({
-          where: { negocioId_fechaJornada: { negocioId, fechaJornada: fechaSiguiente } },
-          update: {},
-          create: { negocioId, fechaJornada: fechaSiguiente, saldoInicial: saldoSiguiente },
+        const fechaSiguiente = limitesJornadaArgentina().fecha;
+        const siguienteAbierto = await tx.controlCaja.findFirst({
+          where: { negocioId, fechaJornada: fechaSiguiente, cerradoAt: null },
+          select: { id: true },
         });
+        if (!siguienteAbierto) {
+          await tx.controlCaja.create({
+            data: { negocioId, fechaJornada: fechaSiguiente, saldoInicial: saldoSiguiente },
+          });
+        }
       }
       return creado;
     });

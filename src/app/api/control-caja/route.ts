@@ -8,21 +8,23 @@ const redondear = (valor: number) => Math.round(valor * 100) / 100;
 async function obtenerEstado(negocioId: number) {
   const jornada = limitesJornadaArgentina();
   const [control, ventasConEfectivo, anterior] = await Promise.all([
-    prisma.controlCaja.findUnique({
-      where: { negocioId_fechaJornada: { negocioId, fechaJornada: jornada.fecha } },
+    prisma.controlCaja.findFirst({
+      where: { negocioId, fechaJornada: jornada.fecha, cerradoAt: null },
       include: { movimientos: { orderBy: { createdAt: "desc" } } },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.venta.findMany({
       where: {
         negocioId,
         estado: "CERRADA",
         createdAt: { gte: jornada.desde, lte: jornada.hasta },
+        closedAt: { lt: jornada.hasta },
       },
       select: { pagos: { where: { metodo: "EFECTIVO" }, select: { monto: true } } },
     }),
     prisma.controlCaja.findFirst({
-      where: { negocioId, fechaJornada: { lt: jornada.fecha }, saldoSiguiente: { not: null } },
-      orderBy: { fechaJornada: "desc" },
+      where: { negocioId, cerradoAt: { not: null }, saldoSiguiente: { not: null } },
+      orderBy: { cerradoAt: "desc" },
       select: { saldoSiguiente: true },
     }),
   ]);
@@ -70,27 +72,25 @@ export async function POST(req: NextRequest) {
   }
   const body = await req.json().catch(() => ({}));
   const jornada = limitesJornadaArgentina();
-  const existente = await prisma.controlCaja.findUnique({
-    where: { negocioId_fechaJornada: { negocioId: sesion.negocioId, fechaJornada: jornada.fecha } },
+  const existente = await prisma.controlCaja.findFirst({
+    where: { negocioId: sesion.negocioId, fechaJornada: jornada.fecha, cerradoAt: null },
+    orderBy: { createdAt: "desc" },
   });
-  if (existente?.cerradoAt) {
-    return NextResponse.json({ error: "El control de esta jornada ya está cerrado" }, { status: 409 });
-  }
 
   if (body.accion === "iniciar") {
     const saldoInicial = Number(body.saldoInicial);
     if (!Number.isFinite(saldoInicial) || saldoInicial < 0) {
       return NextResponse.json({ error: "El efectivo inicial no es válido" }, { status: 400 });
     }
-    await prisma.controlCaja.upsert({
-      where: { negocioId_fechaJornada: { negocioId: sesion.negocioId, fechaJornada: jornada.fecha } },
-      update: { saldoInicial: redondear(saldoInicial) },
-      create: {
+    if (existente) {
+      await prisma.controlCaja.update({ where: { id: existente.id }, data: { saldoInicial: redondear(saldoInicial) } });
+    } else {
+      await prisma.controlCaja.create({ data: {
         negocioId: sesion.negocioId,
         fechaJornada: jornada.fecha,
         saldoInicial: redondear(saldoInicial),
-      },
-    });
+      } });
+    }
   } else if (body.accion === "movimiento") {
     const monto = Number(body.monto);
     const concepto = String(body.concepto || "").trim();

@@ -437,7 +437,7 @@ model ControlCaja {
   negocioId        Int              @default(1)
   negocio          Negocio          @relation(fields: [negocioId], references: [id], onDelete: Cascade)
 
-  @@unique([negocioId, fechaJornada])
+  @@index([negocioId, fechaJornada, cerradoAt])
   @@index([negocioId, createdAt])
 }
 

@@ -284,7 +284,6 @@ export type ControlCajaOrderByWithRelationInput = {
 
 export type ControlCajaWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  negocioId_fechaJornada?: Prisma.ControlCajaNegocioIdFechaJornadaCompoundUniqueInput
   AND?: Prisma.ControlCajaWhereInput | Prisma.ControlCajaWhereInput[]
   OR?: Prisma.ControlCajaWhereInput[]
   NOT?: Prisma.ControlCajaWhereInput | Prisma.ControlCajaWhereInput[]
@@ -298,7 +297,7 @@ export type ControlCajaWhereUniqueInput = Prisma.AtLeast<{
   negocioId?: Prisma.IntFilter<"ControlCaja"> | number
   movimientos?: Prisma.MovimientoCajaListRelationFilter
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
-}, "id" | "negocioId_fechaJornada">
+}, "id">
 
 export type ControlCajaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -424,11 +423,6 @@ export type ControlCajaListRelationFilter = {
 
 export type ControlCajaOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type ControlCajaNegocioIdFechaJornadaCompoundUniqueInput = {
-  negocioId: number
-  fechaJornada: string
 }
 
 export type ControlCajaCountOrderByAggregateInput = {

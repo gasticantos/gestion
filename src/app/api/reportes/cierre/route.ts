@@ -50,6 +50,12 @@ export async function POST(req: NextRequest) {
   if (resultado.estado === "SIN_VENTAS") {
     return NextResponse.json({ error: "No hay ventas nuevas para cerrar" }, { status: 409 });
   }
+  if (resultado.estado === "ARQUEO_PENDIENTE") {
+    return NextResponse.json(
+      { error: "Antes de cerrar, completá el arqueo y el efectivo inicial de la próxima caja" },
+      { status: 409 }
+    );
+  }
   if (resultado.estado === "MESAS_ABIERTAS") {
     return NextResponse.json(
       {
