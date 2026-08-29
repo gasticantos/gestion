@@ -44,25 +44,19 @@ export async function cerrarJornadaCaja({
   const mesasAbiertas = await prisma.mesa.findMany({
     where: {
       negocioId,
-      ventas: {
-        some: {
-          estado: "ABIERTA",
-          OR: [
-            { total: { gt: 0 } },
-            { pedidos: { some: { items: { some: {} } } } },
-            { pagos: { some: {} } },
-          ],
-        },
-      },
+      ventas: { some: { estado: "ABIERTA", total: { gt: 0 } } },
     },
     select: { nombre: true, apodo: true },
     orderBy: { numero: "asc" },
   });
   if (mesasAbiertas.length > 0) {
     await enviarAlertaTelegram(
-      `⚠️ Cierre de caja bloqueado\nJornada: ${fecha}\nOperador: ${operador.nombre} (${operador.rol})\nMesas abiertas: ${mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre).join(", ")}`
+      `⚠️ Cierre de caja bloqueado\nJornada: ${fecha}\nOperador: ${operador.nombre} (${operador.rol})\nMesas abiertas con saldo: ${mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre).join(", ")}`
     );
-    return { estado: "MESAS_ABIERTAS", mesasAbiertas: mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre) };
+    return {
+      estado: "MESAS_ABIERTAS",
+      mesasAbiertas: mesasAbiertas.map((mesa) => mesa.apodo || mesa.nombre),
+    };
   }
 
   // La última venta pendiente identifica de forma estable este lote. Así dos cierres
@@ -128,17 +122,6 @@ export async function cerrarJornadaCaja({
         data: { tipo: "TICKET", contenido: lineas.join("\n"), impresora: null, referencia, negocioId },
         select: { id: true },
       });
-      // Una doble pulsación o dos dispositivos podían dejar una segunda cuenta vacía
-      // abierta en una mesa ya liberada. No representa consumo y no debe sobrevivir al cierre.
-      await tx.venta.deleteMany({
-        where: {
-          negocioId,
-          estado: "ABIERTA",
-          total: { lte: 0 },
-          pedidos: { none: { items: { some: {} } } },
-          pagos: { none: {} },
-        },
-      });
       await tx.venta.updateMany({
         where: {
           negocioId,
@@ -148,7 +131,6 @@ export async function cerrarJornadaCaja({
         },
         data: { closedAt: hasta },
       });
-      await tx.mesa.updateMany({ where: { negocioId }, data: { estado: "LIBRE" } });
       return creado;
     });
     await notificarNuevaImpresion();

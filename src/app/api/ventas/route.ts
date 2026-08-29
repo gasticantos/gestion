@@ -16,7 +16,21 @@ type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; m
 
 export async function GET() {
   // La lista diaria sigue la misma jornada comercial que el cierre: 07:00 a 06:59.
-  const { desde: inicioJornada, hasta: finJornada } = limitesJornadaArgentina();
+  // Si el cierre de ayer fue bloqueado, se mantiene visible hasta poder cerrarlo:
+  // el listado no debe avanzar solo mientras ticket, impresión y Telegram quedaron pendientes.
+  const actual = limitesJornadaArgentina();
+  const inicioAnterior = new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000);
+  const finAnterior = new Date(actual.desde.getTime() - 1);
+  const anteriorPendiente = await prisma.venta.findFirst({
+    where: {
+      estado: "CERRADA",
+      createdAt: { gte: inicioAnterior, lte: finAnterior },
+      closedAt: { lt: finAnterior },
+    },
+    select: { id: true },
+  });
+  const inicioJornada = anteriorPendiente ? inicioAnterior : actual.desde;
+  const finJornada = anteriorPendiente ? finAnterior : actual.hasta;
 
   const ventas = await prisma.venta.findMany({
     where: {

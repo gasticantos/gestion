@@ -3,6 +3,7 @@ import { cerrarJornadaCaja } from "@/lib/cierreCaja";
 import { fechaArgentinaYMD, formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
 import { sesionActual } from "@/lib/sesionServidor";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
@@ -12,12 +13,27 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const actual = limitesJornadaArgentina();
-  const recuperarAnterior = body?.recuperarAnterior === true;
+  const anterior = {
+    desde: new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000),
+    hasta: new Date(actual.desde.getTime() - 1),
+  };
+  const ventaAnteriorPendiente = await prisma.venta.findFirst({
+    where: {
+      negocioId: sesion.negocioId,
+      estado: "CERRADA",
+      createdAt: { gte: anterior.desde, lte: anterior.hasta },
+      closedAt: { lt: anterior.hasta },
+    },
+    select: { id: true },
+  });
+  // Si el automático de las 07:00 quedó bloqueado, el cierre manual normal retoma
+  // primero esa jornada. Así Ventas, ticket, PDF y archivo avanzan juntos.
+  const recuperarAnterior = body?.recuperarAnterior === true || Boolean(ventaAnteriorPendiente);
   const desde = recuperarAnterior
-    ? new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000)
+    ? anterior.desde
     : actual.desde;
   const hasta = recuperarAnterior
-    ? new Date(actual.desde.getTime() - 1)
+    ? anterior.hasta
     : actual.hasta;
   const fecha = recuperarAnterior ? fechaArgentinaYMD(desde) : actual.fecha;
   const resultado = await cerrarJornadaCaja({
@@ -37,13 +53,12 @@ export async function POST(req: NextRequest) {
   if (resultado.estado === "MESAS_ABIERTAS") {
     return NextResponse.json(
       {
-        error: `No se puede cerrar la caja. Hay ${resultado.mesasAbiertas.length} mesa(s) abierta(s): ${resultado.mesasAbiertas.join(", ")}`,
+        error: `No se puede cerrar la caja. Hay ${resultado.mesasAbiertas.length} mesa(s) con saldo abierto: ${resultado.mesasAbiertas.join(", ")}`,
         mesasAbiertas: resultado.mesasAbiertas,
       },
       { status: 409 }
     );
   }
-
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
   await registrarAuditoria(
     usuarioId,

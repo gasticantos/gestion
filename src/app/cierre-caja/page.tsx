@@ -55,7 +55,7 @@ export default function CierreCajaPage() {
 
       <Card className="flex flex-col gap-4 p-5">
         <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
-          Antes de cerrar, verificá que no queden mesas abiertas. Si luego se realizan ventas nuevas, podés generar otro cierre dentro de la misma jornada.
+          El cierre se bloquea únicamente si hay mesas abiertas con saldo mayor a $0. Las mesas vacías no impiden cerrar.
         </div>
         <Button
           type="button"
