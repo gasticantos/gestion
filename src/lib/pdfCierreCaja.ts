@@ -21,6 +21,16 @@ type DatosCierrePdf = {
   operador: { nombre: string; rol: string };
   reporte: ReporteVentas;
   generadoEn?: Date;
+  controlCaja?: {
+    saldoInicial: number;
+    ventasEfectivo: number;
+    ingresos: number;
+    egresos: number;
+    efectivoEsperado: number;
+    efectivoContado: number | null;
+    diferencia: number | null;
+    saldoSiguiente: number;
+  } | null;
 };
 
 export function generarPdfCierreCaja({
@@ -29,6 +39,7 @@ export function generarPdfCierreCaja({
   operador,
   reporte,
   generadoEn = new Date(),
+  controlCaja,
 }: DatosCierrePdf): ArrayBuffer {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const moneda = (valor: number) => `$${formatearMoneda(valor)}`;
@@ -90,6 +101,25 @@ export function generarPdfCierreCaja({
     }).concat([["TOTAL", moneda(reporte.combinado.total), "100%"]]),
     columnStyles: { 1: { halign: "right" }, 2: { halign: "right" } },
   });
+
+  if (controlCaja) {
+    autoTable(doc, {
+      ...estiloTabla,
+      startY: ultimoY(),
+      head: [["CONTROL DE EFECTIVO", "IMPORTE"]],
+      body: [
+        ["Efectivo inicial", moneda(controlCaja.saldoInicial)],
+        ["Ventas en efectivo", moneda(controlCaja.ventasEfectivo)],
+        ["Otros ingresos", moneda(controlCaja.ingresos)],
+        ["Egresos", `-${moneda(controlCaja.egresos)}`],
+        ["Efectivo esperado", moneda(controlCaja.efectivoEsperado)],
+        ["Efectivo contado", controlCaja.efectivoContado == null ? "Sin informar" : moneda(controlCaja.efectivoContado)],
+        ["Diferencia", controlCaja.diferencia == null ? "Sin informar" : moneda(controlCaja.diferencia)],
+        ["Inicio próxima jornada", moneda(controlCaja.saldoSiguiente)],
+      ],
+      columnStyles: { 1: { halign: "right" } },
+    });
+  }
 
   autoTable(doc, {
     ...estiloTabla,

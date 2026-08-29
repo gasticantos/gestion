@@ -494,6 +494,50 @@ export type EnumMetodoPagoWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
 }
 
+export type FloatNullableFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+}
+
+export type EnumTipoMovimientoCajaFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoMovimientoCaja | Prisma.EnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  in?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTipoMovimientoCajaFilter<$PrismaModel> | $Enums.TipoMovimientoCaja
+}
+
+export type EnumTipoMovimientoCajaWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoMovimientoCaja | Prisma.EnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  in?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTipoMovimientoCajaWithAggregatesFilter<$PrismaModel> | $Enums.TipoMovimientoCaja
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTipoMovimientoCajaFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTipoMovimientoCajaFilter<$PrismaModel>
+}
+
 export type EnumTipoMovimientoCCFilter<$PrismaModel = never> = {
   equals?: $Enums.TipoMovimientoCC | Prisma.EnumTipoMovimientoCCFieldRefInput<$PrismaModel>
   in?: $Enums.TipoMovimientoCC[] | Prisma.ListEnumTipoMovimientoCCFieldRefInput<$PrismaModel>
@@ -979,6 +1023,39 @@ export type NestedEnumMetodoPagoWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
+}
+
+export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumTipoMovimientoCajaFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoMovimientoCaja | Prisma.EnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  in?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTipoMovimientoCajaFilter<$PrismaModel> | $Enums.TipoMovimientoCaja
+}
+
+export type NestedEnumTipoMovimientoCajaWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoMovimientoCaja | Prisma.EnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  in?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TipoMovimientoCaja[] | Prisma.ListEnumTipoMovimientoCajaFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTipoMovimientoCajaWithAggregatesFilter<$PrismaModel> | $Enums.TipoMovimientoCaja
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTipoMovimientoCajaFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTipoMovimientoCajaFilter<$PrismaModel>
 }
 
 export type NestedEnumTipoMovimientoCCFilter<$PrismaModel = never> = {

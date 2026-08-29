@@ -23,6 +23,7 @@ async function preparar(idTexto: string) {
     operador: cierre.operador,
     reporte: reporteDesdeCierre(cierre),
     generadoEn: cierre.creadoEn,
+    controlCaja: cierre.controlCaja,
   });
   return { cierre, pdf } as const;
 }

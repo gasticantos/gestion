@@ -113,3 +113,11 @@ export const EstadoReserva = {
 } as const
 
 export type EstadoReserva = (typeof EstadoReserva)[keyof typeof EstadoReserva]
+
+
+export const TipoMovimientoCaja = {
+  INGRESO: 'INGRESO',
+  EGRESO: 'EGRESO'
+} as const
+
+export type TipoMovimientoCaja = (typeof TipoMovimientoCaja)[keyof typeof TipoMovimientoCaja]

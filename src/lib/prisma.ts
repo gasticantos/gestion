@@ -18,6 +18,7 @@ const MODELOS_NEGOCIO = new Set([
   "Categoria", "Usuario", "Configuracion", "ImpresionTrabajo", "AuditoriaLog",
   "Proveedor", "Producto", "StockEntry", "Mesa", "Reserva", "Venta", "Cliente",
   "Flyer",
+  "ControlCaja",
 ]);
 const FILTROS_RELACIONALES: Record<string, (negocioId: number) => object> = {
   StockEntryItem: (negocioId) => ({ stockEntry: { negocioId } }),
@@ -25,6 +26,7 @@ const FILTROS_RELACIONALES: Record<string, (negocioId: number) => object> = {
   PedidoItem: (negocioId) => ({ pedido: { venta: { negocioId } } }),
   Pago: (negocioId) => ({ venta: { negocioId } }),
   MovimientoCuentaCorriente: (negocioId) => ({ cliente: { negocioId } }),
+  MovimientoCaja: (negocioId) => ({ controlCaja: { negocioId } }),
 };
 
 function crearPrisma() {

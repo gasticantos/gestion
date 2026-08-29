@@ -5,7 +5,7 @@ const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 
 function importeDeLinea(contenido: string, etiqueta: string): number {
   const linea = contenido.split("\n").find((item) => item.includes(etiqueta) && item.includes("$"));
-  const valor = linea?.match(/\$([\d.]+,\d{2})/)?.[1];
+  const valor = linea?.match(/\$(-?[\d.]+,\d{2})/)?.[1];
   return valor ? Number(valor.replaceAll(".", "").replace(",", ".")) : 0;
 }
 
@@ -36,6 +36,22 @@ export function interpretarCierre(trabajo: {
     TRANSFERENCIA: importeDeLinea(trabajo.contenido, "TRANSFERENCIA"),
     FIADO: importeDeLinea(trabajo.contenido, "CUENTA CORRIENTE"),
   };
+  const tieneControl = trabajo.contenido.includes("CONTROL DE EFECTIVO");
+  const efectivoContado = trabajo.contenido.includes("EFECTIVO CONTADO")
+    ? importeDeLinea(trabajo.contenido, "EFECTIVO CONTADO")
+    : null;
+  const controlCaja = tieneControl
+    ? {
+        saldoInicial: importeDeLinea(trabajo.contenido, "EFECTIVO INICIAL"),
+        ventasEfectivo: importeDeLinea(trabajo.contenido, "VENTAS EFECTIVO"),
+        ingresos: importeDeLinea(trabajo.contenido, "OTROS INGRESOS"),
+        egresos: Math.abs(importeDeLinea(trabajo.contenido, "EGRESOS")),
+        efectivoEsperado: importeDeLinea(trabajo.contenido, "EFECTIVO ESPERADO"),
+        efectivoContado,
+        diferencia: efectivoContado == null ? null : importeDeLinea(trabajo.contenido, "DIFERENCIA"),
+        saldoSiguiente: importeDeLinea(trabajo.contenido, "INICIO PROXIMA JORNADA"),
+      }
+    : null;
   return {
     id: trabajo.id,
     fecha,
@@ -50,6 +66,7 @@ export function interpretarCierre(trabajo: {
     creadoEn: trabajo.createdAt,
     impresoEn: trabajo.printedAt,
     error: trabajo.error,
+    controlCaja,
   };
 }
 

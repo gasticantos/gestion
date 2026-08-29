@@ -137,6 +137,16 @@ export type PedidoItem = Prisma.PedidoItemModel
  */
 export type Pago = Prisma.PagoModel
 /**
+ * Model ControlCaja
+ * 
+ */
+export type ControlCaja = Prisma.ControlCajaModel
+/**
+ * Model MovimientoCaja
+ * 
+ */
+export type MovimientoCaja = Prisma.MovimientoCajaModel
+/**
  * Model Cliente
  * 
  */

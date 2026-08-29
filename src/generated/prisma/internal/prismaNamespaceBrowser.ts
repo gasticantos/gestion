@@ -70,6 +70,8 @@ export const ModelName = {
   Pedido: 'Pedido',
   PedidoItem: 'PedidoItem',
   Pago: 'Pago',
+  ControlCaja: 'ControlCaja',
+  MovimientoCaja: 'MovimientoCaja',
   Cliente: 'Cliente',
   MovimientoCuentaCorriente: 'MovimientoCuentaCorriente'
 } as const
@@ -362,6 +364,34 @@ export const PagoScalarFieldEnum = {
 } as const
 
 export type PagoScalarFieldEnum = (typeof PagoScalarFieldEnum)[keyof typeof PagoScalarFieldEnum]
+
+
+export const ControlCajaScalarFieldEnum = {
+  id: 'id',
+  fechaJornada: 'fechaJornada',
+  saldoInicial: 'saldoInicial',
+  efectivoContado: 'efectivoContado',
+  saldoSiguiente: 'saldoSiguiente',
+  cerradoAt: 'cerradoAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  negocioId: 'negocioId'
+} as const
+
+export type ControlCajaScalarFieldEnum = (typeof ControlCajaScalarFieldEnum)[keyof typeof ControlCajaScalarFieldEnum]
+
+
+export const MovimientoCajaScalarFieldEnum = {
+  id: 'id',
+  controlCajaId: 'controlCajaId',
+  tipo: 'tipo',
+  monto: 'monto',
+  concepto: 'concepto',
+  operador: 'operador',
+  createdAt: 'createdAt'
+} as const
+
+export type MovimientoCajaScalarFieldEnum = (typeof MovimientoCajaScalarFieldEnum)[keyof typeof MovimientoCajaScalarFieldEnum]
 
 
 export const ClienteScalarFieldEnum = {

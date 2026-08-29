@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
-import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
+import { fechaArgentinaYMD, formatearFechaHora, formatearMoneda } from "@/lib/formato";
 import { obtenerReporteVentas } from "@/lib/reportes";
 import { enviarAlertaTelegram, enviarDocumentoTelegram } from "@/lib/telegram";
 import { generarPdfCierreCaja } from "@/lib/pdfCierreCaja";
@@ -80,7 +80,7 @@ export async function cerrarJornadaCaja({
   });
   if (cierreExistente) return { estado: "YA_CERRADO" };
 
-  const [reporte, configuracion] = await Promise.all([
+  const [reporte, configuracion, control] = await Promise.all([
     obtenerReporteVentas(desde, hasta, {
       limiteProductos: null,
       negocioId,
@@ -89,6 +89,10 @@ export async function cerrarJornadaCaja({
       soloPendientesCierre: true,
     }),
     prisma.configuracion.findUnique({ where: { negocioId }, select: { nombrePrograma: true } }),
+    prisma.controlCaja.findUnique({
+      where: { negocioId_fechaJornada: { negocioId, fechaJornada: fecha } },
+      include: { movimientos: true },
+    }),
   ]);
   // No crear referencias, tickets ni PDFs vacíos: un cierre sin ventas no debe impedir
   // cerrar las ventas que se realicen más tarde durante esa misma noche.
@@ -114,6 +118,49 @@ export async function cerrarJornadaCaja({
   for (const metodo of Object.keys(METODOS) as (keyof typeof METODOS)[]) {
     lineas.push(`[[ROW]] ${fila(METODOS[metodo], reporte.combinado.pagos[metodo])}`);
   }
+  const controlPendiente = control && !control.cerradoAt ? control : null;
+  const ingresosCaja = controlPendiente?.movimientos
+    .filter((movimiento) => movimiento.tipo === "INGRESO")
+    .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
+  const egresosCaja = controlPendiente?.movimientos
+    .filter((movimiento) => movimiento.tipo === "EGRESO")
+    .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
+  const efectivoEsperado = controlPendiente
+    ? controlPendiente.saldoInicial + reporte.combinado.pagos.EFECTIVO + ingresosCaja - egresosCaja
+    : 0;
+  const diferencia =
+    controlPendiente?.efectivoContado == null ? null : controlPendiente.efectivoContado - efectivoEsperado;
+  const saldoSiguiente = controlPendiente?.saldoSiguiente ?? efectivoEsperado;
+  const resumenControl = controlPendiente
+    ? {
+        saldoInicial: controlPendiente.saldoInicial,
+        ventasEfectivo: reporte.combinado.pagos.EFECTIVO,
+        ingresos: ingresosCaja,
+        egresos: egresosCaja,
+        efectivoEsperado,
+        efectivoContado: controlPendiente.efectivoContado,
+        diferencia,
+        saldoSiguiente,
+      }
+    : null;
+  if (resumenControl) {
+    lineas.push(
+      "[[HR]]",
+      "[[SECTION]] CONTROL DE EFECTIVO",
+      `[[ROW]] ${fila("EFECTIVO INICIAL", resumenControl.saldoInicial)}`,
+      `[[ROW]] ${fila("VENTAS EFECTIVO", resumenControl.ventasEfectivo)}`,
+      `[[ROW]] ${fila("OTROS INGRESOS", resumenControl.ingresos)}`,
+      `[[ROW]] ${fila("EGRESOS", -resumenControl.egresos)}`,
+      `[[TOTAL]] ${fila("EFECTIVO ESPERADO", resumenControl.efectivoEsperado)}`,
+      ...(resumenControl.efectivoContado == null
+        ? []
+        : [
+            `[[ROW]] ${fila("EFECTIVO CONTADO", resumenControl.efectivoContado)}`,
+            `[[ROW]] ${fila("DIFERENCIA", resumenControl.diferencia ?? 0)}`,
+          ]),
+      `[[ROW]] ${fila("INICIO PROXIMA JORNADA", resumenControl.saldoSiguiente)}`
+    );
+  }
   lineas.push("[[HR]]", "[[FOOTER]] Fin del cierre de caja", "");
 
   try {
@@ -131,6 +178,18 @@ export async function cerrarJornadaCaja({
         },
         data: { closedAt: hasta },
       });
+      if (controlPendiente) {
+        await tx.controlCaja.update({
+          where: { id: controlPendiente.id },
+          data: { cerradoAt: new Date() },
+        });
+        const fechaSiguiente = fechaArgentinaYMD(new Date(hasta.getTime() + 1));
+        await tx.controlCaja.upsert({
+          where: { negocioId_fechaJornada: { negocioId, fechaJornada: fechaSiguiente } },
+          update: {},
+          create: { negocioId, fechaJornada: fechaSiguiente, saldoInicial: saldoSiguiente },
+        });
+      }
       return creado;
     });
     await notificarNuevaImpresion();
@@ -142,6 +201,7 @@ export async function cerrarJornadaCaja({
         fechaJornada: fecha,
         operador,
         reporte,
+        controlCaja: resumenControl,
       });
       const envioTelegram = await enviarDocumentoTelegram(
         pdf,

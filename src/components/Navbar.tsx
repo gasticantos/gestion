@@ -26,6 +26,7 @@ const gruposLinks = [
     { href: "/presupuestos", label: "Presupuestos" },
   ],
   [
+    { href: "/control-caja", label: "Control de caja" },
     { href: "/cierre-caja", label: "Cierre de caja" },
     { href: "/reportes", label: "Reportes" },
   ],

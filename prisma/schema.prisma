@@ -29,6 +29,7 @@ model Negocio {
   clientes        Cliente[]
   presupuestos    Presupuesto[]
   flyers          Flyer[]
+  controlesCaja   ControlCaja[]
 }
 
 model Flyer {
@@ -416,6 +417,41 @@ model Pago {
   createdAt DateTime   @default(now())
 
   @@index([ventaId])
+}
+
+enum TipoMovimientoCaja {
+  INGRESO
+  EGRESO
+}
+
+model ControlCaja {
+  id               Int              @id @default(autoincrement())
+  fechaJornada     String
+  saldoInicial     Float            @default(0)
+  efectivoContado  Float?
+  saldoSiguiente   Float?
+  cerradoAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  movimientos      MovimientoCaja[]
+  negocioId        Int              @default(1)
+  negocio          Negocio          @relation(fields: [negocioId], references: [id], onDelete: Cascade)
+
+  @@unique([negocioId, fechaJornada])
+  @@index([negocioId, createdAt])
+}
+
+model MovimientoCaja {
+  id            Int                @id @default(autoincrement())
+  controlCajaId Int
+  controlCaja   ControlCaja        @relation(fields: [controlCajaId], references: [id], onDelete: Cascade)
+  tipo          TipoMovimientoCaja
+  monto         Float
+  concepto      String
+  operador      String
+  createdAt     DateTime           @default(now())
+
+  @@index([controlCajaId, createdAt])
 }
 
 model Cliente {
