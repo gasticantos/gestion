@@ -21,6 +21,18 @@ type ReporteVentas = {
   serieDiaria: { fecha: string; total: number }[];
 };
 
+type CierreHistorico = {
+  id: number;
+  fecha: string;
+  cantidadVentas: number;
+  total: number;
+  operador: { nombre: string; rol: string };
+  estadoImpresion: string;
+  creadoEn: string;
+  impresoEn: string | null;
+  error: string | null;
+};
+
 const METODO_LABEL: Record<Metodo, string> = {
   EFECTIVO: "Efectivo",
   TARJETA: "Tarjeta",
@@ -107,6 +119,9 @@ export default function ReportesPage() {
   const [loading, setLoading] = useState(true);
   const [cerrandoCaja, setCerrandoCaja] = useState(false);
   const [estadoCierre, setEstadoCierre] = useState("");
+  const [cierres, setCierres] = useState<CierreHistorico[]>([]);
+  const [enviandoCierreId, setEnviandoCierreId] = useState<number | null>(null);
+  const [estadoHistorial, setEstadoHistorial] = useState("");
 
   async function cargar(desde: string, hasta: string) {
     setLoading(true);
@@ -119,6 +134,17 @@ export default function ReportesPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- recarga al cambiar el período
     cargar(rango.desde, rango.hasta);
   }, [rango]);
+
+  async function cargarCierres() {
+    const res = await fetch("/api/reportes/cierres", { cache: "no-store" });
+    const data = await res.json().catch(() => null);
+    if (res.ok && Array.isArray(data)) setCierres(data);
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial del historial remoto
+    cargarCierres();
+  }, []);
 
   function elegirPreset(p: Preset) {
     setPreset(p);
@@ -146,11 +172,26 @@ export default function ReportesPage() {
       // Recargar los datos después de 1 segundo para reflejar el reset de mesas
       setTimeout(() => {
         cargar(rango.desde, rango.hasta);
+        cargarCierres();
       }, 1000);
     } catch {
       setEstadoCierre("No se pudo conectar para generar el cierre");
     } finally {
       setCerrandoCaja(false);
+    }
+  }
+
+  async function enviarCierreTelegram(id: number) {
+    setEnviandoCierreId(id);
+    setEstadoHistorial("");
+    try {
+      const res = await fetch(`/api/reportes/cierres/${id}/pdf`, { method: "POST" });
+      const data = await res.json().catch(() => null);
+      setEstadoHistorial(res.ok ? "PDF enviado correctamente a Telegram" : data?.error || "No se pudo enviar el PDF");
+    } catch {
+      setEstadoHistorial("No se pudo conectar con Telegram");
+    } finally {
+      setEnviandoCierreId(null);
     }
   }
 
@@ -223,6 +264,83 @@ export default function ReportesPage() {
               value={rango.hasta}
               onChange={(e) => setRango((r) => ({ ...r, hasta: e.target.value }))}
             />
+          </div>
+        )}
+      </Card>
+
+      <Card>
+        <div className="flex items-center justify-between gap-3 border-b border-neutral-200 p-4 dark:border-neutral-800">
+          <div>
+            <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Historial de cierres de caja</h2>
+            <p className="text-xs text-neutral-500">Cierres registrados, impresión y copias en PDF.</p>
+          </div>
+          <Button variant="secondary" onClick={cargarCierres}>Actualizar</Button>
+        </div>
+        {estadoHistorial && (
+          <div className="mx-4 mt-3 rounded-lg border border-blue-600/30 bg-blue-600/10 px-3 py-2 text-sm text-blue-500">
+            {estadoHistorial}
+          </div>
+        )}
+        {cierres.length === 0 ? (
+          <div className="p-4 text-sm text-neutral-500">Todavía no hay cierres registrados.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className={th}>Jornada</th>
+                  <th className={th}>Responsable</th>
+                  <th className={th}>Ventas</th>
+                  <th className={th}>Total</th>
+                  <th className={th}>Impresión</th>
+                  <th className={th}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cierres.map((cierre) => (
+                  <tr key={cierre.id} className={trHover}>
+                    <td className={td}>
+                      <div className="font-medium">{cierre.fecha}</div>
+                      <div className="text-xs text-neutral-500">
+                        {new Date(cierre.creadoEn).toLocaleString("es-AR")}
+                      </div>
+                    </td>
+                    <td className={td}>
+                      <div>{cierre.operador.nombre}</div>
+                      <div className="text-xs text-neutral-500">{cierre.operador.rol}</div>
+                    </td>
+                    <td className={td}>{cierre.cantidadVentas}</td>
+                    <td className={`${td} font-semibold`}>${formatearMoneda(cierre.total)}</td>
+                    <td className={td}>
+                      <span className={cierre.estadoImpresion === "IMPRESO" ? "text-emerald-600" : "text-amber-600"}>
+                        {cierre.estadoImpresion}
+                      </span>
+                      {cierre.error && <div className="max-w-48 text-xs text-red-500">{cierre.error}</div>}
+                    </td>
+                    <td className={td}>
+                      <div className="flex flex-wrap gap-2">
+                        <a
+                          href={`/api/reportes/cierres/${cierre.id}/pdf`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                        >
+                          Ver PDF
+                        </a>
+                        <button
+                          type="button"
+                          disabled={enviandoCierreId !== null}
+                          onClick={() => enviarCierreTelegram(cierre.id)}
+                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          {enviandoCierreId === cierre.id ? "Enviando..." : "Enviar a Telegram"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </Card>
