@@ -34,7 +34,6 @@ export default function VentaPage() {
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
-  const [itemPrecioSeleccionado, setItemPrecioSeleccionado] = useState("");
 
   useEffect(() => {
     // Cargar clientes y configuración (productos se cargan del caché en BuscadorProducto)
@@ -71,9 +70,6 @@ export default function VentaPage() {
   const subtotal = useMemo(() => carrito.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [carrito]);
   const descuento = useMemo(() => aplicarDescuento(subtotal, Number(descuentoPct)), [subtotal, descuentoPct]);
   const total = descuento.total;
-  const itemSeleccionado = carrito.find(
-    (item) => `${item.productoId}:${item.tarifa}` === itemPrecioSeleccionado
-  );
 
   function agregar(
     p: ProductoBusqueda,
@@ -105,16 +101,6 @@ export default function VentaPage() {
       prev
         .map((i) => (i.productoId === productoId && i.tarifa === tarifa ? { ...i, cantidad: Math.max(0, cantidad) } : i))
         .filter((i) => i.cantidad > 0)
-    );
-  }
-
-  function cambiarPrecio(productoId: number, tarifa: Tarifa, precioUnitario: number) {
-    setCarrito((prev) =>
-      prev.map((i) =>
-        i.productoId === productoId && i.tarifa === tarifa
-          ? { ...i, precioUnitario: Math.max(0, precioUnitario) }
-          : i
-      )
     );
   }
 
@@ -171,14 +157,18 @@ export default function VentaPage() {
     setPagos([{ metodo: "EFECTIVO", monto: "0" }]);
     setClienteId("");
     setDescuentoPct("0");
-    setItemPrecioSeleccionado("");
   }
 
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Venta (mostrador)</h1>
-        <BuscadorProducto onSeleccionar={agregar} precioMesaActivo={precioMesaActivo} soloPrecioVenta />
+        <BuscadorProducto
+          onSeleccionar={agregar}
+          precioMesaActivo={precioMesaActivo}
+          soloPrecioVenta
+          permitirPrecioLibre
+        />
 
         {carrito.length > 0 && (
           <div className="text-xs text-blue-500 bg-blue-600/10 border border-blue-600/30 rounded-lg px-3 py-2">
@@ -249,48 +239,6 @@ export default function VentaPage() {
           )}
         </Card>
 
-        {carrito.length > 0 && (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-            <label className="flex flex-1 flex-col gap-1 text-xs text-neutral-500">
-              Cambiar precio de un producto
-              <select
-                className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-600/50 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
-                value={itemPrecioSeleccionado}
-                onChange={(e) => setItemPrecioSeleccionado(e.target.value)}
-              >
-                <option value="">Seleccionar producto...</option>
-                {carrito.map((item) => (
-                  <option key={`${item.productoId}:${item.tarifa}`} value={`${item.productoId}:${item.tarifa}`}>
-                    {item.nombre}{precioMesaActivo ? ` · ${item.tarifa === "MESA" ? "Mesa" : "Mostrador"}` : ""}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {itemSeleccionado && (
-              <label className="flex flex-col gap-1 text-xs text-neutral-500">
-                Nuevo precio unitario
-                <div className="flex items-center rounded-lg border border-neutral-300 bg-white px-3 dark:border-neutral-700 dark:bg-neutral-950">
-                  <span>$</span>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    min="0"
-                    step="0.01"
-                    className="w-32 bg-transparent px-2 py-2 text-right text-sm text-neutral-900 focus:outline-none dark:text-neutral-100"
-                    value={itemSeleccionado.precioUnitario}
-                    onChange={(e) =>
-                      cambiarPrecio(
-                        itemSeleccionado.productoId,
-                        itemSeleccionado.tarifa,
-                        Number(e.target.value) || 0
-                      )
-                    }
-                  />
-                </div>
-              </label>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="flex flex-col gap-3">
