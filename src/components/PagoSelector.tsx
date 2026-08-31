@@ -5,7 +5,8 @@ import { input, label } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 
 export type Metodo = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
-export type PagoLinea = { metodo: Metodo; monto: string };
+export type TipoTarjeta = "QR" | "DEBITO" | "CREDITO";
+export type PagoLinea = { metodo: Metodo; monto: string; tipoTarjeta?: TipoTarjeta | null };
 export type ClienteOpcion = { id: number; nombre: string; saldo: number };
 
 const METODOS: { value: Metodo; label: string }[] = [
@@ -43,6 +44,8 @@ function PagoSelectorBase({
   clientes,
   clienteId,
   setClienteId,
+  propina,
+  setPropina,
 }: {
   total: number;
   pagos: PagoLinea[];
@@ -50,6 +53,8 @@ function PagoSelectorBase({
   clientes: ClienteOpcion[];
   clienteId: string;
   setClienteId: (id: string) => void;
+  propina?: string;
+  setPropina?: (valor: string) => void;
 }) {
   function dividirPago() {
     setPagos([
@@ -63,7 +68,17 @@ function PagoSelectorBase({
   }
 
   function actualizarPago(index: number, campo: "metodo" | "monto", valor: string) {
-    setPagos(pagos.map((p, i) => (i === index ? { ...p, [campo]: valor } : p)));
+    setPagos(pagos.map((p, i) => {
+      if (i !== index) return p;
+      if (campo === "metodo") {
+        return { ...p, metodo: valor as Metodo, tipoTarjeta: valor === "TARJETA" ? p.tipoTarjeta || "QR" : null };
+      }
+      return { ...p, monto: valor };
+    }));
+  }
+
+  function actualizarTipoTarjeta(index: number, valor: TipoTarjeta) {
+    setPagos(pagos.map((p, i) => (i === index ? { ...p, tipoTarjeta: valor } : p)));
   }
 
   const suma = sumaPagos(pagos);
@@ -108,6 +123,24 @@ function PagoSelectorBase({
               />
             )}
           </div>
+          {p.metodo === "TARJETA" && (
+            <div className="grid grid-cols-3 gap-2">
+              {(["QR", "DEBITO", "CREDITO"] as TipoTarjeta[]).map((tipo) => (
+                <button
+                  key={tipo}
+                  type="button"
+                  onClick={() => actualizarTipoTarjeta(idx, tipo)}
+                  className={`rounded-lg border px-2 py-1.5 text-xs font-medium ${
+                    (p.tipoTarjeta || "QR") === tipo
+                      ? "border-blue-600 bg-blue-600/10 text-blue-700 dark:text-blue-300"
+                      : "border-neutral-300 text-neutral-600 dark:border-neutral-700 dark:text-neutral-300"
+                  }`}
+                >
+                  {tipo === "DEBITO" ? "Débito" : tipo === "CREDITO" ? "Crédito" : "QR"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ))}
       {pagos.length === 1 ? (
@@ -136,6 +169,23 @@ function PagoSelectorBase({
               </option>
             ))}
           </select>
+        </div>
+      )}
+      {setPropina && (
+        <div>
+          <label className={label}>Propina (opcional)</label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            className={`${input} w-full`}
+            value={propina || ""}
+            onChange={(e) => setPropina(e.target.value)}
+          />
+          {Number(propina) > 0 && (
+            <p className="mt-1 text-xs text-neutral-500">Se agrega al total final y se registra separada de los medios de pago.</p>
+          )}
         </div>
       )}
     </div>

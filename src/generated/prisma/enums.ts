@@ -60,6 +60,15 @@ export const MetodoPago = {
 export type MetodoPago = (typeof MetodoPago)[keyof typeof MetodoPago]
 
 
+export const TipoTarjeta = {
+  QR: 'QR',
+  DEBITO: 'DEBITO',
+  CREDITO: 'CREDITO'
+} as const
+
+export type TipoTarjeta = (typeof TipoTarjeta)[keyof typeof TipoTarjeta]
+
+
 export const TipoMovimientoCC = {
   CARGO: 'CARGO',
   PAGO: 'PAGO',

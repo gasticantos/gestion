@@ -8,10 +8,11 @@ const ventaAbierta = {
     id: true,
     total: true,
     descuentoPct: true,
+    propina: true,
     ticketImpreso: true,
     borradorRonda: true,
     pagos: {
-      select: { id: true, metodo: true, monto: true, createdAt: true },
+      select: { id: true, metodo: true, monto: true, tipoTarjeta: true, createdAt: true },
       orderBy: { createdAt: "asc" as const },
     },
     pedidos: {

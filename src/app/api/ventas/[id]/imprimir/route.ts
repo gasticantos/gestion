@@ -40,6 +40,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       subtotal,
       venta.estado === "CERRADA" ? venta.descuentoPct : Number(body.descuentoPct) || 0
     );
+    const responsableDescuento = venta.estado === "CERRADA"
+      ? venta.descuentoResponsable
+      : String(body.descuentoResponsable || "").trim().slice(0, 80) || null;
     const dinero = (valor: number) => `$${formatearMoneda(valor)}`;
     const lineaImporte = (etiqueta: string, valor: number) =>
       `${etiqueta}${dinero(valor).padStart(Math.max(1, 36 - etiqueta.length))}`;
@@ -75,8 +78,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     lineas.push(`[[ROW]] ${lineaImporte("SUBTOTAL", subtotal)}`);
     if (descuento.monto > 0) {
       lineas.push(`[[ROW]] ${lineaImporte(`DESCUENTO ${descuento.pct}%`, -descuento.monto)}`);
+      if (responsableDescuento) lineas.push(`[[NOTE]] Descuento aplicado por: ${responsableDescuento}`);
     }
-    lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL", descuento.total)}`);
+    if (venta.propina > 0) {
+      lineas.push(`[[ROW]] ${lineaImporte("PROPINA", venta.propina)}`);
+    }
+    lineas.push(`[[TOTAL]] ${lineaImporte("TOTAL FINAL", descuento.total + venta.propina)}`);
 
     const totalPagado = venta.pagos.reduce((suma, pago) => suma + pago.monto, 0);
     if (totalPagado > 0 && venta.estado !== "CERRADA") {
@@ -100,7 +107,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         TRANSFERENCIA: "Transferencia",
         FIADO: "Cuenta corriente",
       };
-      lineas.push(`[[ROW]] ${lineaImporte(metodos[pago.metodo] || pago.metodo, pago.monto)}`);
+      const detalleTarjeta = pago.metodo === "TARJETA"
+        ? ` · ${pago.tipoTarjeta === "DEBITO" ? "Débito" : pago.tipoTarjeta === "CREDITO" ? "Crédito" : "QR"}`
+        : "";
+      lineas.push(`[[ROW]] ${lineaImporte(`${metodos[pago.metodo] || pago.metodo}${detalleTarjeta}`, pago.monto)}`);
     }
 
     lineas.push("[[HR]]");

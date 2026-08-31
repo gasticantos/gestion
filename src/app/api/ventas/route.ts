@@ -12,7 +12,8 @@ type ItemInput = {
   notas?: string;
   precioUnitario?: number;
 };
-type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
+type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number; tipoTarjeta?: "QR" | "DEBITO" | "CREDITO" | null };
+const TIPOS_TARJETA = ["QR", "DEBITO", "CREDITO"] as const;
 
 export async function GET() {
   // La lista diaria sigue la misma jornada comercial que el cierre: 07:00 a 06:59.
@@ -44,11 +45,12 @@ export async function GET() {
       tipo: true,
       total: true,
       descuentoPct: true,
+      propina: true,
       closedAt: true,
       createdAt: true,
       clienteId: true,
       mesa: { select: { id: true, nombre: true } },
-      pagos: { select: { id: true, metodo: true, monto: true }, orderBy: { id: "asc" } },
+      pagos: { select: { id: true, metodo: true, monto: true, tipoTarjeta: true }, orderBy: { id: "asc" } },
       pedidos: {
         select: {
           id: true,
@@ -74,11 +76,13 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
   const body = await req.json();
-  const { items, pagos, clienteId, descuentoPct } = body as {
+  const { items, pagos, clienteId, descuentoPct, descuentoResponsable, propina } = body as {
     items: ItemInput[];
     pagos: PagoInput[];
     clienteId?: number | null;
     descuentoPct?: number;
+    descuentoResponsable?: string | null;
+    propina?: number;
   };
 
   if (!Array.isArray(items) || items.length === 0) {
@@ -86,6 +90,13 @@ export async function POST(req: NextRequest) {
   }
   if (!Array.isArray(pagos) || pagos.length === 0) {
     return NextResponse.json({ error: "Falta indicar el pago" }, { status: 400 });
+  }
+  const propinaFinal = Math.round(Number(propina || 0) * 100) / 100;
+  if (!Number.isFinite(propinaFinal) || propinaFinal < 0) {
+    return NextResponse.json({ error: "La propina no es válida" }, { status: 400 });
+  }
+  if (pagos.some((p) => p.metodo === "TARJETA" && p.tipoTarjeta && !TIPOS_TARJETA.includes(p.tipoTarjeta))) {
+    return NextResponse.json({ error: "El tipo de pago con tarjeta no es válido" }, { status: 400 });
   }
 
   const tieneFiado = pagos.some((p) => p.metodo === "FIADO");
@@ -135,6 +146,10 @@ export async function POST(req: NextRequest) {
     return acc + precioDelItem(item) * Number(item.cantidad);
   }, 0);
   const { pct, monto: montoDescuento, total } = aplicarDescuento(subtotal, Number(descuentoPct) || 0);
+  const responsableDescuento = String(descuentoResponsable || "").trim().slice(0, 80);
+  if (pct > 0 && !responsableDescuento) {
+    return NextResponse.json({ error: "Indicá quién aplica el descuento" }, { status: 400 });
+  }
 
   const totalPagos = pagos.reduce((acc, p) => acc + Number(p.monto), 0);
   if (Math.abs(totalPagos - total) > 0.01) {
@@ -154,6 +169,8 @@ export async function POST(req: NextRequest) {
         tarifa: tarifaResumen,
         total,
         descuentoPct: pct,
+        descuentoResponsable: pct > 0 ? responsableDescuento : null,
+        propina: propinaFinal,
         pedidos: {
           create: {
             creadoPorId: sesion ? Number(sesion.sub) : null,
@@ -174,7 +191,7 @@ export async function POST(req: NextRequest) {
           },
         },
         pagos: {
-          create: pagos.map((p) => ({ metodo: p.metodo, monto: Number(p.monto) })),
+          create: pagos.map((p) => ({ metodo: p.metodo, monto: Number(p.monto), tipoTarjeta: p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null })),
         },
       },
       include: { pedidos: { include: { items: { include: { producto: true } } } }, pagos: true },
@@ -208,7 +225,7 @@ export async function POST(req: NextRequest) {
 
   if (pct > 0) {
     await enviarAlertaTelegram(
-      `🏷️ Descuento aplicado\nMostrador · Venta #${venta.id}\nSubtotal: $${formatearMoneda(subtotal)}\nDescuento: ${pct}% (-$${formatearMoneda(montoDescuento)})\nTotal: $${formatearMoneda(total)}\nRealizado por: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
+      `🏷️ Descuento aplicado\nMostrador · Venta #${venta.id}\nSubtotal: $${formatearMoneda(subtotal)}\nDescuento: ${pct}% (-$${formatearMoneda(montoDescuento)})\nResponsable informado: ${responsableDescuento}\nTotal: $${formatearMoneda(total)}\nOperador del sistema: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
     );
   }
 

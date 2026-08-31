@@ -1,0 +1,4 @@
+CREATE TYPE "TipoTarjeta" AS ENUM ('QR', 'DEBITO', 'CREDITO');
+
+ALTER TABLE "Venta" ADD COLUMN "propina" DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE "Pago" ADD COLUMN "tipoTarjeta" "TipoTarjeta";

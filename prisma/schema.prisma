@@ -105,6 +105,12 @@ enum MetodoPago {
   FIADO
 }
 
+enum TipoTarjeta {
+  QR
+  DEBITO
+  CREDITO
+}
+
 enum TipoMovimientoCC {
   CARGO
   PAGO
@@ -361,6 +367,8 @@ model Venta {
   tarifa        TarifaPrecio                @default(PARTICULAR)
   total         Float                       @default(0)
   descuentoPct  Float                       @default(0)
+  descuentoResponsable String?
+  propina       Float                       @default(0)
   borradorRonda Json?
   ticketImpreso Boolean                     @default(false)
   createdAt     DateTime                    @default(now())
@@ -413,6 +421,7 @@ model Pago {
   ventaId   Int
   venta     Venta      @relation(fields: [ventaId], references: [id], onDelete: Cascade)
   metodo    MetodoPago
+  tipoTarjeta TipoTarjeta?
   monto     Float
   createdAt DateTime   @default(now())
 

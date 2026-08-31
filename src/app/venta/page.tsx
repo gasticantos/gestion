@@ -30,7 +30,9 @@ export default function VentaPage() {
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [pagos, setPagos] = useState<PagoLinea[]>([{ metodo: "EFECTIVO", monto: "0" }]);
   const [clienteId, setClienteId] = useState("");
-  const [descuentoPct, setDescuentoPct] = useState("0");
+  const [descuentoPct, setDescuentoPct] = useState("");
+  const [descuentoResponsable, setDescuentoResponsable] = useState("");
+  const [propina, setPropina] = useState("");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
@@ -122,6 +124,10 @@ export default function VentaPage() {
       setError("Elegí un cliente para la parte fiada");
       return;
     }
+    if (descuento.pct > 0 && !descuentoResponsable.trim()) {
+      setError("Escribí el nombre de quien aplica el descuento");
+      return;
+    }
 
     const pagosFinales = resolvePagos(pagos, total);
     setEnviando(true);
@@ -135,9 +141,11 @@ export default function VentaPage() {
           tarifa: i.tarifa,
           precioUnitario: i.precioUnitario,
         })),
-        pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto) })),
+        pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto), tipoTarjeta: p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null })),
         clienteId: requiereCliente(pagos) ? Number(clienteId) : null,
         descuentoPct: Number(descuentoPct) || 0,
+        descuentoResponsable: descuentoResponsable.trim() || null,
+        propina: Number(propina) || 0,
       }),
     });
 
@@ -156,7 +164,9 @@ export default function VentaPage() {
     setCarrito([]);
     setPagos([{ metodo: "EFECTIVO", monto: "0" }]);
     setClienteId("");
-    setDescuentoPct("0");
+    setDescuentoPct("");
+    setDescuentoResponsable("");
+    setPropina("");
   }
 
   return (
@@ -248,26 +258,38 @@ export default function VentaPage() {
             <span className="text-neutral-700 dark:text-neutral-300">${formatearMoneda(subtotal)}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <label className="text-xs text-neutral-500 flex items-center gap-1.5">
-              Descuento
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-                value={descuentoPct}
-                onChange={(e) => setDescuentoPct(e.target.value)}
-                className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
-              />
-              %
-            </label>
+            <div className="flex flex-1 flex-wrap items-center gap-2">
+              <label className="text-xs text-neutral-500 flex items-center gap-1.5">
+                Descuento
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={descuentoPct}
+                  onChange={(e) => setDescuentoPct(e.target.value)}
+                  className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
+                />
+                %
+              </label>
+              {descuentoPct.trim() !== "" && (
+                <input
+                  type="text"
+                  maxLength={80}
+                  value={descuentoResponsable}
+                  onChange={(e) => setDescuentoResponsable(e.target.value)}
+                  placeholder="Nombre de quien aplica"
+                  className="min-w-44 flex-1 rounded border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-600/50 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-200"
+                />
+              )}
+            </div>
             {descuento.monto > 0 && (
               <span className="text-xs font-medium text-red-400">-${formatearMoneda(descuento.monto)}</span>
             )}
           </div>
           <div className="flex justify-between items-baseline pt-1 border-t border-neutral-200 dark:border-neutral-800">
-            <span className="text-neutral-500 dark:text-neutral-400">Total</span>
-            <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(total)}</span>
+            <span className="text-neutral-500 dark:text-neutral-400">Total final</span>
+            <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(total + (Number(propina) || 0))}</span>
           </div>
 
           <PagoSelector
@@ -277,6 +299,8 @@ export default function VentaPage() {
             clientes={clientes}
             clienteId={clienteId}
             setClienteId={setClienteId}
+            propina={propina}
+            setPropina={setPropina}
           />
 
           <Button

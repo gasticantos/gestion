@@ -62,6 +62,7 @@ export default async function ReporteTicketPage({
             <span>${formatearMoneda(reporte.porCanal.MOSTRADOR.pagos[m as keyof typeof reporte.porCanal.MOSTRADOR.pagos])}</span>
           </div>
         ))}
+        <div className="flex justify-between"><span>Propina</span><span>${formatearMoneda(reporte.porCanal.MOSTRADOR.propina)}</span></div>
 
         <div className="border-t border-dashed my-2" />
         <div className="font-bold mb-1">MESAS (${formatearMoneda(reporte.porCanal.MESA.total)})</div>
@@ -71,6 +72,7 @@ export default async function ReporteTicketPage({
             <span>${formatearMoneda(reporte.porCanal.MESA.pagos[m as keyof typeof reporte.porCanal.MESA.pagos])}</span>
           </div>
         ))}
+        <div className="flex justify-between"><span>Propina</span><span>${formatearMoneda(reporte.porCanal.MESA.propina)}</span></div>
 
         <div className="border-t border-dashed my-2" />
         <div className="font-bold mb-1">TOTAL POR MEDIO DE PAGO</div>
@@ -80,6 +82,10 @@ export default async function ReporteTicketPage({
             <span>${formatearMoneda(reporte.combinado.pagos[m as keyof typeof reporte.combinado.pagos])}</span>
           </div>
         ))}
+        <div className="flex justify-between font-bold"><span>Propina</span><span>${formatearMoneda(reporte.combinado.propina)}</span></div>
+        <div className="ml-2 flex justify-between"><span>Tarjeta QR</span><span>${formatearMoneda(reporte.combinado.tarjetas.QR)}</span></div>
+        <div className="ml-2 flex justify-between"><span>Tarjeta Débito</span><span>${formatearMoneda(reporte.combinado.tarjetas.DEBITO)}</span></div>
+        <div className="ml-2 flex justify-between"><span>Tarjeta Crédito</span><span>${formatearMoneda(reporte.combinado.tarjetas.CREDITO)}</span></div>
 
         {reporte.categorias.length > 0 && (
           <>

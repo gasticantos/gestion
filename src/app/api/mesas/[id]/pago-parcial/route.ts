@@ -17,8 +17,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const body = await req.json().catch(() => ({}));
   const metodo = String(body.metodo || "") as (typeof METODOS_PARCIALES)[number];
   const monto = Math.round(Number(body.monto) * 100) / 100;
+  const tipoTarjeta = metodo === "TARJETA" ? String(body.tipoTarjeta || "QR") as "QR" | "DEBITO" | "CREDITO" : null;
   if (!METODOS_PARCIALES.includes(metodo) || !Number.isFinite(monto) || monto <= 0) {
     return NextResponse.json({ error: "Indicá un medio y un monto válido" }, { status: 400 });
+  }
+  if (tipoTarjeta && !["QR", "DEBITO", "CREDITO"].includes(tipoTarjeta)) {
+    return NextResponse.json({ error: "El tipo de tarjeta no es válido" }, { status: 400 });
   }
 
   const mesa = await prisma.mesa.findUnique({
@@ -52,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   await prisma.$transaction([
-    prisma.pago.create({ data: { ventaId: venta.id, metodo, monto } }),
+    prisma.pago.create({ data: { ventaId: venta.id, metodo, monto, tipoTarjeta } }),
     prisma.venta.update({ where: { id: venta.id }, data: { descuentoPct } }),
   ]);
 

@@ -9,7 +9,8 @@ import { th, td, trHover, input } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 
 type MetodoPago = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
-type Pago = { id: number; metodo: MetodoPago; monto: number };
+type TipoTarjeta = "QR" | "DEBITO" | "CREDITO";
+type Pago = { id: number; metodo: MetodoPago; monto: number; tipoTarjeta?: TipoTarjeta | null };
 type PedidoItem = { id: number; productoId: number; cantidad: number; precioUnitario: number; subtotal: number; producto: { nombre: string } };
 type Pedido = { id: number; items: PedidoItem[] };
 
@@ -21,6 +22,7 @@ type Venta = {
   mesa?: { nombre: string };
   total: number;
   descuentoPct: number;
+  propina: number;
   closedAt: string | null;
   createdAt: string;
   pedidos: Pedido[];
@@ -70,9 +72,17 @@ export default function VentasPage() {
     const actuales = pagosEditados[venta.id] || venta.pagos;
     setPagosEditados((prev) => ({
       ...prev,
-      [venta.id]: actuales.map((p) => (p.id === pagoId ? { ...p, metodo } : p)),
+      [venta.id]: actuales.map((p) => (p.id === pagoId ? { ...p, metodo, tipoTarjeta: metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null } : p)),
     }));
     setMensaje(null);
+  }
+
+  function cambiarTipoTarjeta(venta: Venta, pagoId: number, tipoTarjeta: TipoTarjeta) {
+    const actuales = pagosEditados[venta.id] || venta.pagos;
+    setPagosEditados((prev) => ({
+      ...prev,
+      [venta.id]: actuales.map((p) => (p.id === pagoId ? { ...p, tipoTarjeta } : p)),
+    }));
   }
 
   async function guardarPagos(venta: Venta) {
@@ -84,7 +94,7 @@ export default function VentasPage() {
       const res = await fetch(`/api/ventas/${venta.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pagos: pagos.map(({ id, metodo }) => ({ id, metodo })) }),
+        body: JSON.stringify({ pagos: pagos.map(({ id, metodo, tipoTarjeta }) => ({ id, metodo, tipoTarjeta: metodo === "TARJETA" ? tipoTarjeta || "QR" : null })) }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || "No se pudo modificar el pago");
@@ -133,31 +143,40 @@ export default function VentasPage() {
         <div className="flex flex-wrap items-center justify-end gap-2">
           <div className="flex flex-wrap gap-1">
             {venta.pagos.map((p) => (
-              <Badge key={p.id} variant="neutral">{p.metodo}</Badge>
+              <Badge key={p.id} variant="neutral">{p.metodo}{p.metodo === "TARJETA" ? ` · ${p.tipoTarjeta === "DEBITO" ? "DÉBITO" : p.tipoTarjeta === "CREDITO" ? "CRÉDITO" : "QR"}` : ""}</Badge>
             ))}
           </div>
-          <Button size="sm" onClick={() => {
-            setEditandoId(editando ? null : venta.id);
-            if (editando) {
-              setPagosEditados((prev) => {
-                const siguiente = { ...prev };
-                delete siguiente[venta.id];
-                return siguiente;
-              });
-            }
-            setMensaje(null);
-          }}>
-            {editando ? "Cancelar" : "Editar pago"}
-          </Button>
-          <Button size="sm" onClick={() => reimprimir(venta.id)} disabled={imprimiendoId === venta.id}>
+          <button
+            type="button"
+            className="px-1 py-1 text-sm font-medium text-red-500 transition-colors hover:text-red-400 disabled:opacity-40"
+            onClick={() => {
+              setEditandoId(editando ? null : venta.id);
+              if (editando) {
+                setPagosEditados((prev) => {
+                  const siguiente = { ...prev };
+                  delete siguiente[venta.id];
+                  return siguiente;
+                });
+              }
+              setMensaje(null);
+            }}
+          >
+            {editando ? "Cancelar" : "Editar"}
+          </button>
+          <button
+            type="button"
+            className="px-1 py-1 text-sm font-medium text-blue-500 transition-colors hover:text-blue-400 disabled:opacity-40"
+            onClick={() => reimprimir(venta.id)}
+            disabled={imprimiendoId === venta.id}
+          >
             {imprimiendoId === venta.id ? "Enviando..." : "Reimprimir ticket"}
-          </Button>
+          </button>
         </div>
         {editando && (
           <div className="flex flex-wrap items-center justify-end gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-700 dark:bg-neutral-900">
             {pagos.map((p) => (
-              <select
-                key={p.id}
+              <div key={p.id} className="flex gap-1">
+                <select
                 aria-label={`Método de pago de $${formatearMoneda(p.monto)}`}
                 className={`${input} py-1.5 text-xs min-w-32`}
                 value={p.metodo}
@@ -167,7 +186,13 @@ export default function VentasPage() {
                 <option value="TARJETA">Tarjeta</option>
                 <option value="TRANSFERENCIA">Transferencia</option>
                 <option value="FIADO" disabled={!venta.clienteId}>Cuenta corriente</option>
-              </select>
+                </select>
+                {p.metodo === "TARJETA" && (
+                  <select className={`${input} py-1.5 text-xs min-w-24`} value={p.tipoTarjeta || "QR"} onChange={(e) => cambiarTipoTarjeta(venta, p.id, e.target.value as TipoTarjeta)}>
+                    <option value="QR">QR</option><option value="DEBITO">Débito</option><option value="CREDITO">Crédito</option>
+                  </select>
+                )}
+              </div>
             ))}
             <Button size="sm" variant="primary" onClick={() => guardarPagos(venta)} disabled={!modificado || guardandoId === venta.id}>
               {guardandoId === venta.id ? "Guardando..." : "Guardar"}
@@ -241,6 +266,7 @@ export default function VentasPage() {
                       <td className={td}>
                         <span className="font-semibold">${formatearMoneda(v.total)}</span>
                         {v.descuentoPct > 0 && <span className="text-xs text-red-400 ml-1">({v.descuentoPct}%)</span>}
+                        {v.propina > 0 && <span className="block text-xs text-violet-500">+ ${formatearMoneda(v.propina)} propina</span>}
                       </td>
                       <td className={td}>
                         <ControlesVenta venta={v} />

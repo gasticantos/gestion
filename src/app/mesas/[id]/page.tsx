@@ -38,11 +38,12 @@ type PedidoItem = {
 
 type Pedido = { id: number; createdAt: string; items: PedidoItem[] };
 
-type PagoRegistrado = { id: number; metodo: PagoLinea["metodo"]; monto: number; createdAt: string };
+type PagoRegistrado = { id: number; metodo: PagoLinea["metodo"]; monto: number; tipoTarjeta?: PagoLinea["tipoTarjeta"]; createdAt: string };
 type Venta = {
   id: number;
   total: number;
   descuentoPct: number;
+  propina: number;
   pagos: PagoRegistrado[];
   pedidos: Pedido[];
   borradorRonda: ItemRonda[] | null;
@@ -76,9 +77,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [ronda, setRonda] = useState<ItemRonda[]>([]);
   const [pagos, setPagos] = useState<PagoLinea[]>([{ metodo: "EFECTIVO", monto: "0" }]);
   const [clienteId, setClienteId] = useState("");
-  const [descuentoPct, setDescuentoPct] = useState("0");
+  const [descuentoPct, setDescuentoPct] = useState("");
+  const [descuentoResponsable, setDescuentoResponsable] = useState("");
+  const [propina, setPropina] = useState("");
   const [montoParcial, setMontoParcial] = useState("");
   const [metodoParcial, setMetodoParcial] = useState<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA">("EFECTIVO");
+  const [tipoTarjetaParcial, setTipoTarjetaParcial] = useState<"QR" | "DEBITO" | "CREDITO">("QR");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [rol, setRol] = useState<string | null>(null);
@@ -562,12 +566,16 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       setError('Hay productos pendientes de enviar a cocina. Tocá "Enviar a cocina" antes de cobrar.');
       return;
     }
+    if (descuento.pct > 0 && !descuentoResponsable.trim()) {
+      setError("Escribí el nombre de quien aplica el descuento");
+      return;
+    }
     setEnviando(true);
     try {
       const res = await fetch(`/api/ventas/${venta.id}/imprimir`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ descuentoPct: descuento.pct }),
+        body: JSON.stringify({ descuentoPct: descuento.pct, descuentoResponsable: descuentoResponsable.trim() || null }),
       });
       if (!res.ok) {
         setError("No se pudo enviar el ticket a la estación de impresión.");
@@ -592,15 +600,21 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       setError("Elegí un cliente para la parte fiada");
       return;
     }
+    if (descuento.pct > 0 && !descuentoResponsable.trim()) {
+      setError("Escribí el nombre de quien aplica el descuento");
+      return;
+    }
     const pagosFinales = saldoPendiente > 0.01 ? resolvePagos(pagos, saldoPendiente) : [];
     setEnviando(true);
     const res = await fetch(`/api/mesas/${id}/cerrar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto) })),
+        pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto), tipoTarjeta: p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null })),
         clienteId: pagosFinales.length && requiereCliente(pagosFinales) ? Number(clienteId) : null,
         descuentoPct: Number(descuentoPct) || 0,
+        descuentoResponsable: descuentoResponsable.trim() || null,
+        propina: Number(propina) || 0,
       }),
     });
     setEnviando(false);
@@ -631,7 +645,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       const res = await fetch(`/api/mesas/${id}/pago-parcial`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ metodo: metodoParcial, monto, descuentoPct: Number(descuentoPct) || 0 }),
+        body: JSON.stringify({ metodo: metodoParcial, monto, tipoTarjeta: metodoParcial === "TARJETA" ? tipoTarjetaParcial : null, descuentoPct: Number(descuentoPct) || 0 }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
@@ -951,27 +965,39 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 <span className="text-neutral-700 dark:text-neutral-300">${formatearMoneda(total)}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
-                <label className="text-xs text-neutral-500 flex items-center gap-1.5">
-                  Descuento
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={descuentoPct}
-                    disabled={pagadoParcial > 0}
-                    onChange={(e) => setDescuentoPct(e.target.value)}
-                    className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
-                  />
-                  %
-                </label>
+                <div className="flex flex-1 flex-wrap items-center gap-2">
+                  <label className="text-xs text-neutral-500 flex items-center gap-1.5">
+                    Descuento
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={descuentoPct}
+                      disabled={pagadoParcial > 0}
+                      onChange={(e) => setDescuentoPct(e.target.value)}
+                      className="w-14 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-1.5 py-0.5 text-xs text-neutral-700 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
+                    />
+                    %
+                  </label>
+                  {descuentoPct.trim() !== "" && (
+                    <input
+                      type="text"
+                      maxLength={80}
+                      value={descuentoResponsable}
+                      onChange={(e) => setDescuentoResponsable(e.target.value)}
+                      placeholder="Nombre de quien aplica"
+                      className="min-w-44 flex-1 rounded border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-600/50 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-200"
+                    />
+                  )}
+                </div>
                 {descuento.monto > 0 && (
                   <span className="text-xs font-medium text-red-400">-${formatearMoneda(descuento.monto)}</span>
                 )}
               </div>
               <div className="flex justify-between items-baseline pt-1 border-t border-neutral-200 dark:border-neutral-800">
-                <span className="text-neutral-500 dark:text-neutral-400">Total a cobrar</span>
-                <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalFinal)}</span>
+                <span className="text-neutral-500 dark:text-neutral-400">Total final</span>
+                <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalFinal + (Number(propina) || 0))}</span>
               </div>
               {!ticketImpreso ? (
                 <Button
@@ -992,7 +1018,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       <div className="mb-2 font-medium text-emerald-700 dark:text-emerald-300">Pagos parciales registrados</div>
                       {venta?.pagos.map((pago) => (
                         <div key={pago.id} className="flex justify-between py-0.5 text-neutral-600 dark:text-neutral-300">
-                          <span>{pago.metodo === "EFECTIVO" ? "Efectivo" : pago.metodo === "TARJETA" ? "Tarjeta" : pago.metodo === "TRANSFERENCIA" ? "Transferencia" : "Cuenta corriente"}</span>
+                          <span>{pago.metodo === "EFECTIVO" ? "Efectivo" : pago.metodo === "TARJETA" ? `Tarjeta · ${pago.tipoTarjeta === "DEBITO" ? "Débito" : pago.tipoTarjeta === "CREDITO" ? "Crédito" : "QR"}` : pago.metodo === "TRANSFERENCIA" ? "Transferencia" : "Cuenta corriente"}</span>
                           <span>${formatearMoneda(pago.monto)}</span>
                         </div>
                       ))}
@@ -1000,6 +1026,17 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                         <span>Saldo pendiente</span>
                         <span>${formatearMoneda(saldoPendiente)}</span>
                       </div>
+                      {metodoParcial === "TARJETA" && (
+                        <select
+                          className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+                          value={tipoTarjetaParcial}
+                          onChange={(e) => setTipoTarjetaParcial(e.target.value as typeof tipoTarjetaParcial)}
+                        >
+                          <option value="QR">QR</option>
+                          <option value="DEBITO">Débito</option>
+                          <option value="CREDITO">Crédito</option>
+                        </select>
+                      )}
                     </div>
                   )}
 
@@ -1048,6 +1085,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                         clientes={clientes}
                         clienteId={clienteId}
                         setClienteId={setClienteId}
+                        propina={propina}
+                        setPropina={setPropina}
                       />
                     </>
                   )}

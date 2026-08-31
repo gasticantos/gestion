@@ -124,6 +124,10 @@ export async function cerrarJornadaCaja({
   for (const metodo of Object.keys(METODOS) as (keyof typeof METODOS)[]) {
     lineas.push(`[[ROW]] ${fila(METODOS[metodo], reporte.combinado.pagos[metodo])}`);
   }
+  lineas.push(`[[ROW]] ${fila("TARJETA QR", reporte.combinado.tarjetas.QR)}`);
+  lineas.push(`[[ROW]] ${fila("TARJETA DEBITO", reporte.combinado.tarjetas.DEBITO)}`);
+  lineas.push(`[[ROW]] ${fila("TARJETA CREDITO", reporte.combinado.tarjetas.CREDITO)}`);
+  lineas.push(`[[ROW]] ${fila("PROPINA", reporte.combinado.propina)}`);
   const ingresosCaja = controlPendiente?.movimientos
     .filter((movimiento) => movimiento.tipo === "INGRESO")
     .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;

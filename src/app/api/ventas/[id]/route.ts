@@ -5,6 +5,8 @@ import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditori
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 type MetodoPago = (typeof METODOS)[number];
+const TIPOS_TARJETA = ["QR", "DEBITO", "CREDITO"] as const;
+type TipoTarjeta = (typeof TIPOS_TARJETA)[number];
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,13 +33,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const ventaId = Number(id);
   const body = await req.json().catch(() => null);
-  const pagos = body?.pagos as { id: number; metodo: MetodoPago }[] | undefined;
+  const pagos = body?.pagos as { id: number; metodo: MetodoPago; tipoTarjeta?: TipoTarjeta | null }[] | undefined;
 
   if (!Number.isInteger(ventaId) || !Array.isArray(pagos) || pagos.length === 0) {
     return NextResponse.json({ error: "Datos de pago inválidos" }, { status: 400 });
   }
   if (pagos.some((p) => !Number.isInteger(Number(p.id)) || !METODOS.includes(p.metodo))) {
     return NextResponse.json({ error: "Método de pago inválido" }, { status: 400 });
+  }
+  if (pagos.some((p) => p.metodo === "TARJETA" && p.tipoTarjeta && !TIPOS_TARJETA.includes(p.tipoTarjeta))) {
+    return NextResponse.json({ error: "Tipo de tarjeta inválido" }, { status: 400 });
   }
 
   const venta = await prisma.venta.findFirst({
@@ -52,6 +57,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const metodoPorId = new Map(pagos.map((p) => [Number(p.id), p.metodo]));
+  const tipoTarjetaPorId = new Map(pagos.map((p) => [Number(p.id), p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null]));
   const fiadoAnterior = venta.pagos
     .filter((p) => p.metodo === "FIADO")
     .reduce((total, p) => total + p.monto, 0);
@@ -68,7 +74,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     for (const pago of venta.pagos) {
       await tx.pago.update({
         where: { id: pago.id },
-        data: { metodo: metodoPorId.get(pago.id)! },
+        data: { metodo: metodoPorId.get(pago.id)!, tipoTarjeta: tipoTarjetaPorId.get(pago.id) },
       });
     }
 
@@ -93,7 +99,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const actualizada = await prisma.venta.findUnique({
     where: { id: venta.id },
-    select: { pagos: { select: { id: true, metodo: true, monto: true }, orderBy: { id: "asc" } } },
+    select: { pagos: { select: { id: true, metodo: true, monto: true, tipoTarjeta: true }, orderBy: { id: "asc" } } },
   });
   return NextResponse.json(actualizada);
 }

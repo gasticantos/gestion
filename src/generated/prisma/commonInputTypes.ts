@@ -484,6 +484,13 @@ export type EnumMetodoPagoFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel> | $Enums.MetodoPago
 }
 
+export type EnumTipoTarjetaNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoTarjeta | Prisma.EnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTipoTarjetaNullableFilter<$PrismaModel> | $Enums.TipoTarjeta | null
+}
+
 export type EnumMetodoPagoWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.MetodoPago | Prisma.EnumMetodoPagoFieldRefInput<$PrismaModel>
   in?: $Enums.MetodoPago[] | Prisma.ListEnumMetodoPagoFieldRefInput<$PrismaModel>
@@ -492,6 +499,16 @@ export type EnumMetodoPagoWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
+}
+
+export type EnumTipoTarjetaNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoTarjeta | Prisma.EnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTipoTarjetaNullableWithAggregatesFilter<$PrismaModel> | $Enums.TipoTarjeta | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTipoTarjetaNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTipoTarjetaNullableFilter<$PrismaModel>
 }
 
 export type FloatNullableFilter<$PrismaModel = never> = {
@@ -1015,6 +1032,13 @@ export type NestedEnumMetodoPagoFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel> | $Enums.MetodoPago
 }
 
+export type NestedEnumTipoTarjetaNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoTarjeta | Prisma.EnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTipoTarjetaNullableFilter<$PrismaModel> | $Enums.TipoTarjeta | null
+}
+
 export type NestedEnumMetodoPagoWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.MetodoPago | Prisma.EnumMetodoPagoFieldRefInput<$PrismaModel>
   in?: $Enums.MetodoPago[] | Prisma.ListEnumMetodoPagoFieldRefInput<$PrismaModel>
@@ -1023,6 +1047,16 @@ export type NestedEnumMetodoPagoWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMetodoPagoFilter<$PrismaModel>
+}
+
+export type NestedEnumTipoTarjetaNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TipoTarjeta | Prisma.EnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TipoTarjeta[] | Prisma.ListEnumTipoTarjetaFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTipoTarjetaNullableWithAggregatesFilter<$PrismaModel> | $Enums.TipoTarjeta | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTipoTarjetaNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTipoTarjetaNullableFilter<$PrismaModel>
 }
 
 export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {

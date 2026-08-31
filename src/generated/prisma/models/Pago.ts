@@ -42,6 +42,7 @@ export type PagoMinAggregateOutputType = {
   id: number | null
   ventaId: number | null
   metodo: $Enums.MetodoPago | null
+  tipoTarjeta: $Enums.TipoTarjeta | null
   monto: number | null
   createdAt: Date | null
 }
@@ -50,6 +51,7 @@ export type PagoMaxAggregateOutputType = {
   id: number | null
   ventaId: number | null
   metodo: $Enums.MetodoPago | null
+  tipoTarjeta: $Enums.TipoTarjeta | null
   monto: number | null
   createdAt: Date | null
 }
@@ -58,6 +60,7 @@ export type PagoCountAggregateOutputType = {
   id: number
   ventaId: number
   metodo: number
+  tipoTarjeta: number
   monto: number
   createdAt: number
   _all: number
@@ -80,6 +83,7 @@ export type PagoMinAggregateInputType = {
   id?: true
   ventaId?: true
   metodo?: true
+  tipoTarjeta?: true
   monto?: true
   createdAt?: true
 }
@@ -88,6 +92,7 @@ export type PagoMaxAggregateInputType = {
   id?: true
   ventaId?: true
   metodo?: true
+  tipoTarjeta?: true
   monto?: true
   createdAt?: true
 }
@@ -96,6 +101,7 @@ export type PagoCountAggregateInputType = {
   id?: true
   ventaId?: true
   metodo?: true
+  tipoTarjeta?: true
   monto?: true
   createdAt?: true
   _all?: true
@@ -191,6 +197,7 @@ export type PagoGroupByOutputType = {
   id: number
   ventaId: number
   metodo: $Enums.MetodoPago
+  tipoTarjeta: $Enums.TipoTarjeta | null
   monto: number
   createdAt: Date
   _count: PagoCountAggregateOutputType | null
@@ -222,6 +229,7 @@ export type PagoWhereInput = {
   id?: Prisma.IntFilter<"Pago"> | number
   ventaId?: Prisma.IntFilter<"Pago"> | number
   metodo?: Prisma.EnumMetodoPagoFilter<"Pago"> | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.EnumTipoTarjetaNullableFilter<"Pago"> | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFilter<"Pago"> | number
   createdAt?: Prisma.DateTimeFilter<"Pago"> | Date | string
   venta?: Prisma.XOR<Prisma.VentaScalarRelationFilter, Prisma.VentaWhereInput>
@@ -231,6 +239,7 @@ export type PagoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   metodo?: Prisma.SortOrder
+  tipoTarjeta?: Prisma.SortOrderInput | Prisma.SortOrder
   monto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   venta?: Prisma.VentaOrderByWithRelationInput
@@ -243,6 +252,7 @@ export type PagoWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PagoWhereInput | Prisma.PagoWhereInput[]
   ventaId?: Prisma.IntFilter<"Pago"> | number
   metodo?: Prisma.EnumMetodoPagoFilter<"Pago"> | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.EnumTipoTarjetaNullableFilter<"Pago"> | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFilter<"Pago"> | number
   createdAt?: Prisma.DateTimeFilter<"Pago"> | Date | string
   venta?: Prisma.XOR<Prisma.VentaScalarRelationFilter, Prisma.VentaWhereInput>
@@ -252,6 +262,7 @@ export type PagoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   metodo?: Prisma.SortOrder
+  tipoTarjeta?: Prisma.SortOrderInput | Prisma.SortOrder
   monto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PagoCountOrderByAggregateInput
@@ -268,12 +279,14 @@ export type PagoScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Pago"> | number
   ventaId?: Prisma.IntWithAggregatesFilter<"Pago"> | number
   metodo?: Prisma.EnumMetodoPagoWithAggregatesFilter<"Pago"> | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.EnumTipoTarjetaNullableWithAggregatesFilter<"Pago"> | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatWithAggregatesFilter<"Pago"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Pago"> | Date | string
 }
 
 export type PagoCreateInput = {
   metodo: $Enums.MetodoPago
+  tipoTarjeta?: $Enums.TipoTarjeta | null
   monto: number
   createdAt?: Date | string
   venta: Prisma.VentaCreateNestedOneWithoutPagosInput
@@ -283,12 +296,14 @@ export type PagoUncheckedCreateInput = {
   id?: number
   ventaId: number
   metodo: $Enums.MetodoPago
+  tipoTarjeta?: $Enums.TipoTarjeta | null
   monto: number
   createdAt?: Date | string
 }
 
 export type PagoUpdateInput = {
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   venta?: Prisma.VentaUpdateOneRequiredWithoutPagosNestedInput
@@ -298,6 +313,7 @@ export type PagoUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -306,12 +322,14 @@ export type PagoCreateManyInput = {
   id?: number
   ventaId: number
   metodo: $Enums.MetodoPago
+  tipoTarjeta?: $Enums.TipoTarjeta | null
   monto: number
   createdAt?: Date | string
 }
 
 export type PagoUpdateManyMutationInput = {
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -320,6 +338,7 @@ export type PagoUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -338,6 +357,7 @@ export type PagoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   metodo?: Prisma.SortOrder
+  tipoTarjeta?: Prisma.SortOrder
   monto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -352,6 +372,7 @@ export type PagoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   metodo?: Prisma.SortOrder
+  tipoTarjeta?: Prisma.SortOrder
   monto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -360,6 +381,7 @@ export type PagoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   metodo?: Prisma.SortOrder
+  tipoTarjeta?: Prisma.SortOrder
   monto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -416,8 +438,13 @@ export type EnumMetodoPagoFieldUpdateOperationsInput = {
   set?: $Enums.MetodoPago
 }
 
+export type NullableEnumTipoTarjetaFieldUpdateOperationsInput = {
+  set?: $Enums.TipoTarjeta | null
+}
+
 export type PagoCreateWithoutVentaInput = {
   metodo: $Enums.MetodoPago
+  tipoTarjeta?: $Enums.TipoTarjeta | null
   monto: number
   createdAt?: Date | string
 }
@@ -425,6 +452,7 @@ export type PagoCreateWithoutVentaInput = {
 export type PagoUncheckedCreateWithoutVentaInput = {
   id?: number
   metodo: $Enums.MetodoPago
+  tipoTarjeta?: $Enums.TipoTarjeta | null
   monto: number
   createdAt?: Date | string
 }
@@ -462,6 +490,7 @@ export type PagoScalarWhereInput = {
   id?: Prisma.IntFilter<"Pago"> | number
   ventaId?: Prisma.IntFilter<"Pago"> | number
   metodo?: Prisma.EnumMetodoPagoFilter<"Pago"> | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.EnumTipoTarjetaNullableFilter<"Pago"> | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFilter<"Pago"> | number
   createdAt?: Prisma.DateTimeFilter<"Pago"> | Date | string
 }
@@ -469,12 +498,14 @@ export type PagoScalarWhereInput = {
 export type PagoCreateManyVentaInput = {
   id?: number
   metodo: $Enums.MetodoPago
+  tipoTarjeta?: $Enums.TipoTarjeta | null
   monto: number
   createdAt?: Date | string
 }
 
 export type PagoUpdateWithoutVentaInput = {
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -482,6 +513,7 @@ export type PagoUpdateWithoutVentaInput = {
 export type PagoUncheckedUpdateWithoutVentaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -489,6 +521,7 @@ export type PagoUncheckedUpdateWithoutVentaInput = {
 export type PagoUncheckedUpdateManyWithoutVentaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   metodo?: Prisma.EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
+  tipoTarjeta?: Prisma.NullableEnumTipoTarjetaFieldUpdateOperationsInput | $Enums.TipoTarjeta | null
   monto?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -499,6 +532,7 @@ export type PagoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   ventaId?: boolean
   metodo?: boolean
+  tipoTarjeta?: boolean
   monto?: boolean
   createdAt?: boolean
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
@@ -508,6 +542,7 @@ export type PagoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   ventaId?: boolean
   metodo?: boolean
+  tipoTarjeta?: boolean
   monto?: boolean
   createdAt?: boolean
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
@@ -517,6 +552,7 @@ export type PagoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   ventaId?: boolean
   metodo?: boolean
+  tipoTarjeta?: boolean
   monto?: boolean
   createdAt?: boolean
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
@@ -526,11 +562,12 @@ export type PagoSelectScalar = {
   id?: boolean
   ventaId?: boolean
   metodo?: boolean
+  tipoTarjeta?: boolean
   monto?: boolean
   createdAt?: boolean
 }
 
-export type PagoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ventaId" | "metodo" | "monto" | "createdAt", ExtArgs["result"]["pago"]>
+export type PagoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ventaId" | "metodo" | "tipoTarjeta" | "monto" | "createdAt", ExtArgs["result"]["pago"]>
 export type PagoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
 }
@@ -550,6 +587,7 @@ export type $PagoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: number
     ventaId: number
     metodo: $Enums.MetodoPago
+    tipoTarjeta: $Enums.TipoTarjeta | null
     monto: number
     createdAt: Date
   }, ExtArgs["result"]["pago"]>
@@ -979,6 +1017,7 @@ export interface PagoFieldRefs {
   readonly id: Prisma.FieldRef<"Pago", 'Int'>
   readonly ventaId: Prisma.FieldRef<"Pago", 'Int'>
   readonly metodo: Prisma.FieldRef<"Pago", 'MetodoPago'>
+  readonly tipoTarjeta: Prisma.FieldRef<"Pago", 'TipoTarjeta'>
   readonly monto: Prisma.FieldRef<"Pago", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Pago", 'DateTime'>
 }

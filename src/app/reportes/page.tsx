@@ -10,13 +10,14 @@ import CategoricalBarChart, { BarDatum } from "@/components/charts/CategoricalBa
 import { formatearMoneda } from "@/lib/formato";
 
 type Metodo = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
+type DesgloseTarjeta = Record<"QR" | "DEBITO" | "CREDITO", number>;
 
 type ReporteVentas = {
   desde: string;
   hasta: string;
   cantidadVentas: number;
-  porCanal: Record<"MOSTRADOR" | "MESA", { total: number; pagos: Record<Metodo, number> }>;
-  combinado: { total: number; pagos: Record<Metodo, number> };
+  porCanal: Record<"MOSTRADOR" | "MESA", { total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta }>;
+  combinado: { total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta };
   categorias: { categoria: string; cantidad: number; importe: number }[];
   productos: { nombre: string; cantidad: number; importe: number }[];
   serieDiaria: { fecha: string; total: number }[];
@@ -344,11 +345,24 @@ export default function ReportesPage() {
                 <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">{titulo}</div>
                 <div className="flex flex-col gap-1.5">
                   {(Object.keys(METODO_LABEL) as Metodo[]).map((m) => (
-                    <div key={m} className="flex justify-between text-sm">
-                      <span className="text-neutral-500 dark:text-neutral-400">{METODO_LABEL[m]}</span>
-                      <span className="text-neutral-800 dark:text-neutral-100">${formatearMoneda(datos.pagos[m])}</span>
+                    <div key={m}>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-neutral-500 dark:text-neutral-400">{METODO_LABEL[m]}</span>
+                        <span className="text-neutral-800 dark:text-neutral-100">${formatearMoneda(datos.pagos[m])}</span>
+                      </div>
+                      {m === "TARJETA" && datos.pagos.TARJETA > 0 && (
+                        <div className="ml-3 mt-1 space-y-1 text-xs text-neutral-500">
+                          <div className="flex justify-between"><span>QR</span><span>${formatearMoneda(datos.tarjetas.QR)}</span></div>
+                          <div className="flex justify-between"><span>Débito</span><span>${formatearMoneda(datos.tarjetas.DEBITO)}</span></div>
+                          <div className="flex justify-between"><span>Crédito</span><span>${formatearMoneda(datos.tarjetas.CREDITO)}</span></div>
+                        </div>
+                      )}
                     </div>
                   ))}
+                  <div className="flex justify-between text-sm text-violet-700 dark:text-violet-300">
+                    <span>Propina</span>
+                    <span>${formatearMoneda(datos.propina)}</span>
+                  </div>
                   <div className="flex justify-between text-sm font-semibold border-t border-neutral-200 dark:border-neutral-800 pt-1.5 mt-1">
                     <span className="text-neutral-700 dark:text-neutral-300">Total</span>
                     <span className="text-neutral-900 dark:text-neutral-50">${formatearMoneda(datos.total)}</span>

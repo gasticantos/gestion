@@ -98,7 +98,13 @@ export function generarPdfCierreCaja({
       const importe = reporte.combinado.pagos[clave];
       const porcentaje = reporte.combinado.total > 0 ? (importe / reporte.combinado.total) * 100 : 0;
       return [etiqueta, moneda(importe), `${porcentaje.toFixed(1)}%`];
-    }).concat([["TOTAL", moneda(reporte.combinado.total), "100%"]]),
+    }).concat([
+      ["  Tarjeta QR", moneda(reporte.combinado.tarjetas.QR), "-"],
+      ["  Tarjeta Débito", moneda(reporte.combinado.tarjetas.DEBITO), "-"],
+      ["  Tarjeta Crédito", moneda(reporte.combinado.tarjetas.CREDITO), "-"],
+      ["Propina", moneda(reporte.combinado.propina), "-"],
+      ["TOTAL VENTAS", moneda(reporte.combinado.total), "100%"],
+    ]),
     columnStyles: { 1: { halign: "right" }, 2: { halign: "right" } },
   });
 

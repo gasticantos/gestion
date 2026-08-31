@@ -3,13 +3,15 @@ import { fechaJornadaArgentina } from "@/lib/formato";
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 type Metodo = (typeof METODOS)[number];
+type TipoTarjeta = "QR" | "DEBITO" | "CREDITO";
+type DesgloseTarjeta = Record<TipoTarjeta, number>;
 
 export type ReporteVentas = {
   desde: string;
   hasta: string;
   cantidadVentas: number;
-  porCanal: Record<"MOSTRADOR" | "MESA", { cantidad: number; total: number; pagos: Record<Metodo, number> }>;
-  combinado: { total: number; pagos: Record<Metodo, number> };
+  porCanal: Record<"MOSTRADOR" | "MESA", { cantidad: number; total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta }>;
+  combinado: { total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta };
   categorias: { categoria: string; cantidad: number; importe: number }[];
   productos: { nombre: string; cantidad: number; importe: number }[];
   serieDiaria: { fecha: string; total: number }[];
@@ -17,6 +19,10 @@ export type ReporteVentas = {
 
 function pagosVacio(): Record<Metodo, number> {
   return Object.fromEntries(METODOS.map((m) => [m, 0])) as Record<Metodo, number>;
+}
+
+function tarjetasVacio(): DesgloseTarjeta {
+  return { QR: 0, DEBITO: 0, CREDITO: 0 };
 }
 
 export async function obtenerReporteVentas(
@@ -47,10 +53,10 @@ export async function obtenerReporteVentas(
   });
 
   const porCanal = {
-    MOSTRADOR: { cantidad: 0, total: 0, pagos: pagosVacio() },
-    MESA: { cantidad: 0, total: 0, pagos: pagosVacio() },
+    MOSTRADOR: { cantidad: 0, total: 0, propina: 0, pagos: pagosVacio(), tarjetas: tarjetasVacio() },
+    MESA: { cantidad: 0, total: 0, propina: 0, pagos: pagosVacio(), tarjetas: tarjetasVacio() },
   };
-  const combinado = { total: 0, pagos: pagosVacio() };
+  const combinado = { total: 0, propina: 0, pagos: pagosVacio(), tarjetas: tarjetasVacio() };
   const categoriaMap = new Map<string, { cantidad: number; importe: number }>();
   const productoMap = new Map<string, { cantidad: number; importe: number }>();
   const diaMap = new Map<string, number>();
@@ -59,11 +65,18 @@ export async function obtenerReporteVentas(
     const canal = porCanal[venta.tipo];
     canal.cantidad += 1;
     canal.total += venta.total;
+    canal.propina += venta.propina;
     combinado.total += venta.total;
+    combinado.propina += venta.propina;
 
     for (const pago of venta.pagos) {
       canal.pagos[pago.metodo] += pago.monto;
       combinado.pagos[pago.metodo] += pago.monto;
+      if (pago.metodo === "TARJETA") {
+        const tipo = pago.tipoTarjeta || "QR";
+        canal.tarjetas[tipo] += pago.monto;
+        combinado.tarjetas[tipo] += pago.monto;
+      }
     }
 
     const fechaKey = fechaJornadaArgentina(venta.createdAt);

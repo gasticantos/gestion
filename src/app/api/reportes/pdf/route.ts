@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
       ["Mostrador", moneda(reporte.porCanal.MOSTRADOR.total)],
       ["Mesas", moneda(reporte.porCanal.MESA.total)],
       ["Cantidad de ventas", String(reporte.cantidadVentas)],
+      ["Propinas", moneda(reporte.combinado.propina)],
     ],
     theme: "grid",
   });
@@ -56,7 +57,13 @@ export async function GET(req: NextRequest) {
       head: [[titulo, "Importe"]],
       body: (Object.keys(METODO_LABEL) as (keyof typeof METODO_LABEL)[])
         .map((metodo) => [METODO_LABEL[metodo], moneda(datos.pagos[metodo])])
-        .concat([["Total", moneda(datos.total)]]),
+        .concat([
+          ["  Tarjeta QR", moneda(datos.tarjetas.QR)],
+          ["  Tarjeta Debito", moneda(datos.tarjetas.DEBITO)],
+          ["  Tarjeta Credito", moneda(datos.tarjetas.CREDITO)],
+          ["Propina", moneda(datos.propina)],
+          ["Total ventas", moneda(datos.total)],
+        ]),
       theme: "grid",
     });
   }

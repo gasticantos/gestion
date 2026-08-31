@@ -53,13 +53,15 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
         ))}
         <div className="border-t border-dashed my-2" />
         <div className="flex justify-between font-bold">
-          <span>TOTAL</span>
-          <span>${formatearMoneda(venta.total)}</span>
+          <span>TOTAL FINAL</span>
+          <span>${formatearMoneda(venta.total + venta.propina)}</span>
         </div>
+        {venta.propina > 0 && <div className="flex justify-between"><span>Propina</span><span>${formatearMoneda(venta.propina)}</span></div>}
+        {venta.descuentoPct > 0 && venta.descuentoResponsable && <div className="mt-1">Descuento aplicado por: {venta.descuentoResponsable}</div>}
         <div className="border-t border-dashed my-2" />
         {venta.pagos.map((pago) => (
           <div key={pago.id} className="flex justify-between">
-            <span>{METODOS[pago.metodo]}</span>
+            <span>{METODOS[pago.metodo]}{pago.metodo === "TARJETA" ? ` · ${pago.tipoTarjeta === "DEBITO" ? "Débito" : pago.tipoTarjeta === "CREDITO" ? "Crédito" : "QR"}` : ""}</span>
             <span>${formatearMoneda(pago.monto)}</span>
           </div>
         ))}

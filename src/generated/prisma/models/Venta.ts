@@ -32,6 +32,7 @@ export type VentaAvgAggregateOutputType = {
   clienteId: number | null
   total: number | null
   descuentoPct: number | null
+  propina: number | null
   negocioId: number | null
 }
 
@@ -41,6 +42,7 @@ export type VentaSumAggregateOutputType = {
   clienteId: number | null
   total: number | null
   descuentoPct: number | null
+  propina: number | null
   negocioId: number | null
 }
 
@@ -53,6 +55,8 @@ export type VentaMinAggregateOutputType = {
   tarifa: $Enums.TarifaPrecio | null
   total: number | null
   descuentoPct: number | null
+  descuentoResponsable: string | null
+  propina: number | null
   ticketImpreso: boolean | null
   createdAt: Date | null
   closedAt: Date | null
@@ -68,6 +72,8 @@ export type VentaMaxAggregateOutputType = {
   tarifa: $Enums.TarifaPrecio | null
   total: number | null
   descuentoPct: number | null
+  descuentoResponsable: string | null
+  propina: number | null
   ticketImpreso: boolean | null
   createdAt: Date | null
   closedAt: Date | null
@@ -83,6 +89,8 @@ export type VentaCountAggregateOutputType = {
   tarifa: number
   total: number
   descuentoPct: number
+  descuentoResponsable: number
+  propina: number
   borradorRonda: number
   ticketImpreso: number
   createdAt: number
@@ -98,6 +106,7 @@ export type VentaAvgAggregateInputType = {
   clienteId?: true
   total?: true
   descuentoPct?: true
+  propina?: true
   negocioId?: true
 }
 
@@ -107,6 +116,7 @@ export type VentaSumAggregateInputType = {
   clienteId?: true
   total?: true
   descuentoPct?: true
+  propina?: true
   negocioId?: true
 }
 
@@ -119,6 +129,8 @@ export type VentaMinAggregateInputType = {
   tarifa?: true
   total?: true
   descuentoPct?: true
+  descuentoResponsable?: true
+  propina?: true
   ticketImpreso?: true
   createdAt?: true
   closedAt?: true
@@ -134,6 +146,8 @@ export type VentaMaxAggregateInputType = {
   tarifa?: true
   total?: true
   descuentoPct?: true
+  descuentoResponsable?: true
+  propina?: true
   ticketImpreso?: true
   createdAt?: true
   closedAt?: true
@@ -149,6 +163,8 @@ export type VentaCountAggregateInputType = {
   tarifa?: true
   total?: true
   descuentoPct?: true
+  descuentoResponsable?: true
+  propina?: true
   borradorRonda?: true
   ticketImpreso?: true
   createdAt?: true
@@ -252,6 +268,8 @@ export type VentaGroupByOutputType = {
   tarifa: $Enums.TarifaPrecio
   total: number
   descuentoPct: number
+  descuentoResponsable: string | null
+  propina: number
   borradorRonda: runtime.JsonValue | null
   ticketImpreso: boolean
   createdAt: Date
@@ -291,6 +309,8 @@ export type VentaWhereInput = {
   tarifa?: Prisma.EnumTarifaPrecioFilter<"Venta"> | $Enums.TarifaPrecio
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
+  descuentoResponsable?: Prisma.StringNullableFilter<"Venta"> | string | null
+  propina?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
@@ -313,6 +333,8 @@ export type VentaOrderByWithRelationInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  descuentoResponsable?: Prisma.SortOrderInput | Prisma.SortOrder
+  propina?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -338,6 +360,8 @@ export type VentaWhereUniqueInput = Prisma.AtLeast<{
   tarifa?: Prisma.EnumTarifaPrecioFilter<"Venta"> | $Enums.TarifaPrecio
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
+  descuentoResponsable?: Prisma.StringNullableFilter<"Venta"> | string | null
+  propina?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
@@ -360,6 +384,8 @@ export type VentaOrderByWithAggregationInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  descuentoResponsable?: Prisma.SortOrderInput | Prisma.SortOrder
+  propina?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -384,6 +410,8 @@ export type VentaScalarWhereWithAggregatesInput = {
   tarifa?: Prisma.EnumTarifaPrecioWithAggregatesFilter<"Venta"> | $Enums.TarifaPrecio
   total?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
+  descuentoResponsable?: Prisma.StringNullableWithAggregatesFilter<"Venta"> | string | null
+  propina?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableWithAggregatesFilter<"Venta">
   ticketImpreso?: Prisma.BoolWithAggregatesFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Venta"> | Date | string
@@ -397,6 +425,8 @@ export type VentaCreateInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -418,6 +448,8 @@ export type VentaUncheckedCreateInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -434,6 +466,8 @@ export type VentaUpdateInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -455,6 +489,8 @@ export type VentaUncheckedUpdateInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -474,6 +510,8 @@ export type VentaCreateManyInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -487,6 +525,8 @@ export type VentaUpdateManyMutationInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -502,6 +542,8 @@ export type VentaUncheckedUpdateManyInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -528,6 +570,8 @@ export type VentaCountOrderByAggregateInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  descuentoResponsable?: Prisma.SortOrder
+  propina?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -541,6 +585,7 @@ export type VentaAvgOrderByAggregateInput = {
   clienteId?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  propina?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
 
@@ -553,6 +598,8 @@ export type VentaMaxOrderByAggregateInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  descuentoResponsable?: Prisma.SortOrder
+  propina?: Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
@@ -568,6 +615,8 @@ export type VentaMinOrderByAggregateInput = {
   tarifa?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  descuentoResponsable?: Prisma.SortOrder
+  propina?: Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
@@ -580,6 +629,7 @@ export type VentaSumOrderByAggregateInput = {
   clienteId?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  propina?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
 
@@ -781,6 +831,8 @@ export type VentaCreateWithoutNegocioInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -801,6 +853,8 @@ export type VentaUncheckedCreateWithoutNegocioInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -848,6 +902,8 @@ export type VentaScalarWhereInput = {
   tarifa?: Prisma.EnumTarifaPrecioFilter<"Venta"> | $Enums.TarifaPrecio
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
+  descuentoResponsable?: Prisma.StringNullableFilter<"Venta"> | string | null
+  propina?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
@@ -861,6 +917,8 @@ export type VentaCreateWithoutMesaInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -880,6 +938,8 @@ export type VentaUncheckedCreateWithoutMesaInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -922,6 +982,8 @@ export type VentaCreateWithoutPedidosInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -942,6 +1004,8 @@ export type VentaUncheckedCreateWithoutPedidosInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -973,6 +1037,8 @@ export type VentaUpdateWithoutPedidosInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -993,6 +1059,8 @@ export type VentaUncheckedUpdateWithoutPedidosInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1008,6 +1076,8 @@ export type VentaCreateWithoutPagosInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1028,6 +1098,8 @@ export type VentaUncheckedCreateWithoutPagosInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1059,6 +1131,8 @@ export type VentaUpdateWithoutPagosInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1079,6 +1153,8 @@ export type VentaUncheckedUpdateWithoutPagosInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1094,6 +1170,8 @@ export type VentaCreateWithoutClienteInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1113,6 +1191,8 @@ export type VentaUncheckedCreateWithoutClienteInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1155,6 +1235,8 @@ export type VentaCreateWithoutMovimientosCCInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1175,6 +1257,8 @@ export type VentaUncheckedCreateWithoutMovimientosCCInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1206,6 +1290,8 @@ export type VentaUpdateWithoutMovimientosCCInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1226,6 +1312,8 @@ export type VentaUncheckedUpdateWithoutMovimientosCCInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1244,6 +1332,8 @@ export type VentaCreateManyNegocioInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1256,6 +1346,8 @@ export type VentaUpdateWithoutNegocioInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1276,6 +1368,8 @@ export type VentaUncheckedUpdateWithoutNegocioInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1294,6 +1388,8 @@ export type VentaUncheckedUpdateManyWithoutNegocioInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1308,6 +1404,8 @@ export type VentaCreateManyMesaInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1321,6 +1419,8 @@ export type VentaUpdateWithoutMesaInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1340,6 +1440,8 @@ export type VentaUncheckedUpdateWithoutMesaInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1358,6 +1460,8 @@ export type VentaUncheckedUpdateManyWithoutMesaInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1373,6 +1477,8 @@ export type VentaCreateManyClienteInput = {
   tarifa?: $Enums.TarifaPrecio
   total?: number
   descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
   createdAt?: Date | string
@@ -1386,6 +1492,8 @@ export type VentaUpdateWithoutClienteInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1405,6 +1513,8 @@ export type VentaUncheckedUpdateWithoutClienteInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1423,6 +1533,8 @@ export type VentaUncheckedUpdateManyWithoutClienteInput = {
   tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1488,6 +1600,8 @@ export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   tarifa?: boolean
   total?: boolean
   descuentoPct?: boolean
+  descuentoResponsable?: boolean
+  propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
   createdAt?: boolean
@@ -1511,6 +1625,8 @@ export type VentaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   tarifa?: boolean
   total?: boolean
   descuentoPct?: boolean
+  descuentoResponsable?: boolean
+  propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
   createdAt?: boolean
@@ -1530,6 +1646,8 @@ export type VentaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   tarifa?: boolean
   total?: boolean
   descuentoPct?: boolean
+  descuentoResponsable?: boolean
+  propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
   createdAt?: boolean
@@ -1549,6 +1667,8 @@ export type VentaSelectScalar = {
   tarifa?: boolean
   total?: boolean
   descuentoPct?: boolean
+  descuentoResponsable?: boolean
+  propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
   createdAt?: boolean
@@ -1556,7 +1676,7 @@ export type VentaSelectScalar = {
   negocioId?: boolean
 }
 
-export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt" | "negocioId", ExtArgs["result"]["venta"]>
+export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "descuentoResponsable" | "propina" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt" | "negocioId", ExtArgs["result"]["venta"]>
 export type VentaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
@@ -1596,6 +1716,8 @@ export type $VentaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     tarifa: $Enums.TarifaPrecio
     total: number
     descuentoPct: number
+    descuentoResponsable: string | null
+    propina: number
     borradorRonda: runtime.JsonValue | null
     ticketImpreso: boolean
     createdAt: Date
@@ -2038,6 +2160,8 @@ export interface VentaFieldRefs {
   readonly tarifa: Prisma.FieldRef<"Venta", 'TarifaPrecio'>
   readonly total: Prisma.FieldRef<"Venta", 'Float'>
   readonly descuentoPct: Prisma.FieldRef<"Venta", 'Float'>
+  readonly descuentoResponsable: Prisma.FieldRef<"Venta", 'String'>
+  readonly propina: Prisma.FieldRef<"Venta", 'Float'>
   readonly borradorRonda: Prisma.FieldRef<"Venta", 'Json'>
   readonly ticketImpreso: Prisma.FieldRef<"Venta", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Venta", 'DateTime'>

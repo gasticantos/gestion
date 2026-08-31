@@ -321,6 +321,8 @@ export const VentaScalarFieldEnum = {
   tarifa: 'tarifa',
   total: 'total',
   descuentoPct: 'descuentoPct',
+  descuentoResponsable: 'descuentoResponsable',
+  propina: 'propina',
   borradorRonda: 'borradorRonda',
   ticketImpreso: 'ticketImpreso',
   createdAt: 'createdAt',
@@ -359,6 +361,7 @@ export const PagoScalarFieldEnum = {
   id: 'id',
   ventaId: 'ventaId',
   metodo: 'metodo',
+  tipoTarjeta: 'tipoTarjeta',
   monto: 'monto',
   createdAt: 'createdAt'
 } as const

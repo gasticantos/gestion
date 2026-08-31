@@ -36,6 +36,12 @@ export function interpretarCierre(trabajo: {
     TRANSFERENCIA: importeDeLinea(trabajo.contenido, "TRANSFERENCIA"),
     FIADO: importeDeLinea(trabajo.contenido, "CUENTA CORRIENTE"),
   };
+  const propina = importeDeLinea(trabajo.contenido, "PROPINA");
+  const tarjetas = {
+    QR: importeDeLinea(trabajo.contenido, "TARJETA QR"),
+    DEBITO: importeDeLinea(trabajo.contenido, "TARJETA DEBITO"),
+    CREDITO: importeDeLinea(trabajo.contenido, "TARJETA CREDITO"),
+  };
   const tieneControl = trabajo.contenido.includes("CONTROL DE EFECTIVO");
   const efectivoContado = trabajo.contenido.includes("EFECTIVO CONTADO")
     ? importeDeLinea(trabajo.contenido, "EFECTIVO CONTADO")
@@ -60,6 +66,8 @@ export function interpretarCierre(trabajo: {
     mostrador: importeDeLinea(trabajo.contenido, "MOSTRADOR"),
     mesas: importeDeLinea(trabajo.contenido, "MESAS"),
     pagos,
+    propina,
+    tarjetas,
     operador,
     estadoImpresion: trabajo.estado,
     intentos: trabajo.intentos,
@@ -94,10 +102,10 @@ export function reporteDesdeCierre(cierre: NonNullable<Awaited<ReturnType<typeof
     hasta: cierre.fecha,
     cantidadVentas: cierre.cantidadVentas,
     porCanal: {
-      MOSTRADOR: { cantidad: 0, total: cierre.mostrador, pagos: pagosVacios() },
-      MESA: { cantidad: 0, total: cierre.mesas, pagos: pagosVacios() },
+      MOSTRADOR: { cantidad: 0, total: cierre.mostrador, propina: 0, pagos: pagosVacios(), tarjetas: { QR: 0, DEBITO: 0, CREDITO: 0 } },
+      MESA: { cantidad: 0, total: cierre.mesas, propina: 0, pagos: pagosVacios(), tarjetas: { QR: 0, DEBITO: 0, CREDITO: 0 } },
     },
-    combinado: { total: cierre.total, pagos: cierre.pagos },
+    combinado: { total: cierre.total, propina: cierre.propina, pagos: cierre.pagos, tarjetas: cierre.tarjetas },
     categorias: [],
     productos: [],
     serieDiaria: cierre.fecha ? [{ fecha: cierre.fecha, total: cierre.total }] : [],

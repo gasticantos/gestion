@@ -6,7 +6,7 @@ import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditori
 import { enviarAlertaTelegram } from "@/lib/telegram";
 import { formatearMoneda } from "@/lib/formato";
 
-type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number };
+type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; monto: number; tipoTarjeta?: "QR" | "DEBITO" | "CREDITO" | null };
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
@@ -16,10 +16,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { id } = await params;
   const body = await req.json();
-  const { pagos, clienteId, descuentoPct } = body as {
+  const { pagos, clienteId, descuentoPct, descuentoResponsable, propina } = body as {
     pagos: PagoInput[];
     clienteId?: number | null;
     descuentoPct?: number;
+    descuentoResponsable?: string | null;
+    propina?: number;
   };
 
   const mesa = await prisma.mesa.findUnique({
@@ -36,6 +38,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!Array.isArray(pagos)) {
     return NextResponse.json({ error: "Falta indicar el pago" }, { status: 400 });
   }
+  const propinaFinal = Math.round(Number(propina || 0) * 100) / 100;
+  if (!Number.isFinite(propinaFinal) || propinaFinal < 0) {
+    return NextResponse.json({ error: "La propina no es válida" }, { status: 400 });
+  }
 
   const tieneFiado = pagos.some((p) => p.metodo === "FIADO");
   if (tieneFiado && !clienteId) {
@@ -44,6 +50,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const pctSolicitado = venta.pagos.length > 0 ? venta.descuentoPct : Number(descuentoPct) || 0;
   const { pct, monto: montoDescuento, total } = aplicarDescuento(venta.total, pctSolicitado);
+  const responsableDescuento = String(descuentoResponsable || "").trim().slice(0, 80);
+  if (pct > 0 && !responsableDescuento) {
+    return NextResponse.json({ error: "Indicá quién aplica el descuento" }, { status: 400 });
+  }
 
   const totalPagosPrevios = venta.pagos.reduce((acc, p) => acc + p.monto, 0);
   const totalPagos = totalPagosPrevios + pagos.reduce((acc, p) => acc + Number(p.monto), 0);
@@ -60,7 +70,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         clienteId: clienteId ? Number(clienteId) : null,
         total,
         descuentoPct: pct,
-        pagos: { create: pagos.map((p) => ({ metodo: p.metodo, monto: Number(p.monto) })) },
+        descuentoResponsable: pct > 0 ? responsableDescuento : null,
+        propina: propinaFinal,
+        pagos: { create: pagos.map((p) => ({ metodo: p.metodo, monto: Number(p.monto), tipoTarjeta: p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null })) },
       },
     });
 
@@ -89,7 +101,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (pct > 0) {
     await enviarAlertaTelegram(
-      `🏷️ Descuento aplicado\n${mesa.apodo || mesa.nombre} · Venta #${cerrada.id}\nSubtotal: $${formatearMoneda(venta.total)}\nDescuento: ${pct}% (-$${formatearMoneda(montoDescuento)})\nTotal: $${formatearMoneda(total)}\nRealizado por: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
+      `🏷️ Descuento aplicado\n${mesa.apodo || mesa.nombre} · Venta #${cerrada.id}\nSubtotal: $${formatearMoneda(venta.total)}\nDescuento: ${pct}% (-$${formatearMoneda(montoDescuento)})\nResponsable informado: ${responsableDescuento}\nTotal: $${formatearMoneda(total)}\nOperador del sistema: ${sesion?.nombre || "Usuario"} (${sesion?.rol || "sin rol"})`
     );
   }
 
