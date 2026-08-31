@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 import Plegable from "@/components/ui/Plegable";
 import Button from "@/components/ui/Button";
 import { th, td, trHover, input } from "@/components/ui/styles";
@@ -33,6 +34,7 @@ export default function VentasPage() {
   const [pagosEditados, setPagosEditados] = useState<Record<number, Pago[]>>({});
   const [guardandoId, setGuardandoId] = useState<number | null>(null);
   const [imprimiendoId, setImprimiendoId] = useState<number | null>(null);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
   const [mensaje, setMensaje] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
 
   useEffect(() => {
@@ -94,6 +96,7 @@ export default function VentasPage() {
         delete siguiente[venta.id];
         return siguiente;
       });
+      setEditandoId(null);
       setMensaje({ tipo: "ok", texto: `Método de pago de la venta #${venta.id} actualizado.` });
     } catch (err) {
       setMensaje({ tipo: "error", texto: err instanceof Error ? err.message : "No se pudo modificar el pago" });
@@ -124,32 +127,53 @@ export default function VentasPage() {
   function ControlesVenta({ venta }: { venta: Venta }) {
     const pagos = pagosEditados[venta.id] || venta.pagos;
     const modificado = Boolean(pagosEditados[venta.id]);
+    const editando = editandoId === venta.id;
     return (
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <div className="flex flex-wrap gap-1">
-          {pagos.map((p) => (
-            <select
-              key={p.id}
-              aria-label={`Método de pago de $${formatearMoneda(p.monto)}`}
-              className={`${input} py-1.5 text-xs min-w-32`}
-              value={p.metodo}
-              onChange={(e) => cambiarMetodo(venta, p.id, e.target.value as MetodoPago)}
-            >
-              <option value="EFECTIVO">Efectivo</option>
-              <option value="TARJETA">Tarjeta</option>
-              <option value="TRANSFERENCIA">Transferencia</option>
-              <option value="FIADO" disabled={!venta.clienteId}>Cuenta corriente</option>
-            </select>
-          ))}
-        </div>
-        {modificado && (
-          <Button size="sm" variant="primary" onClick={() => guardarPagos(venta)} disabled={guardandoId === venta.id}>
-            {guardandoId === venta.id ? "Guardando..." : "Guardar pago"}
+      <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-wrap gap-1">
+            {venta.pagos.map((p) => (
+              <Badge key={p.id} variant="neutral">{p.metodo}</Badge>
+            ))}
+          </div>
+          <Button size="sm" onClick={() => {
+            setEditandoId(editando ? null : venta.id);
+            if (editando) {
+              setPagosEditados((prev) => {
+                const siguiente = { ...prev };
+                delete siguiente[venta.id];
+                return siguiente;
+              });
+            }
+            setMensaje(null);
+          }}>
+            {editando ? "Cancelar" : "Editar pago"}
           </Button>
+          <Button size="sm" onClick={() => reimprimir(venta.id)} disabled={imprimiendoId === venta.id}>
+            {imprimiendoId === venta.id ? "Enviando..." : "Reimprimir ticket"}
+          </Button>
+        </div>
+        {editando && (
+          <div className="flex flex-wrap items-center justify-end gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-700 dark:bg-neutral-900">
+            {pagos.map((p) => (
+              <select
+                key={p.id}
+                aria-label={`Método de pago de $${formatearMoneda(p.monto)}`}
+                className={`${input} py-1.5 text-xs min-w-32`}
+                value={p.metodo}
+                onChange={(e) => cambiarMetodo(venta, p.id, e.target.value as MetodoPago)}
+              >
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="TARJETA">Tarjeta</option>
+                <option value="TRANSFERENCIA">Transferencia</option>
+                <option value="FIADO" disabled={!venta.clienteId}>Cuenta corriente</option>
+              </select>
+            ))}
+            <Button size="sm" variant="primary" onClick={() => guardarPagos(venta)} disabled={!modificado || guardandoId === venta.id}>
+              {guardandoId === venta.id ? "Guardando..." : "Guardar"}
+            </Button>
+          </div>
         )}
-        <Button size="sm" onClick={() => reimprimir(venta.id)} disabled={imprimiendoId === venta.id}>
-          {imprimiendoId === venta.id ? "Enviando..." : "Reimprimir ticket"}
-        </Button>
       </div>
     );
   }
@@ -198,7 +222,7 @@ export default function VentasPage() {
                     <th className={th}>Hora</th>
                     <th className={th}>Productos</th>
                     <th className={th}>Total</th>
-                    <th className={th}>Pago y acciones</th>
+                    <th className={th}>Métodos de pago</th>
                   </tr>
                 </thead>
                 <tbody>
