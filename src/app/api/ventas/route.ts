@@ -48,7 +48,7 @@ export async function GET() {
       createdAt: true,
       clienteId: true,
       mesa: { select: { id: true, nombre: true } },
-      pagos: { select: { metodo: true, monto: true } },
+      pagos: { select: { id: true, metodo: true, monto: true }, orderBy: { id: "asc" } },
       pedidos: {
         select: {
           id: true,
