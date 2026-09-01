@@ -103,3 +103,56 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   });
   return NextResponse.json(actualizada);
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const sesion = await sesionActual();
+  if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (sesion.rol === "MOZO") {
+    return NextResponse.json({ error: "No tenés permiso para eliminar ventas" }, { status: 403 });
+  }
+
+  const { id } = await params;
+  const ventaId = Number(id);
+  if (!Number.isInteger(ventaId)) {
+    return NextResponse.json({ error: "Venta inválida" }, { status: 400 });
+  }
+
+  const venta = await prisma.venta.findFirst({
+    where: { id: ventaId, negocioId: sesion.negocioId, estado: "CERRADA" },
+    include: {
+      pagos: true,
+      movimientosCC: true,
+      pedidos: { include: { items: true } },
+    },
+  });
+  if (!venta) return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
+
+  const cargoCuentaCorriente = venta.movimientosCC
+    .filter((movimiento) => movimiento.tipo === "CARGO")
+    .reduce((total, movimiento) => total + movimiento.monto, 0);
+
+  await prisma.$transaction(async (tx) => {
+    for (const item of venta.pedidos.flatMap((pedido) => pedido.items)) {
+      await tx.producto.update({
+        where: { id: item.productoId },
+        data: { stock: { increment: item.cantidad } },
+      });
+    }
+    if (venta.clienteId && cargoCuentaCorriente > 0) {
+      await tx.cliente.update({
+        where: { id: venta.clienteId },
+        data: { saldo: { decrement: cargoCuentaCorriente } },
+      });
+    }
+    await tx.movimientoCuentaCorriente.deleteMany({ where: { ventaId: venta.id } });
+    await tx.venta.delete({ where: { id: venta.id } });
+  });
+
+  const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
+  await registrarAuditoria(
+    usuarioId,
+    "eliminar_venta",
+    `Venta #${venta.id} eliminada · Total: $${venta.total} · Stock restaurado`
+  );
+  return NextResponse.json({ success: true });
+}

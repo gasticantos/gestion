@@ -36,6 +36,7 @@ export default function VentasPage() {
   const [pagosEditados, setPagosEditados] = useState<Record<number, Pago[]>>({});
   const [guardandoId, setGuardandoId] = useState<number | null>(null);
   const [imprimiendoId, setImprimiendoId] = useState<number | null>(null);
+  const [eliminandoId, setEliminandoId] = useState<number | null>(null);
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [mensaje, setMensaje] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
 
@@ -134,6 +135,33 @@ export default function VentasPage() {
     }
   }
 
+  async function eliminarVenta(venta: Venta) {
+    const confirmado = window.confirm(
+      `¿Eliminar definitivamente la venta #${venta.id}?\n\nLos productos volverán al stock y se revertirá cualquier cargo en cuenta corriente.`
+    );
+    if (!confirmado) return;
+
+    setEliminandoId(venta.id);
+    setMensaje(null);
+    try {
+      const res = await fetch(`/api/ventas/${venta.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "No se pudo eliminar la venta");
+      setVentas((actuales) => actuales.filter((item) => item.id !== venta.id));
+      setPagosEditados((prev) => {
+        const siguiente = { ...prev };
+        delete siguiente[venta.id];
+        return siguiente;
+      });
+      setEditandoId(null);
+      setMensaje({ tipo: "ok", texto: `Venta #${venta.id} eliminada y stock restaurado.` });
+    } catch (err) {
+      setMensaje({ tipo: "error", texto: err instanceof Error ? err.message : "No se pudo eliminar la venta" });
+    } finally {
+      setEliminandoId(null);
+    }
+  }
+
   function ControlesVenta({ venta }: { venta: Venta }) {
     const pagos = pagosEditados[venta.id] || venta.pagos;
     const modificado = Boolean(pagosEditados[venta.id]);
@@ -197,6 +225,14 @@ export default function VentasPage() {
             <Button size="sm" variant="primary" onClick={() => guardarPagos(venta)} disabled={!modificado || guardandoId === venta.id}>
               {guardandoId === venta.id ? "Guardando..." : "Guardar"}
             </Button>
+            <button
+              type="button"
+              className="px-2 py-1.5 text-sm font-semibold text-red-600 transition-colors hover:text-red-500 disabled:opacity-40"
+              onClick={() => eliminarVenta(venta)}
+              disabled={eliminandoId === venta.id}
+            >
+              {eliminandoId === venta.id ? "Eliminando..." : "Eliminar venta"}
+            </button>
           </div>
         )}
       </div>
