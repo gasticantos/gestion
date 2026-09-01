@@ -2,9 +2,13 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatearFechaHora, formatearMoneda } from "@/lib/formato";
 
-const AZUL: [number, number, number] = [37, 99, 235];
-const AZUL_OSCURO: [number, number, number] = [30, 64, 175];
-const GRIS: [number, number, number] = [82, 82, 91];
+const TINTA: [number, number, number] = [23, 37, 61];
+const AZUL: [number, number, number] = [42, 91, 215];
+const CELESTE: [number, number, number] = [224, 235, 255];
+const GRIS: [number, number, number] = [93, 104, 120];
+const BORDE: [number, number, number] = [220, 226, 235];
+const FONDO: [number, number, number] = [247, 249, 252];
+const VERDE: [number, number, number] = [16, 135, 93];
 
 type PresupuestoPdf = {
   id: number;
@@ -26,7 +30,9 @@ export function generarPdfPresupuesto(
 ): ArrayBuffer {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const ancho = doc.internal.pageSize.getWidth();
-  const margen = 14;
+  const alto = doc.internal.pageSize.getHeight();
+  const margen = 15;
+  const anchoUtil = ancho - margen * 2;
   const moneda = (valor: number) => `$${formatearMoneda(valor)}`;
   const fechaCorta = (fecha: Date) =>
     new Intl.DateTimeFormat("es-AR", {
@@ -35,112 +41,189 @@ export function generarPdfPresupuesto(
       month: "2-digit",
       year: "numeric",
     }).format(fecha);
+  const descuento = presupuesto.subtotal - presupuesto.total;
 
-  doc.setFillColor(...AZUL_OSCURO);
-  doc.rect(0, 0, ancho, 45, "F");
+  doc.setFillColor(...TINTA);
+  doc.rect(0, 0, ancho, 52, "F");
+  doc.setFillColor(...AZUL);
+  doc.rect(0, 0, 5, 52, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(19);
-  doc.text(nombreNegocio.toUpperCase(), margen, 15);
-  doc.setFontSize(14);
-  doc.text(`PRESUPUESTO #${presupuesto.id}`, margen, 25);
-  doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(`Emitido: ${formatearFechaHora(presupuesto.createdAt)}`, margen, 34);
-  doc.text(`Válido hasta: ${fechaCorta(presupuesto.validoHasta)}`, margen, 40);
+  doc.text(nombreNegocio.toUpperCase(), margen, 13);
+  doc.setFontSize(24);
+  doc.text("Presupuesto", margen, 28);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(206, 216, 231);
+  doc.text(`Emitido  ${formatearFechaHora(presupuesto.createdAt)}`, margen, 39);
+  doc.text(`Preparado por  ${responsable}`, margen, 45);
 
-  doc.setFillColor(244, 247, 255);
-  doc.roundedRect(margen, 51, ancho - margen * 2, 29, 2, 2, "F");
+  doc.setFillColor(...AZUL);
+  doc.roundedRect(ancho - margen - 42, 10, 42, 17, 2.5, 2.5, "F");
+  doc.setTextColor(220, 230, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  doc.text("PRESUPUESTO", ancho - margen - 38, 16);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
+  doc.text(`#${presupuesto.id}`, ancho - margen - 4, 23, { align: "right" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(206, 216, 231);
+  doc.text("VÁLIDO HASTA", ancho - margen, 37, { align: "right" });
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text(fechaCorta(presupuesto.validoHasta), ancho - margen, 44, { align: "right" });
+
+  doc.setFillColor(...FONDO);
+  doc.setDrawColor(...BORDE);
+  doc.roundedRect(margen, 59, anchoUtil, 29, 2.5, 2.5, "FD");
+  doc.setFillColor(...CELESTE);
+  doc.roundedRect(margen + 4, 63, 10, 2, 1, 1, "F");
   doc.setTextColor(...GRIS);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.text("CLIENTE", margen + 4, 59);
-  doc.setTextColor(...AZUL_OSCURO);
-  doc.setFontSize(12);
-  doc.text(presupuesto.clienteNombre, margen + 4, 67);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
+  doc.setFontSize(7.2);
+  doc.text("PREPARADO PARA", margen + 4, 71);
+  doc.setTextColor(...TINTA);
+  doc.setFontSize(13);
+  doc.text(presupuesto.clienteNombre, margen + 4, 79, { maxWidth: 105 });
   doc.setTextColor(...GRIS);
-  doc.text(`Teléfono: ${presupuesto.clienteTelefono || "No informado"}`, margen + 4, 74);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.text(`Teléfono  ${presupuesto.clienteTelefono || "No informado"}`, margen + 4, 84);
+  doc.setDrawColor(...BORDE);
+  doc.line(ancho - margen - 47, 64, ancho - margen - 47, 83);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.2);
+  doc.text("VALOR DE LA PROPUESTA", ancho - margen - 4, 70, { align: "right" });
+  doc.setTextColor(...AZUL);
+  doc.setFontSize(16);
+  doc.text(moneda(presupuesto.total), ancho - margen - 4, 80, { align: "right" });
+
+  doc.setFillColor(...AZUL);
+  doc.roundedRect(margen, 96, 3, 8, 1, 1, "F");
+  doc.setTextColor(...TINTA);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("Detalle de la propuesta", margen + 7, 100);
+  doc.setTextColor(...GRIS);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.text(`${presupuesto.items.length} ${presupuesto.items.length === 1 ? "concepto incluido" : "conceptos incluidos"}`, margen + 7, 104);
 
   autoTable(doc, {
-    startY: 87,
-    head: [["DESCRIPCIÓN", "CANTIDAD", "PRECIO UNITARIO", "SUBTOTAL"]],
+    startY: 110,
+    head: [["DESCRIPCIÓN", "CANT.", "PRECIO UNITARIO", "IMPORTE"]],
     body: presupuesto.items.map((item) => [
       item.nombre,
       String(item.cantidad),
       moneda(item.precioUnitario),
       moneda(item.subtotal),
     ]),
-    theme: "grid",
-    styles: { font: "helvetica", fontSize: 8.5, cellPadding: 3, lineColor: [226, 232, 240] },
-    headStyles: { fillColor: AZUL, textColor: 255, fontStyle: "bold" },
-    alternateRowStyles: { fillColor: [248, 250, 252] },
-    columnStyles: {
-      1: { halign: "right", cellWidth: 24 },
-      2: { halign: "right", cellWidth: 36 },
-      3: { halign: "right", cellWidth: 36 },
+    theme: "plain",
+    styles: {
+      font: "helvetica",
+      fontSize: 8.5,
+      cellPadding: { top: 3.2, right: 2.7, bottom: 3.2, left: 2.7 },
+      textColor: TINTA,
+      lineColor: BORDE,
+      lineWidth: { bottom: 0.15 },
+      overflow: "linebreak",
     },
-    margin: { left: margen, right: margen },
+    headStyles: { fillColor: TINTA, textColor: 255, fontStyle: "bold", cellPadding: 3.2 },
+    alternateRowStyles: { fillColor: FONDO },
+    columnStyles: {
+      0: { cellWidth: "auto" },
+      1: { halign: "right", cellWidth: 20 },
+      2: { halign: "right", cellWidth: 37 },
+      3: { halign: "right", cellWidth: 37, fontStyle: "bold" },
+    },
+    margin: { left: margen, right: margen, bottom: 22 },
   });
 
-  let y = ((doc as typeof doc & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 90) + 8;
-  if (y > 245) {
+  let y = ((doc as typeof doc & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 110) + 9;
+  const altoResumen = presupuesto.descuentoPct > 0 ? 44 : 36;
+  const lineasNotas = presupuesto.notas
+    ? (doc.splitTextToSize(presupuesto.notas, anchoUtil - 8) as string[])
+    : [];
+  const altoNotas = lineasNotas.length > 0 ? 14 + lineasNotas.length * 4 : 0;
+  if (y + altoResumen + (altoNotas ? altoNotas + 7 : 0) > alto - 19) {
     doc.addPage();
     y = 20;
   }
 
-  const cajaX = 112;
-  doc.setFillColor(244, 247, 255);
-  doc.roundedRect(cajaX, y, ancho - margen - cajaX, presupuesto.descuentoPct > 0 ? 35 : 27, 2, 2, "F");
-  doc.setFontSize(9);
+  const resumenX = ancho - margen - 75;
+  doc.setFillColor(...FONDO);
+  doc.setDrawColor(...BORDE);
+  doc.roundedRect(resumenX, y, 75, altoResumen, 2.5, 2.5, "FD");
   doc.setTextColor(...GRIS);
-  doc.text("Subtotal", cajaX + 4, y + 8);
-  doc.text(moneda(presupuesto.subtotal), ancho - margen - 4, y + 8, { align: "right" });
-  let totalY = y + 17;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.text("Subtotal", resumenX + 5, y + 9);
+  doc.text(moneda(presupuesto.subtotal), ancho - margen - 5, y + 9, { align: "right" });
+  let totalY = y + 19;
   if (presupuesto.descuentoPct > 0) {
-    const descuento = presupuesto.subtotal - presupuesto.total;
-    doc.setTextColor(190, 24, 93);
-    doc.text(`Descuento ${presupuesto.descuentoPct}%`, cajaX + 4, totalY);
-    doc.text(`-${moneda(descuento)}`, ancho - margen - 4, totalY, { align: "right" });
+    doc.setTextColor(...VERDE);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Descuento (${presupuesto.descuentoPct}%)`, resumenX + 5, totalY);
+    doc.text(`-${moneda(descuento)}`, ancho - margen - 5, totalY, { align: "right" });
     totalY += 10;
   }
+  doc.setDrawColor(...BORDE);
+  doc.line(resumenX + 5, totalY - 5, ancho - margen - 5, totalY - 5);
+  doc.setTextColor(...TINTA);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(...AZUL_OSCURO);
-  doc.text("TOTAL", cajaX + 4, totalY);
-  doc.text(moneda(presupuesto.total), ancho - margen - 4, totalY, { align: "right" });
+  doc.setFontSize(10);
+  doc.text("TOTAL", resumenX + 5, totalY + 3);
+  doc.setTextColor(...AZUL);
+  doc.setFontSize(14);
+  doc.text(moneda(presupuesto.total), ancho - margen - 5, totalY + 3, { align: "right" });
 
-  if (presupuesto.notas) {
-    let notasY = y + (presupuesto.descuentoPct > 0 ? 43 : 35);
-    const lineas = doc.splitTextToSize(presupuesto.notas, ancho - margen * 2 - 8) as string[];
-    const altoNotas = 14 + lineas.length * 4;
-    if (notasY + altoNotas > 280) {
+  if (presupuesto.descuentoPct > 0) {
+    doc.setFillColor(...CELESTE);
+    doc.roundedRect(margen, y, 62, 22, 2.5, 2.5, "F");
+    doc.setTextColor(...GRIS);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.2);
+    doc.text("BENEFICIO APLICADO", margen + 4, y + 7);
+    doc.setTextColor(...VERDE);
+    doc.setFontSize(12);
+    doc.text(`Ahorrás ${moneda(descuento)}`, margen + 4, y + 16);
+  }
+
+  if (lineasNotas.length > 0) {
+    let notasY = y + altoResumen + 7;
+    if (notasY + altoNotas > alto - 19) {
       doc.addPage();
       notasY = 20;
     }
-    doc.setFillColor(250, 250, 250);
-    doc.roundedRect(margen, notasY, ancho - margen * 2, altoNotas, 2, 2, "F");
+    doc.setFillColor(...FONDO);
+    doc.setDrawColor(...BORDE);
+    doc.roundedRect(margen, notasY, anchoUtil, altoNotas, 2.5, 2.5, "FD");
+    doc.setFillColor(...AZUL);
+    doc.roundedRect(margen + 4, notasY + 4, 10, 2, 1, 1, "F");
+    doc.setTextColor(...TINTA);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
+    doc.text("NOTAS Y CONDICIONES", margen + 4, notasY + 11);
     doc.setTextColor(...GRIS);
-    doc.text("NOTAS Y CONDICIONES", margen + 4, notasY + 7);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text(lineas, margen + 4, notasY + 13);
+    doc.setFontSize(8.5);
+    doc.text(lineasNotas, margen + 4, notasY + 17);
   }
 
   const paginas = doc.getNumberOfPages();
   for (let pagina = 1; pagina <= paginas; pagina += 1) {
     doc.setPage(pagina);
-    const alto = doc.internal.pageSize.getHeight();
-    doc.setDrawColor(226, 232, 240);
+    doc.setDrawColor(...BORDE);
     doc.line(margen, alto - 12, ancho - margen, alto - 12);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(...GRIS);
-    doc.text(`Preparado por ${responsable}`, margen, alto - 7);
-    doc.text(`Página ${pagina} de ${paginas}`, ancho - margen, alto - 7, { align: "right" });
+    doc.text(`${nombreNegocio} · Presupuesto #${presupuesto.id}`, margen, alto - 7);
+    doc.text(`Válido hasta ${fechaCorta(presupuesto.validoHasta)}  ·  Página ${pagina} de ${paginas}`, ancho - margen, alto - 7, { align: "right" });
   }
 
   return doc.output("arraybuffer");

@@ -427,17 +427,17 @@ export default function ProductosPage() {
   }
 
   const listado = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
+    const terminos = busqueda.trim().toLocaleLowerCase("es").split(/\s+/).filter(Boolean);
     return productos.filter((p) => {
       if (!mostrarInactivos && !p.activo) return false;
       if (filtroCategoria && String(p.categoriaId) !== filtroCategoria) return false;
-      if (!q) return true;
-      return (
-        p.nombre.toLowerCase().includes(q) ||
-        p.marca?.toLowerCase().includes(q) ||
-        p.codigoBarras?.toLowerCase().includes(q) ||
-        p.codigoInterno?.toLowerCase().includes(q)
-      );
+      if (terminos.length === 0) return true;
+
+      const campos = [p.nombre, p.marca, p.codigoBarras, p.codigoInterno]
+        .filter((campo): campo is string => Boolean(campo))
+        .map((campo) => campo.toLocaleLowerCase("es"));
+
+      return terminos.every((termino) => campos.some((campo) => campo.includes(termino)));
     });
   }, [productos, mostrarInactivos, filtroCategoria, busqueda]);
 
