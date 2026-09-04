@@ -25,8 +25,8 @@ export async function GET() {
   const anteriorPendiente = await prisma.venta.findFirst({
     where: {
       estado: "CERRADA",
-      createdAt: { gte: inicioAnterior, lte: finAnterior },
-      closedAt: { lt: finAnterior },
+      closedAt: { gte: inicioAnterior, lte: finAnterior },
+      cierreCajaAt: null,
     },
     select: { id: true },
   });
@@ -36,9 +36,8 @@ export async function GET() {
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
-      createdAt: { gte: inicioJornada, lte: finJornada },
-      // El cierre archiva las ventas con closedAt exactamente al final de jornada.
-      closedAt: { lt: finJornada },
+      closedAt: { gte: inicioJornada, lte: finJornada },
+      cierreCajaAt: null,
     },
     select: {
       id: true,

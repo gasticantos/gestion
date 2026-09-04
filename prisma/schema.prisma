@@ -373,6 +373,7 @@ model Venta {
   ticketImpreso Boolean                     @default(false)
   createdAt     DateTime                    @default(now())
   closedAt      DateTime?
+  cierreCajaAt  DateTime?
   pedidos       Pedido[]
   pagos         Pago[]
   movimientosCC MovimientoCuentaCorriente[]
@@ -384,6 +385,7 @@ model Venta {
   @@index([clienteId])
   @@index([estado])
   @@index([estado, closedAt])
+  @@index([negocioId, cierreCajaAt])
   @@index([estado, createdAt])
 }
 

@@ -17,18 +17,34 @@ export async function POST(req: NextRequest) {
     desde: new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000),
     hasta: new Date(actual.desde.getTime() - 1),
   };
-  const ventaAnteriorPendiente = await prisma.venta.findFirst({
-    where: {
-      negocioId: sesion.negocioId,
-      estado: "CERRADA",
-      createdAt: { gte: anterior.desde, lte: anterior.hasta },
-      closedAt: { lt: anterior.hasta },
-    },
-    select: { id: true },
-  });
+  const [ventaAnteriorPendiente, controlAnteriorListo] = await Promise.all([
+    prisma.venta.findFirst({
+      where: {
+        negocioId: sesion.negocioId,
+        estado: "CERRADA",
+        closedAt: { gte: anterior.desde, lte: anterior.hasta },
+        cierreCajaAt: null,
+      },
+      select: { id: true },
+    }),
+    prisma.controlCaja.findFirst({
+      where: {
+        negocioId: sesion.negocioId,
+        fechaJornada: fechaArgentinaYMD(anterior.desde),
+        cerradoAt: null,
+        efectivoContado: { not: null },
+        saldoSiguiente: { not: null },
+      },
+      select: { id: true },
+    }),
+  ]);
   // Si el automático de las 07:00 quedó bloqueado, el cierre manual normal retoma
   // primero esa jornada. Así Ventas, ticket, PDF y archivo avanzan juntos.
-  const recuperarAnterior = body?.recuperarAnterior === true || Boolean(ventaAnteriorPendiente);
+  // Una venta vieja por sí sola no alcanza para desviar el cierre: el arqueo que
+  // acaba de guardar el usuario corresponde a la jornada actual. Sólo retomamos
+  // automáticamente la anterior si también tiene su propio arqueo listo.
+  const recuperarAnterior =
+    body?.recuperarAnterior === true || Boolean(ventaAnteriorPendiente && controlAnteriorListo);
   const desde = recuperarAnterior
     ? anterior.desde
     : actual.desde;

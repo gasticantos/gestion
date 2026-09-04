@@ -39,11 +39,10 @@ export async function obtenerReporteVentas(
   const ventas = await prisma.venta.findMany({
     where: {
       estado: "CERRADA",
-      // El cierre de caja puede mover closedAt para marcar una jornada archivada.
-      // createdAt conserva cuándo nació realmente la venta y evita que el cierre anterior
-      // vuelva a aparecer en el reporte de la jornada siguiente.
-      createdAt: { gte: desde, lte: hasta },
-      ...(opciones?.soloPendientesCierre ? { closedAt: { lt: hasta } } : {}),
+      // Una venta pertenece a la jornada en la que se cobró, no a aquella en la
+      // que se abrió la mesa. cierreCajaAt indica por separado si ya fue archivada.
+      closedAt: { gte: desde, lte: hasta },
+      ...(opciones?.soloPendientesCierre ? { cierreCajaAt: null } : {}),
       ...(opciones?.negocioId ? { negocioId: opciones.negocioId } : {}),
     },
     include: {
@@ -79,7 +78,7 @@ export async function obtenerReporteVentas(
       }
     }
 
-    const fechaKey = fechaJornadaArgentina(venta.createdAt);
+    const fechaKey = fechaJornadaArgentina(venta.closedAt ?? venta.createdAt);
     diaMap.set(fechaKey, (diaMap.get(fechaKey) ?? 0) + venta.total);
 
     for (const pedido of venta.pedidos) {

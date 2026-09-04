@@ -60,6 +60,7 @@ export type VentaMinAggregateOutputType = {
   ticketImpreso: boolean | null
   createdAt: Date | null
   closedAt: Date | null
+  cierreCajaAt: Date | null
   negocioId: number | null
 }
 
@@ -77,6 +78,7 @@ export type VentaMaxAggregateOutputType = {
   ticketImpreso: boolean | null
   createdAt: Date | null
   closedAt: Date | null
+  cierreCajaAt: Date | null
   negocioId: number | null
 }
 
@@ -95,6 +97,7 @@ export type VentaCountAggregateOutputType = {
   ticketImpreso: number
   createdAt: number
   closedAt: number
+  cierreCajaAt: number
   negocioId: number
   _all: number
 }
@@ -134,6 +137,7 @@ export type VentaMinAggregateInputType = {
   ticketImpreso?: true
   createdAt?: true
   closedAt?: true
+  cierreCajaAt?: true
   negocioId?: true
 }
 
@@ -151,6 +155,7 @@ export type VentaMaxAggregateInputType = {
   ticketImpreso?: true
   createdAt?: true
   closedAt?: true
+  cierreCajaAt?: true
   negocioId?: true
 }
 
@@ -169,6 +174,7 @@ export type VentaCountAggregateInputType = {
   ticketImpreso?: true
   createdAt?: true
   closedAt?: true
+  cierreCajaAt?: true
   negocioId?: true
   _all?: true
 }
@@ -274,6 +280,7 @@ export type VentaGroupByOutputType = {
   ticketImpreso: boolean
   createdAt: Date
   closedAt: Date | null
+  cierreCajaAt: Date | null
   negocioId: number
   _count: VentaCountAggregateOutputType | null
   _avg: VentaAvgAggregateOutputType | null
@@ -315,6 +322,7 @@ export type VentaWhereInput = {
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
+  cierreCajaAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
   negocioId?: Prisma.IntFilter<"Venta"> | number
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
   cliente?: Prisma.XOR<Prisma.ClienteNullableScalarRelationFilter, Prisma.ClienteWhereInput> | null
@@ -339,6 +347,7 @@ export type VentaOrderByWithRelationInput = {
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cierreCajaAt?: Prisma.SortOrderInput | Prisma.SortOrder
   negocioId?: Prisma.SortOrder
   mesa?: Prisma.MesaOrderByWithRelationInput
   cliente?: Prisma.ClienteOrderByWithRelationInput
@@ -366,6 +375,7 @@ export type VentaWhereUniqueInput = Prisma.AtLeast<{
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
+  cierreCajaAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
   negocioId?: Prisma.IntFilter<"Venta"> | number
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
   cliente?: Prisma.XOR<Prisma.ClienteNullableScalarRelationFilter, Prisma.ClienteWhereInput> | null
@@ -390,6 +400,7 @@ export type VentaOrderByWithAggregationInput = {
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cierreCajaAt?: Prisma.SortOrderInput | Prisma.SortOrder
   negocioId?: Prisma.SortOrder
   _count?: Prisma.VentaCountOrderByAggregateInput
   _avg?: Prisma.VentaAvgOrderByAggregateInput
@@ -416,6 +427,7 @@ export type VentaScalarWhereWithAggregatesInput = {
   ticketImpreso?: Prisma.BoolWithAggregatesFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Venta"> | Date | string | null
+  cierreCajaAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Venta"> | Date | string | null
   negocioId?: Prisma.IntWithAggregatesFilter<"Venta"> | number
 }
 
@@ -431,6 +443,7 @@ export type VentaCreateInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
@@ -454,6 +467,7 @@ export type VentaUncheckedCreateInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
@@ -472,6 +486,7 @@ export type VentaUpdateInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
@@ -495,6 +510,7 @@ export type VentaUncheckedUpdateInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
@@ -516,6 +532,7 @@ export type VentaCreateManyInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
 }
 
@@ -531,6 +548,7 @@ export type VentaUpdateManyMutationInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type VentaUncheckedUpdateManyInput = {
@@ -548,6 +566,7 @@ export type VentaUncheckedUpdateManyInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -576,6 +595,7 @@ export type VentaCountOrderByAggregateInput = {
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
+  cierreCajaAt?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
 
@@ -603,6 +623,7 @@ export type VentaMaxOrderByAggregateInput = {
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
+  cierreCajaAt?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
 
@@ -620,6 +641,7 @@ export type VentaMinOrderByAggregateInput = {
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
+  cierreCajaAt?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
 
@@ -837,6 +859,7 @@ export type VentaCreateWithoutNegocioInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
@@ -859,6 +882,7 @@ export type VentaUncheckedCreateWithoutNegocioInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
@@ -908,6 +932,7 @@ export type VentaScalarWhereInput = {
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Venta"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
+  cierreCajaAt?: Prisma.DateTimeNullableFilter<"Venta"> | Date | string | null
   negocioId?: Prisma.IntFilter<"Venta"> | number
 }
 
@@ -923,6 +948,7 @@ export type VentaCreateWithoutMesaInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
@@ -944,6 +970,7 @@ export type VentaUncheckedCreateWithoutMesaInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
@@ -988,6 +1015,7 @@ export type VentaCreateWithoutPedidosInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
@@ -1010,6 +1038,7 @@ export type VentaUncheckedCreateWithoutPedidosInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
@@ -1043,6 +1072,7 @@ export type VentaUpdateWithoutPedidosInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
@@ -1065,6 +1095,7 @@ export type VentaUncheckedUpdateWithoutPedidosInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
@@ -1082,6 +1113,7 @@ export type VentaCreateWithoutPagosInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
@@ -1104,6 +1136,7 @@ export type VentaUncheckedCreateWithoutPagosInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
@@ -1137,6 +1170,7 @@ export type VentaUpdateWithoutPagosInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
@@ -1159,6 +1193,7 @@ export type VentaUncheckedUpdateWithoutPagosInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
@@ -1176,6 +1211,7 @@ export type VentaCreateWithoutClienteInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
@@ -1197,6 +1233,7 @@ export type VentaUncheckedCreateWithoutClienteInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
@@ -1241,6 +1278,7 @@ export type VentaCreateWithoutMovimientosCCInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
@@ -1263,6 +1301,7 @@ export type VentaUncheckedCreateWithoutMovimientosCCInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
@@ -1296,6 +1335,7 @@ export type VentaUpdateWithoutMovimientosCCInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
@@ -1318,6 +1358,7 @@ export type VentaUncheckedUpdateWithoutMovimientosCCInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
@@ -1338,6 +1379,7 @@ export type VentaCreateManyNegocioInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
 }
 
 export type VentaUpdateWithoutNegocioInput = {
@@ -1352,6 +1394,7 @@ export type VentaUpdateWithoutNegocioInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
@@ -1374,6 +1417,7 @@ export type VentaUncheckedUpdateWithoutNegocioInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
@@ -1394,6 +1438,7 @@ export type VentaUncheckedUpdateManyWithoutNegocioInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type VentaCreateManyMesaInput = {
@@ -1410,6 +1455,7 @@ export type VentaCreateManyMesaInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
 }
 
@@ -1425,6 +1471,7 @@ export type VentaUpdateWithoutMesaInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
@@ -1446,6 +1493,7 @@ export type VentaUncheckedUpdateWithoutMesaInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
@@ -1466,6 +1514,7 @@ export type VentaUncheckedUpdateManyWithoutMesaInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -1483,6 +1532,7 @@ export type VentaCreateManyClienteInput = {
   ticketImpreso?: boolean
   createdAt?: Date | string
   closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
   negocioId?: number
 }
 
@@ -1498,6 +1548,7 @@ export type VentaUpdateWithoutClienteInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
@@ -1519,6 +1570,7 @@ export type VentaUncheckedUpdateWithoutClienteInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
@@ -1539,6 +1591,7 @@ export type VentaUncheckedUpdateManyWithoutClienteInput = {
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -1606,6 +1659,7 @@ export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
+  cierreCajaAt?: boolean
   negocioId?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
@@ -1631,6 +1685,7 @@ export type VentaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
+  cierreCajaAt?: boolean
   negocioId?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
@@ -1652,6 +1707,7 @@ export type VentaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
+  cierreCajaAt?: boolean
   negocioId?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
@@ -1673,10 +1729,11 @@ export type VentaSelectScalar = {
   ticketImpreso?: boolean
   createdAt?: boolean
   closedAt?: boolean
+  cierreCajaAt?: boolean
   negocioId?: boolean
 }
 
-export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "descuentoResponsable" | "propina" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt" | "negocioId", ExtArgs["result"]["venta"]>
+export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "descuentoResponsable" | "propina" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt" | "cierreCajaAt" | "negocioId", ExtArgs["result"]["venta"]>
 export type VentaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
@@ -1722,6 +1779,7 @@ export type $VentaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     ticketImpreso: boolean
     createdAt: Date
     closedAt: Date | null
+    cierreCajaAt: Date | null
     negocioId: number
   }, ExtArgs["result"]["venta"]>
   composites: {}
@@ -2166,6 +2224,7 @@ export interface VentaFieldRefs {
   readonly ticketImpreso: Prisma.FieldRef<"Venta", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Venta", 'DateTime'>
   readonly closedAt: Prisma.FieldRef<"Venta", 'DateTime'>
+  readonly cierreCajaAt: Prisma.FieldRef<"Venta", 'DateTime'>
   readonly negocioId: Prisma.FieldRef<"Venta", 'Int'>
 }
     

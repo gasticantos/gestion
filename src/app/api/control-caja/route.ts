@@ -17,8 +17,8 @@ async function obtenerEstado(negocioId: number) {
       where: {
         negocioId,
         estado: "CERRADA",
-        createdAt: { gte: jornada.desde, lte: jornada.hasta },
-        closedAt: { lt: jornada.hasta },
+        closedAt: { gte: jornada.desde, lte: jornada.hasta },
+        cierreCajaAt: null,
       },
       select: { pagos: { where: { metodo: "EFECTIVO" }, select: { monto: true } } },
     }),

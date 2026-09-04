@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
-import { formatearFechaHora, formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
+import { fechaArgentinaYMD, formatearFechaHora, formatearMoneda } from "@/lib/formato";
 import { obtenerReporteVentas } from "@/lib/reportes";
 import { enviarAlertaTelegram, enviarDocumentoTelegram } from "@/lib/telegram";
 import { generarPdfCierreCaja } from "@/lib/pdfCierreCaja";
@@ -75,8 +75,8 @@ export async function cerrarJornadaCaja({
     where: {
       negocioId,
       estado: "CERRADA",
-      createdAt: { gte: desde, lte: hasta },
-      closedAt: { lt: hasta },
+      closedAt: { gte: desde, lte: hasta },
+      cierreCajaAt: null,
     },
     orderBy: { id: "desc" },
     select: { id: true },
@@ -182,17 +182,20 @@ export async function cerrarJornadaCaja({
         where: {
           negocioId,
           estado: "CERRADA",
-          createdAt: { gte: desde, lte: hasta },
-          closedAt: { lt: hasta },
+          closedAt: { gte: desde, lte: hasta },
+          cierreCajaAt: null,
         },
-        data: { closedAt: hasta },
+        data: { cierreCajaAt: new Date() },
       });
       if (controlPendiente) {
         await tx.controlCaja.update({
           where: { id: controlPendiente.id },
           data: { cerradoAt: new Date() },
         });
-        const fechaSiguiente = limitesJornadaArgentina().fecha;
+        // La caja siguiente pertenece a la jornada que comienza justo después de
+        // la que estamos cerrando. Usar la hora actual recreaba una caja abierta
+        // con la misma fecha cuando el cierre se hacía antes de las 07:00.
+        const fechaSiguiente = fechaArgentinaYMD(new Date(hasta.getTime() + 1));
         const siguienteAbierto = await tx.controlCaja.findFirst({
           where: { negocioId, fechaJornada: fechaSiguiente, cerradoAt: null },
           select: { id: true },
