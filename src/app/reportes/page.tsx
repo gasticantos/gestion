@@ -213,7 +213,7 @@ export default function ReportesPage() {
   }, [reporte]);
 
   return (
-    <div className="max-w-5xl mx-auto flex flex-col gap-6">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reportes de ventas</h1>
         <a href={`/api/reportes/pdf?${consulta}`} download>
@@ -299,7 +299,7 @@ export default function ReportesPage() {
               <tbody>
                 {cierres.map((cierre) => (
                   <tr key={cierre.id} className={trHover}>
-                    <td className={`${td} font-mono font-semibold`}>{cierre.codigo}</td>
+                    <td className={`${td} whitespace-nowrap font-mono font-semibold`}>{cierre.codigo}</td>
                     <td className={td}>
                       <div className="font-medium">{cierre.fecha}</div>
                       <div className="text-xs text-neutral-500">
@@ -319,12 +319,12 @@ export default function ReportesPage() {
                       {cierre.error && <div className="max-w-48 text-xs text-red-500">{cierre.error}</div>}
                     </td>
                     <td className={td}>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-nowrap items-center gap-1.5 whitespace-nowrap">
                         <a
                           href={`/api/reportes/cierres/${cierre.id}/pdf`}
                           target="_blank"
                           rel="noreferrer"
-                          className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                          className="rounded-md border border-neutral-300 px-2 py-1 text-[11px] font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
                         >
                           Ver PDF
                         </a>
@@ -332,15 +332,15 @@ export default function ReportesPage() {
                           type="button"
                           disabled={enviandoCierreId !== null || reimprimiendoCierreId !== null}
                           onClick={() => enviarCierreTelegram(cierre.id)}
-                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                          className="rounded-md bg-blue-600 px-2 py-1 text-[11px] font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                         >
-                          {enviandoCierreId === cierre.id ? "Enviando..." : "Enviar a Telegram"}
+                          {enviandoCierreId === cierre.id ? "Enviando..." : "Telegram"}
                         </button>
                         <button
                           type="button"
                           disabled={enviandoCierreId !== null || reimprimiendoCierreId !== null}
                           onClick={() => reimprimirCierre(cierre)}
-                          className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+                          className="rounded-md bg-amber-600 px-2 py-1 text-[11px] font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
                         >
                           {reimprimiendoCierreId === cierre.id ? "Encolando..." : "Reimprimir"}
                         </button>
