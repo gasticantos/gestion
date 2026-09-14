@@ -61,9 +61,10 @@ export async function imprimirLocal(contenido: string, impresoraDestino?: string
     const res = await fetch(`${agenteUrl}/imprimir`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // Rasteriza el mismo diseño visual y lo envía directamente mediante ESC/POS. El agente
-      // vuelve al controlador de Windows dentro del mismo intento si la impresora no lo admite.
-      body: JSON.stringify({ contenido, impresora, modo: "raster" }),
+      // Usar siempre el controlador de Windows. Enviar una imagen ESC/POS en RAW no es
+      // confiable: el spooler puede aceptar el trabajo aunque la impresora no entienda ese
+      // dialecto y termine imprimiendo los bytes de la imagen como símbolos.
+      body: JSON.stringify({ contenido, impresora, modo: "windows" }),
       signal: controller.signal,
     });
     clearTimeout(timeout);
