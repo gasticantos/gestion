@@ -325,12 +325,6 @@ export default function ReportesPage() {
                     <td className={td}>
                       <div className="flex flex-nowrap items-center gap-1.5 whitespace-nowrap">
                         <a
-                          href={`/reportes/cierres/${cierre.id}`}
-                          className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
-                        >
-                          Ver detalle
-                        </a>
-                        <a
                           href={`/api/reportes/cierres/${cierre.id}/pdf`}
                           target="_blank"
                           rel="noreferrer"
@@ -354,6 +348,12 @@ export default function ReportesPage() {
                         >
                           {reimprimiendoCierreId === cierre.id ? "Encolando..." : "Reimprimir"}
                         </button>
+                        <a
+                          href={`/reportes/cierres/${cierre.id}`}
+                          className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
+                        >
+                          Ver detalle
+                        </a>
                       </div>
                     </td>
                   </tr>
