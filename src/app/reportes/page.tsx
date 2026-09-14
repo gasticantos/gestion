@@ -7,12 +7,13 @@ import Plegable from "@/components/ui/Plegable";
 import { input, th, td, trHover } from "@/components/ui/styles";
 import TrendArea from "@/components/charts/TrendArea";
 import CategoricalBarChart, { BarDatum } from "@/components/charts/CategoricalBarChart";
-import { formatearMoneda } from "@/lib/formato";
+import { formatearMoneda, formatearFechaHora, fechaReporteYMD } from "@/lib/formato";
 
 type Metodo = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
 type DesgloseTarjeta = Record<"QR" | "DEBITO" | "CREDITO", number>;
 
 type ReporteVentas = {
+  caja: { id: number; fechaJornada: string; createdAt: string; cerradoAt: string | null } | null;
   desde: string;
   hasta: string;
   cantidadVentas: number;
@@ -25,6 +26,7 @@ type ReporteVentas = {
 
 type CierreHistorico = {
   id: number;
+  codigo: string;
   fecha: string;
   cantidadVentas: number;
   total: number;
@@ -68,20 +70,12 @@ function sumarDias(d: Date, n: number) {
   return r;
 }
 
-type Preset = "hoy" | "ayer" | "semana" | "mes" | "mesAnterior" | "custom";
+type Preset = "caja" | "hoy" | "ayer" | "semana" | "mes" | "mesAnterior" | "custom";
 
 function rangoPreset(preset: Preset): { desde: string; hasta: string } {
   const ahora = new Date();
-  const fechaArgentina = toYMD(ahora);
-  const horaArgentina = Number(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Argentina/Cordoba",
-      hour: "2-digit",
-      hourCycle: "h23",
-    }).format(ahora)
-  );
+  const fechaArgentina = fechaReporteYMD(ahora);
   const hoy = new Date(`${fechaArgentina}T12:00:00-03:00`);
-  if (horaArgentina < 7) hoy.setDate(hoy.getDate() - 1);
   switch (preset) {
     case "hoy":
       return { desde: toYMD(hoy), hasta: toYMD(hoy) };
@@ -106,7 +100,8 @@ function rangoPreset(preset: Preset): { desde: string; hasta: string } {
 }
 
 const PRESETS: { value: Preset; label: string }[] = [
-  { value: "hoy", label: "Hoy" },
+  { value: "caja", label: "Caja actual" },
+  { value: "hoy", label: "Hoy (07 a 07 h)" },
   { value: "ayer", label: "Ayer" },
   { value: "semana", label: "Últimos 7 días" },
   { value: "mes", label: "Este mes" },
@@ -115,25 +110,39 @@ const PRESETS: { value: Preset; label: string }[] = [
 ];
 
 export default function ReportesPage() {
-  const [preset, setPreset] = useState<Preset>("hoy");
+  const [preset, setPreset] = useState<Preset>("caja");
   const [rango, setRango] = useState(() => rangoPreset("hoy"));
   const [reporte, setReporte] = useState<ReporteVentas | null>(null);
   const [loading, setLoading] = useState(true);
   const [cierres, setCierres] = useState<CierreHistorico[]>([]);
   const [enviandoCierreId, setEnviandoCierreId] = useState<number | null>(null);
+  const [reimprimiendoCierreId, setReimprimiendoCierreId] = useState<number | null>(null);
   const [estadoHistorial, setEstadoHistorial] = useState("");
 
-  async function cargar(desde: string, hasta: string) {
-    setLoading(true);
-    const res = await fetch(`/api/reportes?desde=${desde}&hasta=${hasta}`);
-    setReporte(await res.json());
-    setLoading(false);
-  }
+  const [error, setError] = useState("");
+  const [revision, setRevision] = useState(0);
+  const consulta = preset === "caja" ? "modo=caja" : new URLSearchParams(rango).toString();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- recarga al cambiar el período
-    cargar(rango.desde, rango.hasta);
-  }, [rango]);
+    const controller = new AbortController();
+    async function cargar() {
+      setLoading(true);
+      setError("");
+      setReporte(null);
+      try {
+        const res = await fetch(`/api/reportes?${consulta}`, { cache: "no-store", signal: controller.signal });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "No se pudo cargar el reporte");
+        if (!controller.signal.aborted) setReporte(data);
+      } catch (error) {
+        if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "No se pudo cargar el reporte");
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+    cargar();
+    return () => controller.abort();
+  }, [consulta, revision]);
 
   async function cargarCierres() {
     const res = await fetch("/api/reportes/cierres", { cache: "no-store" });
@@ -148,9 +157,10 @@ export default function ReportesPage() {
 
   function elegirPreset(p: Preset) {
     setPreset(p);
-    if (p !== "custom") {
+    if (p !== "custom" && p !== "caja") {
       setRango(rangoPreset(p));
     }
+    setRevision(v => v + 1);
   }
 
   async function enviarCierreTelegram(id: number) {
@@ -164,6 +174,25 @@ export default function ReportesPage() {
       setEstadoHistorial("No se pudo conectar con Telegram");
     } finally {
       setEnviandoCierreId(null);
+    }
+  }
+
+  async function reimprimirCierre(cierre: CierreHistorico) {
+    if (!window.confirm(`¿Reimprimir el cierre ${cierre.codigo}?`)) return;
+    setReimprimiendoCierreId(cierre.id);
+    setEstadoHistorial("");
+    try {
+      const res = await fetch(`/api/reportes/cierres/${cierre.id}/reimprimir`, { method: "POST" });
+      const data = await res.json().catch(() => null);
+      setEstadoHistorial(
+        res.ok
+          ? `El cierre ${cierre.codigo} se agregó a la cola de impresión`
+          : data?.error || "No se pudo reimprimir el cierre"
+      );
+    } catch {
+      setEstadoHistorial("No se pudo conectar con la cola de impresión");
+    } finally {
+      setReimprimiendoCierreId(null);
     }
   }
 
@@ -187,14 +216,16 @@ export default function ReportesPage() {
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reportes de ventas</h1>
-        <a href={`/api/reportes/pdf?desde=${rango.desde}&hasta=${rango.hasta}`} download>
+        <a href={`/api/reportes/pdf?${consulta}`} download>
           <Button variant="primary" disabled={!reporte || loading}>Descargar PDF</Button>
         </a>
       </div>
 
       <Card className="p-4 flex flex-col gap-3">
         <p className="text-xs text-neutral-500">
-          Cada fecha corresponde a la jornada comercial de 07:00 a 06:59 del día siguiente.
+          {preset === "caja"
+            ? "Ventas de la caja abierta, desde su apertura manual. Sin caja abierta, el reporte muestra cero. Los turnos cerrados están en el historial de cierres."
+            : "Cada día va de las 07:00 hasta las 07:00 del día siguiente (hora Argentina). Las ventas de madrugada pertenecen al día anterior. Incluye cajas cerradas."}
         </p>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p) => (
@@ -211,6 +242,15 @@ export default function ReportesPage() {
             </button>
           ))}
         </div>
+        {preset === "caja" && reporte?.caja && (
+          <p className="text-sm font-medium">
+            Caja #{reporte.caja.id} · {reporte.caja.cerradoAt ? "Cerrada" : "Abierta"} · Apertura: {formatearFechaHora(reporte.caja.createdAt)}
+          </p>
+        )}
+        {preset === "caja" && reporte && !reporte.caja && <p className="text-sm font-medium">Sin caja abierta · Sin ventas en caja actual</p>}
+        {preset !== "caja" && <p className="text-sm">Desde {rango.desde} 07:00 hasta las 07:00 del día siguiente a {rango.hasta} · Argentina</p>}
+        <Button variant="secondary" disabled={loading} onClick={() => setRevision(v => v + 1)}>Actualizar reporte</Button>
+        {error && <p className="text-sm text-red-500">{error}</p>}
         {preset === "custom" && (
           <div className="flex items-center gap-2">
             <input
@@ -247,6 +287,7 @@ export default function ReportesPage() {
             <table className="w-full">
               <thead>
                 <tr>
+                  <th className={th}>Código</th>
                   <th className={th}>Jornada</th>
                   <th className={th}>Responsable</th>
                   <th className={th}>Ventas</th>
@@ -258,6 +299,7 @@ export default function ReportesPage() {
               <tbody>
                 {cierres.map((cierre) => (
                   <tr key={cierre.id} className={trHover}>
+                    <td className={`${td} font-mono font-semibold`}>{cierre.codigo}</td>
                     <td className={td}>
                       <div className="font-medium">{cierre.fecha}</div>
                       <div className="text-xs text-neutral-500">
@@ -288,11 +330,19 @@ export default function ReportesPage() {
                         </a>
                         <button
                           type="button"
-                          disabled={enviandoCierreId !== null}
+                          disabled={enviandoCierreId !== null || reimprimiendoCierreId !== null}
                           onClick={() => enviarCierreTelegram(cierre.id)}
                           className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                         >
                           {enviandoCierreId === cierre.id ? "Enviando..." : "Enviar a Telegram"}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={enviandoCierreId !== null || reimprimiendoCierreId !== null}
+                          onClick={() => reimprimirCierre(cierre)}
+                          className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+                        >
+                          {reimprimiendoCierreId === cierre.id ? "Encolando..." : "Reimprimir"}
                         </button>
                       </div>
                     </td>
@@ -304,7 +354,7 @@ export default function ReportesPage() {
         )}
       </Plegable>
 
-      {loading || !reporte ? (
+      {error ? null : loading || !reporte ? (
         <div className="text-sm text-neutral-500">Cargando...</div>
       ) : (
         <>

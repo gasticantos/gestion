@@ -21,6 +21,7 @@ const METODOS = [
 type DatosCierrePdf = {
   nombreNegocio: string;
   fechaJornada: string;
+  codigoCierre: string;
   operador: { nombre: string; rol: string };
   reporte: ReporteVentas;
   generadoEn?: Date;
@@ -39,6 +40,7 @@ type DatosCierrePdf = {
 export function generarPdfCierreCaja({
   nombreNegocio,
   fechaJornada,
+  codigoCierre,
   operador,
   reporte,
   generadoEn = new Date(),
@@ -60,12 +62,13 @@ export function generarPdfCierreCaja({
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.text(nombreNegocio.toUpperCase(), margen, 13);
+  doc.text(codigoCierre, ancho - margen, 13, { align: "right" });
   doc.setFontSize(23);
   doc.text("Cierre de caja", margen, 25);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(206, 216, 231);
-  doc.text(`Jornada comercial  ${fechaJornada}`, margen, 35);
+  doc.text(`Fecha de apertura  ${fechaJornada}`, margen, 35);
   doc.text(`Generado  ${formatearFechaHora(generadoEn)}`, margen, 41);
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -212,7 +215,7 @@ export function generarPdfCierreCaja({
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...GRIS);
-    doc.text(`${nombreNegocio} · Cierre ${fechaJornada}`, margen, alto - 7);
+    doc.text(`${nombreNegocio} · ${codigoCierre} · ${fechaJornada}`, margen, alto - 7);
     doc.text(`Página ${pagina} de ${paginas}`, ancho - margen, alto - 7, { align: "right" });
   }
 

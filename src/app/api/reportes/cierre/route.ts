@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cerrarJornadaCaja } from "@/lib/cierreCaja";
-import { fechaArgentinaYMD, formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
+import { formatearMoneda } from "@/lib/formato";
 import { sesionActual } from "@/lib/sesionServidor";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
-import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
@@ -12,59 +11,20 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => ({}));
-  const actual = limitesJornadaArgentina();
-  const anterior = {
-    desde: new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000),
-    hasta: new Date(actual.desde.getTime() - 1),
-  };
-  const [ventaAnteriorPendiente, controlAnteriorListo] = await Promise.all([
-    prisma.venta.findFirst({
-      where: {
-        negocioId: sesion.negocioId,
-        estado: "CERRADA",
-        closedAt: { gte: anterior.desde, lte: anterior.hasta },
-        cierreCajaAt: null,
-      },
-      select: { id: true },
-    }),
-    prisma.controlCaja.findFirst({
-      where: {
-        negocioId: sesion.negocioId,
-        fechaJornada: fechaArgentinaYMD(anterior.desde),
-        cerradoAt: null,
-        efectivoContado: { not: null },
-        saldoSiguiente: { not: null },
-      },
-      select: { id: true },
-    }),
-  ]);
-  // Si el automático de las 07:00 quedó bloqueado, el cierre manual normal retoma
-  // primero esa jornada. Así Ventas, ticket, PDF y archivo avanzan juntos.
-  // Una venta vieja por sí sola no alcanza para desviar el cierre: el arqueo que
-  // acaba de guardar el usuario corresponde a la jornada actual. Sólo retomamos
-  // automáticamente la anterior si también tiene su propio arqueo listo.
-  const recuperarAnterior =
-    body?.recuperarAnterior === true || Boolean(ventaAnteriorPendiente && controlAnteriorListo);
-  const desde = recuperarAnterior
-    ? anterior.desde
-    : actual.desde;
-  const hasta = recuperarAnterior
-    ? anterior.hasta
-    : actual.hasta;
-  const fecha = recuperarAnterior ? fechaArgentinaYMD(desde) : actual.fecha;
+  const controlCajaId = Number(body.controlCajaId);
+  if (!Number.isInteger(controlCajaId) || controlCajaId <= 0) {
+    return NextResponse.json({ error: "Abrí Control de caja para cerrar el turno activo" }, { status: 400 });
+  }
   const resultado = await cerrarJornadaCaja({
-    negocioId: sesion.negocioId,
-    fecha,
-    desde,
-    hasta,
+    negocioId: sesion.negocioId, controlCajaId,
     operador: { nombre: sesion.nombre, rol: sesion.rol },
   });
 
   if (resultado.estado === "YA_CERRADO") {
     return NextResponse.json({ error: "La caja de esta jornada ya fue cerrada" }, { status: 409 });
   }
-  if (resultado.estado === "SIN_VENTAS") {
-    return NextResponse.json({ error: "No hay ventas nuevas para cerrar" }, { status: 409 });
+  if (resultado.estado === "CAJA_NO_ABIERTA") {
+    return NextResponse.json({ error: "La caja indicada no existe" }, { status: 409 });
   }
   if (resultado.estado === "ARQUEO_PENDIENTE") {
     return NextResponse.json(
@@ -85,7 +45,7 @@ export async function POST(req: NextRequest) {
   await registrarAuditoria(
     usuarioId,
     "cerrar_caja",
-    `Cierre ${fecha} - ${resultado.cantidadVentas} ventas - Total $${formatearMoneda(resultado.total)}`
+    `Cierre de caja ${resultado.codigo} - ${resultado.cantidadVentas} ventas - Total $${formatearMoneda(resultado.total)}`
   );
-  return NextResponse.json({ success: true, fecha, ...resultado });
+  return NextResponse.json({ success: true, ...resultado });
 }

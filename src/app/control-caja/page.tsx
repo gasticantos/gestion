@@ -26,6 +26,7 @@ type EstadoCaja = {
   efectivoEsperado: number;
   diferencia: number | null;
   control: null | {
+    id: number;
     efectivoContado: number | null;
     saldoSiguiente: number | null;
     cerradoAt: string | null;
@@ -77,7 +78,7 @@ export default function ControlCajaPage() {
       const res = await fetch("/api/control-caja", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...body, controlCajaId: estado?.control?.id }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
@@ -104,10 +105,10 @@ export default function ControlCajaPage() {
   }
 
   async function cerrarCaja() {
-    if (!estado) return;
+    if (!estado?.control) return;
     const contado = Number(efectivoContado);
     const siguiente = Number(saldoSiguiente);
-    if (![contado, siguiente].every((valor) => Number.isFinite(valor) && valor >= 0)) {
+    if (!efectivoContado.trim() || !saldoSiguiente.trim() || ![contado, siguiente].every((valor) => Number.isFinite(valor) && valor >= 0)) {
       setError("Completá el efectivo contado y el inicio de la próxima caja");
       return;
     }
@@ -117,7 +118,7 @@ export default function ControlCajaPage() {
       : diferencia > 0
         ? `Hay un sobrante de $${formatearMoneda(diferencia)}.`
         : `Hay un faltante de $${formatearMoneda(Math.abs(diferencia))}.`;
-    if (!confirm(`${detalle}\nLa próxima caja iniciará con $${formatearMoneda(siguiente)}.\n\n¿Cerrar caja, imprimir y enviar el PDF a Telegram?`)) return;
+    if (!confirm(`${detalle}\nSaldo sugerido para la próxima caja: $${formatearMoneda(siguiente)}.\n\n¿Cerrar caja, imprimir y enviar el PDF a Telegram?`)) return;
 
     const arqueoGuardado = await guardar(
       { accion: "arqueo", efectivoContado: contado, saldoSiguiente: siguiente },
@@ -132,7 +133,7 @@ export default function ControlCajaPage() {
       const res = await fetch("/api/reportes/cierre", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ controlCajaId: estado.control?.id }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
@@ -141,7 +142,7 @@ export default function ControlCajaPage() {
       }
       await cargar();
       const telegram = data.telegramEnviado ? " PDF enviado a Telegram." : " El PDF de Telegram quedó pendiente.";
-      setMensaje(`Caja cerrada: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}.${telegram} Se inició una caja nueva en cero.`);
+      setMensaje(`Caja cerrada ${data.codigo}: ${data.cantidadVentas} ventas · $${formatearMoneda(data.total)}.${telegram} La próxima caja se abre manualmente.`);
     } catch {
       setError("No se pudo conectar para cerrar la caja");
     } finally {
@@ -160,13 +161,13 @@ export default function ControlCajaPage() {
     <div className="mx-auto flex max-w-5xl flex-col gap-5">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Control de caja</h1>
-        <p className="mt-1 text-sm text-neutral-500">Jornada {estado.fechaJornada} · efectivo físico esperado y movimientos manuales.</p>
+        <p className="mt-1 text-sm text-neutral-500">{estado.iniciado ? `Caja #${estado.control?.id} abierta desde ${estado.fechaJornada}` : "Caja sin iniciar"} · apertura y cierre manual.</p>
       </div>
 
       {!estado.iniciado ? (
         <Card className="flex max-w-xl flex-col gap-3 p-5">
           <div>
-            <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Iniciar jornada</h2>
+            <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Abrir caja</h2>
             <p className="text-sm text-neutral-500">Indicá cuánto efectivo hay en caja antes de comenzar.</p>
           </div>
           <label className="text-sm text-neutral-600 dark:text-neutral-300">
@@ -219,7 +220,7 @@ export default function ControlCajaPage() {
 
             <Card className="flex flex-col gap-3 p-5">
               <div>
-                <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Arqueo y próxima jornada</h2>
+                <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Arqueo y próxima caja</h2>
                 <p className="text-xs text-neutral-500">Contá el efectivo real y prepará con cuánto comenzará el turno siguiente.</p>
               </div>
               <label className="text-sm text-neutral-600 dark:text-neutral-300">Efectivo contado<input className={`${input} mt-1`} type="number" min="0" step="0.01" value={efectivoContado} onChange={(e) => setEfectivoContado(e.target.value)} /></label>

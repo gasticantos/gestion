@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { fechaJornadaArgentina } from "@/lib/formato";
+import type { TransaccionCaja } from "@/lib/cajaManual";
+import { fechaArgentinaYMD, fechaReporteYMD } from "@/lib/formato";
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 type Metodo = (typeof METODOS)[number];
@@ -30,18 +31,23 @@ export async function obtenerReporteVentas(
   hasta: Date,
   opciones?: {
     limiteProductos?: number | null;
+    diaReporte?: boolean;
     negocioId?: number;
     etiquetaDesde?: string;
     etiquetaHasta?: string;
     soloPendientesCierre?: boolean;
-  }
+    ventaIds?: number[];
+  },
+  cliente: Pick<TransaccionCaja, "venta"> = prisma
 ): Promise<ReporteVentas> {
-  const ventas = await prisma.venta.findMany({
+  const ventas = await cliente.venta.findMany({
     where: {
       estado: "CERRADA",
       // Una venta pertenece a la jornada en la que se cobró, no a aquella en la
       // que se abrió la mesa. cierreCajaAt indica por separado si ya fue archivada.
-      closedAt: { gte: desde, lte: hasta },
+      ...(opciones?.ventaIds
+        ? { id: { in: opciones.ventaIds } }
+        : { closedAt: { gte: desde, lte: hasta } }),
       ...(opciones?.soloPendientesCierre ? { cierreCajaAt: null } : {}),
       ...(opciones?.negocioId ? { negocioId: opciones.negocioId } : {}),
     },
@@ -78,7 +84,7 @@ export async function obtenerReporteVentas(
       }
     }
 
-    const fechaKey = fechaJornadaArgentina(venta.closedAt ?? venta.createdAt);
+    const fechaKey = (opciones?.diaReporte ? fechaReporteYMD : fechaArgentinaYMD)(venta.closedAt ?? venta.createdAt);
     diaMap.set(fechaKey, (diaMap.get(fechaKey) ?? 0) + venta.total);
 
     for (const pedido of venta.pedidos) {
@@ -116,8 +122,8 @@ export async function obtenerReporteVentas(
     .sort((a, b) => a.fecha.localeCompare(b.fecha));
 
   return {
-    desde: opciones?.etiquetaDesde ?? fechaJornadaArgentina(desde),
-    hasta: opciones?.etiquetaHasta ?? fechaJornadaArgentina(hasta),
+    desde: opciones?.etiquetaDesde ?? fechaArgentinaYMD(desde),
+    hasta: opciones?.etiquetaHasta ?? fechaArgentinaYMD(hasta),
     cantidadVentas: ventas.length,
     porCanal,
     combinado,

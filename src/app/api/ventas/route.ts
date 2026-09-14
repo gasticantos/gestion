@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { precioSegunTarifa, Tarifa, aplicarDescuento } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
-import { formatearMoneda, limitesJornadaArgentina } from "@/lib/formato";
+import { formatearMoneda } from "@/lib/formato";
+import { filtroVentasCajaActual, conBloqueoCaja } from "@/lib/cajaManual";
 import { enviarAlertaTelegram } from "@/lib/telegram";
 
 type ItemInput = {
@@ -16,29 +17,10 @@ type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; m
 const TIPOS_TARJETA = ["QR", "DEBITO", "CREDITO"] as const;
 
 export async function GET() {
-  // La lista diaria sigue la misma jornada comercial que el cierre: 07:00 a 06:59.
-  // Si el cierre de ayer fue bloqueado, se mantiene visible hasta poder cerrarlo:
-  // el listado no debe avanzar solo mientras ticket, impresión y Telegram quedaron pendientes.
-  const actual = limitesJornadaArgentina();
-  const inicioAnterior = new Date(actual.desde.getTime() - 24 * 60 * 60 * 1000);
-  const finAnterior = new Date(actual.desde.getTime() - 1);
-  const anteriorPendiente = await prisma.venta.findFirst({
-    where: {
-      estado: "CERRADA",
-      closedAt: { gte: inicioAnterior, lte: finAnterior },
-      cierreCajaAt: null,
-    },
-    select: { id: true },
-  });
-  const inicioJornada = anteriorPendiente ? inicioAnterior : actual.desde;
-  const finJornada = anteriorPendiente ? finAnterior : actual.hasta;
-
+  const sesion = await sesionActual();
+  if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const ventas = await prisma.venta.findMany({
-    where: {
-      estado: "CERRADA",
-      closedAt: { gte: inicioJornada, lte: finJornada },
-      cierreCajaAt: null,
-    },
+    where: await filtroVentasCajaActual(sesion.negocioId),
     select: {
       id: true,
       tipo: true,
@@ -67,13 +49,13 @@ export async function GET() {
       },
     },
     orderBy: { closedAt: "desc" },
-    take: 100,
   });
   return NextResponse.json(ventas);
 }
 
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
+  if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const body = await req.json();
   const { items, pagos, clienteId, descuentoPct, descuentoResponsable, propina } = body as {
     items: ItemInput[];
@@ -158,7 +140,7 @@ export async function POST(req: NextRequest) {
   // Tarifa "resumen" de la venta: informativa, refleja si hubo algún ítem a precio de mesa.
   const tarifaResumen: Tarifa = items.some((i) => itemTarifa(i) === "MESA") ? "MESA" : "PARTICULAR";
 
-  const venta = await prisma.$transaction(async (tx) => {
+  const venta = await conBloqueoCaja(sesion.negocioId, async (tx) => {
     const created = await tx.venta.create({
       data: {
         tipo: "MOSTRADOR",

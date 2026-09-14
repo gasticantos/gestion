@@ -59,9 +59,7 @@ export default function VentasPage() {
     cargar();
   }, []);
 
-  // La API ya devuelve exclusivamente la jornada comercial vigente (07:00 a 06:59)
-  // y excluye lo archivado por un cierre manual. No volver a filtrar por fecha calendario:
-  // hacerlo reiniciaba visualmente todo a medianoche aunque la caja siguiera abierta.
+  // Las ventas permanecen hasta el cierre manual, sin reinicios por fecha u hora.
   const ventasJornada = ventas;
   const mostrador = ventasJornada.filter((v) => v.tipo === "MOSTRADOR");
   const mesas = ventasJornada.filter((v) => v.tipo === "MESA");
@@ -246,7 +244,7 @@ export default function VentasPage() {
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Ventas de la jornada</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Ventas pendientes de cierre</h1>
 
       {mensaje && (
         <div className={`rounded-lg border p-3 text-sm ${mensaje.tipo === "ok" ? "border-green-300 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300" : "border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"}`}>

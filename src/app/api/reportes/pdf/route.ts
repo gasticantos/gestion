@@ -1,8 +1,9 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { obtenerReporteVentas } from "@/lib/reportes";
-import { fechaArgentinaYMD, formatearMoneda, limitesRangoJornadasArgentina } from "@/lib/formato";
+import { consultarReporte } from "@/lib/consultaReportes";
+import { sesionActual } from "@/lib/sesionServidor";
+import { formatearMoneda } from "@/lib/formato";
 
 const METODO_LABEL = {
   EFECTIVO: "Efectivo",
@@ -12,19 +13,17 @@ const METODO_LABEL = {
 } as const;
 
 export async function GET(req: NextRequest) {
-  const hoy = fechaArgentinaYMD();
-  const desdeStr = req.nextUrl.searchParams.get("desde") || hoy;
-  const hastaStr = req.nextUrl.searchParams.get("hasta") || hoy;
-  const { desde, hasta } = limitesRangoJornadasArgentina(desdeStr, hastaStr);
-  const reporte = await obtenerReporteVentas(desde, hasta, {
-    etiquetaDesde: desdeStr,
-    etiquetaHasta: hastaStr,
-  });
+  const sesion = await sesionActual();
+  if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  const reporte = await consultarReporte(new URL(req.url).searchParams, sesion.negocioId);
+  if (!reporte) return NextResponse.json({ error: "Período inválido" }, { status: 400 });
 
   const doc = new jsPDF();
   const moneda = (valor: number) => `$${formatearMoneda(valor)}`;
-  const periodo =
-    reporte.desde === reporte.hasta ? reporte.desde : `${reporte.desde} al ${reporte.hasta}`;
+  const periodoBase =
+    reporte.caja ? `Caja #${reporte.caja.id} · ${reporte.caja.cerradoAt ? "Cerrada" : "Abierta"}`
+      : reporte.modoCaja ? "Caja actual - Sin caja abierta" : reporte.desde === reporte.hasta ? reporte.desde : `${reporte.desde} al ${reporte.hasta}`;
+  const periodo = periodoBase + (reporte.modoCaja ? "" : " (07 a 07 h Argentina)");
   const obtenerY = () =>
     ((doc as typeof doc & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 20) + 9;
 

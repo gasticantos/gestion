@@ -1,7 +1,8 @@
 import Link from "next/link";
 import AutoPrint from "@/components/AutoPrint";
-import { obtenerReporteVentas } from "@/lib/reportes";
-import { fechaArgentinaYMD, formatearMoneda, limitesRangoJornadasArgentina } from "@/lib/formato";
+import { consultarReporte } from "@/lib/consultaReportes";
+import { sesionActual } from "@/lib/sesionServidor";
+import { formatearMoneda } from "@/lib/formato";
 
 const METODO_LABEL: Record<string, string> = {
   EFECTIVO: "Efectivo",
@@ -13,18 +14,15 @@ const METODO_LABEL: Record<string, string> = {
 export default async function ReporteTicketPage({
   searchParams,
 }: {
-  searchParams: Promise<{ desde?: string; hasta?: string }>;
+  searchParams: Promise<{ modo?: string; desde?: string; hasta?: string }>;
 }) {
-  const { desde: desdeStr, hasta: hastaStr } = await searchParams;
-  const hoy = fechaArgentinaYMD();
-  const etiquetaDesde = desdeStr || hoy;
-  const etiquetaHasta = hastaStr || hoy;
-  const { desde, hasta } = limitesRangoJornadasArgentina(etiquetaDesde, etiquetaHasta);
-
-  const reporte = await obtenerReporteVentas(desde, hasta, {
-    etiquetaDesde,
-    etiquetaHasta,
-  });
+  const filtros = await searchParams;
+  const sesion = await sesionActual();
+  if (!sesion) return <p>No autenticado.</p>;
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filtros)) if (value) params.set(key, value);
+  const reporte = await consultarReporte(params, sesion.negocioId);
+  if (!reporte) return <p>Período inválido.</p>;
   const metodos = Object.keys(METODO_LABEL);
 
   return (
@@ -40,7 +38,8 @@ export default async function ReporteTicketPage({
         <div className="text-center mb-2">
           <div className="font-bold text-sm">RESUMEN DE VENTAS</div>
           <div>
-            {reporte.desde === reporte.hasta ? reporte.desde : `${reporte.desde} al ${reporte.hasta}`}
+            {reporte.caja ? `Caja #${reporte.caja.id} · ${reporte.caja.cerradoAt ? "Cerrada" : "Abierta"}` : reporte.modoCaja ? "Caja actual - Sin caja abierta" : reporte.desde === reporte.hasta ? reporte.desde : `${reporte.desde} al ${reporte.hasta}`}
+            {!reporte.modoCaja && <div>07:00 a 07:00 del día siguiente · Argentina</div>}
           </div>
         </div>
         <div className="border-t border-dashed my-2" />

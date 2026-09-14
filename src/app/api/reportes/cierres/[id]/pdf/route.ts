@@ -20,6 +20,7 @@ async function preparar(idTexto: string) {
   const pdf = generarPdfCierreCaja({
     nombreNegocio: configuracion?.nombrePrograma || "Gestión",
     fechaJornada: cierre.fecha,
+    codigoCierre: cierre.codigo,
     operador: cierre.operador,
     reporte: reporteDesdeCierre(cierre),
     generadoEn: cierre.creadoEn,
@@ -35,7 +36,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return new Response(preparado.pdf, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="cierre-caja-${preparado.cierre.fecha}.pdf"`,
+      "Content-Disposition": `inline; filename="cierre-${preparado.cierre.codigo}.pdf"`,
       "Cache-Control": "no-store",
     },
   });
@@ -47,8 +48,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   if ("error" in preparado) return NextResponse.json({ error: preparado.error }, { status: preparado.status });
   const envio = await enviarDocumentoTelegram(
     preparado.pdf,
-    `cierre-caja-${preparado.cierre.fecha}.pdf`,
-    `Reenvío de cierre de caja · ${preparado.cierre.fecha}\n${preparado.cierre.cantidadVentas} ventas · $${formatearMoneda(preparado.cierre.total)}`
+    `cierre-${preparado.cierre.codigo}.pdf`,
+    `Reenvío de cierre ${preparado.cierre.codigo} · ${preparado.cierre.fecha}\n${preparado.cierre.cantidadVentas} ventas · $${formatearMoneda(preparado.cierre.total)}`
   );
   if (!envio.ok) return NextResponse.json({ error: envio.error }, { status: 502 });
   return NextResponse.json({ success: true });

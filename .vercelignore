@@ -1,0 +1,13 @@
+.git
+.env*
+.codex
+.agents
+.claude
+node_modules
+.next
+src-tauri
+coverage
+tests
+scripts/backup-datos.json
+*.tsbuildinfo
+dev.db*

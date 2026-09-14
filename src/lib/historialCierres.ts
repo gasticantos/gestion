@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { ReporteVentas } from "@/lib/reportes";
+import { codigoCierre } from "@/lib/codigoCierre";
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 
@@ -20,6 +21,7 @@ export function interpretarCierre(trabajo: {
   error: string | null;
 }) {
   const fecha = trabajo.referencia?.match(/^cierre-caja:(\d{4}-\d{2}-\d{2})/)?.[1] || "";
+  const controlCajaId = Number(trabajo.referencia?.match(/:control:(\d+)$/)?.[1] || trabajo.id);
   const cantidad = Number(trabajo.contenido.match(/VENTAS REALIZADAS:\s*(\d+)/)?.[1] || 0);
   const operadorLinea = trabajo.contenido
     .split("\n")
@@ -60,6 +62,7 @@ export function interpretarCierre(trabajo: {
     : null;
   return {
     id: trabajo.id,
+    codigo: codigoCierre(fecha, controlCajaId),
     fecha,
     cantidadVentas: cantidad,
     total: importeDeLinea(trabajo.contenido, "TOTAL VENDIDO"),

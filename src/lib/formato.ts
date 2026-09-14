@@ -40,51 +40,19 @@ export function limitesDiaArgentino(fechaYMD: string): { desde: Date; hasta: Dat
   };
 }
 
-/**
- * Jornada comercial argentina: comienza a las 07:00 y termina a las 06:59:59.999
- * del día siguiente. Entre medianoche y las 06:59, las ventas siguen perteneciendo
- * a la jornada que comenzó el día anterior.
- */
-export function limitesJornadaArgentina(ahora: Date = new Date()): {
-  fecha: string;
-  desde: Date;
-  hasta: Date;
-} {
-  const fechaActual = fechaArgentinaYMD(ahora);
-  const horaActual = Number(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Argentina/Cordoba",
-      hour: "2-digit",
-      hourCycle: "h23",
-    }).format(ahora)
-  );
-  const inicioJornada =
-    horaActual < 7
-      ? fechaArgentinaYMD(new Date(new Date(`${fechaActual}T12:00:00-03:00`).getTime() - 24 * 60 * 60 * 1000))
-      : fechaActual;
-  const desde = new Date(`${inicioJornada}T07:00:00-03:00`);
-  return {
-    fecha: inicioJornada,
-    desde,
-    hasta: new Date(desde.getTime() + 24 * 60 * 60 * 1000 - 1),
-  };
+/** Rango de días calendario para reportes; no abre ni cierra cajas. */
+export function limitesRangoFechasArgentina(desdeYMD: string, hastaYMD: string) {
+  return { desde: limitesDiaArgentino(desdeYMD).desde, hasta: limitesDiaArgentino(hastaYMD).hasta };
 }
 
-/** Límites inclusivos de una o varias jornadas comerciales identificadas por su fecha de inicio. */
-export function limitesRangoJornadasArgentina(
-  desdeYMD: string,
-  hastaYMD: string
-): { desde: Date; hasta: Date } {
-  const desde = new Date(`${desdeYMD}T07:00:00-03:00`);
-  const inicioUltimaJornada = new Date(`${hastaYMD}T07:00:00-03:00`);
-  return {
-    desde,
-    hasta: new Date(inicioUltimaJornada.getTime() + 24 * 60 * 60 * 1000 - 1),
-  };
+/** Día de reporte 07:00–07:00. No controla apertura ni cierre de caja. */
+export function fechaReporteYMD(fecha: Date = new Date()): string {
+  return fechaArgentinaYMD(new Date(fecha.getTime() - 7 * 60 * 60 * 1000));
 }
 
-/** Fecha de jornada de un instante: de 00:00 a 06:59 pertenece al día anterior. */
-export function fechaJornadaArgentina(fecha: Date): string {
-  // Argentina es UTC-3; restar otras 7 horas permite leer como UTC la fecha comercial.
-  return new Date(fecha.getTime() - 10 * 60 * 60 * 1000).toISOString().slice(0, 10);
+export function limitesRangoReporte(desdeYMD: string, hastaYMD: string) {
+  return {
+    desde: new Date(`${desdeYMD}T07:00:00-03:00`),
+    hasta: new Date(new Date(`${hastaYMD}T07:00:00-03:00`).getTime() + 86400000 - 1),
+  };
 }

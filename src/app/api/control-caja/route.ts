@@ -1,25 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { limitesJornadaArgentina } from "@/lib/formato";
+import { fechaArgentinaYMD } from "@/lib/formato";
+import { conBloqueoCaja, filtroVentasCajaActual } from "@/lib/cajaManual";
 import { sesionActual } from "@/lib/sesionServidor";
 
 const redondear = (valor: number) => Math.round(valor * 100) / 100;
 
 async function obtenerEstado(negocioId: number) {
-  const jornada = limitesJornadaArgentina();
-  const [control, ventasConEfectivo, anterior] = await Promise.all([
+  const filtroVentas = await filtroVentasCajaActual(negocioId);
+  const [ultimaCaja, ventasConEfectivo, anterior] = await Promise.all([
     prisma.controlCaja.findFirst({
-      where: { negocioId, fechaJornada: jornada.fecha, cerradoAt: null },
+      where: { negocioId },
       include: { movimientos: { orderBy: { createdAt: "desc" } } },
-      orderBy: { createdAt: "desc" },
+      orderBy: { id: "desc" },
     }),
     prisma.venta.findMany({
-      where: {
-        negocioId,
-        estado: "CERRADA",
-        closedAt: { gte: jornada.desde, lte: jornada.hasta },
-        cierreCajaAt: null,
-      },
+      where: filtroVentas,
       select: { pagos: { where: { metodo: "EFECTIVO" }, select: { monto: true } } },
     }),
     prisma.controlCaja.findFirst({
@@ -28,14 +24,15 @@ async function obtenerEstado(negocioId: number) {
       select: { saldoSiguiente: true },
     }),
   ]);
+  // Las cajas antiguas incompletas no vuelven a activarse al cerrar la última.
+  const control = ultimaCaja && !ultimaCaja.cerradoAt ? ultimaCaja : null;
   const ingresos = control?.movimientos
     .filter((movimiento) => movimiento.tipo === "INGRESO")
     .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
   const egresos = control?.movimientos
     .filter((movimiento) => movimiento.tipo === "EGRESO")
     .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
-  // Consultar desde Venta conserva el filtro de jornada y negocio. Una consulta directa
-  // sobre Pago podía perder el rango al aplicar el aislamiento multinegocio y sumar el histórico.
+  // Los cobros pendientes siguen visibles hasta el cierre manual, sin filtro de fecha.
   const ventasEfectivo = ventasConEfectivo.reduce(
     (total, venta) => total + venta.pagos.reduce((subtotal, pago) => subtotal + pago.monto, 0),
     0
@@ -43,7 +40,7 @@ async function obtenerEstado(negocioId: number) {
   const saldoInicial = control?.saldoInicial ?? anterior?.saldoSiguiente ?? 0;
   const efectivoEsperado = redondear(saldoInicial + ventasEfectivo + ingresos - egresos);
   return {
-    fechaJornada: jornada.fecha,
+    fechaJornada: control?.fechaJornada ?? fechaArgentinaYMD(),
     iniciado: Boolean(control),
     control,
     saldoInicial,
@@ -71,72 +68,79 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No tenés permiso para controlar la caja" }, { status: 403 });
   }
   const body = await req.json().catch(() => ({}));
-  const jornada = limitesJornadaArgentina();
-  const existente = await prisma.controlCaja.findFirst({
-    where: { negocioId: sesion.negocioId, fechaJornada: jornada.fecha, cerradoAt: null },
-    orderBy: { createdAt: "desc" },
-  });
+  const error = await conBloqueoCaja(sesion.negocioId, async (tx) => {
+    const ultimaCaja = await tx.controlCaja.findFirst({
+      where: { negocioId: sesion.negocioId },
+      orderBy: { id: "desc" },
+    });
+    const existente = ultimaCaja && !ultimaCaja.cerradoAt ? ultimaCaja : null;
 
-  if (body.accion === "iniciar") {
-    const saldoInicial = Number(body.saldoInicial);
-    if (!Number.isFinite(saldoInicial) || saldoInicial < 0) {
-      return NextResponse.json({ error: "El efectivo inicial no es válido" }, { status: 400 });
+    if (body.accion !== "iniciar" && (!existente || body.controlCajaId !== existente.id)) {
+      return NextResponse.json({ error: "La caja cambió. Actualizá la pantalla antes de continuar." }, { status: 409 });
     }
-    if (existente) {
-      await prisma.controlCaja.update({ where: { id: existente.id }, data: { saldoInicial: redondear(saldoInicial) } });
+    if (body.accion === "iniciar") {
+      const saldoInicial = Number(body.saldoInicial);
+      if (body.saldoInicial == null || String(body.saldoInicial).trim() === "" || !Number.isFinite(saldoInicial) || saldoInicial < 0) {
+        return NextResponse.json({ error: "El efectivo inicial no es válido" }, { status: 400 });
+      }
+      if (existente) {
+        return NextResponse.json({ error: "Ya hay una caja abierta. Cerrala antes de iniciar otra." }, { status: 409 });
+      } else {
+        await tx.controlCaja.create({ data: {
+          negocioId: sesion.negocioId,
+          fechaJornada: fechaArgentinaYMD(),
+          saldoInicial: redondear(saldoInicial),
+        } });
+      }
+    } else if (body.accion === "movimiento") {
+      const monto = Number(body.monto);
+      const concepto = String(body.concepto || "").trim();
+      const tipo = body.tipo === "EGRESO" ? "EGRESO" : body.tipo === "INGRESO" ? "INGRESO" : null;
+      if (!existente) return NextResponse.json({ error: "Primero iniciá la caja" }, { status: 409 });
+      if (!tipo || !Number.isFinite(monto) || monto <= 0 || !concepto) {
+        return NextResponse.json({ error: "Completá tipo, monto y concepto" }, { status: 400 });
+      }
+      await tx.movimientoCaja.create({
+        data: {
+          controlCajaId: existente.id,
+          tipo,
+          monto: redondear(monto),
+          concepto: concepto.slice(0, 160),
+          operador: `${sesion.nombre} (${sesion.rol})`,
+        },
+      });
+    } else if (body.accion === "arqueo") {
+      if (!existente) return NextResponse.json({ error: "Primero iniciá la caja" }, { status: 409 });
+      const efectivoContado = Number(body.efectivoContado);
+      const saldoSiguiente = Number(body.saldoSiguiente);
+      if (body.efectivoContado == null || body.saldoSiguiente == null || String(body.efectivoContado).trim() === "" || String(body.saldoSiguiente).trim() === "" || ![efectivoContado, saldoSiguiente].every((valor) => Number.isFinite(valor) && valor >= 0)) {
+        return NextResponse.json({ error: "Los importes del arqueo no son válidos" }, { status: 400 });
+      }
+      await tx.controlCaja.update({
+        where: { id: existente.id },
+        data: {
+          efectivoContado: redondear(efectivoContado),
+          saldoSiguiente: redondear(saldoSiguiente),
+        },
+      });
+    } else if (body.accion === "eliminar_movimiento") {
+      if (!existente) return NextResponse.json({ error: "La caja no está iniciada" }, { status: 409 });
+      const movimientoId = Number(body.movimientoId);
+      if (!Number.isInteger(movimientoId)) {
+        return NextResponse.json({ error: "Movimiento inválido" }, { status: 400 });
+      }
+      const eliminado = await tx.movimientoCaja.deleteMany({
+        where: { id: movimientoId, controlCajaId: existente.id },
+      });
+      if (eliminado.count === 0) {
+        return NextResponse.json({ error: "El movimiento no existe en esta jornada" }, { status: 404 });
+      }
     } else {
-      await prisma.controlCaja.create({ data: {
-        negocioId: sesion.negocioId,
-        fechaJornada: jornada.fecha,
-        saldoInicial: redondear(saldoInicial),
-      } });
+      return NextResponse.json({ error: "Acción inválida" }, { status: 400 });
     }
-  } else if (body.accion === "movimiento") {
-    const monto = Number(body.monto);
-    const concepto = String(body.concepto || "").trim();
-    const tipo = body.tipo === "EGRESO" ? "EGRESO" : body.tipo === "INGRESO" ? "INGRESO" : null;
-    if (!existente) return NextResponse.json({ error: "Primero iniciá la caja" }, { status: 409 });
-    if (!tipo || !Number.isFinite(monto) || monto <= 0 || !concepto) {
-      return NextResponse.json({ error: "Completá tipo, monto y concepto" }, { status: 400 });
-    }
-    await prisma.movimientoCaja.create({
-      data: {
-        controlCajaId: existente.id,
-        tipo,
-        monto: redondear(monto),
-        concepto: concepto.slice(0, 160),
-        operador: `${sesion.nombre} (${sesion.rol})`,
-      },
-    });
-  } else if (body.accion === "arqueo") {
-    if (!existente) return NextResponse.json({ error: "Primero iniciá la caja" }, { status: 409 });
-    const efectivoContado = Number(body.efectivoContado);
-    const saldoSiguiente = Number(body.saldoSiguiente);
-    if (![efectivoContado, saldoSiguiente].every((valor) => Number.isFinite(valor) && valor >= 0)) {
-      return NextResponse.json({ error: "Los importes del arqueo no son válidos" }, { status: 400 });
-    }
-    await prisma.controlCaja.update({
-      where: { id: existente.id },
-      data: {
-        efectivoContado: redondear(efectivoContado),
-        saldoSiguiente: redondear(saldoSiguiente),
-      },
-    });
-  } else if (body.accion === "eliminar_movimiento") {
-    if (!existente) return NextResponse.json({ error: "La caja no está iniciada" }, { status: 409 });
-    const movimientoId = Number(body.movimientoId);
-    if (!Number.isInteger(movimientoId)) {
-      return NextResponse.json({ error: "Movimiento inválido" }, { status: 400 });
-    }
-    const eliminado = await prisma.movimientoCaja.deleteMany({
-      where: { id: movimientoId, controlCajaId: existente.id },
-    });
-    if (eliminado.count === 0) {
-      return NextResponse.json({ error: "El movimiento no existe en esta jornada" }, { status: 404 });
-    }
-  } else {
-    return NextResponse.json({ error: "Acción inválida" }, { status: 400 });
-  }
 
+    return null;
+  });
+  if (error) return error;
   return NextResponse.json(await obtenerEstado(sesion.negocioId));
 }

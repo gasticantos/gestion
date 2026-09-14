@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { conBloqueoCaja } from "@/lib/cajaManual";
 import { sesionActual } from "@/lib/sesionServidor";
 import { aplicarDescuento } from "@/lib/precio";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
@@ -10,7 +11,7 @@ type PagoInput = { metodo: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO"; m
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
-  if (sesion?.rol === "MOZO") {
+  if (!sesion || sesion.rol === "MOZO") {
     return NextResponse.json({ error: "No tenés permiso para cobrar" }, { status: 403 });
   }
 
@@ -61,7 +62,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "El total pagado no coincide con el total de la cuenta" }, { status: 400 });
   }
 
-  const cerrada = await prisma.$transaction(async (tx) => {
+  const cerrada = await conBloqueoCaja(sesion.negocioId, async (tx) => {
+    const sigueAbierta = await tx.venta.findFirst({
+      where: { id: venta.id, negocioId: sesion.negocioId, estado: "ABIERTA" },
+      select: { id: true },
+    });
+    if (!sigueAbierta) return null;
     const updated = await tx.venta.update({
       where: { id: venta.id },
       data: {
@@ -91,6 +97,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return updated;
   });
+
+  if (!cerrada) return NextResponse.json({ error: "La mesa ya fue cobrada. Actualizá la pantalla." }, { status: 409 });
 
   const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
   const detallesPago = [
