@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 import { codigoCierre } from "@/lib/codigoCierre";
+import { formatearMoneda } from "@/lib/formato";
+import { obtenerTrabajoCierre } from "@/lib/historialCierres";
 import { notificarNuevaImpresion } from "@/lib/notificarImpresion";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
@@ -32,12 +34,31 @@ export async function POST(req: NextRequest, { params }: RouteContext<"/api/repo
   const fecha = original.referencia?.match(/^cierre-caja:(\d{4}-\d{2}-\d{2})/)?.[1] || "";
   const controlCajaId = Number(original.referencia?.match(/:control:(\d+)$/)?.[1] || id);
   const codigo = codigoCierre(fecha, controlCajaId);
-  const contenido = original.contenido.includes(codigo)
+  let contenido = original.contenido.includes(codigo)
     ? original.contenido
     : original.contenido.replace(
         "[[SUBTITLE]] CIERRE DE CAJA",
         `[[SUBTITLE]] CIERRE DE CAJA\n[[HR]]\n[[HERO]] ${codigo}\n[[CENTER]] IDENTIFICADOR DEL CIERRE`
       );
+  if (!contenido.includes("COBROS DE CUENTA CORRIENTE")) {
+    const cierre = await obtenerTrabajoCierre(id, sesion.negocioId);
+    if (cierre) {
+      const cobros = cierre.cobrosCuentaCorriente;
+      const bloque = [
+        "[[HR]]",
+        "[[SECTION]] COBROS DE CUENTA CORRIENTE",
+        `[[ROW]] COBROS REALIZADOS: ${cobros.cantidad}`,
+        `[[ROW]] COBROS CC EFECTIVO $${formatearMoneda(cobros.porMetodo.EFECTIVO)}`,
+        `[[ROW]] COBROS CC TARJETA $${formatearMoneda(cobros.porMetodo.TARJETA)}`,
+        `[[ROW]] COBROS CC TRANSFERENCIA $${formatearMoneda(cobros.porMetodo.TRANSFERENCIA)}`,
+        `[[TOTAL]] TOTAL COBRADO CC $${formatearMoneda(cobros.total)}`,
+      ].join("\n");
+      const antesDeControl = "[[HR]]\n[[SECTION]] CONTROL DE EFECTIVO";
+      contenido = contenido.includes(antesDeControl)
+        ? contenido.replace(antesDeControl, `${bloque}\n${antesDeControl}`)
+        : contenido.replace("[[FOOTER]] Fin del cierre de caja", `${bloque}\n[[HR]]\n[[FOOTER]] Fin del cierre de caja`);
+    }
+  }
 
   const trabajo = await prisma.impresionTrabajo.create({
     data: {

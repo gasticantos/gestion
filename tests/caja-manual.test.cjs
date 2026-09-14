@@ -118,15 +118,29 @@ test('reportes separa turnos del mismo día y muestra cero sin caja abierta', as
   const actual = await open({ fechaJornada: '2026-09-09', createdAt: corte });
   for (let i = 0; i < 2; i++) await sale({ closedAt: new Date('2026-09-09T10:11:00Z') });
   await sale({ negocioId: 2, closedAt: new Date('2026-09-09T10:11:00Z') });
+  const cliente = await prisma.cliente.create({ data: { negocioId: 1, nombre: 'Cuenta corriente' } });
+  await prisma.movimientoCuentaCorriente.create({ data: {
+    clienteId: cliente.id, tipo: 'PAGO', metodo: 'TRANSFERENCIA', monto: 120,
+    createdAt: new Date('2026-09-09T10:12:00Z'),
+  } });
+  const clienteOtro = await prisma.cliente.create({ data: { negocioId: 2, nombre: 'Otro cliente' } });
+  await prisma.movimientoCuentaCorriente.create({ data: {
+    clienteId: clienteOtro.id, tipo: 'PAGO', metodo: 'EFECTIVO', monto: 999,
+    createdAt: new Date('2026-09-09T10:12:00Z'),
+  } });
   const antes = await prisma.venta.findMany({ orderBy: { id: 'asc' } });
   const reporte = await consultarReporte(new URLSearchParams(), 1);
   assert.equal(reporte.caja.id, actual.id);
   assert.equal(reporte.cantidadVentas, 2);
   assert.equal(reporte.combinado.total, 100);
+  assert.deepEqual(reporte.cobrosCuentaCorriente, {
+    cantidad: 1, total: 120, porMetodo: { EFECTIVO: 0, TARJETA: 0, TRANSFERENCIA: 120 },
+  });
   const calendario = await consultarReporte(new URLSearchParams({ desde: '2026-09-09', hasta: '2026-09-09' }), 1);
   assert.equal(calendario.cantidadVentas, 2);
   assert.deepEqual(await prisma.venta.findMany({ orderBy: { id: 'asc' } }), antes);
   assert.equal((await close(actual.id)).estado, 'CERRADO');
+  assert.match((await prisma.impresionTrabajo.findFirst({ orderBy: { id: 'desc' } })).contenido, /COBROS CC TRANSFERENCIA.*\$120,00/);
   const cerrada = await consultarReporte(new URLSearchParams({ modo: 'caja' }), 1);
   assert.equal(cerrada.cantidadVentas, 0);
   assert.equal(cerrada.caja, null);
@@ -148,11 +162,17 @@ test('una caja abierta y sus ventas siguen visibles al pasar medianoche, las 7 y
   for (const time of ['2026-09-07T23:59:00-03:00', '2026-09-08T06:59:59-03:00', '2026-09-08T07:00:00-03:00', '2026-09-10T18:00:00-03:00']) await sale({ closedAt: new Date(time) });
   await sale({ negocioId: 2 });
   await sale({ cierreCajaAt: new Date() });
+  const cliente = await prisma.cliente.create({ data: { negocioId: 1, nombre: 'Cobro efectivo' } });
+  await prisma.movimientoCuentaCorriente.create({ data: {
+    clienteId: cliente.id, tipo: 'PAGO', metodo: 'EFECTIVO', monto: 30,
+    createdAt: new Date('2026-09-08T12:00:00Z'),
+  } });
   const estado = await (await controlRoute.GET()).json();
   assert.equal(estado.control.id, box.id);
   assert.equal(estado.fechaJornada, '2026-09-07');
   assert.equal(estado.ventasEfectivo, 200);
-  assert.equal(estado.efectivoEsperado, 300);
+  assert.equal(estado.cobrosCuentaCorrienteEfectivo, 30);
+  assert.equal(estado.efectivoEsperado, 330);
   assert.equal((await (await ventasRoute.GET()).json()).length, 4);
   assert.equal(await prisma.impresionTrabajo.count(), 0);
 });

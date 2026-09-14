@@ -8,15 +8,11 @@ const redondear = (valor: number) => Math.round(valor * 100) / 100;
 
 async function obtenerEstado(negocioId: number) {
   const filtroVentas = await filtroVentasCajaActual(negocioId);
-  const [ultimaCaja, ventasConEfectivo, anterior] = await Promise.all([
+  const [ultimaCaja, anterior] = await Promise.all([
     prisma.controlCaja.findFirst({
       where: { negocioId },
       include: { movimientos: { orderBy: { createdAt: "desc" } } },
       orderBy: { id: "desc" },
-    }),
-    prisma.venta.findMany({
-      where: filtroVentas,
-      select: { pagos: { where: { metodo: "EFECTIVO" }, select: { monto: true } } },
     }),
     prisma.controlCaja.findFirst({
       where: { negocioId, cerradoAt: { not: null }, saldoSiguiente: { not: null } },
@@ -26,6 +22,23 @@ async function obtenerEstado(negocioId: number) {
   ]);
   // Las cajas antiguas incompletas no vuelven a activarse al cerrar la última.
   const control = ultimaCaja && !ultimaCaja.cerradoAt ? ultimaCaja : null;
+  const [ventasConEfectivo, cobrosCuentaEfectivo] = await Promise.all([
+    prisma.venta.findMany({
+      where: filtroVentas,
+      select: { pagos: { where: { metodo: "EFECTIVO" }, select: { monto: true } } },
+    }),
+    control
+      ? prisma.movimientoCuentaCorriente.aggregate({
+          where: {
+            tipo: "PAGO",
+            metodo: "EFECTIVO",
+            createdAt: { gte: control.createdAt },
+            cliente: { negocioId },
+          },
+          _sum: { monto: true },
+        })
+      : Promise.resolve({ _sum: { monto: null } }),
+  ]);
   const ingresos = control?.movimientos
     .filter((movimiento) => movimiento.tipo === "INGRESO")
     .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
@@ -37,8 +50,11 @@ async function obtenerEstado(negocioId: number) {
     (total, venta) => total + venta.pagos.reduce((subtotal, pago) => subtotal + pago.monto, 0),
     0
   );
+  const cobrosCuentaCorrienteEfectivo = cobrosCuentaEfectivo._sum.monto ?? 0;
   const saldoInicial = control?.saldoInicial ?? anterior?.saldoSiguiente ?? 0;
-  const efectivoEsperado = redondear(saldoInicial + ventasEfectivo + ingresos - egresos);
+  const efectivoEsperado = redondear(
+    saldoInicial + ventasEfectivo + cobrosCuentaCorrienteEfectivo + ingresos - egresos
+  );
   return {
     fechaJornada: control?.fechaJornada ?? fechaArgentinaYMD(),
     iniciado: Boolean(control),
@@ -46,6 +62,7 @@ async function obtenerEstado(negocioId: number) {
     saldoInicial,
     saldoSugerido: anterior?.saldoSiguiente ?? 0,
     ventasEfectivo: redondear(ventasEfectivo),
+    cobrosCuentaCorrienteEfectivo: redondear(cobrosCuentaCorrienteEfectivo),
     ingresos: redondear(ingresos),
     egresos: redondear(egresos),
     efectivoEsperado,

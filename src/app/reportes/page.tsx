@@ -19,6 +19,7 @@ type ReporteVentas = {
   cantidadVentas: number;
   porCanal: Record<"MOSTRADOR" | "MESA", { total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta }>;
   combinado: { total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta };
+  cobrosCuentaCorriente: { cantidad: number; total: number; porMetodo: Record<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA", number> };
   categorias: { categoria: string; cantidad: number; importe: number }[];
   productos: { nombre: string; cantidad: number; importe: number }[];
   serieDiaria: { fecha: string; total: number }[];
@@ -35,6 +36,7 @@ type CierreHistorico = {
   creadoEn: string;
   impresoEn: string | null;
   error: string | null;
+  cobrosCuentaCorriente: { cantidad: number; total: number; porMetodo: Record<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA", number> };
 };
 
 const METODO_LABEL: Record<Metodo, string> = {
@@ -292,6 +294,7 @@ export default function ReportesPage() {
                   <th className={th}>Responsable</th>
                   <th className={th}>Ventas</th>
                   <th className={th}>Total</th>
+                  <th className={th}>Cobros CC</th>
                   <th className={th}>Impresión</th>
                   <th className={th}>Acciones</th>
                 </tr>
@@ -312,6 +315,7 @@ export default function ReportesPage() {
                     </td>
                     <td className={td}>{cierre.cantidadVentas}</td>
                     <td className={`${td} font-semibold`}>${formatearMoneda(cierre.total)}</td>
+                    <td className={`${td} font-semibold`}>${formatearMoneda(cierre.cobrosCuentaCorriente.total)}</td>
                     <td className={td}>
                       <span className={cierre.estadoImpresion === "IMPRESO" ? "text-emerald-600" : "text-amber-600"}>
                         {cierre.estadoImpresion}
@@ -382,6 +386,24 @@ export default function ReportesPage() {
               <div className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50 mt-1">{reporte.cantidadVentas}</div>
             </Card>
           </div>
+
+          <Card className="p-4">
+            <div className="mb-2 text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              Cobros de cuenta corriente ({reporte.cobrosCuentaCorriente.cantidad})
+            </div>
+            <div className="grid gap-2 text-sm sm:grid-cols-4">
+              {(["EFECTIVO", "TARJETA", "TRANSFERENCIA"] as const).map((metodo) => (
+                <div key={metodo} className="flex justify-between gap-3 sm:block">
+                  <span className="text-neutral-500">{METODO_LABEL[metodo]}</span>
+                  <div className="font-medium">${formatearMoneda(reporte.cobrosCuentaCorriente.porMetodo[metodo])}</div>
+                </div>
+              ))}
+              <div className="flex justify-between gap-3 border-t pt-2 font-semibold sm:block sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0 dark:border-neutral-800">
+                <span>Total cobrado</span>
+                <div>${formatearMoneda(reporte.cobrosCuentaCorriente.total)}</div>
+              </div>
+            </div>
+          </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {(

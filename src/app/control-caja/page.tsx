@@ -21,6 +21,7 @@ type EstadoCaja = {
   saldoInicial: number;
   saldoSugerido: number;
   ventasEfectivo: number;
+  cobrosCuentaCorrienteEfectivo: number;
   ingresos: number;
   egresos: number;
   efectivoEsperado: number;
@@ -182,6 +183,7 @@ export default function ControlCajaPage() {
             {[
               ["Efectivo inicial", estado.saldoInicial],
               ["Ventas en efectivo", estado.ventasEfectivo],
+              ["Cobros de cuenta corriente", estado.cobrosCuentaCorrienteEfectivo],
               ["Otros ingresos", estado.ingresos],
               ["Egresos", -estado.egresos],
               ["Efectivo esperado", estado.efectivoEsperado],

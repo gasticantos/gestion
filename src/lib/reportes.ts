@@ -6,6 +6,13 @@ const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
 type Metodo = (typeof METODOS)[number];
 type TipoTarjeta = "QR" | "DEBITO" | "CREDITO";
 type DesgloseTarjeta = Record<TipoTarjeta, number>;
+type MetodoCobroCuenta = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA";
+export type CobrosCuentaCorriente = {
+  cantidad: number;
+  total: number;
+  porMetodo: Record<MetodoCobroCuenta, number>;
+};
+type MovimientoCobro = { monto: number; metodo: string | null };
 
 export type ReporteVentas = {
   desde: string;
@@ -13,6 +20,7 @@ export type ReporteVentas = {
   cantidadVentas: number;
   porCanal: Record<"MOSTRADOR" | "MESA", { cantidad: number; total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta }>;
   combinado: { total: number; propina: number; pagos: Record<Metodo, number>; tarjetas: DesgloseTarjeta };
+  cobrosCuentaCorriente: CobrosCuentaCorriente;
   categorias: { categoria: string; cantidad: number; importe: number }[];
   productos: { nombre: string; cantidad: number; importe: number }[];
   serieDiaria: { fecha: string; total: number }[];
@@ -24,6 +32,38 @@ function pagosVacio(): Record<Metodo, number> {
 
 function tarjetasVacio(): DesgloseTarjeta {
   return { QR: 0, DEBITO: 0, CREDITO: 0 };
+}
+
+export async function obtenerCobrosCuentaCorriente(
+  desde: Date,
+  hasta: Date,
+  negocioId: number,
+  cliente: Pick<TransaccionCaja, "movimientoCuentaCorriente"> = prisma
+): Promise<CobrosCuentaCorriente> {
+  const movimientos = await cliente.movimientoCuentaCorriente.findMany({
+    where: {
+      tipo: "PAGO",
+      createdAt: { gte: desde, lte: hasta },
+      cliente: { negocioId },
+    },
+    select: { monto: true, metodo: true },
+  });
+  return resumirCobrosCuentaCorriente(movimientos);
+}
+
+export function resumirCobrosCuentaCorriente(movimientos: MovimientoCobro[]): CobrosCuentaCorriente {
+  const resultado: CobrosCuentaCorriente = {
+    cantidad: movimientos.length,
+    total: 0,
+    porMetodo: { EFECTIVO: 0, TARJETA: 0, TRANSFERENCIA: 0 },
+  };
+  for (const movimiento of movimientos) {
+    if (movimiento.metodo === "EFECTIVO" || movimiento.metodo === "TARJETA" || movimiento.metodo === "TRANSFERENCIA") {
+      resultado.total += movimiento.monto;
+      resultado.porMetodo[movimiento.metodo] += movimiento.monto;
+    }
+  }
+  return resultado;
 }
 
 export async function obtenerReporteVentas(
@@ -38,9 +78,9 @@ export async function obtenerReporteVentas(
     soloPendientesCierre?: boolean;
     ventaIds?: number[];
   },
-  cliente: Pick<TransaccionCaja, "venta"> = prisma
+  cliente: Pick<TransaccionCaja, "venta" | "movimientoCuentaCorriente"> = prisma
 ): Promise<ReporteVentas> {
-  const ventas = await cliente.venta.findMany({
+  const [ventas, cobrosCuentaCorriente] = await Promise.all([cliente.venta.findMany({
     where: {
       estado: "CERRADA",
       // Una venta pertenece a la jornada en la que se cobró, no a aquella en la
@@ -55,7 +95,7 @@ export async function obtenerReporteVentas(
       pagos: true,
       pedidos: { include: { items: { include: { producto: { include: { categoria: true } } } } } },
     },
-  });
+  }), obtenerCobrosCuentaCorriente(desde, hasta, opciones?.negocioId ?? 1, cliente)]);
 
   const porCanal = {
     MOSTRADOR: { cantidad: 0, total: 0, propina: 0, pagos: pagosVacio(), tarjetas: tarjetasVacio() },
@@ -127,6 +167,7 @@ export async function obtenerReporteVentas(
     cantidadVentas: ventas.length,
     porCanal,
     combinado,
+    cobrosCuentaCorriente,
     categorias,
     productos,
     serieDiaria,

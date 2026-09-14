@@ -41,6 +41,19 @@ export async function GET(req: NextRequest) {
       ["Mesas", moneda(reporte.porCanal.MESA.total)],
       ["Cantidad de ventas", String(reporte.cantidadVentas)],
       ["Propinas", moneda(reporte.combinado.propina)],
+      ["Cobros de cuenta corriente", moneda(reporte.cobrosCuentaCorriente.total)],
+    ],
+    theme: "grid",
+  });
+
+  autoTable(doc, {
+    startY: obtenerY(),
+    head: [["Cobros de cuenta corriente", "Importe"]],
+    body: [
+      ["Efectivo", moneda(reporte.cobrosCuentaCorriente.porMetodo.EFECTIVO)],
+      ["Tarjeta", moneda(reporte.cobrosCuentaCorriente.porMetodo.TARJETA)],
+      ["Transferencia", moneda(reporte.cobrosCuentaCorriente.porMetodo.TRANSFERENCIA)],
+      ["Total cobrado", moneda(reporte.cobrosCuentaCorriente.total)],
     ],
     theme: "grid",
   });

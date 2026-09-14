@@ -108,6 +108,15 @@ export async function cerrarJornadaCaja({
     lineas.push(`[[ROW]] ${fila("TARJETA DEBITO", reporte.combinado.tarjetas.DEBITO)}`);
     lineas.push(`[[ROW]] ${fila("TARJETA CREDITO", reporte.combinado.tarjetas.CREDITO)}`);
     lineas.push(`[[ROW]] ${fila("PROPINA", reporte.combinado.propina)}`);
+    lineas.push(
+      "[[HR]]",
+      "[[SECTION]] COBROS DE CUENTA CORRIENTE",
+      `[[ROW]] COBROS REALIZADOS: ${reporte.cobrosCuentaCorriente.cantidad}`,
+      `[[ROW]] ${fila("COBROS CC EFECTIVO", reporte.cobrosCuentaCorriente.porMetodo.EFECTIVO)}`,
+      `[[ROW]] ${fila("COBROS CC TARJETA", reporte.cobrosCuentaCorriente.porMetodo.TARJETA)}`,
+      `[[ROW]] ${fila("COBROS CC TRANSFERENCIA", reporte.cobrosCuentaCorriente.porMetodo.TRANSFERENCIA)}`,
+      `[[TOTAL]] ${fila("TOTAL COBRADO CC", reporte.cobrosCuentaCorriente.total)}`
+    );
     const ingresosCaja = controlPendiente?.movimientos
       .filter((movimiento) => movimiento.tipo === "INGRESO")
       .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
@@ -115,7 +124,8 @@ export async function cerrarJornadaCaja({
       .filter((movimiento) => movimiento.tipo === "EGRESO")
       .reduce((total, movimiento) => total + movimiento.monto, 0) ?? 0;
     const efectivoEsperado = controlPendiente
-      ? controlPendiente.saldoInicial + reporte.combinado.pagos.EFECTIVO + ingresosCaja - egresosCaja
+      ? controlPendiente.saldoInicial + reporte.combinado.pagos.EFECTIVO +
+        reporte.cobrosCuentaCorriente.porMetodo.EFECTIVO + ingresosCaja - egresosCaja
       : 0;
     const diferencia =
       controlPendiente?.efectivoContado == null ? null : controlPendiente.efectivoContado - efectivoEsperado;
@@ -124,6 +134,7 @@ export async function cerrarJornadaCaja({
       ? {
           saldoInicial: controlPendiente.saldoInicial,
           ventasEfectivo: reporte.combinado.pagos.EFECTIVO,
+          cobrosCuentaCorrienteEfectivo: reporte.cobrosCuentaCorriente.porMetodo.EFECTIVO,
           ingresos: ingresosCaja,
           egresos: egresosCaja,
           efectivoEsperado,
@@ -138,6 +149,7 @@ export async function cerrarJornadaCaja({
         "[[SECTION]] CONTROL DE EFECTIVO",
         `[[ROW]] ${fila("EFECTIVO INICIAL", resumenControl.saldoInicial)}`,
         `[[ROW]] ${fila("VENTAS EFECTIVO", resumenControl.ventasEfectivo)}`,
+        `[[ROW]] ${fila("COBROS CC EFECTIVO", resumenControl.cobrosCuentaCorrienteEfectivo)}`,
         `[[ROW]] ${fila("OTROS INGRESOS", resumenControl.ingresos)}`,
         `[[ROW]] ${fila("EGRESOS", -resumenControl.egresos)}`,
         `[[TOTAL]] ${fila("EFECTIVO ESPERADO", resumenControl.efectivoEsperado)}`,

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { ReporteVentas } from "@/lib/reportes";
+import { obtenerCobrosCuentaCorriente, type ReporteVentas } from "@/lib/reportes";
 import { codigoCierre } from "@/lib/codigoCierre";
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
@@ -44,6 +44,15 @@ export function interpretarCierre(trabajo: {
     DEBITO: importeDeLinea(trabajo.contenido, "TARJETA DEBITO"),
     CREDITO: importeDeLinea(trabajo.contenido, "TARJETA CREDITO"),
   };
+  const cobrosCuentaCorriente = {
+    cantidad: Number(trabajo.contenido.match(/COBROS REALIZADOS:\s*(\d+)/)?.[1] || 0),
+    total: importeDeLinea(trabajo.contenido, "TOTAL COBRADO CC"),
+    porMetodo: {
+      EFECTIVO: importeDeLinea(trabajo.contenido, "COBROS CC EFECTIVO"),
+      TARJETA: importeDeLinea(trabajo.contenido, "COBROS CC TARJETA"),
+      TRANSFERENCIA: importeDeLinea(trabajo.contenido, "COBROS CC TRANSFERENCIA"),
+    },
+  };
   const tieneControl = trabajo.contenido.includes("CONTROL DE EFECTIVO");
   const efectivoContado = trabajo.contenido.includes("EFECTIVO CONTADO")
     ? importeDeLinea(trabajo.contenido, "EFECTIVO CONTADO")
@@ -52,6 +61,7 @@ export function interpretarCierre(trabajo: {
     ? {
         saldoInicial: importeDeLinea(trabajo.contenido, "EFECTIVO INICIAL"),
         ventasEfectivo: importeDeLinea(trabajo.contenido, "VENTAS EFECTIVO"),
+        cobrosCuentaCorrienteEfectivo: importeDeLinea(trabajo.contenido, "COBROS CC EFECTIVO"),
         ingresos: importeDeLinea(trabajo.contenido, "OTROS INGRESOS"),
         egresos: Math.abs(importeDeLinea(trabajo.contenido, "EGRESOS")),
         efectivoEsperado: importeDeLinea(trabajo.contenido, "EFECTIVO ESPERADO"),
@@ -71,6 +81,7 @@ export function interpretarCierre(trabajo: {
     pagos,
     propina,
     tarjetas,
+    cobrosCuentaCorriente,
     operador,
     estadoImpresion: trabajo.estado,
     intentos: trabajo.intentos,
@@ -95,7 +106,21 @@ export async function obtenerTrabajoCierre(id: number, negocioId: number) {
       error: true,
     },
   });
-  return trabajo ? interpretarCierre(trabajo) : null;
+  if (!trabajo) return null;
+  const cierre = interpretarCierre(trabajo);
+  const controlCajaId = Number(trabajo.referencia?.match(/:control:(\d+)$/)?.[1]);
+  if (!Number.isInteger(controlCajaId)) return cierre;
+  const control = await prisma.controlCaja.findFirst({
+    where: { id: controlCajaId, negocioId },
+    select: { createdAt: true, cerradoAt: true },
+  });
+  if (!control) return cierre;
+  const cobrosCuentaCorriente = await obtenerCobrosCuentaCorriente(
+    control.createdAt,
+    control.cerradoAt ?? trabajo.createdAt,
+    negocioId
+  );
+  return { ...cierre, cobrosCuentaCorriente };
 }
 
 export function reporteDesdeCierre(cierre: NonNullable<Awaited<ReturnType<typeof obtenerTrabajoCierre>>>): ReporteVentas {
@@ -109,6 +134,7 @@ export function reporteDesdeCierre(cierre: NonNullable<Awaited<ReturnType<typeof
       MESA: { cantidad: 0, total: cierre.mesas, propina: 0, pagos: pagosVacios(), tarjetas: { QR: 0, DEBITO: 0, CREDITO: 0 } },
     },
     combinado: { total: cierre.total, propina: cierre.propina, pagos: cierre.pagos, tarjetas: cierre.tarjetas },
+    cobrosCuentaCorriente: cierre.cobrosCuentaCorriente,
     categorias: [],
     productos: [],
     serieDiaria: cierre.fecha ? [{ fecha: cierre.fecha, total: cierre.total }] : [],

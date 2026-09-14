@@ -86,6 +86,13 @@ export default async function ReporteTicketPage({
         <div className="ml-2 flex justify-between"><span>Tarjeta Débito</span><span>${formatearMoneda(reporte.combinado.tarjetas.DEBITO)}</span></div>
         <div className="ml-2 flex justify-between"><span>Tarjeta Crédito</span><span>${formatearMoneda(reporte.combinado.tarjetas.CREDITO)}</span></div>
 
+        <div className="border-t border-dashed my-2" />
+        <div className="font-bold mb-1">COBROS DE CUENTA CORRIENTE</div>
+        <div className="flex justify-between"><span>Efectivo</span><span>${formatearMoneda(reporte.cobrosCuentaCorriente.porMetodo.EFECTIVO)}</span></div>
+        <div className="flex justify-between"><span>Tarjeta</span><span>${formatearMoneda(reporte.cobrosCuentaCorriente.porMetodo.TARJETA)}</span></div>
+        <div className="flex justify-between"><span>Transferencia</span><span>${formatearMoneda(reporte.cobrosCuentaCorriente.porMetodo.TRANSFERENCIA)}</span></div>
+        <div className="flex justify-between font-bold"><span>Total cobrado</span><span>${formatearMoneda(reporte.cobrosCuentaCorriente.total)}</span></div>
+
         {reporte.categorias.length > 0 && (
           <>
             <div className="border-t border-dashed my-2" />

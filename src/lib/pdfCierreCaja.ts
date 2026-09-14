@@ -28,6 +28,7 @@ type DatosCierrePdf = {
   controlCaja?: {
     saldoInicial: number;
     ventasEfectivo: number;
+    cobrosCuentaCorrienteEfectivo: number;
     ingresos: number;
     egresos: number;
     efectivoEsperado: number;
@@ -152,6 +153,20 @@ export function generarPdfCierreCaja({
     columnStyles: { 0: { cellWidth: 95 }, 1: { halign: "right", fontStyle: "bold" }, 2: { halign: "right" } },
   });
 
+  inicio = tituloSeccion("Cobros de cuenta corriente", "Pagos de deudas recibidos durante la caja", ultimoY() + 7);
+  autoTable(doc, {
+    ...estiloTabla,
+    startY: inicio,
+    head: [["MEDIO DE COBRO", "IMPORTE"]],
+    body: [
+      ["Efectivo", moneda(reporte.cobrosCuentaCorriente.porMetodo.EFECTIVO)],
+      ["Tarjeta", moneda(reporte.cobrosCuentaCorriente.porMetodo.TARJETA)],
+      ["Transferencia", moneda(reporte.cobrosCuentaCorriente.porMetodo.TRANSFERENCIA)],
+      ["TOTAL COBRADO", moneda(reporte.cobrosCuentaCorriente.total)],
+    ],
+    columnStyles: { 1: { halign: "right", fontStyle: "bold" } },
+  });
+
   if (controlCaja) {
     inicio = tituloSeccion("Control de efectivo", "Conciliación entre sistema y dinero contado", ultimoY() + 7);
     autoTable(doc, {
@@ -161,6 +176,7 @@ export function generarPdfCierreCaja({
       body: [
         ["Efectivo inicial", moneda(controlCaja.saldoInicial)],
         ["Ventas en efectivo", moneda(controlCaja.ventasEfectivo)],
+        ["Cobros de cuenta corriente en efectivo", moneda(controlCaja.cobrosCuentaCorrienteEfectivo)],
         ["Otros ingresos", moneda(controlCaja.ingresos)],
         ["Egresos", `-${moneda(controlCaja.egresos)}`],
         ["Efectivo esperado", moneda(controlCaja.efectivoEsperado)],
