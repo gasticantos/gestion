@@ -215,7 +215,7 @@ export default function ReportesPage() {
   }, [reporte]);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Reportes de ventas</h1>
         <a href={`/api/reportes/pdf?${consulta}`} download>
@@ -324,6 +324,12 @@ export default function ReportesPage() {
                     </td>
                     <td className={td}>
                       <div className="flex flex-nowrap items-center gap-1.5 whitespace-nowrap">
+                        <a
+                          href={`/reportes/cierres/${cierre.id}`}
+                          className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
+                        >
+                          Ver detalle
+                        </a>
                         <a
                           href={`/api/reportes/cierres/${cierre.id}/pdf`}
                           target="_blank"
