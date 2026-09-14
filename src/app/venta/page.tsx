@@ -25,17 +25,66 @@ type ItemCarrito = {
   stockDisponible: number;
 };
 
+type BorradorVenta = {
+  carrito: ItemCarrito[];
+  pagos: PagoLinea[];
+  clienteId: string;
+  descuentoPct: string;
+  descuentoResponsable: string;
+  propina: string;
+  error: string;
+};
+
+const CLAVE_BORRADORES = "ventas-mostrador-borradores";
+
+function borradorVacio(): BorradorVenta {
+  return {
+    carrito: [],
+    pagos: [{ metodo: "EFECTIVO", monto: "0" }],
+    clienteId: "",
+    descuentoPct: "",
+    descuentoResponsable: "",
+    propina: "",
+    error: "",
+  };
+}
+
 export default function VentaPage() {
   const [clientes, setClientes] = useState<ClienteOpcion[]>([]);
-  const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
-  const [pagos, setPagos] = useState<PagoLinea[]>([{ metodo: "EFECTIVO", monto: "0" }]);
-  const [clienteId, setClienteId] = useState("");
-  const [descuentoPct, setDescuentoPct] = useState("");
-  const [descuentoResponsable, setDescuentoResponsable] = useState("");
-  const [propina, setPropina] = useState("");
-  const [error, setError] = useState("");
-  const [enviando, setEnviando] = useState(false);
+  const [borradores, setBorradores] = useState<BorradorVenta[]>(() =>
+    Array.from({ length: 3 }, borradorVacio)
+  );
+  const [ventaActiva, setVentaActiva] = useState(0);
+  const [restaurado, setRestaurado] = useState(false);
+  const [enviandoIndice, setEnviandoIndice] = useState<number | null>(null);
   const [precioMesaActivo, setPrecioMesaActivo] = useState(true);
+  const borrador = borradores[ventaActiva];
+  const { carrito, pagos, clienteId, descuentoPct, descuentoResponsable, propina, error } = borrador;
+  const enviando = enviandoIndice === ventaActiva;
+
+  function actualizarBorrador(indice: number, cambios: Partial<BorradorVenta>) {
+    setBorradores((actuales) =>
+      actuales.map((item, posicion) => posicion === indice ? { ...item, ...cambios } : item)
+    );
+  }
+
+  function actualizarActivo(cambios: Partial<BorradorVenta>) {
+    actualizarBorrador(ventaActiva, cambios);
+  }
+
+  function setCarrito(valor: ItemCarrito[] | ((actual: ItemCarrito[]) => ItemCarrito[])) {
+    setBorradores((actuales) => actuales.map((item, indice) => {
+      if (indice !== ventaActiva) return item;
+      return { ...item, carrito: typeof valor === "function" ? valor(item.carrito) : valor };
+    }));
+  }
+
+  const setPagos = (valor: PagoLinea[]) => actualizarActivo({ pagos: valor });
+  const setClienteId = (valor: string) => actualizarActivo({ clienteId: valor });
+  const setDescuentoPct = (valor: string) => actualizarActivo({ descuentoPct: valor });
+  const setDescuentoResponsable = (valor: string) => actualizarActivo({ descuentoResponsable: valor });
+  const setPropina = (valor: string) => actualizarActivo({ propina: valor });
+  const setError = (valor: string) => actualizarActivo({ error: valor });
 
   useEffect(() => {
     // Cargar clientes y configuración (productos se cargan del caché en BuscadorProducto)
@@ -51,23 +100,34 @@ export default function VentaPage() {
     });
   }, []);
 
-  // Restaura un carrito sin cobrar si volviste a esta pantalla sin haber tocado "Cobrar".
+  // Restaura las tres ventas sin cobrar. También migra el carrito único de versiones anteriores.
   useEffect(() => {
-    const guardado = localStorage.getItem("carrito-venta");
-    if (guardado) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- restaura el borrador guardado localmente
-      setCarrito(JSON.parse(guardado));
+    try {
+      const guardados = localStorage.getItem(CLAVE_BORRADORES);
+      if (guardados) {
+        const datos = JSON.parse(guardados);
+        // La restauración desde almacenamiento externo se realiza una sola vez al montar.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (Array.isArray(datos) && datos.length === 3) setBorradores(datos);
+      } else {
+        const carritoAnterior = localStorage.getItem("carrito-venta");
+        if (carritoAnterior) {
+          const migrados = Array.from({ length: 3 }, borradorVacio);
+          migrados[0].carrito = JSON.parse(carritoAnterior);
+          setBorradores(migrados);
+          localStorage.removeItem("carrito-venta");
+        }
+      }
+    } catch {
+      localStorage.removeItem(CLAVE_BORRADORES);
     }
+    setRestaurado(true);
   }, []);
 
-  // Guarda el carrito en curso en el navegador para no perderlo si se navega a otra pantalla antes de cobrar.
+  // Guarda productos y datos de cobro de las tres ventas en este dispositivo.
   useEffect(() => {
-    if (carrito.length > 0) {
-      localStorage.setItem("carrito-venta", JSON.stringify(carrito));
-    } else {
-      localStorage.removeItem("carrito-venta");
-    }
-  }, [carrito]);
+    if (restaurado) localStorage.setItem(CLAVE_BORRADORES, JSON.stringify(borradores));
+  }, [borradores, restaurado]);
 
   const subtotal = useMemo(() => carrito.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0), [carrito]);
   const descuento = useMemo(() => aplicarDescuento(subtotal, Number(descuentoPct)), [subtotal, descuentoPct]);
@@ -111,6 +171,7 @@ export default function VentaPage() {
   }
 
   async function confirmarVenta() {
+    const indiceVenta = ventaActiva;
     setError("");
     if (carrito.length === 0) {
       setError("El carrito está vacío");
@@ -130,49 +191,78 @@ export default function VentaPage() {
     }
 
     const pagosFinales = resolvePagos(pagos, total);
-    setEnviando(true);
-    const res = await fetch("/api/ventas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: carrito.map((i) => ({
-          productoId: i.productoId,
-          cantidad: i.cantidad,
-          tarifa: i.tarifa,
-          precioUnitario: i.precioUnitario,
-        })),
-        pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto), tipoTarjeta: p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null })),
-        clienteId: requiereCliente(pagos) ? Number(clienteId) : null,
-        descuentoPct: Number(descuentoPct) || 0,
-        descuentoResponsable: descuentoResponsable.trim() || null,
-        propina: Number(propina) || 0,
-      }),
-    });
+    setEnviandoIndice(indiceVenta);
+    try {
+      const res = await fetch("/api/ventas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: carrito.map((i) => ({
+            productoId: i.productoId,
+            cantidad: i.cantidad,
+            tarifa: i.tarifa,
+            precioUnitario: i.precioUnitario,
+          })),
+          pagos: pagosFinales.map((p) => ({ metodo: p.metodo, monto: Number(p.monto), tipoTarjeta: p.metodo === "TARJETA" ? p.tipoTarjeta || "QR" : null })),
+          clienteId: requiereCliente(pagos) ? Number(clienteId) : null,
+          descuentoPct: Number(descuentoPct) || 0,
+          descuentoResponsable: descuentoResponsable.trim() || null,
+          propina: Number(propina) || 0,
+        }),
+      });
 
-    setEnviando(false);
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error || "Ocurrió un error");
-      return;
+      if (!res.ok) {
+        const data = await res.json();
+        actualizarBorrador(indiceVenta, { error: data.error || "Ocurrió un error" });
+        return;
+      }
+
+      const venta = await res.json();
+      const resImp = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" }).catch(() => null);
+      const limpio = borradorVacio();
+      if (!resImp?.ok) limpio.error = "La venta se guardó, pero no se pudo enviar el ticket a la estación de impresión.";
+      setBorradores((actuales) =>
+        actuales.map((item, posicion) => posicion === indiceVenta ? limpio : item)
+      );
+    } catch {
+      actualizarBorrador(indiceVenta, { error: "No se pudo conectar para guardar la venta" });
+    } finally {
+      setEnviandoIndice((actual) => actual === indiceVenta ? null : actual);
     }
-
-    const venta = await res.json();
-
-    const resImp = await fetch(`/api/ventas/${venta.id}/imprimir`, { method: "POST" }).catch(() => null);
-    if (!resImp?.ok) setError("La venta se guardó, pero no se pudo enviar el ticket a la estación de impresión.");
-
-    setCarrito([]);
-    setPagos([{ metodo: "EFECTIVO", monto: "0" }]);
-    setClienteId("");
-    setDescuentoPct("");
-    setDescuentoResponsable("");
-    setPropina("");
   }
 
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Venta (mostrador)</h1>
+        <div className="grid grid-cols-3 gap-2">
+          {borradores.map((venta, indice) => {
+            const importe = venta.carrito.reduce((suma, item) => suma + item.precioUnitario * item.cantidad, 0);
+            const activa = indice === ventaActiva;
+            return (
+              <button
+                key={indice}
+                type="button"
+                onClick={() => setVentaActiva(indice)}
+                className={`rounded-lg border px-2 py-2 text-left transition-colors ${
+                  activa
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-neutral-300 bg-white text-neutral-700 hover:border-blue-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-1 text-xs font-semibold">
+                  <span>Venta {indice + 1}</span>
+                  {enviandoIndice === indice && <span className="animate-pulse">Cobrando...</span>}
+                </div>
+                <div className={`mt-0.5 truncate text-[11px] ${activa ? "text-blue-100" : "text-neutral-500"}`}>
+                  {venta.carrito.length
+                    ? `${venta.carrito.length} producto${venta.carrito.length === 1 ? "" : "s"} · $${formatearMoneda(importe)}`
+                    : "Disponible"}
+                </div>
+              </button>
+            );
+          })}
+        </div>
         <BuscadorProducto
           onSeleccionar={agregar}
           precioMesaActivo={precioMesaActivo}
