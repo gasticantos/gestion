@@ -56,7 +56,7 @@ model Categoria {
 }
 
 enum Rol {
-  DUENIO
+  ADMIN
   CAJERO
   MOZO
 }

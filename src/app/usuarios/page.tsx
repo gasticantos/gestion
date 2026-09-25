@@ -125,7 +125,7 @@ export default function UsuariosPage() {
           <div>
             <label className={label}>Rol</label>
             <select className={input} value={form.rol} onChange={(e) => setForm({ ...form, rol: e.target.value as Rol })}>
-              <option value="DUENIO">Dueño</option>
+              <option value="ADMIN">ADMIN</option>
               <option value="CAJERO">Cajero</option>
               <option value="MOZO">Moza/o</option>
             </select>
@@ -175,7 +175,7 @@ export default function UsuariosPage() {
                   <td className={td}>{u.nombre}</td>
                   <td className={td}>{u.email}</td>
                   <td className={td}>
-                    <Badge variant={u.rol === "DUENIO" ? "accent" : "neutral"}>{ROL_LABEL[u.rol]}</Badge>
+                    <Badge variant={u.rol === "ADMIN" ? "accent" : "neutral"}>{ROL_LABEL[u.rol]}</Badge>
                   </td>
                   <td className={`${td} text-right whitespace-nowrap`}>
                     <button className="text-blue-500 hover:text-blue-400 mr-3" onClick={() => editar(u)}>

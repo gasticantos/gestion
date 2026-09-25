@@ -12,7 +12,7 @@ const { Pool } = require('pg');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const root = path.resolve(__dirname, '..');
 let db, server, pool, prisma, cierre, controlRoute, ventasRoute, cronRoute;
-let session = { negocioId: 1, nombre: 'Prueba', rol: 'DUENIO' };
+let session = { negocioId: 1, nombre: 'Prueba', rol: 'ADMIN' };
 let telegramCalls = 0;
 let telegramOk = true;
 const cache = new Map();
@@ -87,7 +87,7 @@ beforeEach(async () => {
   await pool.query('TRUNCATE "Negocio" RESTART IDENTITY CASCADE');
   await prisma.negocio.create({ data: { id: 1, nombre: 'Prueba' } });
   await prisma.negocio.create({ data: { id: 2, nombre: 'Otro negocio' } });
-  session = { negocioId: 1, nombre: 'Prueba', rol: 'DUENIO' };
+  session = { negocioId: 1, nombre: 'Prueba', rol: 'ADMIN' };
   telegramCalls = 0;
   telegramOk = true;
 });
@@ -108,7 +108,7 @@ async function sale(data = {}) {
     pagos: { create: { metodo: 'EFECTIVO', monto: 50 } }, ...data,
   } });
 }
-const close = (id) => cierre({ negocioId: 1, controlCajaId: id, operador: { nombre: 'Prueba', rol: 'DUENIO' } });
+const close = (id) => cierre({ negocioId: 1, controlCajaId: id, operador: { nombre: 'Prueba', rol: 'ADMIN' } });
 
 test('reportes separa turnos del mismo día y muestra cero sin caja abierta', async () => {
   const { consultarReporte } = load('src/lib/consultaReportes.ts');

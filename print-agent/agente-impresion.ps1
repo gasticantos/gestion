@@ -529,7 +529,7 @@ while ($listener.IsListening) {
 
     if ($request.HttpMethod -eq "POST" -and $request.Url.AbsolutePath -eq "/imprimir") {
       # El navegador siempre envía JSON en UTF-8. Usar explícitamente esa codificación evita
-      # mojibake en textos como "Dueño", "Gestión" o nombres con acentos.
+      # mojibake en textos como "Gestión" o nombres con acentos.
       $reader = New-Object System.IO.StreamReader(
         $request.InputStream,
         [System.Text.Encoding]::UTF8,

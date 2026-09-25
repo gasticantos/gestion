@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (sesion.rol !== "DUENIO" && sesion.rol !== "CAJERO") {
+  if (sesion.rol !== "ADMIN" && sesion.rol !== "CAJERO") {
     return NextResponse.json({ error: "No tenés permiso para cambiar la estación" }, { status: 403 });
   }
 

@@ -29,7 +29,7 @@ export async function verificarSesion(token: string): Promise<SesionPayload | nu
   try {
     const { payload } = await jwtVerify(token, secretKey());
     const sesion = payload as unknown as SesionPayload;
-    if (!sesion.negocioId || !sesion.negocioNombre) return null;
+    if (!sesion.negocioId || !sesion.negocioNombre || !Object.values(Rol).includes(sesion.rol)) return null;
     return sesion;
   } catch {
     return null;

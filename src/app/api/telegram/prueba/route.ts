@@ -5,8 +5,8 @@ import { enviarAlertaTelegram } from "@/lib/telegram";
 export async function POST() {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (sesion.rol !== "DUENIO") {
-    return NextResponse.json({ error: "Solo el dueño puede probar las alertas" }, { status: 403 });
+  if (sesion.rol !== "ADMIN") {
+    return NextResponse.json({ error: "Solo ADMIN puede probar las alertas" }, { status: 403 });
   }
 
   const resultado = await enviarAlertaTelegram(

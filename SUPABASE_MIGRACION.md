@@ -47,7 +47,7 @@ que se quieran conservar, hay que exportarlos e importarlos (pedir ayuda llegado
 no es automático entre motores distintos).
 
 ## 6. Antes de salir a producción remota
-- **Ya está preparado**: usuarios con roles (Dueño/Cajero/Moza) y permisos por sección,
+- **Ya está preparado**: usuarios con roles (ADMIN/Cajero/Moza) y permisos por sección,
   login con contraseña, sesión por cookie firmada.
 - **Falta decidir/hacer en ese momento**:
   - Dominio/hosting donde correr el Next.js (Vercel es lo más directo dado que ya es Next).

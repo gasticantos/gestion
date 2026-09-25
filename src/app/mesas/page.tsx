@@ -105,7 +105,7 @@ export default function MesasPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Mesas</h1>
       </div>
 
-      {rol === "DUENIO" && (
+      {rol === "ADMIN" && (
         <div className="flex justify-center">
           <div className="text-center px-6 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
             <span className="text-xs text-amber-500 font-medium">Total mesas sin cobrar: </span>

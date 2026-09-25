@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
           email: emailNormalizado,
           authId: usuarioAuth.id,
           passwordHash: await hashPassword(crypto.randomUUID()),
-          rol: "DUENIO",
+          rol: "ADMIN",
           negocioId: negocio.id,
         },
         include: { negocio: true },

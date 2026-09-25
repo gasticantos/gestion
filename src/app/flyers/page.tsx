@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
 type Flyer = { id: number; imagen: string; createdAt: string };
-type Rol = "DUENIO" | "CAJERO" | "MOZO";
+type Rol = "ADMIN" | "CAJERO" | "MOZO";
 
 async function comprimirImagen(archivo: File): Promise<string> {
   if (!archivo.type.startsWith("image/")) throw new Error("Elegí solamente archivos de imagen");
@@ -138,7 +138,7 @@ export default function FlyersPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Flyers</h1>
           <p className="mt-1 text-sm text-neutral-500">Promociones listas para mostrar a los clientes.</p>
         </div>
-        {rol === "DUENIO" && (
+        {rol === "ADMIN" && (
           <label className={`inline-flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 ${subiendo ? "pointer-events-none opacity-50" : ""}`}>
             {subiendo ? "Subiendo..." : "Cargar imágenes"}
             <input
@@ -159,7 +159,7 @@ export default function FlyersPage() {
         <p className="text-sm text-neutral-500">Cargando flyers...</p>
       ) : flyers.length === 0 ? (
         <Card className="grid min-h-56 place-items-center p-6 text-center text-neutral-500">
-          {rol === "DUENIO" ? "Todavía no cargaste ningún flyer." : "Todavía no hay promociones para mostrar."}
+          {rol === "ADMIN" ? "Todavía no cargaste ningún flyer." : "Todavía no hay promociones para mostrar."}
         </Card>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -169,7 +169,7 @@ export default function FlyersPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element -- imágenes cargadas por el negocio */}
                 <img src={flyer.imagen} alt="Flyer promocional" className="aspect-[4/5] w-full object-contain" />
               </button>
-              {rol === "DUENIO" && (
+              {rol === "ADMIN" && (
                 <Button
                   type="button"
                   variant="danger"

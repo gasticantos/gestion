@@ -2,7 +2,7 @@
 CREATE SCHEMA IF NOT EXISTS "public";
 
 -- CreateEnum
-CREATE TYPE "Rol" AS ENUM ('DUENIO', 'CAJERO', 'MOZO');
+CREATE TYPE "Rol" AS ENUM ('ADMIN', 'CAJERO', 'MOZO');
 
 -- CreateEnum
 CREATE TYPE "TipoStockEntry" AS ENUM ('ENTRADA', 'AJUSTE');
@@ -633,4 +633,3 @@ ALTER TABLE "MovimientoCuentaCorriente" ADD CONSTRAINT "MovimientoCuentaCorrient
 
 -- AddForeignKey
 ALTER TABLE "MovimientoCuentaCorriente" ADD CONSTRAINT "MovimientoCuentaCorriente_ventaId_fkey" FOREIGN KEY ("ventaId") REFERENCES "Venta"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-

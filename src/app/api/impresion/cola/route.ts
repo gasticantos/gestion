@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     if (!sesion || sesion.negocioId !== negocioId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
-    if (sesion.rol !== "DUENIO" && sesion.rol !== "CAJERO") {
+    if (sesion.rol !== "ADMIN" && sesion.rol !== "CAJERO") {
       return NextResponse.json({ error: "No tenés permiso para consultar la cola" }, { status: 403 });
     }
   }
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
   if (body.accion === "prueba") {
     const sesion = await sesionActual();
     if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    if (sesion.rol !== "DUENIO" && sesion.rol !== "CAJERO") {
+    if (sesion.rol !== "ADMIN" && sesion.rol !== "CAJERO") {
       return NextResponse.json({ error: "No tenés permiso para imprimir una prueba" }, { status: 403 });
     }
     const trabajo = await prisma.impresionTrabajo.create({

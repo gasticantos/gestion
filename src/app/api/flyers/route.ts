@@ -19,8 +19,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (sesion.rol !== "DUENIO") {
-    return NextResponse.json({ error: "Solo el dueño puede cargar flyers" }, { status: 403 });
+  if (sesion.rol !== "ADMIN") {
+    return NextResponse.json({ error: "Solo ADMIN puede cargar flyers" }, { status: 403 });
   }
 
   const body = await req.json().catch(() => null);

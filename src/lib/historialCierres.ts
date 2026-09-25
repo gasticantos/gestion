@@ -25,7 +25,7 @@ export function interpretarCierre(trabajo: {
   const cantidad = Number(trabajo.contenido.match(/VENTAS REALIZADAS:\s*(\d+)/)?.[1] || 0);
   const operadorLinea = trabajo.contenido
     .split("\n")
-    .find((linea) => /^\[\[CENTER\]\].+ - (DUENIO|CAJERO|CIERRE AUTOMÁTICO)$/.test(linea));
+    .find((linea) => /^\[\[CENTER\]\].+ - (ADMIN|CAJERO|CIERRE AUTOMÁTICO)$/.test(linea));
   const operadorTexto = operadorLinea?.replace(/^\[\[CENTER\]\]\s*/, "") || "Sistema - CIERRE AUTOMÁTICO";
   const separador = operadorTexto.lastIndexOf(" - ");
   const operador = {

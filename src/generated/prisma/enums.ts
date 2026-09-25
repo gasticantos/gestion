@@ -10,7 +10,7 @@
 */
 
 export const Rol = {
-  DUENIO: 'DUENIO',
+  ADMIN: 'ADMIN',
   CAJERO: 'CAJERO',
   MOZO: 'MOZO'
 } as const

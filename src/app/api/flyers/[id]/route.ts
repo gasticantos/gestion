@@ -5,8 +5,8 @@ import { sesionActual } from "@/lib/sesionServidor";
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sesion = await sesionActual();
   if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (sesion.rol !== "DUENIO") {
-    return NextResponse.json({ error: "Solo el dueño puede eliminar flyers" }, { status: 403 });
+  if (sesion.rol !== "ADMIN") {
+    return NextResponse.json({ error: "Solo ADMIN puede eliminar flyers" }, { status: 403 });
   }
 
   const { id } = await params;
