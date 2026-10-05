@@ -20,6 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         mesa: true,
         pagos: true,
         pedidos: { include: { items: { include: { producto: true } } } },
+        ajustesPreticket: { orderBy: { createdAt: "asc" } },
       },
     });
 
@@ -30,10 +31,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const configuracion = await prisma.configuracion.findUnique({
       where: { negocioId: sesion.negocioId },
     });
-    const subtotal = venta.pedidos.reduce(
-      (total, pedido) => total + pedido.items.reduce((suma, item) => suma + item.subtotal, 0),
-      0
-    );
+    const subtotalComun = venta.pedidos
+      .filter((pedido) => !pedido.postPreticket)
+      .reduce((total, pedido) => total + pedido.items.reduce((suma, item) => suma + item.subtotal, 0), 0);
+    const subtotalPostPreticket = venta.pedidos
+      .filter((pedido) => pedido.postPreticket)
+      .reduce((total, pedido) => total + pedido.items.reduce((suma, item) => suma + item.subtotal, 0), 0);
+    const subtotal = subtotalComun + subtotalPostPreticket;
     // En la cuenta previa el descuento todavía no está persistido: usar el valor que
     // está viendo el cajero. En el comprobante final, usar siempre el descuento guardado.
     const descuento = aplicarDescuento(
@@ -67,22 +71,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // En mesa cada ronda se guarda como un pedido independiente para poder imprimir su
     // comanda en el momento. En el ticket de cobro consolidamos las rondas para no mostrar,
     // por ejemplo, cinco líneas de "Fernet x 1". Si el precio cambió, queda en otra línea.
-    const itemsAgrupados = new Map<
+    const itemsComunes = new Map<
+      string,
+      { nombre: string; cantidad: number; precioUnitario: number; subtotal: number }
+    >();
+    const itemsPostPreticket = new Map<
       string,
       { nombre: string; cantidad: number; precioUnitario: number; subtotal: number }
     >();
     for (const pedido of venta.pedidos) {
+      const destino = pedido.postPreticket ? itemsPostPreticket : itemsComunes;
       for (const item of pedido.items) {
         // Productos marcados "No imprimir" (ver /productos) no aparecen en ningún ticket
         // impreso, ni comanda ni comprobante, aunque su importe sigue formando parte del total.
         if (item.producto.impresora?.trim() === "No imprimir") continue;
         const clave = `${item.productoId}:${item.precioUnitario.toFixed(2)}`;
-        const existente = itemsAgrupados.get(clave);
+        const existente = destino.get(clave);
         if (existente) {
           existente.cantidad += item.cantidad;
           existente.subtotal += item.subtotal;
         } else {
-          itemsAgrupados.set(clave, {
+          destino.set(clave, {
             nombre: item.producto.nombre,
             cantidad: item.cantidad,
             precioUnitario: item.precioUnitario,
@@ -92,13 +101,35 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
-    for (const item of itemsAgrupados.values()) {
+    for (const item of itemsComunes.values()) {
       lineas.push(`[[RECEIPT_ITEM]] ${item.nombre}`);
       lineas.push(`[[DETAIL]] ${lineaDetalle(item.cantidad, item.precioUnitario, item.subtotal)}`);
     }
+    lineas.push(`[[ROW]] ${lineaImporte("SUBTOTAL COMUN", subtotalComun)}`);
+
+    if (itemsPostPreticket.size > 0 || subtotalPostPreticket > 0) {
+      lineas.push("[[HR]]");
+      lineas.push("[[SECTION]] PRODUCTOS POST PRE-TICKET");
+      for (const item of itemsPostPreticket.values()) {
+        lineas.push(`[[RECEIPT_ITEM]] ${item.nombre}`);
+        lineas.push(`[[DETAIL]] ${lineaDetalle(item.cantidad, item.precioUnitario, item.subtotal)}`);
+      }
+      lineas.push(`[[ROW]] ${lineaImporte("SUBTOTAL POST PRE-TICKET", subtotalPostPreticket)}`);
+    }
+
+    const productosQuitados = venta.ajustesPreticket.filter((ajuste) => ajuste.tipo === "QUITADO");
+    if (productosQuitados.length > 0) {
+      lineas.push("[[HR]]");
+      lineas.push("[[SECTION]] ERRORES DE CUENTA");
+      for (const ajuste of productosQuitados) {
+        lineas.push(`[[RECEIPT_ITEM]] - ${ajuste.cantidad} x ${ajuste.productoNombre}`);
+        lineas.push(`[[DETAIL]] ERROR ${dinero(ajuste.subtotal)} · ${ajuste.usuarioNombre}`);
+      }
+      const totalErrores = productosQuitados.reduce((suma, ajuste) => suma + ajuste.subtotal, 0);
+      lineas.push(`[[ROW]] ${lineaImporte("TOTAL ERRORES", -totalErrores)}`);
+    }
 
     lineas.push("[[HR]]");
-    lineas.push(`[[ROW]] ${lineaImporte("SUBTOTAL", subtotal)}`);
     if (descuento.monto > 0) {
       lineas.push(`[[ROW]] ${lineaImporte(`DESCUENTO ${descuento.pct}%`, -descuento.monto)}`);
       if (responsableDescuento) lineas.push(`[[NOTE]] Descuento aplicado por: ${responsableDescuento}`);

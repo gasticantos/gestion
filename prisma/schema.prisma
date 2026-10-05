@@ -62,18 +62,19 @@ enum Rol {
 }
 
 model Usuario {
-  id             Int            @id @default(autoincrement())
-  nombre         String
-  email          String         @unique
-  authId         String?        @unique @db.Uuid
-  passwordHash   String
-  rol            Rol            @default(MOZO)
-  activo         Boolean        @default(true)
-  createdAt      DateTime       @default(now())
-  auditorias     AuditoriaLog[]
-  pedidosCreados Pedido[]       @relation("PedidoCreadoPor")
-  negocioId      Int            @default(1)
-  negocio        Negocio        @relation(fields: [negocioId], references: [id])
+  id               Int               @id @default(autoincrement())
+  nombre           String
+  email            String            @unique
+  authId           String?           @unique @db.Uuid
+  passwordHash     String
+  rol              Rol               @default(MOZO)
+  activo           Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  auditorias       AuditoriaLog[]
+  pedidosCreados   Pedido[]          @relation("PedidoCreadoPor")
+  ajustesPreticket AjustePreticket[]
+  negocioId        Int               @default(1)
+  negocio          Negocio           @relation(fields: [negocioId], references: [id])
 
   @@index([negocioId])
 }
@@ -357,28 +358,29 @@ model Reserva {
 }
 
 model Venta {
-  id            Int                         @id @default(autoincrement())
-  tipo          TipoVenta
-  mesaId        Int?
-  mesa          Mesa?                       @relation(fields: [mesaId], references: [id])
-  clienteId     Int?
-  cliente       Cliente?                    @relation(fields: [clienteId], references: [id])
-  estado        EstadoVenta                 @default(ABIERTA)
-  tarifa        TarifaPrecio                @default(PARTICULAR)
-  total         Float                       @default(0)
-  descuentoPct  Float                       @default(0)
+  id                   Int                         @id @default(autoincrement())
+  tipo                 TipoVenta
+  mesaId               Int?
+  mesa                 Mesa?                       @relation(fields: [mesaId], references: [id])
+  clienteId            Int?
+  cliente              Cliente?                    @relation(fields: [clienteId], references: [id])
+  estado               EstadoVenta                 @default(ABIERTA)
+  tarifa               TarifaPrecio                @default(PARTICULAR)
+  total                Float                       @default(0)
+  descuentoPct         Float                       @default(0)
   descuentoResponsable String?
-  propina       Float                       @default(0)
-  borradorRonda Json?
-  ticketImpreso Boolean                     @default(false)
-  createdAt     DateTime                    @default(now())
-  closedAt      DateTime?
-  cierreCajaAt  DateTime?
-  pedidos       Pedido[]
-  pagos         Pago[]
-  movimientosCC MovimientoCuentaCorriente[]
-  negocioId     Int                         @default(1)
-  negocio       Negocio                     @relation(fields: [negocioId], references: [id])
+  propina              Float                       @default(0)
+  borradorRonda        Json?
+  ticketImpreso        Boolean                     @default(false)
+  createdAt            DateTime                    @default(now())
+  closedAt             DateTime?
+  cierreCajaAt         DateTime?
+  pedidos              Pedido[]
+  pagos                Pago[]
+  movimientosCC        MovimientoCuentaCorriente[]
+  ajustesPreticket     AjustePreticket[]
+  negocioId            Int                         @default(1)
+  negocio              Negocio                     @relation(fields: [negocioId], references: [id])
 
   @@index([negocioId])
   @@index([mesaId])
@@ -389,12 +391,35 @@ model Venta {
   @@index([estado, createdAt])
 }
 
+// Conserva el detalle de todo cambio realizado después de emitir la cuenta previa.
+// Los datos del producto y del operador se guardan como foto histórica para que el
+// comprobante final siga siendo explicativo aunque luego cambien sus nombres.
+model AjustePreticket {
+  id             Int      @id @default(autoincrement())
+  ventaId        Int
+  venta          Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  productoId     Int
+  productoNombre String
+  tipo           String
+  cantidad       Float
+  precioUnitario Float
+  subtotal       Float
+  usuarioId      Int?
+  usuario        Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  usuarioNombre  String
+  createdAt      DateTime @default(now())
+
+  @@index([ventaId, createdAt])
+  @@index([usuarioId])
+}
+
 model Pedido {
   id             Int          @id @default(autoincrement())
   ventaId        Int
   venta          Venta        @relation(fields: [ventaId], references: [id], onDelete: Cascade)
   creadoPorId    Int?
   creadoPor      Usuario?     @relation("PedidoCreadoPor", fields: [creadoPorId], references: [id], onDelete: SetNull)
+  postPreticket  Boolean      @default(false)
   comandaImpresa Boolean      @default(false)
   createdAt      DateTime     @default(now())
   items          PedidoItem[]
@@ -419,13 +444,13 @@ model PedidoItem {
 }
 
 model Pago {
-  id        Int        @id @default(autoincrement())
-  ventaId   Int
-  venta     Venta      @relation(fields: [ventaId], references: [id], onDelete: Cascade)
-  metodo    MetodoPago
+  id          Int          @id @default(autoincrement())
+  ventaId     Int
+  venta       Venta        @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  metodo      MetodoPago
   tipoTarjeta TipoTarjeta?
-  monto     Float
-  createdAt DateTime   @default(now())
+  monto       Float
+  createdAt   DateTime     @default(now())
 
   @@index([ventaId])
 }
@@ -436,17 +461,17 @@ enum TipoMovimientoCaja {
 }
 
 model ControlCaja {
-  id               Int              @id @default(autoincrement())
-  fechaJornada     String
-  saldoInicial     Float            @default(0)
-  efectivoContado  Float?
-  saldoSiguiente   Float?
-  cerradoAt        DateTime?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  movimientos      MovimientoCaja[]
-  negocioId        Int              @default(1)
-  negocio          Negocio          @relation(fields: [negocioId], references: [id], onDelete: Cascade)
+  id              Int              @id @default(autoincrement())
+  fechaJornada    String
+  saldoInicial    Float            @default(0)
+  efectivoContado Float?
+  saldoSiguiente  Float?
+  cerradoAt       DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  movimientos     MovimientoCaja[]
+  negocioId       Int              @default(1)
+  negocio         Negocio          @relation(fields: [negocioId], references: [id], onDelete: Cascade)
 
   @@index([negocioId, fechaJornada, cerradoAt])
   @@index([negocioId, createdAt])

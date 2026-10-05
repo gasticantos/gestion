@@ -1,0 +1,2 @@
+ALTER TABLE "Pedido"
+ADD COLUMN "postPreticket" BOOLEAN NOT NULL DEFAULT false;

@@ -290,6 +290,7 @@ CREATE TABLE "Pedido" (
     "id" SERIAL NOT NULL,
     "ventaId" INTEGER NOT NULL,
     "creadoPorId" INTEGER,
+    "postPreticket" BOOLEAN NOT NULL DEFAULT false,
     "comandaImpresa" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

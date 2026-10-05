@@ -42,6 +42,7 @@ export type PedidoMinAggregateOutputType = {
   id: number | null
   ventaId: number | null
   creadoPorId: number | null
+  postPreticket: boolean | null
   comandaImpresa: boolean | null
   createdAt: Date | null
 }
@@ -50,6 +51,7 @@ export type PedidoMaxAggregateOutputType = {
   id: number | null
   ventaId: number | null
   creadoPorId: number | null
+  postPreticket: boolean | null
   comandaImpresa: boolean | null
   createdAt: Date | null
 }
@@ -58,6 +60,7 @@ export type PedidoCountAggregateOutputType = {
   id: number
   ventaId: number
   creadoPorId: number
+  postPreticket: number
   comandaImpresa: number
   createdAt: number
   _all: number
@@ -80,6 +83,7 @@ export type PedidoMinAggregateInputType = {
   id?: true
   ventaId?: true
   creadoPorId?: true
+  postPreticket?: true
   comandaImpresa?: true
   createdAt?: true
 }
@@ -88,6 +92,7 @@ export type PedidoMaxAggregateInputType = {
   id?: true
   ventaId?: true
   creadoPorId?: true
+  postPreticket?: true
   comandaImpresa?: true
   createdAt?: true
 }
@@ -96,6 +101,7 @@ export type PedidoCountAggregateInputType = {
   id?: true
   ventaId?: true
   creadoPorId?: true
+  postPreticket?: true
   comandaImpresa?: true
   createdAt?: true
   _all?: true
@@ -191,6 +197,7 @@ export type PedidoGroupByOutputType = {
   id: number
   ventaId: number
   creadoPorId: number | null
+  postPreticket: boolean
   comandaImpresa: boolean
   createdAt: Date
   _count: PedidoCountAggregateOutputType | null
@@ -222,6 +229,7 @@ export type PedidoWhereInput = {
   id?: Prisma.IntFilter<"Pedido"> | number
   ventaId?: Prisma.IntFilter<"Pedido"> | number
   creadoPorId?: Prisma.IntNullableFilter<"Pedido"> | number | null
+  postPreticket?: Prisma.BoolFilter<"Pedido"> | boolean
   comandaImpresa?: Prisma.BoolFilter<"Pedido"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Pedido"> | Date | string
   venta?: Prisma.XOR<Prisma.VentaScalarRelationFilter, Prisma.VentaWhereInput>
@@ -233,6 +241,7 @@ export type PedidoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   creadoPorId?: Prisma.SortOrderInput | Prisma.SortOrder
+  postPreticket?: Prisma.SortOrder
   comandaImpresa?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   venta?: Prisma.VentaOrderByWithRelationInput
@@ -247,6 +256,7 @@ export type PedidoWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PedidoWhereInput | Prisma.PedidoWhereInput[]
   ventaId?: Prisma.IntFilter<"Pedido"> | number
   creadoPorId?: Prisma.IntNullableFilter<"Pedido"> | number | null
+  postPreticket?: Prisma.BoolFilter<"Pedido"> | boolean
   comandaImpresa?: Prisma.BoolFilter<"Pedido"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Pedido"> | Date | string
   venta?: Prisma.XOR<Prisma.VentaScalarRelationFilter, Prisma.VentaWhereInput>
@@ -258,6 +268,7 @@ export type PedidoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   creadoPorId?: Prisma.SortOrderInput | Prisma.SortOrder
+  postPreticket?: Prisma.SortOrder
   comandaImpresa?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PedidoCountOrderByAggregateInput
@@ -274,11 +285,13 @@ export type PedidoScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Pedido"> | number
   ventaId?: Prisma.IntWithAggregatesFilter<"Pedido"> | number
   creadoPorId?: Prisma.IntNullableWithAggregatesFilter<"Pedido"> | number | null
+  postPreticket?: Prisma.BoolWithAggregatesFilter<"Pedido"> | boolean
   comandaImpresa?: Prisma.BoolWithAggregatesFilter<"Pedido"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Pedido"> | Date | string
 }
 
 export type PedidoCreateInput = {
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   venta: Prisma.VentaCreateNestedOneWithoutPedidosInput
@@ -290,12 +303,14 @@ export type PedidoUncheckedCreateInput = {
   id?: number
   ventaId: number
   creadoPorId?: number | null
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   items?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutPedidoInput
 }
 
 export type PedidoUpdateInput = {
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   venta?: Prisma.VentaUpdateOneRequiredWithoutPedidosNestedInput
@@ -307,6 +322,7 @@ export type PedidoUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
   creadoPorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.PedidoItemUncheckedUpdateManyWithoutPedidoNestedInput
@@ -316,11 +332,13 @@ export type PedidoCreateManyInput = {
   id?: number
   ventaId: number
   creadoPorId?: number | null
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
 }
 
 export type PedidoUpdateManyMutationInput = {
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -329,6 +347,7 @@ export type PedidoUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
   creadoPorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -347,6 +366,7 @@ export type PedidoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   creadoPorId?: Prisma.SortOrder
+  postPreticket?: Prisma.SortOrder
   comandaImpresa?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -361,6 +381,7 @@ export type PedidoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   creadoPorId?: Prisma.SortOrder
+  postPreticket?: Prisma.SortOrder
   comandaImpresa?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -369,6 +390,7 @@ export type PedidoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ventaId?: Prisma.SortOrder
   creadoPorId?: Prisma.SortOrder
+  postPreticket?: Prisma.SortOrder
   comandaImpresa?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -483,6 +505,7 @@ export type PedidoUpdateOneRequiredWithoutItemsNestedInput = {
 }
 
 export type PedidoCreateWithoutCreadoPorInput = {
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   venta: Prisma.VentaCreateNestedOneWithoutPedidosInput
@@ -492,6 +515,7 @@ export type PedidoCreateWithoutCreadoPorInput = {
 export type PedidoUncheckedCreateWithoutCreadoPorInput = {
   id?: number
   ventaId: number
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   items?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutPedidoInput
@@ -530,11 +554,13 @@ export type PedidoScalarWhereInput = {
   id?: Prisma.IntFilter<"Pedido"> | number
   ventaId?: Prisma.IntFilter<"Pedido"> | number
   creadoPorId?: Prisma.IntNullableFilter<"Pedido"> | number | null
+  postPreticket?: Prisma.BoolFilter<"Pedido"> | boolean
   comandaImpresa?: Prisma.BoolFilter<"Pedido"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Pedido"> | Date | string
 }
 
 export type PedidoCreateWithoutVentaInput = {
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   creadoPor?: Prisma.UsuarioCreateNestedOneWithoutPedidosCreadosInput
@@ -544,6 +570,7 @@ export type PedidoCreateWithoutVentaInput = {
 export type PedidoUncheckedCreateWithoutVentaInput = {
   id?: number
   creadoPorId?: number | null
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   items?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutPedidoInput
@@ -576,6 +603,7 @@ export type PedidoUpdateManyWithWhereWithoutVentaInput = {
 }
 
 export type PedidoCreateWithoutItemsInput = {
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
   venta: Prisma.VentaCreateNestedOneWithoutPedidosInput
@@ -586,6 +614,7 @@ export type PedidoUncheckedCreateWithoutItemsInput = {
   id?: number
   ventaId: number
   creadoPorId?: number | null
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
 }
@@ -607,6 +636,7 @@ export type PedidoUpdateToOneWithWhereWithoutItemsInput = {
 }
 
 export type PedidoUpdateWithoutItemsInput = {
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   venta?: Prisma.VentaUpdateOneRequiredWithoutPedidosNestedInput
@@ -617,6 +647,7 @@ export type PedidoUncheckedUpdateWithoutItemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
   creadoPorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -624,11 +655,13 @@ export type PedidoUncheckedUpdateWithoutItemsInput = {
 export type PedidoCreateManyCreadoPorInput = {
   id?: number
   ventaId: number
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
 }
 
 export type PedidoUpdateWithoutCreadoPorInput = {
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   venta?: Prisma.VentaUpdateOneRequiredWithoutPedidosNestedInput
@@ -638,6 +671,7 @@ export type PedidoUpdateWithoutCreadoPorInput = {
 export type PedidoUncheckedUpdateWithoutCreadoPorInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.PedidoItemUncheckedUpdateManyWithoutPedidoNestedInput
@@ -646,6 +680,7 @@ export type PedidoUncheckedUpdateWithoutCreadoPorInput = {
 export type PedidoUncheckedUpdateManyWithoutCreadoPorInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   ventaId?: Prisma.IntFieldUpdateOperationsInput | number
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -653,11 +688,13 @@ export type PedidoUncheckedUpdateManyWithoutCreadoPorInput = {
 export type PedidoCreateManyVentaInput = {
   id?: number
   creadoPorId?: number | null
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: Date | string
 }
 
 export type PedidoUpdateWithoutVentaInput = {
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   creadoPor?: Prisma.UsuarioUpdateOneWithoutPedidosCreadosNestedInput
@@ -667,6 +704,7 @@ export type PedidoUpdateWithoutVentaInput = {
 export type PedidoUncheckedUpdateWithoutVentaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   creadoPorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.PedidoItemUncheckedUpdateManyWithoutPedidoNestedInput
@@ -675,6 +713,7 @@ export type PedidoUncheckedUpdateWithoutVentaInput = {
 export type PedidoUncheckedUpdateManyWithoutVentaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   creadoPorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  postPreticket?: Prisma.BoolFieldUpdateOperationsInput | boolean
   comandaImpresa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -714,6 +753,7 @@ export type PedidoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   id?: boolean
   ventaId?: boolean
   creadoPorId?: boolean
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: boolean
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
@@ -726,6 +766,7 @@ export type PedidoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   id?: boolean
   ventaId?: boolean
   creadoPorId?: boolean
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: boolean
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
@@ -736,6 +777,7 @@ export type PedidoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   id?: boolean
   ventaId?: boolean
   creadoPorId?: boolean
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: boolean
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
@@ -746,11 +788,12 @@ export type PedidoSelectScalar = {
   id?: boolean
   ventaId?: boolean
   creadoPorId?: boolean
+  postPreticket?: boolean
   comandaImpresa?: boolean
   createdAt?: boolean
 }
 
-export type PedidoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ventaId" | "creadoPorId" | "comandaImpresa" | "createdAt", ExtArgs["result"]["pedido"]>
+export type PedidoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ventaId" | "creadoPorId" | "postPreticket" | "comandaImpresa" | "createdAt", ExtArgs["result"]["pedido"]>
 export type PedidoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   venta?: boolean | Prisma.VentaDefaultArgs<ExtArgs>
   creadoPor?: boolean | Prisma.Pedido$creadoPorArgs<ExtArgs>
@@ -777,6 +820,7 @@ export type $PedidoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     id: number
     ventaId: number
     creadoPorId: number | null
+    postPreticket: boolean
     comandaImpresa: boolean
     createdAt: Date
   }, ExtArgs["result"]["pedido"]>
@@ -1208,6 +1252,7 @@ export interface PedidoFieldRefs {
   readonly id: Prisma.FieldRef<"Pedido", 'Int'>
   readonly ventaId: Prisma.FieldRef<"Pedido", 'Int'>
   readonly creadoPorId: Prisma.FieldRef<"Pedido", 'Int'>
+  readonly postPreticket: Prisma.FieldRef<"Pedido", 'Boolean'>
   readonly comandaImpresa: Prisma.FieldRef<"Pedido", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Pedido", 'DateTime'>
 }

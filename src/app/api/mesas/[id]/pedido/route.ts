@@ -79,6 +79,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: {
         ventaId: venta.id,
         creadoPorId: sesion ? Number(sesion.sub) : null,
+        postPreticket: venta.ticketImpreso,
         items: {
           create: items.map((item) => {
             const producto = porId.get(Number(item.productoId))!;
@@ -107,6 +108,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       where: { id: venta.id },
       data: { total: { increment: subtotalPedido }, borradorRonda: Prisma.JsonNull },
     });
+
+    if (venta.ticketImpreso) {
+      await tx.ajustePreticket.createMany({
+        data: created.items.map((item) => ({
+          ventaId: venta.id,
+          productoId: item.productoId,
+          productoNombre: item.producto.nombre,
+          tipo: "AGREGADO",
+          cantidad: item.cantidad,
+          precioUnitario: item.precioUnitario,
+          subtotal: item.subtotal,
+          usuarioId: sesion ? Number(sesion.sub) : null,
+          usuarioNombre: sesion?.nombre || "Usuario",
+        })),
+      });
+    }
 
     // La comanda se crea dentro de la misma transacción que el pedido. Antes el navegador
     // hacía una segunda llamada y, si se cortaba la conexión entre ambas, el producto quedaba

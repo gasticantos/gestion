@@ -329,6 +329,7 @@ export type VentaWhereInput = {
   pedidos?: Prisma.PedidoListRelationFilter
   pagos?: Prisma.PagoListRelationFilter
   movimientosCC?: Prisma.MovimientoCuentaCorrienteListRelationFilter
+  ajustesPreticket?: Prisma.AjustePreticketListRelationFilter
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
@@ -354,6 +355,7 @@ export type VentaOrderByWithRelationInput = {
   pedidos?: Prisma.PedidoOrderByRelationAggregateInput
   pagos?: Prisma.PagoOrderByRelationAggregateInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteOrderByRelationAggregateInput
+  ajustesPreticket?: Prisma.AjustePreticketOrderByRelationAggregateInput
   negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
@@ -382,6 +384,7 @@ export type VentaWhereUniqueInput = Prisma.AtLeast<{
   pedidos?: Prisma.PedidoListRelationFilter
   pagos?: Prisma.PagoListRelationFilter
   movimientosCC?: Prisma.MovimientoCuentaCorrienteListRelationFilter
+  ajustesPreticket?: Prisma.AjustePreticketListRelationFilter
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id">
 
@@ -449,6 +452,7 @@ export type VentaCreateInput = {
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
 }
 
@@ -472,6 +476,7 @@ export type VentaUncheckedCreateInput = {
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaUpdateInput = {
@@ -492,6 +497,7 @@ export type VentaUpdateInput = {
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
 }
 
@@ -515,6 +521,7 @@ export type VentaUncheckedUpdateInput = {
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaCreateManyInput = {
@@ -761,6 +768,20 @@ export type EnumTarifaPrecioFieldUpdateOperationsInput = {
   set?: $Enums.TarifaPrecio
 }
 
+export type VentaCreateNestedOneWithoutAjustesPreticketInput = {
+  create?: Prisma.XOR<Prisma.VentaCreateWithoutAjustesPreticketInput, Prisma.VentaUncheckedCreateWithoutAjustesPreticketInput>
+  connectOrCreate?: Prisma.VentaCreateOrConnectWithoutAjustesPreticketInput
+  connect?: Prisma.VentaWhereUniqueInput
+}
+
+export type VentaUpdateOneRequiredWithoutAjustesPreticketNestedInput = {
+  create?: Prisma.XOR<Prisma.VentaCreateWithoutAjustesPreticketInput, Prisma.VentaUncheckedCreateWithoutAjustesPreticketInput>
+  connectOrCreate?: Prisma.VentaCreateOrConnectWithoutAjustesPreticketInput
+  upsert?: Prisma.VentaUpsertWithoutAjustesPreticketInput
+  connect?: Prisma.VentaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VentaUpdateToOneWithWhereWithoutAjustesPreticketInput, Prisma.VentaUpdateWithoutAjustesPreticketInput>, Prisma.VentaUncheckedUpdateWithoutAjustesPreticketInput>
+}
+
 export type VentaCreateNestedOneWithoutPedidosInput = {
   create?: Prisma.XOR<Prisma.VentaCreateWithoutPedidosInput, Prisma.VentaUncheckedCreateWithoutPedidosInput>
   connectOrCreate?: Prisma.VentaCreateOrConnectWithoutPedidosInput
@@ -865,6 +886,7 @@ export type VentaCreateWithoutNegocioInput = {
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
 }
 
 export type VentaUncheckedCreateWithoutNegocioInput = {
@@ -886,6 +908,7 @@ export type VentaUncheckedCreateWithoutNegocioInput = {
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaCreateOrConnectWithoutNegocioInput = {
@@ -953,6 +976,7 @@ export type VentaCreateWithoutMesaInput = {
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
 }
 
@@ -975,6 +999,7 @@ export type VentaUncheckedCreateWithoutMesaInput = {
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaCreateOrConnectWithoutMesaInput = {
@@ -1003,6 +1028,108 @@ export type VentaUpdateManyWithWhereWithoutMesaInput = {
   data: Prisma.XOR<Prisma.VentaUpdateManyMutationInput, Prisma.VentaUncheckedUpdateManyWithoutMesaInput>
 }
 
+export type VentaCreateWithoutAjustesPreticketInput = {
+  tipo: $Enums.TipoVenta
+  estado?: $Enums.EstadoVenta
+  tarifa?: $Enums.TarifaPrecio
+  total?: number
+  descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
+  createdAt?: Date | string
+  closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
+  mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
+  cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
+  pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
+}
+
+export type VentaUncheckedCreateWithoutAjustesPreticketInput = {
+  id?: number
+  tipo: $Enums.TipoVenta
+  mesaId?: number | null
+  clienteId?: number | null
+  estado?: $Enums.EstadoVenta
+  tarifa?: $Enums.TarifaPrecio
+  total?: number
+  descuentoPct?: number
+  descuentoResponsable?: string | null
+  propina?: number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
+  createdAt?: Date | string
+  closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
+  negocioId?: number
+  pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
+  pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+}
+
+export type VentaCreateOrConnectWithoutAjustesPreticketInput = {
+  where: Prisma.VentaWhereUniqueInput
+  create: Prisma.XOR<Prisma.VentaCreateWithoutAjustesPreticketInput, Prisma.VentaUncheckedCreateWithoutAjustesPreticketInput>
+}
+
+export type VentaUpsertWithoutAjustesPreticketInput = {
+  update: Prisma.XOR<Prisma.VentaUpdateWithoutAjustesPreticketInput, Prisma.VentaUncheckedUpdateWithoutAjustesPreticketInput>
+  create: Prisma.XOR<Prisma.VentaCreateWithoutAjustesPreticketInput, Prisma.VentaUncheckedCreateWithoutAjustesPreticketInput>
+  where?: Prisma.VentaWhereInput
+}
+
+export type VentaUpdateToOneWithWhereWithoutAjustesPreticketInput = {
+  where?: Prisma.VentaWhereInput
+  data: Prisma.XOR<Prisma.VentaUpdateWithoutAjustesPreticketInput, Prisma.VentaUncheckedUpdateWithoutAjustesPreticketInput>
+}
+
+export type VentaUpdateWithoutAjustesPreticketInput = {
+  tipo?: Prisma.EnumTipoVentaFieldUpdateOperationsInput | $Enums.TipoVenta
+  estado?: Prisma.EnumEstadoVentaFieldUpdateOperationsInput | $Enums.EstadoVenta
+  tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
+  cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
+  pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
+}
+
+export type VentaUncheckedUpdateWithoutAjustesPreticketInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  tipo?: Prisma.EnumTipoVentaFieldUpdateOperationsInput | $Enums.TipoVenta
+  mesaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  clienteId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  estado?: Prisma.EnumEstadoVentaFieldUpdateOperationsInput | $Enums.EstadoVenta
+  tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+  pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
+  pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+}
+
 export type VentaCreateWithoutPedidosInput = {
   tipo: $Enums.TipoVenta
   estado?: $Enums.EstadoVenta
@@ -1020,6 +1147,7 @@ export type VentaCreateWithoutPedidosInput = {
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
 }
 
@@ -1042,6 +1170,7 @@ export type VentaUncheckedCreateWithoutPedidosInput = {
   negocioId?: number
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaCreateOrConnectWithoutPedidosInput = {
@@ -1077,6 +1206,7 @@ export type VentaUpdateWithoutPedidosInput = {
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
 }
 
@@ -1099,6 +1229,7 @@ export type VentaUncheckedUpdateWithoutPedidosInput = {
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaCreateWithoutPagosInput = {
@@ -1118,6 +1249,7 @@ export type VentaCreateWithoutPagosInput = {
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
 }
 
@@ -1140,6 +1272,7 @@ export type VentaUncheckedCreateWithoutPagosInput = {
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaCreateOrConnectWithoutPagosInput = {
@@ -1175,6 +1308,7 @@ export type VentaUpdateWithoutPagosInput = {
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
 }
 
@@ -1197,6 +1331,7 @@ export type VentaUncheckedUpdateWithoutPagosInput = {
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaCreateWithoutClienteInput = {
@@ -1216,6 +1351,7 @@ export type VentaCreateWithoutClienteInput = {
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
 }
 
@@ -1238,6 +1374,7 @@ export type VentaUncheckedCreateWithoutClienteInput = {
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaCreateOrConnectWithoutClienteInput = {
@@ -1283,6 +1420,7 @@ export type VentaCreateWithoutMovimientosCCInput = {
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
 }
 
@@ -1305,6 +1443,7 @@ export type VentaUncheckedCreateWithoutMovimientosCCInput = {
   negocioId?: number
   pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
 }
 
 export type VentaCreateOrConnectWithoutMovimientosCCInput = {
@@ -1340,6 +1479,7 @@ export type VentaUpdateWithoutMovimientosCCInput = {
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
 }
 
@@ -1362,6 +1502,7 @@ export type VentaUncheckedUpdateWithoutMovimientosCCInput = {
   negocioId?: Prisma.IntFieldUpdateOperationsInput | number
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaCreateManyNegocioInput = {
@@ -1400,6 +1541,7 @@ export type VentaUpdateWithoutNegocioInput = {
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaUncheckedUpdateWithoutNegocioInput = {
@@ -1421,6 +1563,7 @@ export type VentaUncheckedUpdateWithoutNegocioInput = {
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaUncheckedUpdateManyWithoutNegocioInput = {
@@ -1476,6 +1619,7 @@ export type VentaUpdateWithoutMesaInput = {
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
 }
 
@@ -1498,6 +1642,7 @@ export type VentaUncheckedUpdateWithoutMesaInput = {
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaUncheckedUpdateManyWithoutMesaInput = {
@@ -1553,6 +1698,7 @@ export type VentaUpdateWithoutClienteInput = {
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
 }
 
@@ -1575,6 +1721,7 @@ export type VentaUncheckedUpdateWithoutClienteInput = {
   pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
 }
 
 export type VentaUncheckedUpdateManyWithoutClienteInput = {
@@ -1604,12 +1751,14 @@ export type VentaCountOutputType = {
   pedidos: number
   pagos: number
   movimientosCC: number
+  ajustesPreticket: number
 }
 
 export type VentaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pedidos?: boolean | VentaCountOutputTypeCountPedidosArgs
   pagos?: boolean | VentaCountOutputTypeCountPagosArgs
   movimientosCC?: boolean | VentaCountOutputTypeCountMovimientosCCArgs
+  ajustesPreticket?: boolean | VentaCountOutputTypeCountAjustesPreticketArgs
 }
 
 /**
@@ -1643,6 +1792,13 @@ export type VentaCountOutputTypeCountMovimientosCCArgs<ExtArgs extends runtime.T
   where?: Prisma.MovimientoCuentaCorrienteWhereInput
 }
 
+/**
+ * VentaCountOutputType without action
+ */
+export type VentaCountOutputTypeCountAjustesPreticketArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AjustePreticketWhereInput
+}
+
 
 export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1666,6 +1822,7 @@ export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   pedidos?: boolean | Prisma.Venta$pedidosArgs<ExtArgs>
   pagos?: boolean | Prisma.Venta$pagosArgs<ExtArgs>
   movimientosCC?: boolean | Prisma.Venta$movimientosCCArgs<ExtArgs>
+  ajustesPreticket?: boolean | Prisma.Venta$ajustesPreticketArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.VentaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["venta"]>
@@ -1740,6 +1897,7 @@ export type VentaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   pedidos?: boolean | Prisma.Venta$pedidosArgs<ExtArgs>
   pagos?: boolean | Prisma.Venta$pagosArgs<ExtArgs>
   movimientosCC?: boolean | Prisma.Venta$movimientosCCArgs<ExtArgs>
+  ajustesPreticket?: boolean | Prisma.Venta$ajustesPreticketArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.VentaCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1762,6 +1920,7 @@ export type $VentaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     pedidos: Prisma.$PedidoPayload<ExtArgs>[]
     pagos: Prisma.$PagoPayload<ExtArgs>[]
     movimientosCC: Prisma.$MovimientoCuentaCorrientePayload<ExtArgs>[]
+    ajustesPreticket: Prisma.$AjustePreticketPayload<ExtArgs>[]
     negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2180,6 +2339,7 @@ export interface Prisma__VentaClient<T, Null = never, ExtArgs extends runtime.Ty
   pedidos<T extends Prisma.Venta$pedidosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$pedidosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PedidoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pagos<T extends Prisma.Venta$pagosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$pagosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PagoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimientosCC<T extends Prisma.Venta$movimientosCCArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$movimientosCCArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MovimientoCuentaCorrientePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ajustesPreticket<T extends Prisma.Venta$ajustesPreticketArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$ajustesPreticketArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AjustePreticketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2734,6 +2894,30 @@ export type Venta$movimientosCCArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.MovimientoCuentaCorrienteScalarFieldEnum | Prisma.MovimientoCuentaCorrienteScalarFieldEnum[]
+}
+
+/**
+ * Venta.ajustesPreticket
+ */
+export type Venta$ajustesPreticketArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AjustePreticket
+   */
+  select?: Prisma.AjustePreticketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AjustePreticket
+   */
+  omit?: Prisma.AjustePreticketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AjustePreticketInclude<ExtArgs> | null
+  where?: Prisma.AjustePreticketWhereInput
+  orderBy?: Prisma.AjustePreticketOrderByWithRelationInput | Prisma.AjustePreticketOrderByWithRelationInput[]
+  cursor?: Prisma.AjustePreticketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AjustePreticketScalarFieldEnum | Prisma.AjustePreticketScalarFieldEnum[]
 }
 
 /**

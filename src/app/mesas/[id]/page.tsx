@@ -36,15 +36,25 @@ type PedidoItem = {
   producto: { nombre: string };
 };
 
-type Pedido = { id: number; createdAt: string; items: PedidoItem[] };
+type Pedido = { id: number; createdAt: string; postPreticket: boolean; items: PedidoItem[] };
 
 type PagoRegistrado = { id: number; metodo: PagoLinea["metodo"]; monto: number; tipoTarjeta?: PagoLinea["tipoTarjeta"]; createdAt: string };
+type ErrorCuenta = {
+  id: number;
+  productoNombre: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+  usuarioNombre: string;
+  createdAt: string;
+};
 type Venta = {
   id: number;
   total: number;
   descuentoPct: number;
   propina: number;
   pagos: PagoRegistrado[];
+  ajustesPreticket: ErrorCuenta[];
   pedidos: Pedido[];
   borradorRonda: ItemRonda[] | null;
   ticketImpreso: boolean;
@@ -195,6 +205,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   type GrupoItem = {
     clave: string;
+    postPreticket: boolean;
     productoId: number;
     nombre: string;
     precioUnitario: number;
@@ -210,7 +221,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     const grupos = new Map<string, GrupoItem>();
     for (const pedido of venta?.pedidos ?? []) {
       for (const item of pedido.items) {
-        const clave = `${item.productoId}::${item.precioUnitario}`;
+        const clave = `${pedido.postPreticket ? "post" : "pre"}::${item.productoId}::${item.precioUnitario}`;
         const existente = grupos.get(clave);
         if (existente) {
           existente.cantidad += item.cantidad;
@@ -219,6 +230,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         } else {
           grupos.set(clave, {
             clave,
+            postPreticket: pedido.postPreticket,
             productoId: item.productoId,
             nombre: item.producto.nombre,
             precioUnitario: item.precioUnitario,
@@ -231,6 +243,28 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
     return [...grupos.values()].sort((a, b) => comparadorAlfabetico.compare(a.nombre, b.nombre));
   }, [venta?.pedidos]);
+
+  const itemsComunes = useMemo(
+    () => itemsAgrupados.filter((grupo) => !grupo.postPreticket),
+    [itemsAgrupados]
+  );
+  const itemsPostPreticket = useMemo(
+    () => itemsAgrupados.filter((grupo) => grupo.postPreticket),
+    [itemsAgrupados]
+  );
+  const subtotalComun = useMemo(
+    () => itemsComunes.reduce((suma, grupo) => suma + grupo.subtotal, 0),
+    [itemsComunes]
+  );
+  const subtotalPostPreticket = useMemo(
+    () => itemsPostPreticket.reduce((suma, grupo) => suma + grupo.subtotal, 0),
+    [itemsPostPreticket]
+  );
+  const erroresCuenta = useMemo(() => venta?.ajustesPreticket ?? [], [venta?.ajustesPreticket]);
+  const totalErroresCuenta = useMemo(
+    () => erroresCuenta.reduce((suma, errorCuenta) => suma + errorCuenta.subtotal, 0),
+    [erroresCuenta]
+  );
 
   const rondaOrdenada = useMemo(
     () => [...ronda].sort((a, b) => comparadorAlfabetico.compare(a.nombre, b.nombre)),
@@ -463,31 +497,41 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  function eliminarGrupo(grupo: GrupoItem) {
-    // Actualizar local inmediatamente, descontando también el total de la venta
-    // (si no, queda mostrando el total viejo hasta el próximo sondeo).
-    setMesa((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        ventas: prev.ventas.map((v, index) => {
-          if (index !== 0) return v;
-          return {
-            ...v,
-            pedidos: v.pedidos.map((p) => ({
-              ...p,
-              items: p.items.filter((i) => !grupo.itemIds.includes(i.id)),
-            })),
-            total: v.total - grupo.subtotal,
-          };
-        }),
-      };
-    });
-
-    // Enviar al servidor en background sin esperar
-    for (const itemId of grupo.itemIds) {
-      fetch(`/api/pedidos/item/${itemId}`, { method: "DELETE" }).catch(() => cargar());
+  async function eliminarGrupo(grupo: GrupoItem) {
+    let cantidadAEliminar = grupo.cantidad;
+    if (ticketImpreso) {
+      const respuesta = prompt(
+        `¿Cuántas unidades de ${grupo.nombre} querés marcar como error de cuenta?`,
+        "1"
+      );
+      if (respuesta === null) return;
+      cantidadAEliminar = Number(respuesta.replace(",", "."));
+      if (!Number.isFinite(cantidadAEliminar) || cantidadAEliminar <= 0 || cantidadAEliminar > grupo.cantidad) {
+        setError(`Ingresá una cantidad entre 1 y ${grupo.cantidad}`);
+        return;
+      }
     }
+    setError("");
+    let cantidadRestante = cantidadAEliminar;
+    for (const itemId of grupo.itemIds) {
+      if (cantidadRestante <= 0) break;
+      const res = await fetch(`/api/pedidos/item/${itemId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: ticketImpreso ? JSON.stringify({ cantidad: cantidadRestante }) : undefined,
+      }).catch(() => null);
+      if (!res?.ok) {
+        const data = await res?.json().catch(() => ({}));
+        setError(data?.error || "No se pudo registrar el error de cuenta");
+        await cargar();
+        return;
+      }
+      if (ticketImpreso) {
+        const data = await res.json();
+        cantidadRestante -= Number(data.cantidadEliminada) || 0;
+      }
+    }
+    await cargar();
   }
 
   async function abrirMesa() {
@@ -661,6 +705,84 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  function filaGrupo(grupo: GrupoItem) {
+    const editando = editandoGrupos.has(grupo.clave);
+    const cantidadActual = edicionCantidad.get(grupo.clave) ?? grupo.cantidad;
+    const precioActual = edicionPrecio.get(grupo.clave) ?? grupo.precioUnitario;
+    return (
+      <tr
+        key={grupo.clave}
+        className={trHover}
+        onBlur={(e) => {
+          if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+          guardarEdicionGrupo(grupo, cantidadActual, precioActual);
+        }}
+      >
+        <td className={`${tdM} max-w-[130px] truncate`} title={grupo.nombre}>{grupo.nombre}</td>
+        <td className={tdM}>
+          {editando && rol !== "MOZO" ? (
+            <input
+              type="number"
+              autoFocus
+              className="w-11 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+              value={cantidadActual}
+              onChange={(e) => {
+                const num = Number(e.target.value);
+                setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, isNaN(num) ? 0 : num));
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              }}
+            />
+          ) : (
+            <span className="text-sm font-medium">{cantidadActual}x</span>
+          )}
+        </td>
+        <td className={tdM}>
+          {editando ? (
+            <input
+              type="number"
+              step="0.01"
+              className="w-20 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
+              value={precioActual}
+              onChange={(e) =>
+                setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, Number(e.target.value) || 0))
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              }}
+            />
+          ) : (
+            <span>${formatearMoneda(precioActual)}</span>
+          )}
+        </td>
+        <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
+        <td className={`${tdM} text-right whitespace-nowrap`}>
+          {!ticketImpreso && !editando && (
+            <button
+              className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
+              onClick={() => {
+                setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, grupo.cantidad));
+                setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, grupo.precioUnitario));
+                setEditandoGrupos((s) => new Set(s).add(grupo.clave));
+              }}
+            >
+              Editar
+            </button>
+          )}
+          {(!ticketImpreso || rol === "ADMIN") && (
+            <button
+              className="text-red-400 hover:text-red-300 text-xs px-1"
+              onClick={() => eliminarGrupo(grupo)}
+            >
+              {ticketImpreso ? "Marcar error" : "Quitar"}
+            </button>
+          )}
+        </td>
+      </tr>
+    );
+  }
+
   if (!mesa) {
     return <div className="text-sm text-neutral-500">Cargando...</div>;
   }
@@ -777,7 +899,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
               </div>
               {ticketImpreso && (
                 <div className="border-b border-blue-600/30 bg-blue-600/10 px-3 py-2 text-xs text-blue-600 dark:text-blue-300">
-                  Preticket emitido: los productos cargados ya no se pueden editar ni quitar. Podés seguir agregando productos nuevos.
+                  Preticket emitido: podés seguir agregando productos. Un administrador puede marcar cantidades incorrectas como errores de cuenta.
                 </div>
               )}
               {!venta?.pedidos.length && ronda.length === 0 ? (
@@ -795,87 +917,15 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       </tr>
                     </thead>
                     <tbody>
-                      {itemsAgrupados.map((grupo) => {
-                        const editando = editandoGrupos.has(grupo.clave);
-                        const cantidadActual = edicionCantidad.get(grupo.clave) ?? grupo.cantidad;
-                        const precioActual = edicionPrecio.get(grupo.clave) ?? grupo.precioUnitario;
-                        return (
-                          <tr
-                            key={grupo.clave}
-                            className={trHover}
-                            onBlur={(e) => {
-                              // Solo cerrar la edición cuando el foco realmente sale de la fila
-                              // (no al pasar de "cantidad" a "precio" dentro de la misma fila).
-                              if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-                              guardarEdicionGrupo(grupo, cantidadActual, precioActual);
-                            }}
-                          >
-                            <td className={`${tdM} max-w-[130px] truncate`} title={grupo.nombre}>
-                              {grupo.nombre}
-                            </td>
-                            <td className={tdM}>
-                              {editando && rol !== "MOZO" ? (
-                                <input
-                                  type="number"
-                                  autoFocus
-                                  className="w-11 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
-                                  value={cantidadActual}
-                                  onChange={(e) => {
-                                    const num = Number(e.target.value);
-                                    setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, isNaN(num) ? 0 : num));
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                  }}
-                                />
-                              ) : (
-                                <span className="text-sm font-medium">{cantidadActual}x</span>
-                              )}
-                            </td>
-                            <td className={tdM}>
-                              {editando ? (
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  className="w-20 rounded border border-blue-600 bg-neutral-50 dark:bg-neutral-950 px-1 py-0.5 text-sm text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-600/50"
-                                  value={precioActual}
-                                  onChange={(e) =>
-                                    setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, Number(e.target.value) || 0))
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                  }}
-                                />
-                              ) : (
-                                <span>${formatearMoneda(precioActual)}</span>
-                              )}
-                            </td>
-                            <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
-                            <td className={`${tdM} text-right whitespace-nowrap`}>
-                              {!ticketImpreso && !editando && (
-                                <button
-                                  className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
-                                  onClick={() => {
-                                    setEdicionCantidad((prev) => new Map(prev).set(grupo.clave, grupo.cantidad));
-                                    setEdicionPrecio((prev) => new Map(prev).set(grupo.clave, grupo.precioUnitario));
-                                    setEditandoGrupos((s) => new Set(s).add(grupo.clave));
-                                  }}
-                                >
-                                  Editar
-                                </button>
-                              )}
-                              {!ticketImpreso && (
-                                <button
-                                  className="text-red-400 hover:text-red-300 text-xs px-1"
-                                  onClick={() => eliminarGrupo(grupo)}
-                                >
-                                  Quitar
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {itemsComunes.map(filaGrupo)}
+                      {(itemsPostPreticket.length > 0 || (ticketImpreso && rondaOrdenada.length > 0)) && (
+                        <tr className="border-y border-amber-500/30 bg-amber-500/10">
+                          <td colSpan={5} className="px-2 py-2 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                            Productos post pre-ticket
+                          </td>
+                        </tr>
+                      )}
+                      {itemsPostPreticket.map(filaGrupo)}
                       {rondaOrdenada.map((i) => (
                         <tr key={`${i.productoId}-${i.tarifa}`} className={`${trHover} bg-blue-600/5`}>
                           <td className={`${tdM} max-w-[130px]`}>
@@ -939,9 +989,21 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                   </Button>
                 </div>
               )}
-              <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-between font-semibold text-neutral-800 dark:text-neutral-100">
-                <span>Total</span>
-                <span>${formatearMoneda(total)}</span>
+              <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 flex flex-col gap-1 text-sm text-neutral-700 dark:text-neutral-300">
+                <div className="flex justify-between">
+                  <span>Subtotal común</span>
+                  <span>${formatearMoneda(subtotalComun)}</span>
+                </div>
+                {ticketImpreso && (
+                  <div className="flex justify-between font-medium text-amber-700 dark:text-amber-300">
+                    <span>Subtotal productos post pre-ticket</span>
+                    <span>${formatearMoneda(subtotalPostPreticket)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between border-t border-neutral-200 pt-1 font-semibold text-neutral-900 dark:border-neutral-800 dark:text-neutral-100">
+                  <span>Total</span>
+                  <span>${formatearMoneda(total)}</span>
+                </div>
               </div>
             </Card>
 
@@ -961,9 +1023,15 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
           {rol !== "MOZO" && (
             <Card className="p-4 flex flex-col gap-3 self-start">
               <div className="flex justify-between items-baseline text-sm">
-                <span className="text-neutral-500">Subtotal</span>
-                <span className="text-neutral-700 dark:text-neutral-300">${formatearMoneda(total)}</span>
+                <span className="text-neutral-500">Subtotal común</span>
+                <span className="text-neutral-700 dark:text-neutral-300">${formatearMoneda(subtotalComun)}</span>
               </div>
+              {ticketImpreso && (
+                <div className="flex justify-between items-baseline text-sm text-amber-700 dark:text-amber-300">
+                  <span>Subtotal productos post pre-ticket</span>
+                  <span>${formatearMoneda(subtotalPostPreticket)}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex flex-1 flex-wrap items-center gap-2">
                   <label className="text-xs text-neutral-500 flex items-center gap-1.5">
@@ -1090,6 +1158,27 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                       />
                     </>
                   )}
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-3 text-sm">
+                    <div className="font-medium text-red-700 dark:text-red-300">Errores de cuenta</div>
+                    {erroresCuenta.length === 0 ? (
+                      <p className="mt-1 text-xs text-neutral-500">
+                        Los productos que marques como error después del pre-ticket aparecerán acá.
+                      </p>
+                    ) : (
+                      <div className="mt-2 flex flex-col gap-1">
+                        {erroresCuenta.map((errorCuenta) => (
+                          <div key={errorCuenta.id} className="flex justify-between gap-3 text-neutral-700 dark:text-neutral-300">
+                            <span>{errorCuenta.cantidad} x {errorCuenta.productoNombre}</span>
+                            <span>-${formatearMoneda(errorCuenta.subtotal)}</span>
+                          </div>
+                        ))}
+                        <div className="mt-1 flex justify-between border-t border-red-500/20 pt-2 font-semibold text-red-700 dark:text-red-300">
+                          <span>Total errores</span>
+                          <span>-${formatearMoneda(totalErroresCuenta)}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <Button
                       onClick={imprimirTicket}

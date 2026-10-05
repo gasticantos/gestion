@@ -68,15 +68,23 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
     ]);
 
     return NextResponse.json(updated);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "No se pudo actualizar el item" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
+  const sesion = await sesionActual();
   const { itemId } = await params;
+  const body = await req.json().catch(() => ({}));
+  const cantidadSolicitada = Number(body.cantidad);
+
+  if ("cantidad" in body && (!Number.isFinite(cantidadSolicitada) || cantidadSolicitada <= 0)) {
+    return NextResponse.json({ error: "Cantidad inválida" }, { status: 400 });
+  }
 
   try {
+    if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     const item = await prisma.pedidoItem.findUnique({
       where: { id: Number(itemId) },
       include: {
@@ -87,6 +95,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
             venta: {
               select: {
                 ticketImpreso: true,
+                negocioId: true,
                 mesa: { select: { id: true, nombre: true, apodo: true } },
               },
             },
@@ -97,24 +106,58 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
     }
-    if (item.pedido.venta.ticketImpreso) {
+    if (item.pedido.venta.negocioId !== sesion.negocioId) {
+      return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
+    }
+    if (item.pedido.venta.ticketImpreso && sesion.rol !== "ADMIN") {
       return NextResponse.json(
-        { error: "No se puede quitar un producto después de emitir el preticket" },
-        { status: 409 }
+        { error: "Solo un administrador puede quitar productos después de emitir el preticket" },
+        { status: 403 }
       );
     }
 
-    await prisma.$transaction([
-      prisma.pedidoItem.delete({ where: { id: Number(itemId) } }),
-      prisma.producto.update({
+    const cantidadEliminada = Number.isFinite(cantidadSolicitada) && cantidadSolicitada > 0
+      ? Math.min(cantidadSolicitada, item.cantidad)
+      : item.cantidad;
+    const subtotalEliminado = cantidadEliminada * item.precioUnitario;
+    const eliminarItemCompleto = cantidadEliminada >= item.cantidad;
+
+    await prisma.$transaction(async (tx) => {
+      if (eliminarItemCompleto) {
+        await tx.pedidoItem.delete({ where: { id: Number(itemId) } });
+      } else {
+        await tx.pedidoItem.update({
+          where: { id: Number(itemId) },
+          data: {
+            cantidad: { decrement: cantidadEliminada },
+            subtotal: { decrement: subtotalEliminado },
+          },
+        });
+      }
+      await tx.producto.update({
         where: { id: item.productoId },
-        data: { stock: { increment: item.cantidad } },
-      }),
-      prisma.venta.update({
+        data: { stock: { increment: cantidadEliminada } },
+      });
+      await tx.venta.update({
         where: { id: item.pedido.ventaId },
-        data: { total: { decrement: item.subtotal } },
-      }),
-    ]);
+        data: { total: { decrement: subtotalEliminado } },
+      });
+      if (item.pedido.venta.ticketImpreso) {
+        await tx.ajustePreticket.create({
+          data: {
+            ventaId: item.pedido.ventaId,
+            productoId: item.productoId,
+            productoNombre: item.producto.nombre,
+            tipo: "QUITADO",
+            cantidad: cantidadEliminada,
+            precioUnitario: item.precioUnitario,
+            subtotal: subtotalEliminado,
+            usuarioId: Number(sesion.sub),
+            usuarioNombre: sesion.nombre,
+          },
+        });
+      }
+    });
 
     const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
     const mesa = item.pedido.venta.mesa;
@@ -122,14 +165,15 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await registrarAuditoria(
       usuarioId,
       "quitar_producto_mesa",
-      `${item.cantidad} x ${item.producto.nombre} quitado de ${nombreMesa} · Venta #${item.pedido.ventaId}`
+      `${cantidadEliminada} x ${item.producto.nombre} marcado como error de cuenta en ${nombreMesa} · Venta #${item.pedido.ventaId}`
     );
     return NextResponse.json({
       success: true,
-      totalDescontado: item.subtotal,
-      stockDevuelto: item.cantidad,
+      cantidadEliminada,
+      totalDescontado: subtotalEliminado,
+      stockDevuelto: cantidadEliminada,
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "No se pudo eliminar el item" }, { status: 500 });
   }
 }

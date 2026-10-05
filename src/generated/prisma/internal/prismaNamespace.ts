@@ -400,6 +400,7 @@ export const ModelName = {
   Mesa: 'Mesa',
   Reserva: 'Reserva',
   Venta: 'Venta',
+  AjustePreticket: 'AjustePreticket',
   Pedido: 'Pedido',
   PedidoItem: 'PedidoItem',
   Pago: 'Pago',
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "negocio" | "flyer" | "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "presupuesto" | "presupuestoItem" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "pedido" | "pedidoItem" | "pago" | "controlCaja" | "movimientoCaja" | "cliente" | "movimientoCuentaCorriente"
+    modelProps: "negocio" | "flyer" | "categoria" | "usuario" | "configuracion" | "impresionTrabajo" | "auditoriaLog" | "proveedor" | "producto" | "presupuesto" | "presupuestoItem" | "stockEntry" | "stockEntryItem" | "mesa" | "reserva" | "venta" | "ajustePreticket" | "pedido" | "pedidoItem" | "pago" | "controlCaja" | "movimientoCaja" | "cliente" | "movimientoCuentaCorriente"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1610,6 +1611,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AjustePreticket: {
+      payload: Prisma.$AjustePreticketPayload<ExtArgs>
+      fields: Prisma.AjustePreticketFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AjustePreticketFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AjustePreticketFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>
+        }
+        findFirst: {
+          args: Prisma.AjustePreticketFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AjustePreticketFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>
+        }
+        findMany: {
+          args: Prisma.AjustePreticketFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>[]
+        }
+        create: {
+          args: Prisma.AjustePreticketCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>
+        }
+        createMany: {
+          args: Prisma.AjustePreticketCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AjustePreticketCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>[]
+        }
+        delete: {
+          args: Prisma.AjustePreticketDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>
+        }
+        update: {
+          args: Prisma.AjustePreticketUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>
+        }
+        deleteMany: {
+          args: Prisma.AjustePreticketDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AjustePreticketUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AjustePreticketUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>[]
+        }
+        upsert: {
+          args: Prisma.AjustePreticketUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AjustePreticketPayload>
+        }
+        aggregate: {
+          args: Prisma.AjustePreticketAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAjustePreticket>
+        }
+        groupBy: {
+          args: Prisma.AjustePreticketGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AjustePreticketGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AjustePreticketCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AjustePreticketCountAggregateOutputType> | number
+        }
+      }
+    }
     Pedido: {
       payload: Prisma.$PedidoPayload<ExtArgs>
       fields: Prisma.PedidoFieldRefs
@@ -2409,10 +2484,28 @@ export const VentaScalarFieldEnum = {
 export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof VentaScalarFieldEnum]
 
 
+export const AjustePreticketScalarFieldEnum = {
+  id: 'id',
+  ventaId: 'ventaId',
+  productoId: 'productoId',
+  productoNombre: 'productoNombre',
+  tipo: 'tipo',
+  cantidad: 'cantidad',
+  precioUnitario: 'precioUnitario',
+  subtotal: 'subtotal',
+  usuarioId: 'usuarioId',
+  usuarioNombre: 'usuarioNombre',
+  createdAt: 'createdAt'
+} as const
+
+export type AjustePreticketScalarFieldEnum = (typeof AjustePreticketScalarFieldEnum)[keyof typeof AjustePreticketScalarFieldEnum]
+
+
 export const PedidoScalarFieldEnum = {
   id: 'id',
   ventaId: 'ventaId',
   creadoPorId: 'creadoPorId',
+  postPreticket: 'postPreticket',
   comandaImpresa: 'comandaImpresa',
   createdAt: 'createdAt'
 } as const
@@ -2945,6 +3038,7 @@ export type GlobalOmitConfig = {
   mesa?: Prisma.MesaOmit
   reserva?: Prisma.ReservaOmit
   venta?: Prisma.VentaOmit
+  ajustePreticket?: Prisma.AjustePreticketOmit
   pedido?: Prisma.PedidoOmit
   pedidoItem?: Prisma.PedidoItemOmit
   pago?: Prisma.PagoOmit

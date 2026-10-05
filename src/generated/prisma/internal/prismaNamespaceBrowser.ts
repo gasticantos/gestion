@@ -67,6 +67,7 @@ export const ModelName = {
   Mesa: 'Mesa',
   Reserva: 'Reserva',
   Venta: 'Venta',
+  AjustePreticket: 'AjustePreticket',
   Pedido: 'Pedido',
   PedidoItem: 'PedidoItem',
   Pago: 'Pago',
@@ -334,10 +335,28 @@ export const VentaScalarFieldEnum = {
 export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof VentaScalarFieldEnum]
 
 
+export const AjustePreticketScalarFieldEnum = {
+  id: 'id',
+  ventaId: 'ventaId',
+  productoId: 'productoId',
+  productoNombre: 'productoNombre',
+  tipo: 'tipo',
+  cantidad: 'cantidad',
+  precioUnitario: 'precioUnitario',
+  subtotal: 'subtotal',
+  usuarioId: 'usuarioId',
+  usuarioNombre: 'usuarioNombre',
+  createdAt: 'createdAt'
+} as const
+
+export type AjustePreticketScalarFieldEnum = (typeof AjustePreticketScalarFieldEnum)[keyof typeof AjustePreticketScalarFieldEnum]
+
+
 export const PedidoScalarFieldEnum = {
   id: 'id',
   ventaId: 'ventaId',
   creadoPorId: 'creadoPorId',
+  postPreticket: 'postPreticket',
   comandaImpresa: 'comandaImpresa',
   createdAt: 'createdAt'
 } as const

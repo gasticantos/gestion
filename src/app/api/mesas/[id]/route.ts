@@ -15,10 +15,24 @@ const ventaAbierta = {
       select: { id: true, metodo: true, monto: true, tipoTarjeta: true, createdAt: true },
       orderBy: { createdAt: "asc" as const },
     },
+    ajustesPreticket: {
+      where: { tipo: "QUITADO" },
+      select: {
+        id: true,
+        productoNombre: true,
+        cantidad: true,
+        precioUnitario: true,
+        subtotal: true,
+        usuarioNombre: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "asc" as const },
+    },
     pedidos: {
       select: {
         id: true,
         createdAt: true,
+        postPreticket: true,
         items: {
           select: {
             id: true,
