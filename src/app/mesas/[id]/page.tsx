@@ -499,7 +499,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   async function eliminarGrupo(grupo: GrupoItem) {
     let cantidadAEliminar = grupo.cantidad;
-    if (ticketImpreso) {
+    const esErrorCuenta = ticketImpreso && !grupo.postPreticket;
+    if (esErrorCuenta) {
       const respuesta = prompt(
         `¿Cuántas unidades de ${grupo.nombre} querés marcar como error de cuenta?`,
         "1"
@@ -518,7 +519,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       const res = await fetch(`/api/pedidos/item/${itemId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: ticketImpreso ? JSON.stringify({ cantidad: cantidadRestante }) : undefined,
+        body: esErrorCuenta ? JSON.stringify({ cantidad: cantidadRestante }) : undefined,
       }).catch(() => null);
       if (!res?.ok) {
         const data = await res?.json().catch(() => ({}));
@@ -526,7 +527,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         await cargar();
         return;
       }
-      if (ticketImpreso) {
+      if (esErrorCuenta) {
         const data = await res.json();
         cantidadRestante -= Number(data.cantidadEliminada) || 0;
       }
@@ -758,7 +759,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         </td>
         <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
         <td className={`${tdM} text-right whitespace-nowrap`}>
-          {!ticketImpreso && !editando && (
+          {(!ticketImpreso || grupo.postPreticket) && !editando && (
             <button
               className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
               onClick={() => {
@@ -770,12 +771,12 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
               Editar
             </button>
           )}
-          {(!ticketImpreso || rol === "ADMIN") && (
+          {(!ticketImpreso || grupo.postPreticket || rol === "ADMIN") && (
             <button
               className="text-red-400 hover:text-red-300 text-xs px-1"
               onClick={() => eliminarGrupo(grupo)}
             >
-              {ticketImpreso ? "Marcar error" : "Quitar"}
+              {ticketImpreso && !grupo.postPreticket ? "Marcar error" : "Quitar"}
             </button>
           )}
         </td>

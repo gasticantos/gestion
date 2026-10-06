@@ -12,12 +12,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
   try {
     const item = await prisma.pedidoItem.findUnique({
       where: { id: Number(itemId) },
-      include: { pedido: { select: { ventaId: true, venta: { select: { ticketImpreso: true } } } } },
+      include: {
+        pedido: {
+          select: {
+            ventaId: true,
+            postPreticket: true,
+            venta: { select: { ticketImpreso: true } },
+          },
+        },
+      },
     });
     if (!item) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
     }
-    if (item.pedido.venta.ticketImpreso) {
+    if (item.pedido.venta.ticketImpreso && !item.pedido.postPreticket) {
       return NextResponse.json(
         { error: "No se puede editar un producto después de emitir el preticket" },
         { status: 409 }
@@ -92,6 +100,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         pedido: {
           select: {
             ventaId: true,
+            postPreticket: true,
             venta: {
               select: {
                 ticketImpreso: true,
@@ -109,7 +118,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (item.pedido.venta.negocioId !== sesion.negocioId) {
       return NextResponse.json({ error: "Item no encontrado" }, { status: 404 });
     }
-    if (item.pedido.venta.ticketImpreso && sesion.rol !== "ADMIN") {
+    const esErrorCuenta = item.pedido.venta.ticketImpreso && !item.pedido.postPreticket;
+    if (esErrorCuenta && sesion.rol !== "ADMIN") {
       return NextResponse.json(
         { error: "Solo un administrador puede quitar productos después de emitir el preticket" },
         { status: 403 }
@@ -142,7 +152,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         where: { id: item.pedido.ventaId },
         data: { total: { decrement: subtotalEliminado } },
       });
-      if (item.pedido.venta.ticketImpreso) {
+      if (esErrorCuenta) {
         await tx.ajustePreticket.create({
           data: {
             ventaId: item.pedido.ventaId,
@@ -165,7 +175,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await registrarAuditoria(
       usuarioId,
       "quitar_producto_mesa",
-      `${cantidadEliminada} x ${item.producto.nombre} marcado como error de cuenta en ${nombreMesa} · Venta #${item.pedido.ventaId}`
+      esErrorCuenta
+        ? `${cantidadEliminada} x ${item.producto.nombre} marcado como error de cuenta en ${nombreMesa} · Venta #${item.pedido.ventaId}`
+        : `${cantidadEliminada} x ${item.producto.nombre} quitado de ${nombreMesa} · Venta #${item.pedido.ventaId}`
     );
     return NextResponse.json({
       success: true,
