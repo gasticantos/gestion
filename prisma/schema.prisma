@@ -62,19 +62,20 @@ enum Rol {
 }
 
 model Usuario {
-  id               Int               @id @default(autoincrement())
-  nombre           String
-  email            String            @unique
-  authId           String?           @unique @db.Uuid
-  passwordHash     String
-  rol              Rol               @default(MOZO)
-  activo           Boolean           @default(true)
-  createdAt        DateTime          @default(now())
-  auditorias       AuditoriaLog[]
-  pedidosCreados   Pedido[]          @relation("PedidoCreadoPor")
-  ajustesPreticket AjustePreticket[]
-  negocioId        Int               @default(1)
-  negocio          Negocio           @relation(fields: [negocioId], references: [id])
+  id                 Int               @id @default(autoincrement())
+  nombre             String
+  email              String            @unique
+  authId             String?           @unique @db.Uuid
+  passwordHash       String
+  rol                Rol               @default(MOZO)
+  activo             Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  auditorias         AuditoriaLog[]
+  pedidosCreados     Pedido[]          @relation("PedidoCreadoPor")
+  ajustesPreticket   AjustePreticket[]
+  cuentasResponsable Venta[]           @relation("ResponsableCuenta")
+  negocioId          Int               @default(1)
+  negocio            Negocio           @relation(fields: [negocioId], references: [id])
 
   @@index([negocioId])
 }
@@ -358,33 +359,37 @@ model Reserva {
 }
 
 model Venta {
-  id                   Int                         @id @default(autoincrement())
-  tipo                 TipoVenta
-  mesaId               Int?
-  mesa                 Mesa?                       @relation(fields: [mesaId], references: [id])
-  clienteId            Int?
-  cliente              Cliente?                    @relation(fields: [clienteId], references: [id])
-  estado               EstadoVenta                 @default(ABIERTA)
-  tarifa               TarifaPrecio                @default(PARTICULAR)
-  total                Float                       @default(0)
-  descuentoPct         Float                       @default(0)
-  descuentoResponsable String?
-  propina              Float                       @default(0)
-  borradorRonda        Json?
-  ticketImpreso        Boolean                     @default(false)
-  createdAt            DateTime                    @default(now())
-  closedAt             DateTime?
-  cierreCajaAt         DateTime?
-  pedidos              Pedido[]
-  pagos                Pago[]
-  movimientosCC        MovimientoCuentaCorriente[]
-  ajustesPreticket     AjustePreticket[]
-  negocioId            Int                         @default(1)
-  negocio              Negocio                     @relation(fields: [negocioId], references: [id])
+  id                      Int                         @id @default(autoincrement())
+  tipo                    TipoVenta
+  mesaId                  Int?
+  mesa                    Mesa?                       @relation(fields: [mesaId], references: [id])
+  clienteId               Int?
+  cliente                 Cliente?                    @relation(fields: [clienteId], references: [id])
+  estado                  EstadoVenta                 @default(ABIERTA)
+  tarifa                  TarifaPrecio                @default(PARTICULAR)
+  total                   Float                       @default(0)
+  descuentoPct            Float                       @default(0)
+  descuentoResponsable    String?
+  responsableCuentaId     Int?
+  responsableCuenta       Usuario?                    @relation("ResponsableCuenta", fields: [responsableCuentaId], references: [id], onDelete: SetNull)
+  responsableCuentaNombre String?
+  propina                 Float                       @default(0)
+  borradorRonda           Json?
+  ticketImpreso           Boolean                     @default(false)
+  createdAt               DateTime                    @default(now())
+  closedAt                DateTime?
+  cierreCajaAt            DateTime?
+  pedidos                 Pedido[]
+  pagos                   Pago[]
+  movimientosCC           MovimientoCuentaCorriente[]
+  ajustesPreticket        AjustePreticket[]
+  negocioId               Int                         @default(1)
+  negocio                 Negocio                     @relation(fields: [negocioId], references: [id])
 
   @@index([negocioId])
   @@index([mesaId])
   @@index([clienteId])
+  @@index([responsableCuentaId])
   @@index([estado])
   @@index([estado, closedAt])
   @@index([negocioId, cierreCajaAt])

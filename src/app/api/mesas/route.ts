@@ -7,7 +7,7 @@ export async function GET() {
       include: {
         ventas: {
           where: { estado: "ABIERTA" },
-          select: { id: true, total: true, ticketImpreso: true },
+          select: { id: true, total: true, ticketImpreso: true, responsableCuentaNombre: true },
         },
       },
       // Por número real (1, 2, 3...), no alfabético por nombre ("Mesa 1", "Mesa 10",

@@ -32,6 +32,7 @@ export type VentaAvgAggregateOutputType = {
   clienteId: number | null
   total: number | null
   descuentoPct: number | null
+  responsableCuentaId: number | null
   propina: number | null
   negocioId: number | null
 }
@@ -42,6 +43,7 @@ export type VentaSumAggregateOutputType = {
   clienteId: number | null
   total: number | null
   descuentoPct: number | null
+  responsableCuentaId: number | null
   propina: number | null
   negocioId: number | null
 }
@@ -56,6 +58,8 @@ export type VentaMinAggregateOutputType = {
   total: number | null
   descuentoPct: number | null
   descuentoResponsable: string | null
+  responsableCuentaId: number | null
+  responsableCuentaNombre: string | null
   propina: number | null
   ticketImpreso: boolean | null
   createdAt: Date | null
@@ -74,6 +78,8 @@ export type VentaMaxAggregateOutputType = {
   total: number | null
   descuentoPct: number | null
   descuentoResponsable: string | null
+  responsableCuentaId: number | null
+  responsableCuentaNombre: string | null
   propina: number | null
   ticketImpreso: boolean | null
   createdAt: Date | null
@@ -92,6 +98,8 @@ export type VentaCountAggregateOutputType = {
   total: number
   descuentoPct: number
   descuentoResponsable: number
+  responsableCuentaId: number
+  responsableCuentaNombre: number
   propina: number
   borradorRonda: number
   ticketImpreso: number
@@ -109,6 +117,7 @@ export type VentaAvgAggregateInputType = {
   clienteId?: true
   total?: true
   descuentoPct?: true
+  responsableCuentaId?: true
   propina?: true
   negocioId?: true
 }
@@ -119,6 +128,7 @@ export type VentaSumAggregateInputType = {
   clienteId?: true
   total?: true
   descuentoPct?: true
+  responsableCuentaId?: true
   propina?: true
   negocioId?: true
 }
@@ -133,6 +143,8 @@ export type VentaMinAggregateInputType = {
   total?: true
   descuentoPct?: true
   descuentoResponsable?: true
+  responsableCuentaId?: true
+  responsableCuentaNombre?: true
   propina?: true
   ticketImpreso?: true
   createdAt?: true
@@ -151,6 +163,8 @@ export type VentaMaxAggregateInputType = {
   total?: true
   descuentoPct?: true
   descuentoResponsable?: true
+  responsableCuentaId?: true
+  responsableCuentaNombre?: true
   propina?: true
   ticketImpreso?: true
   createdAt?: true
@@ -169,6 +183,8 @@ export type VentaCountAggregateInputType = {
   total?: true
   descuentoPct?: true
   descuentoResponsable?: true
+  responsableCuentaId?: true
+  responsableCuentaNombre?: true
   propina?: true
   borradorRonda?: true
   ticketImpreso?: true
@@ -275,6 +291,8 @@ export type VentaGroupByOutputType = {
   total: number
   descuentoPct: number
   descuentoResponsable: string | null
+  responsableCuentaId: number | null
+  responsableCuentaNombre: string | null
   propina: number
   borradorRonda: runtime.JsonValue | null
   ticketImpreso: boolean
@@ -317,6 +335,8 @@ export type VentaWhereInput = {
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
   descuentoResponsable?: Prisma.StringNullableFilter<"Venta"> | string | null
+  responsableCuentaId?: Prisma.IntNullableFilter<"Venta"> | number | null
+  responsableCuentaNombre?: Prisma.StringNullableFilter<"Venta"> | string | null
   propina?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
@@ -326,6 +346,7 @@ export type VentaWhereInput = {
   negocioId?: Prisma.IntFilter<"Venta"> | number
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
   cliente?: Prisma.XOR<Prisma.ClienteNullableScalarRelationFilter, Prisma.ClienteWhereInput> | null
+  responsableCuenta?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
   pedidos?: Prisma.PedidoListRelationFilter
   pagos?: Prisma.PagoListRelationFilter
   movimientosCC?: Prisma.MovimientoCuentaCorrienteListRelationFilter
@@ -343,6 +364,8 @@ export type VentaOrderByWithRelationInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   descuentoResponsable?: Prisma.SortOrderInput | Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrderInput | Prisma.SortOrder
+  responsableCuentaNombre?: Prisma.SortOrderInput | Prisma.SortOrder
   propina?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
@@ -352,6 +375,7 @@ export type VentaOrderByWithRelationInput = {
   negocioId?: Prisma.SortOrder
   mesa?: Prisma.MesaOrderByWithRelationInput
   cliente?: Prisma.ClienteOrderByWithRelationInput
+  responsableCuenta?: Prisma.UsuarioOrderByWithRelationInput
   pedidos?: Prisma.PedidoOrderByRelationAggregateInput
   pagos?: Prisma.PagoOrderByRelationAggregateInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteOrderByRelationAggregateInput
@@ -372,6 +396,8 @@ export type VentaWhereUniqueInput = Prisma.AtLeast<{
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
   descuentoResponsable?: Prisma.StringNullableFilter<"Venta"> | string | null
+  responsableCuentaId?: Prisma.IntNullableFilter<"Venta"> | number | null
+  responsableCuentaNombre?: Prisma.StringNullableFilter<"Venta"> | string | null
   propina?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
@@ -381,6 +407,7 @@ export type VentaWhereUniqueInput = Prisma.AtLeast<{
   negocioId?: Prisma.IntFilter<"Venta"> | number
   mesa?: Prisma.XOR<Prisma.MesaNullableScalarRelationFilter, Prisma.MesaWhereInput> | null
   cliente?: Prisma.XOR<Prisma.ClienteNullableScalarRelationFilter, Prisma.ClienteWhereInput> | null
+  responsableCuenta?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
   pedidos?: Prisma.PedidoListRelationFilter
   pagos?: Prisma.PagoListRelationFilter
   movimientosCC?: Prisma.MovimientoCuentaCorrienteListRelationFilter
@@ -398,6 +425,8 @@ export type VentaOrderByWithAggregationInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   descuentoResponsable?: Prisma.SortOrderInput | Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrderInput | Prisma.SortOrder
+  responsableCuentaNombre?: Prisma.SortOrderInput | Prisma.SortOrder
   propina?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
@@ -425,6 +454,8 @@ export type VentaScalarWhereWithAggregatesInput = {
   total?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   descuentoResponsable?: Prisma.StringNullableWithAggregatesFilter<"Venta"> | string | null
+  responsableCuentaId?: Prisma.IntNullableWithAggregatesFilter<"Venta"> | number | null
+  responsableCuentaNombre?: Prisma.StringNullableWithAggregatesFilter<"Venta"> | string | null
   propina?: Prisma.FloatWithAggregatesFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableWithAggregatesFilter<"Venta">
   ticketImpreso?: Prisma.BoolWithAggregatesFilter<"Venta"> | boolean
@@ -441,6 +472,7 @@ export type VentaCreateInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -449,6 +481,7 @@ export type VentaCreateInput = {
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
@@ -466,6 +499,8 @@ export type VentaUncheckedCreateInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -486,6 +521,7 @@ export type VentaUpdateInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -494,6 +530,7 @@ export type VentaUpdateInput = {
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
@@ -511,6 +548,8 @@ export type VentaUncheckedUpdateInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -534,6 +573,8 @@ export type VentaCreateManyInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -550,6 +591,7 @@ export type VentaUpdateManyMutationInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -568,6 +610,8 @@ export type VentaUncheckedUpdateManyInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -597,6 +641,8 @@ export type VentaCountOrderByAggregateInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   descuentoResponsable?: Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrder
+  responsableCuentaNombre?: Prisma.SortOrder
   propina?: Prisma.SortOrder
   borradorRonda?: Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
@@ -612,6 +658,7 @@ export type VentaAvgOrderByAggregateInput = {
   clienteId?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrder
   propina?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
@@ -626,6 +673,8 @@ export type VentaMaxOrderByAggregateInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   descuentoResponsable?: Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrder
+  responsableCuentaNombre?: Prisma.SortOrder
   propina?: Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -644,6 +693,8 @@ export type VentaMinOrderByAggregateInput = {
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
   descuentoResponsable?: Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrder
+  responsableCuentaNombre?: Prisma.SortOrder
   propina?: Prisma.SortOrder
   ticketImpreso?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -658,6 +709,7 @@ export type VentaSumOrderByAggregateInput = {
   clienteId?: Prisma.SortOrder
   total?: Prisma.SortOrder
   descuentoPct?: Prisma.SortOrder
+  responsableCuentaId?: Prisma.SortOrder
   propina?: Prisma.SortOrder
   negocioId?: Prisma.SortOrder
 }
@@ -711,6 +763,48 @@ export type VentaUncheckedUpdateManyWithoutNegocioNestedInput = {
   connect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
   update?: Prisma.VentaUpdateWithWhereUniqueWithoutNegocioInput | Prisma.VentaUpdateWithWhereUniqueWithoutNegocioInput[]
   updateMany?: Prisma.VentaUpdateManyWithWhereWithoutNegocioInput | Prisma.VentaUpdateManyWithWhereWithoutNegocioInput[]
+  deleteMany?: Prisma.VentaScalarWhereInput | Prisma.VentaScalarWhereInput[]
+}
+
+export type VentaCreateNestedManyWithoutResponsableCuentaInput = {
+  create?: Prisma.XOR<Prisma.VentaCreateWithoutResponsableCuentaInput, Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput> | Prisma.VentaCreateWithoutResponsableCuentaInput[] | Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput[]
+  connectOrCreate?: Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput | Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput[]
+  createMany?: Prisma.VentaCreateManyResponsableCuentaInputEnvelope
+  connect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+}
+
+export type VentaUncheckedCreateNestedManyWithoutResponsableCuentaInput = {
+  create?: Prisma.XOR<Prisma.VentaCreateWithoutResponsableCuentaInput, Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput> | Prisma.VentaCreateWithoutResponsableCuentaInput[] | Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput[]
+  connectOrCreate?: Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput | Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput[]
+  createMany?: Prisma.VentaCreateManyResponsableCuentaInputEnvelope
+  connect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+}
+
+export type VentaUpdateManyWithoutResponsableCuentaNestedInput = {
+  create?: Prisma.XOR<Prisma.VentaCreateWithoutResponsableCuentaInput, Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput> | Prisma.VentaCreateWithoutResponsableCuentaInput[] | Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput[]
+  connectOrCreate?: Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput | Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput[]
+  upsert?: Prisma.VentaUpsertWithWhereUniqueWithoutResponsableCuentaInput | Prisma.VentaUpsertWithWhereUniqueWithoutResponsableCuentaInput[]
+  createMany?: Prisma.VentaCreateManyResponsableCuentaInputEnvelope
+  set?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  disconnect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  delete?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  connect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  update?: Prisma.VentaUpdateWithWhereUniqueWithoutResponsableCuentaInput | Prisma.VentaUpdateWithWhereUniqueWithoutResponsableCuentaInput[]
+  updateMany?: Prisma.VentaUpdateManyWithWhereWithoutResponsableCuentaInput | Prisma.VentaUpdateManyWithWhereWithoutResponsableCuentaInput[]
+  deleteMany?: Prisma.VentaScalarWhereInput | Prisma.VentaScalarWhereInput[]
+}
+
+export type VentaUncheckedUpdateManyWithoutResponsableCuentaNestedInput = {
+  create?: Prisma.XOR<Prisma.VentaCreateWithoutResponsableCuentaInput, Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput> | Prisma.VentaCreateWithoutResponsableCuentaInput[] | Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput[]
+  connectOrCreate?: Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput | Prisma.VentaCreateOrConnectWithoutResponsableCuentaInput[]
+  upsert?: Prisma.VentaUpsertWithWhereUniqueWithoutResponsableCuentaInput | Prisma.VentaUpsertWithWhereUniqueWithoutResponsableCuentaInput[]
+  createMany?: Prisma.VentaCreateManyResponsableCuentaInputEnvelope
+  set?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  disconnect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  delete?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  connect?: Prisma.VentaWhereUniqueInput | Prisma.VentaWhereUniqueInput[]
+  update?: Prisma.VentaUpdateWithWhereUniqueWithoutResponsableCuentaInput | Prisma.VentaUpdateWithWhereUniqueWithoutResponsableCuentaInput[]
+  updateMany?: Prisma.VentaUpdateManyWithWhereWithoutResponsableCuentaInput | Prisma.VentaUpdateManyWithWhereWithoutResponsableCuentaInput[]
   deleteMany?: Prisma.VentaScalarWhereInput | Prisma.VentaScalarWhereInput[]
 }
 
@@ -875,6 +969,7 @@ export type VentaCreateWithoutNegocioInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -883,6 +978,7 @@ export type VentaCreateWithoutNegocioInput = {
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
@@ -899,6 +995,8 @@ export type VentaUncheckedCreateWithoutNegocioInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -950,6 +1048,8 @@ export type VentaScalarWhereInput = {
   total?: Prisma.FloatFilter<"Venta"> | number
   descuentoPct?: Prisma.FloatFilter<"Venta"> | number
   descuentoResponsable?: Prisma.StringNullableFilter<"Venta"> | string | null
+  responsableCuentaId?: Prisma.IntNullableFilter<"Venta"> | number | null
+  responsableCuentaNombre?: Prisma.StringNullableFilter<"Venta"> | string | null
   propina?: Prisma.FloatFilter<"Venta"> | number
   borradorRonda?: Prisma.JsonNullableFilter<"Venta">
   ticketImpreso?: Prisma.BoolFilter<"Venta"> | boolean
@@ -959,6 +1059,79 @@ export type VentaScalarWhereInput = {
   negocioId?: Prisma.IntFilter<"Venta"> | number
 }
 
+export type VentaCreateWithoutResponsableCuentaInput = {
+  tipo: $Enums.TipoVenta
+  estado?: $Enums.EstadoVenta
+  tarifa?: $Enums.TarifaPrecio
+  total?: number
+  descuentoPct?: number
+  descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
+  propina?: number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
+  createdAt?: Date | string
+  closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
+  mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
+  cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
+  pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutVentasInput
+}
+
+export type VentaUncheckedCreateWithoutResponsableCuentaInput = {
+  id?: number
+  tipo: $Enums.TipoVenta
+  mesaId?: number | null
+  clienteId?: number | null
+  estado?: $Enums.EstadoVenta
+  tarifa?: $Enums.TarifaPrecio
+  total?: number
+  descuentoPct?: number
+  descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
+  propina?: number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
+  createdAt?: Date | string
+  closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
+  negocioId?: number
+  pedidos?: Prisma.PedidoUncheckedCreateNestedManyWithoutVentaInput
+  pagos?: Prisma.PagoUncheckedCreateNestedManyWithoutVentaInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedCreateNestedManyWithoutVentaInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedCreateNestedManyWithoutVentaInput
+}
+
+export type VentaCreateOrConnectWithoutResponsableCuentaInput = {
+  where: Prisma.VentaWhereUniqueInput
+  create: Prisma.XOR<Prisma.VentaCreateWithoutResponsableCuentaInput, Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput>
+}
+
+export type VentaCreateManyResponsableCuentaInputEnvelope = {
+  data: Prisma.VentaCreateManyResponsableCuentaInput | Prisma.VentaCreateManyResponsableCuentaInput[]
+  skipDuplicates?: boolean
+}
+
+export type VentaUpsertWithWhereUniqueWithoutResponsableCuentaInput = {
+  where: Prisma.VentaWhereUniqueInput
+  update: Prisma.XOR<Prisma.VentaUpdateWithoutResponsableCuentaInput, Prisma.VentaUncheckedUpdateWithoutResponsableCuentaInput>
+  create: Prisma.XOR<Prisma.VentaCreateWithoutResponsableCuentaInput, Prisma.VentaUncheckedCreateWithoutResponsableCuentaInput>
+}
+
+export type VentaUpdateWithWhereUniqueWithoutResponsableCuentaInput = {
+  where: Prisma.VentaWhereUniqueInput
+  data: Prisma.XOR<Prisma.VentaUpdateWithoutResponsableCuentaInput, Prisma.VentaUncheckedUpdateWithoutResponsableCuentaInput>
+}
+
+export type VentaUpdateManyWithWhereWithoutResponsableCuentaInput = {
+  where: Prisma.VentaScalarWhereInput
+  data: Prisma.XOR<Prisma.VentaUpdateManyMutationInput, Prisma.VentaUncheckedUpdateManyWithoutResponsableCuentaInput>
+}
+
 export type VentaCreateWithoutMesaInput = {
   tipo: $Enums.TipoVenta
   estado?: $Enums.EstadoVenta
@@ -966,6 +1139,7 @@ export type VentaCreateWithoutMesaInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -973,6 +1147,7 @@ export type VentaCreateWithoutMesaInput = {
   closedAt?: Date | string | null
   cierreCajaAt?: Date | string | null
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
@@ -989,6 +1164,8 @@ export type VentaUncheckedCreateWithoutMesaInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1035,6 +1212,7 @@ export type VentaCreateWithoutAjustesPreticketInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1043,6 +1221,7 @@ export type VentaCreateWithoutAjustesPreticketInput = {
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
@@ -1059,6 +1238,8 @@ export type VentaUncheckedCreateWithoutAjustesPreticketInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1094,6 +1275,7 @@ export type VentaUpdateWithoutAjustesPreticketInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1102,6 +1284,7 @@ export type VentaUpdateWithoutAjustesPreticketInput = {
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
@@ -1118,6 +1301,8 @@ export type VentaUncheckedUpdateWithoutAjustesPreticketInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1137,6 +1322,7 @@ export type VentaCreateWithoutPedidosInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1145,6 +1331,7 @@ export type VentaCreateWithoutPedidosInput = {
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
   ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
@@ -1161,6 +1348,8 @@ export type VentaUncheckedCreateWithoutPedidosInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1196,6 +1385,7 @@ export type VentaUpdateWithoutPedidosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1204,6 +1394,7 @@ export type VentaUpdateWithoutPedidosInput = {
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
   ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
@@ -1220,6 +1411,8 @@ export type VentaUncheckedUpdateWithoutPedidosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1239,6 +1432,7 @@ export type VentaCreateWithoutPagosInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1247,6 +1441,7 @@ export type VentaCreateWithoutPagosInput = {
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
   ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
@@ -1263,6 +1458,8 @@ export type VentaUncheckedCreateWithoutPagosInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1298,6 +1495,7 @@ export type VentaUpdateWithoutPagosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1306,6 +1504,7 @@ export type VentaUpdateWithoutPagosInput = {
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
   ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
@@ -1322,6 +1521,8 @@ export type VentaUncheckedUpdateWithoutPagosInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1341,6 +1542,7 @@ export type VentaCreateWithoutClienteInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1348,6 +1550,7 @@ export type VentaCreateWithoutClienteInput = {
   closedAt?: Date | string | null
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteCreateNestedManyWithoutVentaInput
@@ -1364,6 +1567,8 @@ export type VentaUncheckedCreateWithoutClienteInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1410,6 +1615,7 @@ export type VentaCreateWithoutMovimientosCCInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1418,6 +1624,7 @@ export type VentaCreateWithoutMovimientosCCInput = {
   cierreCajaAt?: Date | string | null
   mesa?: Prisma.MesaCreateNestedOneWithoutVentasInput
   cliente?: Prisma.ClienteCreateNestedOneWithoutVentasInput
+  responsableCuenta?: Prisma.UsuarioCreateNestedOneWithoutCuentasResponsableInput
   pedidos?: Prisma.PedidoCreateNestedManyWithoutVentaInput
   pagos?: Prisma.PagoCreateNestedManyWithoutVentaInput
   ajustesPreticket?: Prisma.AjustePreticketCreateNestedManyWithoutVentaInput
@@ -1434,6 +1641,8 @@ export type VentaUncheckedCreateWithoutMovimientosCCInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1469,6 +1678,7 @@ export type VentaUpdateWithoutMovimientosCCInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1477,6 +1687,7 @@ export type VentaUpdateWithoutMovimientosCCInput = {
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
@@ -1493,6 +1704,8 @@ export type VentaUncheckedUpdateWithoutMovimientosCCInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1515,6 +1728,8 @@ export type VentaCreateManyNegocioInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1530,6 +1745,7 @@ export type VentaUpdateWithoutNegocioInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1538,6 +1754,7 @@ export type VentaUpdateWithoutNegocioInput = {
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
@@ -1554,6 +1771,8 @@ export type VentaUncheckedUpdateWithoutNegocioInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1576,12 +1795,101 @@ export type VentaUncheckedUpdateManyWithoutNegocioInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type VentaCreateManyResponsableCuentaInput = {
+  id?: number
+  tipo: $Enums.TipoVenta
+  mesaId?: number | null
+  clienteId?: number | null
+  estado?: $Enums.EstadoVenta
+  tarifa?: $Enums.TarifaPrecio
+  total?: number
+  descuentoPct?: number
+  descuentoResponsable?: string | null
+  responsableCuentaNombre?: string | null
+  propina?: number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: boolean
+  createdAt?: Date | string
+  closedAt?: Date | string | null
+  cierreCajaAt?: Date | string | null
+  negocioId?: number
+}
+
+export type VentaUpdateWithoutResponsableCuentaInput = {
+  tipo?: Prisma.EnumTipoVentaFieldUpdateOperationsInput | $Enums.TipoVenta
+  estado?: Prisma.EnumEstadoVentaFieldUpdateOperationsInput | $Enums.EstadoVenta
+  tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
+  cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
+  pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUpdateManyWithoutVentaNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutVentasNestedInput
+}
+
+export type VentaUncheckedUpdateWithoutResponsableCuentaInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  tipo?: Prisma.EnumTipoVentaFieldUpdateOperationsInput | $Enums.TipoVenta
+  mesaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  clienteId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  estado?: Prisma.EnumEstadoVentaFieldUpdateOperationsInput | $Enums.EstadoVenta
+  tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+  pedidos?: Prisma.PedidoUncheckedUpdateManyWithoutVentaNestedInput
+  pagos?: Prisma.PagoUncheckedUpdateManyWithoutVentaNestedInput
+  movimientosCC?: Prisma.MovimientoCuentaCorrienteUncheckedUpdateManyWithoutVentaNestedInput
+  ajustesPreticket?: Prisma.AjustePreticketUncheckedUpdateManyWithoutVentaNestedInput
+}
+
+export type VentaUncheckedUpdateManyWithoutResponsableCuentaInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  tipo?: Prisma.EnumTipoVentaFieldUpdateOperationsInput | $Enums.TipoVenta
+  mesaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  clienteId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  estado?: Prisma.EnumEstadoVentaFieldUpdateOperationsInput | $Enums.EstadoVenta
+  tarifa?: Prisma.EnumTarifaPrecioFieldUpdateOperationsInput | $Enums.TarifaPrecio
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
+  descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  propina?: Prisma.FloatFieldUpdateOperationsInput | number
+  borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type VentaCreateManyMesaInput = {
@@ -1593,6 +1901,8 @@ export type VentaCreateManyMesaInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1609,6 +1919,7 @@ export type VentaUpdateWithoutMesaInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1616,6 +1927,7 @@ export type VentaUpdateWithoutMesaInput = {
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cliente?: Prisma.ClienteUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
@@ -1632,6 +1944,8 @@ export type VentaUncheckedUpdateWithoutMesaInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1654,6 +1968,8 @@ export type VentaUncheckedUpdateManyWithoutMesaInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1672,6 +1988,8 @@ export type VentaCreateManyClienteInput = {
   total?: number
   descuentoPct?: number
   descuentoResponsable?: string | null
+  responsableCuentaId?: number | null
+  responsableCuentaNombre?: string | null
   propina?: number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: boolean
@@ -1688,6 +2006,7 @@ export type VentaUpdateWithoutClienteInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1695,6 +2014,7 @@ export type VentaUpdateWithoutClienteInput = {
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cierreCajaAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mesa?: Prisma.MesaUpdateOneWithoutVentasNestedInput
+  responsableCuenta?: Prisma.UsuarioUpdateOneWithoutCuentasResponsableNestedInput
   pedidos?: Prisma.PedidoUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.PagoUpdateManyWithoutVentaNestedInput
   movimientosCC?: Prisma.MovimientoCuentaCorrienteUpdateManyWithoutVentaNestedInput
@@ -1711,6 +2031,8 @@ export type VentaUncheckedUpdateWithoutClienteInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1733,6 +2055,8 @@ export type VentaUncheckedUpdateManyWithoutClienteInput = {
   total?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoPct?: Prisma.FloatFieldUpdateOperationsInput | number
   descuentoResponsable?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  responsableCuentaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  responsableCuentaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   propina?: Prisma.FloatFieldUpdateOperationsInput | number
   borradorRonda?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ticketImpreso?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1810,6 +2134,8 @@ export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   total?: boolean
   descuentoPct?: boolean
   descuentoResponsable?: boolean
+  responsableCuentaId?: boolean
+  responsableCuentaNombre?: boolean
   propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
@@ -1819,6 +2145,7 @@ export type VentaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   negocioId?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
+  responsableCuenta?: boolean | Prisma.Venta$responsableCuentaArgs<ExtArgs>
   pedidos?: boolean | Prisma.Venta$pedidosArgs<ExtArgs>
   pagos?: boolean | Prisma.Venta$pagosArgs<ExtArgs>
   movimientosCC?: boolean | Prisma.Venta$movimientosCCArgs<ExtArgs>
@@ -1837,6 +2164,8 @@ export type VentaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   total?: boolean
   descuentoPct?: boolean
   descuentoResponsable?: boolean
+  responsableCuentaId?: boolean
+  responsableCuentaNombre?: boolean
   propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
@@ -1846,6 +2175,7 @@ export type VentaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   negocioId?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
+  responsableCuenta?: boolean | Prisma.Venta$responsableCuentaArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["venta"]>
 
@@ -1859,6 +2189,8 @@ export type VentaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   total?: boolean
   descuentoPct?: boolean
   descuentoResponsable?: boolean
+  responsableCuentaId?: boolean
+  responsableCuentaNombre?: boolean
   propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
@@ -1868,6 +2200,7 @@ export type VentaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   negocioId?: boolean
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
+  responsableCuenta?: boolean | Prisma.Venta$responsableCuentaArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["venta"]>
 
@@ -1881,6 +2214,8 @@ export type VentaSelectScalar = {
   total?: boolean
   descuentoPct?: boolean
   descuentoResponsable?: boolean
+  responsableCuentaId?: boolean
+  responsableCuentaNombre?: boolean
   propina?: boolean
   borradorRonda?: boolean
   ticketImpreso?: boolean
@@ -1890,10 +2225,11 @@ export type VentaSelectScalar = {
   negocioId?: boolean
 }
 
-export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "descuentoResponsable" | "propina" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt" | "cierreCajaAt" | "negocioId", ExtArgs["result"]["venta"]>
+export type VentaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tipo" | "mesaId" | "clienteId" | "estado" | "tarifa" | "total" | "descuentoPct" | "descuentoResponsable" | "responsableCuentaId" | "responsableCuentaNombre" | "propina" | "borradorRonda" | "ticketImpreso" | "createdAt" | "closedAt" | "cierreCajaAt" | "negocioId", ExtArgs["result"]["venta"]>
 export type VentaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
+  responsableCuenta?: boolean | Prisma.Venta$responsableCuentaArgs<ExtArgs>
   pedidos?: boolean | Prisma.Venta$pedidosArgs<ExtArgs>
   pagos?: boolean | Prisma.Venta$pagosArgs<ExtArgs>
   movimientosCC?: boolean | Prisma.Venta$movimientosCCArgs<ExtArgs>
@@ -1904,11 +2240,13 @@ export type VentaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type VentaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
+  responsableCuenta?: boolean | Prisma.Venta$responsableCuentaArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 export type VentaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mesa?: boolean | Prisma.Venta$mesaArgs<ExtArgs>
   cliente?: boolean | Prisma.Venta$clienteArgs<ExtArgs>
+  responsableCuenta?: boolean | Prisma.Venta$responsableCuentaArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
 }
 
@@ -1917,6 +2255,7 @@ export type $VentaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     mesa: Prisma.$MesaPayload<ExtArgs> | null
     cliente: Prisma.$ClientePayload<ExtArgs> | null
+    responsableCuenta: Prisma.$UsuarioPayload<ExtArgs> | null
     pedidos: Prisma.$PedidoPayload<ExtArgs>[]
     pagos: Prisma.$PagoPayload<ExtArgs>[]
     movimientosCC: Prisma.$MovimientoCuentaCorrientePayload<ExtArgs>[]
@@ -1933,6 +2272,8 @@ export type $VentaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     total: number
     descuentoPct: number
     descuentoResponsable: string | null
+    responsableCuentaId: number | null
+    responsableCuentaNombre: string | null
     propina: number
     borradorRonda: runtime.JsonValue | null
     ticketImpreso: boolean
@@ -2336,6 +2677,7 @@ export interface Prisma__VentaClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   mesa<T extends Prisma.Venta$mesaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$mesaArgs<ExtArgs>>): Prisma.Prisma__MesaClient<runtime.Types.Result.GetResult<Prisma.$MesaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   cliente<T extends Prisma.Venta$clienteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$clienteArgs<ExtArgs>>): Prisma.Prisma__ClienteClient<runtime.Types.Result.GetResult<Prisma.$ClientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  responsableCuenta<T extends Prisma.Venta$responsableCuentaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$responsableCuentaArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pedidos<T extends Prisma.Venta$pedidosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$pedidosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PedidoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pagos<T extends Prisma.Venta$pagosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$pagosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PagoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimientosCC<T extends Prisma.Venta$movimientosCCArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Venta$movimientosCCArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MovimientoCuentaCorrientePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2379,6 +2721,8 @@ export interface VentaFieldRefs {
   readonly total: Prisma.FieldRef<"Venta", 'Float'>
   readonly descuentoPct: Prisma.FieldRef<"Venta", 'Float'>
   readonly descuentoResponsable: Prisma.FieldRef<"Venta", 'String'>
+  readonly responsableCuentaId: Prisma.FieldRef<"Venta", 'Int'>
+  readonly responsableCuentaNombre: Prisma.FieldRef<"Venta", 'String'>
   readonly propina: Prisma.FieldRef<"Venta", 'Float'>
   readonly borradorRonda: Prisma.FieldRef<"Venta", 'Json'>
   readonly ticketImpreso: Prisma.FieldRef<"Venta", 'Boolean'>
@@ -2822,6 +3166,25 @@ export type Venta$clienteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   include?: Prisma.ClienteInclude<ExtArgs> | null
   where?: Prisma.ClienteWhereInput
+}
+
+/**
+ * Venta.responsableCuenta
+ */
+export type Venta$responsableCuentaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Usuario
+   */
+  select?: Prisma.UsuarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Usuario
+   */
+  omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  where?: Prisma.UsuarioWhereInput
 }
 
 /**

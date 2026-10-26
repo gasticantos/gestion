@@ -58,7 +58,11 @@ type Venta = {
   pedidos: Pedido[];
   borradorRonda: ItemRonda[] | null;
   ticketImpreso: boolean;
+  responsableCuentaId: number | null;
+  responsableCuentaNombre: string | null;
 };
+
+type Moza = { id: number; nombre: string };
 
 type Mesa = {
   id: number;
@@ -110,6 +114,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [mostrarMover, setMostrarMover] = useState(false);
   const [mesasLibres, setMesasLibres] = useState<{ id: number; nombre: string; apodo: string | null }[] | null>(null);
   const [moviendo, setMoviendo] = useState(false);
+  const [mozas, setMozas] = useState<Moza[]>([]);
+  const [mostrarResponsableCuenta, setMostrarResponsableCuenta] = useState(false);
+  const [responsableCuentaId, setResponsableCuentaId] = useState("");
 
   async function cargar() {
     const mesaRes = await fetch(`/api/mesas/${id}`, { cache: "no-store" });
@@ -134,6 +141,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         setClientes(data.clientes);
         setPrecioMesaActivo(data.precioMesaActivo);
         setRol(data.rol);
+        setMozas(data.mozas ?? []);
       })
       .catch(() => activo && setError("No se pudo cargar la mesa"));
     return () => {
@@ -604,7 +612,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     router.push(`/mesas/${destinoId}`);
   }
 
-  async function imprimirTicket() {
+  function imprimirTicket() {
     setError("");
     if (!venta) return;
     if (ronda.length > 0) {
@@ -615,17 +623,37 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
       setError("Escribí el nombre de quien aplica el descuento");
       return;
     }
+    if (mozas.length === 0) {
+      setError("No hay mozas activas. Creá o activá una usuaria con rol Moza/o antes de imprimir.");
+      return;
+    }
+    const seleccionActual = venta.responsableCuentaId;
+    setResponsableCuentaId(String(seleccionActual && mozas.some((moza) => moza.id === seleccionActual)
+      ? seleccionActual
+      : mozas[0].id));
+    setMostrarResponsableCuenta(true);
+  }
+
+  async function confirmarImpresion() {
+    if (!venta || !responsableCuentaId) return;
+    setError("");
     setEnviando(true);
     try {
       const res = await fetch(`/api/ventas/${venta.id}/imprimir`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ descuentoPct: descuento.pct, descuentoResponsable: descuentoResponsable.trim() || null }),
+        body: JSON.stringify({
+          descuentoPct: descuento.pct,
+          descuentoResponsable: descuentoResponsable.trim() || null,
+          responsableCuentaId: Number(responsableCuentaId),
+        }),
       });
       if (!res.ok) {
-        setError("No se pudo enviar el ticket a la estación de impresión.");
+        const data = await res.json().catch(() => null);
+        setError(data?.error || "No se pudo enviar el ticket a la estación de impresión.");
         return;
       }
+      setMostrarResponsableCuenta(false);
       // Recargar mesa para sincronizar ticketImpreso desde la BD.
       await cargar();
     } catch {
@@ -790,6 +818,47 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
+      {mostrarResponsableCuenta && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="responsable-cuenta-titulo"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget && !enviando) setMostrarResponsableCuenta(false);
+          }}
+        >
+          <div className="w-full max-w-sm rounded-xl border border-neutral-200 bg-white p-5 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
+            <h2 id="responsable-cuenta-titulo" className="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+              ¿Quién lleva la cuenta?
+            </h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Esta persona quedará responsable de la cuenta de {mesa.apodo || mesa.nombre}.
+            </p>
+            <label className="mt-4 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              Moza/o responsable
+              <select
+                autoFocus
+                value={responsableCuentaId}
+                onChange={(e) => setResponsableCuentaId(e.target.value)}
+                className="mt-1.5 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-600/50 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
+              >
+                {mozas.map((moza) => (
+                  <option key={moza.id} value={moza.id}>{moza.nombre}</option>
+                ))}
+              </select>
+            </label>
+            <div className="mt-5 flex justify-end gap-2">
+              <Button type="button" onClick={() => setMostrarResponsableCuenta(false)} disabled={enviando}>
+                Cancelar
+              </Button>
+              <Button type="button" variant="primary" onClick={confirmarImpresion} disabled={enviando || !responsableCuentaId}>
+                {enviando ? "Enviando..." : "Confirmar e imprimir"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         {editandoApodo ? (
           <div className="flex items-center gap-2">

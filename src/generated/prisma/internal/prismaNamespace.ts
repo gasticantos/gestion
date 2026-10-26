@@ -2472,6 +2472,8 @@ export const VentaScalarFieldEnum = {
   total: 'total',
   descuentoPct: 'descuentoPct',
   descuentoResponsable: 'descuentoResponsable',
+  responsableCuentaId: 'responsableCuentaId',
+  responsableCuentaNombre: 'responsableCuentaNombre',
   propina: 'propina',
   borradorRonda: 'borradorRonda',
   ticketImpreso: 'ticketImpreso',

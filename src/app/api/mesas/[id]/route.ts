@@ -10,6 +10,8 @@ const ventaAbierta = {
     descuentoPct: true,
     propina: true,
     ticketImpreso: true,
+    responsableCuentaId: true,
+    responsableCuentaNombre: true,
     borradorRonda: true,
     pagos: {
       select: { id: true, metodo: true, monto: true, tipoTarjeta: true, createdAt: true },
@@ -58,7 +60,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   if (req.nextUrl.searchParams.get("inicial") === "1") {
     const ahora = new Date();
-    const [mesa, productos, clientes, configuracion, sesion] = await Promise.all([
+    const sesion = await sesionActual();
+    const [mesa, productos, clientes, configuracion, mozas] = await Promise.all([
       consultaMesa,
       prisma.producto.findMany({
         where: {
@@ -85,7 +88,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         orderBy: { nombre: "asc" },
       }),
       prisma.configuracion.findFirst({ select: { precioMesaActivo: true } }),
-      sesionActual(),
+      prisma.usuario.findMany({
+        where: { activo: true, rol: "MOZO", negocioId: sesion?.negocioId ?? -1 },
+        select: { id: true, nombre: true },
+        orderBy: { nombre: "asc" },
+      }),
     ]);
     if (!mesa) {
       return NextResponse.json({ error: "Mesa no encontrada" }, { status: 404 });
@@ -96,6 +103,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       clientes,
       precioMesaActivo: configuracion?.precioMesaActivo !== false,
       rol: sesion?.rol ?? null,
+      mozas,
     });
   }
 

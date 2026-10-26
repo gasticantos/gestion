@@ -28,6 +28,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
     }
 
+    let responsableCuentaId = venta.responsableCuentaId;
+    let responsableCuentaNombre = venta.responsableCuentaNombre;
+    if (venta.estado !== "CERRADA" && venta.tipo === "MESA") {
+      const idResponsable = Number(body.responsableCuentaId);
+      if (!Number.isInteger(idResponsable) || idResponsable <= 0) {
+        return NextResponse.json({ error: "Elegí quién lleva la cuenta" }, { status: 400 });
+      }
+      const responsable = await prisma.usuario.findFirst({
+        where: { id: idResponsable, negocioId: sesion.negocioId, activo: true, rol: "MOZO" },
+        select: { id: true, nombre: true },
+      });
+      if (!responsable) {
+        return NextResponse.json({ error: "La moza seleccionada no está disponible" }, { status: 400 });
+      }
+      responsableCuentaId = responsable.id;
+      responsableCuentaNombre = responsable.nombre;
+    }
+
     const configuracion = await prisma.configuracion.findUnique({
       where: { negocioId: sesion.negocioId },
     });
@@ -63,6 +81,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     lineas.push(`[[CENTER]] ${venta.mesa?.apodo || venta.mesa?.nombre || "Mostrador"} - Venta #${venta.id}`);
     if (sesion) {
       lineas.push(`[[CENTER]] ${sesion.nombre.toUpperCase()} - ${ROL_LABEL[sesion.rol]}`);
+    }
+    if (responsableCuentaNombre) {
+      lineas.push(`[[CENTER]] RESPONSABLE: ${responsableCuentaNombre.toUpperCase()}`);
     }
     lineas.push(`[[CENTER]] ${formatearFechaHora(venta.createdAt)}`);
     lineas.push("[[HR]]");
@@ -182,12 +203,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // queda registrado de forma separada en ImpresionTrabajo.
       prisma.venta.update({
         where: { id: Number(id) },
-        data: { ticketImpreso: true },
+        data: {
+          ticketImpreso: true,
+          responsableCuentaId,
+          responsableCuentaNombre,
+        },
       }),
     ]);
 
     const usuarioId = await obtenerUsuarioIdDesdeRequest(req);
-    await registrarAuditoria(usuarioId, "imprimir_ticket", `Venta #${venta.id}`);
+    await registrarAuditoria(
+      usuarioId,
+      "imprimir_ticket",
+      `Venta #${venta.id}${responsableCuentaNombre ? ` · Responsable: ${responsableCuentaNombre}` : ""}`
+    );
     await notificarNuevaImpresion();
 
     return NextResponse.json({ success: true, encolado: true, trabajoId: trabajo.id });

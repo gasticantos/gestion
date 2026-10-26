@@ -12,7 +12,7 @@ type Mesa = {
   numero: number;
   apodo: string | null;
   estado: "LIBRE" | "OCUPADA";
-  ventas: { total: number; ticketImpreso: boolean }[];
+  ventas: { total: number; ticketImpreso: boolean; responsableCuentaNombre: string | null }[];
 };
 
 export default function MesasPage() {
@@ -190,6 +190,11 @@ export default function MesasPage() {
                 >
                   {ticketImpreso ? "Esperando pago" : mesa.estado === "OCUPADA" ? "Ocupada" : "Libre"}
                 </div>
+                {ticketImpreso && mesa.ventas[0]?.responsableCuentaNombre && (
+                  <div className="mt-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                    Lleva: {mesa.ventas[0].responsableCuentaNombre}
+                  </div>
+                )}
                 {mesa.ventas[0] && (
                   <div className="text-sm font-semibold mt-2 text-neutral-800 dark:text-neutral-100">
                     ${formatearMoneda(mesa.ventas[0].total)}

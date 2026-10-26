@@ -274,6 +274,8 @@ CREATE TABLE "Venta" (
     "total" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "descuentoPct" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "descuentoResponsable" TEXT,
+    "responsableCuentaId" INTEGER,
+    "responsableCuentaNombre" TEXT,
     "propina" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "borradorRonda" JSONB,
     "ticketImpreso" BOOLEAN NOT NULL DEFAULT false,
@@ -489,6 +491,9 @@ CREATE INDEX "Venta_mesaId_idx" ON "Venta"("mesaId");
 CREATE INDEX "Venta_clienteId_idx" ON "Venta"("clienteId");
 
 -- CreateIndex
+CREATE INDEX "Venta_responsableCuentaId_idx" ON "Venta"("responsableCuentaId");
+
+-- CreateIndex
 CREATE INDEX "Venta_estado_idx" ON "Venta"("estado");
 
 -- CreateIndex
@@ -601,6 +606,9 @@ ALTER TABLE "Venta" ADD CONSTRAINT "Venta_mesaId_fkey" FOREIGN KEY ("mesaId") RE
 
 -- AddForeignKey
 ALTER TABLE "Venta" ADD CONSTRAINT "Venta_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Venta" ADD CONSTRAINT "Venta_responsableCuentaId_fkey" FOREIGN KEY ("responsableCuentaId") REFERENCES "Usuario"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Venta" ADD CONSTRAINT "Venta_negocioId_fkey" FOREIGN KEY ("negocioId") REFERENCES "Negocio"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
