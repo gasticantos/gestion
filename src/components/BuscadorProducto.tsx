@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, KeyboardEvent, memo } from "react
 import { input } from "@/components/ui/styles";
 import { Tarifa } from "@/lib/precio";
 import { formatearMoneda } from "@/lib/formato";
-import VirtualKeyboard from "@/components/VirtualKeyboard";
 import { useData } from "@/hooks/useData";
 
 export type ProductoBusqueda = {
@@ -62,8 +61,6 @@ function BuscadorProductoBase({
   const [notas, setNotas] = useState("");
   const [precioLibre, setPrecioLibre] = useState("");
   const [tarifaLibre, setTarifaLibre] = useState<Tarifa>("PARTICULAR");
-  const [dispositivoTactil, setDispositivoTactil] = useState(false);
-  const [mostrarTeclado, setMostrarTeclado] = useState(false);
   const [resaltado, setResaltado] = useState(0);
   const [queryResaltada, setQueryResaltada] = useState(query);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,12 +69,6 @@ function BuscadorProductoBase({
   const precioMesaBtnRef = useRef<HTMLButtonElement>(null);
   const precioLibreInputRef = useRef<HTMLInputElement>(null);
   const agregarBtnRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    setDispositivoTactil(
-      navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches
-    );
-  }, []);
 
   // Al entrar al paso de cantidad/precio, foco en cantidad para poder navegar con flechas.
   useEffect(() => {
@@ -120,7 +111,6 @@ function BuscadorProductoBase({
   }
 
   function elegirProducto(p: ProductoBusqueda) {
-    setMostrarTeclado(false);
     if (!pedirPrecio) {
       onSeleccionar(p, "PARTICULAR", p.precioVenta);
       setQuery("");
@@ -189,18 +179,6 @@ function BuscadorProductoBase({
     if (resultados.length > 0) {
       elegirProducto(resultados[Math.min(resaltado, resultados.length - 1)]);
     }
-  }
-
-  function entradaVirtual(char: string) {
-    if (char === "\n") {
-      const q = query.trim().toLocaleLowerCase("es");
-      if (!q) return;
-      const exacto = productos.find((p) => p.codigoBarras?.toLocaleLowerCase("es") === q);
-      if (exacto) elegirProducto(exacto);
-      else if (resultados.length > 0) elegirProducto(resultados[Math.min(resaltado, resultados.length - 1)]);
-      return;
-    }
-    setQuery((actual) => (char === "\b" ? actual.slice(0, -1) : actual + char));
   }
 
   // Navegación con flechas entre los controles del paso "elegí el precio"
@@ -358,8 +336,7 @@ function BuscadorProductoBase({
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}
-        inputMode={dispositivoTactil ? "none" : "text"}
-        readOnly={dispositivoTactil}
+        inputMode="text"
         data-lpignore="true"
         data-1p-ignore
         data-form-type="other"
@@ -367,13 +344,8 @@ function BuscadorProductoBase({
         placeholder={placeholder || "Escanear código de barras o escribir para buscar..."}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        onFocus={() => dispositivoTactil && setMostrarTeclado(true)}
-        onPointerDown={() => dispositivoTactil && setMostrarTeclado(true)}
         onKeyDown={handleKeyDown}
       />
-      {dispositivoTactil && mostrarTeclado && (
-        <VirtualKeyboard onInput={entradaVirtual} onCerrar={() => setMostrarTeclado(false)} />
-      )}
       {resultados.length > 0 && (
         <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto">
           {resultados.map((p, idx) => (
