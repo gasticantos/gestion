@@ -59,6 +59,9 @@ export const ModelName = {
   ImpresionTrabajo: 'ImpresionTrabajo',
   AuditoriaLog: 'AuditoriaLog',
   Proveedor: 'Proveedor',
+  FacturaProveedor: 'FacturaProveedor',
+  FacturaProveedorItem: 'FacturaProveedorItem',
+  PagoProveedor: 'PagoProveedor',
   Producto: 'Producto',
   Presupuesto: 'Presupuesto',
   PresupuestoItem: 'PresupuestoItem',
@@ -197,6 +200,53 @@ export const ProveedorScalarFieldEnum = {
 } as const
 
 export type ProveedorScalarFieldEnum = (typeof ProveedorScalarFieldEnum)[keyof typeof ProveedorScalarFieldEnum]
+
+
+export const FacturaProveedorScalarFieldEnum = {
+  id: 'id',
+  proveedorId: 'proveedorId',
+  numero: 'numero',
+  fecha: 'fecha',
+  total: 'total',
+  saldo: 'saldo',
+  estado: 'estado',
+  comprobante: 'comprobante',
+  notas: 'notas',
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
+} as const
+
+export type FacturaProveedorScalarFieldEnum = (typeof FacturaProveedorScalarFieldEnum)[keyof typeof FacturaProveedorScalarFieldEnum]
+
+
+export const FacturaProveedorItemScalarFieldEnum = {
+  id: 'id',
+  facturaId: 'facturaId',
+  productoId: 'productoId',
+  productoNombre: 'productoNombre',
+  cantidad: 'cantidad',
+  costoAnterior: 'costoAnterior',
+  costoUnitario: 'costoUnitario',
+  precioVentaAnterior: 'precioVentaAnterior',
+  precioVentaSugerido: 'precioVentaSugerido',
+  requiereAumento: 'requiereAumento',
+  precioActualizado: 'precioActualizado'
+} as const
+
+export type FacturaProveedorItemScalarFieldEnum = (typeof FacturaProveedorItemScalarFieldEnum)[keyof typeof FacturaProveedorItemScalarFieldEnum]
+
+
+export const PagoProveedorScalarFieldEnum = {
+  id: 'id',
+  proveedorId: 'proveedorId',
+  facturaId: 'facturaId',
+  monto: 'monto',
+  notas: 'notas',
+  createdAt: 'createdAt',
+  negocioId: 'negocioId'
+} as const
+
+export type PagoProveedorScalarFieldEnum = (typeof PagoProveedorScalarFieldEnum)[keyof typeof PagoProveedorScalarFieldEnum]
 
 
 export const ProductoScalarFieldEnum = {

@@ -524,14 +524,6 @@ export type ControlCajaUncheckedUpdateManyWithoutNegocioNestedInput = {
   deleteMany?: Prisma.ControlCajaScalarWhereInput | Prisma.ControlCajaScalarWhereInput[]
 }
 
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ControlCajaCreateNestedOneWithoutMovimientosInput = {
   create?: Prisma.XOR<Prisma.ControlCajaCreateWithoutMovimientosInput, Prisma.ControlCajaUncheckedCreateWithoutMovimientosInput>
   connectOrCreate?: Prisma.ControlCajaCreateOrConnectWithoutMovimientosInput

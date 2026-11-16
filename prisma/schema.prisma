@@ -30,6 +30,8 @@ model Negocio {
   presupuestos    Presupuesto[]
   flyers          Flyer[]
   controlesCaja   ControlCaja[]
+  facturasProveedor FacturaProveedor[]
+  pagosProveedor    PagoProveedor[]
 }
 
 model Flyer {
@@ -195,10 +197,74 @@ model Proveedor {
   createdAt    DateTime     @default(now())
   productos    Producto[]
   stockEntries StockEntry[]
+  facturas     FacturaProveedor[]
+  pagos        PagoProveedor[]
   negocioId    Int          @default(1)
   negocio      Negocio      @relation(fields: [negocioId], references: [id])
 
   @@index([negocioId])
+}
+
+enum EstadoFacturaProveedor {
+  PAGADA
+  CUENTA_CORRIENTE
+}
+
+model FacturaProveedor {
+  id          Int                     @id @default(autoincrement())
+  proveedorId Int
+  proveedor   Proveedor               @relation(fields: [proveedorId], references: [id])
+  numero      String?
+  fecha       DateTime
+  total       Float
+  saldo       Float
+  estado      EstadoFacturaProveedor  @default(CUENTA_CORRIENTE)
+  comprobante String?                 @db.Text
+  notas       String?
+  createdAt   DateTime                @default(now())
+  items       FacturaProveedorItem[]
+  pagos       PagoProveedor[]
+  negocioId   Int                     @default(1)
+  negocio     Negocio                 @relation(fields: [negocioId], references: [id])
+
+  @@index([negocioId, fecha])
+  @@index([proveedorId, saldo])
+}
+
+model FacturaProveedorItem {
+  id                   Int              @id @default(autoincrement())
+  facturaId            Int
+  factura              FacturaProveedor @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+  productoId           Int
+  producto             Producto         @relation(fields: [productoId], references: [id])
+  productoNombre       String
+  cantidad             Float
+  costoAnterior        Float
+  costoUnitario        Float
+  precioVentaAnterior  Float
+  precioVentaSugerido  Float?
+  requiereAumento      Boolean          @default(false)
+  precioActualizado    Boolean          @default(false)
+
+  @@index([facturaId])
+  @@index([productoId])
+}
+
+model PagoProveedor {
+  id          Int              @id @default(autoincrement())
+  proveedorId Int
+  proveedor   Proveedor        @relation(fields: [proveedorId], references: [id])
+  facturaId   Int?
+  factura     FacturaProveedor? @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  monto       Float
+  notas       String?
+  createdAt   DateTime         @default(now())
+  negocioId   Int              @default(1)
+  negocio     Negocio          @relation(fields: [negocioId], references: [id])
+
+  @@index([negocioId, createdAt])
+  @@index([proveedorId])
+  @@index([facturaId])
 }
 
 model Producto {
@@ -229,6 +295,7 @@ model Producto {
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   stockEntryItems       StockEntryItem[]
+  facturaProveedorItems FacturaProveedorItem[]
   pedidoItems           PedidoItem[]
   presupuestoItems      PresupuestoItem[]
   negocioId             Int               @default(1)

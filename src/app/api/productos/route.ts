@@ -4,10 +4,13 @@ import { redondearPrecio } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
 
 export async function GET(req: NextRequest) {
+  const sesion = await sesionActual();
+  if (!sesion) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   if (req.nextUrl.searchParams.get("venta") === "1") {
     const ahora = new Date();
     const productos = await prisma.producto.findMany({
       where: {
+        negocioId: sesion.negocioId,
         activo: true,
         OR: [
           { esPromo: false },
@@ -28,7 +31,7 @@ export async function GET(req: NextRequest) {
   }
 
   const productos = await prisma.producto.findMany({
-    where: { esPromo: false },
+    where: { negocioId: sesion.negocioId, esPromo: false },
     select: {
       id: true,
       nombre: true,

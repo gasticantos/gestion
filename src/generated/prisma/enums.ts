@@ -105,6 +105,14 @@ export const EstadoImpresion = {
 export type EstadoImpresion = (typeof EstadoImpresion)[keyof typeof EstadoImpresion]
 
 
+export const EstadoFacturaProveedor = {
+  PAGADA: 'PAGADA',
+  CUENTA_CORRIENTE: 'CUENTA_CORRIENTE'
+} as const
+
+export type EstadoFacturaProveedor = (typeof EstadoFacturaProveedor)[keyof typeof EstadoFacturaProveedor]
+
+
 export const EstadoPresupuesto = {
   BORRADOR: 'BORRADOR',
   ACEPTADO: 'ACEPTADO',
