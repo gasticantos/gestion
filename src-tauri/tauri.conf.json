@@ -1,11 +1,11 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Gestión",
-  "version": "0.1.50",
+  "version": "0.1.51",
   "identifier": "com.nexusgestion.gestion",
   "build": {
     "devUrl": "http://localhost:3000",
-    "frontendDist": "https://gestion-nexusgestion.vercel.app/?desktop=0.1.50"
+    "frontendDist": "https://gestion-nexusgestion.vercel.app/?desktop=0.1.51"
   },
   "app": {
     "withGlobalTauri": true,
