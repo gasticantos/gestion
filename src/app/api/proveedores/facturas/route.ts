@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redondearPrecio } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { calcularCostoConImpuestos, normalizarImpuestos } from "@/lib/impuestosFactura";
 
 const MAX_COMPROBANTE = 4_500_000;
-type ItemInput = { productoId: unknown; cantidad: unknown; costoUnitario: unknown };
+type ItemInput = { productoId: unknown; cantidad: unknown; costoBase?: unknown; costoUnitario?: unknown; impuestos?: unknown };
 
 export async function GET() {
   const sesion = await sesionActual();
@@ -58,15 +59,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "La foto no es válida o supera el tamaño permitido" }, { status: 400 });
   }
 
-  const normalizados = items.map((item) => ({
-    productoId: Number(item.productoId),
-    cantidad: Number(item.cantidad),
-    costoUnitario: Number(item.costoUnitario),
-  }));
+  const normalizados = items.map((item) => {
+    const costoBase = Number(item.costoBase ?? item.costoUnitario);
+    const impuestos = normalizarImpuestos(item.impuestos);
+    return { productoId: Number(item.productoId), cantidad: Number(item.cantidad), costoBase, impuestos, costoUnitario: impuestos ? calcularCostoConImpuestos(costoBase, impuestos) : NaN };
+  });
   if (
     normalizados.some(
       (item) => !Number.isInteger(item.productoId) || !Number.isFinite(item.cantidad) || item.cantidad <= 0 ||
-        !Number.isFinite(item.costoUnitario) || item.costoUnitario < 0
+        !item.impuestos || !Number.isFinite(item.costoBase) || item.costoBase < 0 || !Number.isFinite(item.costoUnitario)
     )
   ) {
     return NextResponse.json({ error: "Revisá las cantidades y costos de la factura" }, { status: 400 });
@@ -101,6 +102,8 @@ export async function POST(req: NextRequest) {
           productoNombre: producto.nombre,
           cantidad: item.cantidad,
           costoAnterior: producto.precioCosto,
+          costoBase: item.costoBase,
+          impuestos: item.impuestos ?? [],
           costoUnitario: item.costoUnitario,
           precioVentaAnterior: producto.precioVenta,
           precioVentaSugerido: sugerido > producto.precioVenta ? sugerido : null,
@@ -133,7 +136,7 @@ export async function POST(req: NextRequest) {
           tipo: "ENTRADA",
           notas: `Factura ${factura.numero || `#${factura.id}`}`,
           negocioId: sesion.negocioId,
-          items: { create: normalizados },
+          items: { create: normalizados.map(({ productoId, cantidad, costoUnitario }) => ({ productoId, cantidad, costoUnitario })) },
         },
       });
       for (const item of normalizados) {

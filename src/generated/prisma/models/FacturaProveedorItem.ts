@@ -32,6 +32,7 @@ export type FacturaProveedorItemAvgAggregateOutputType = {
   productoId: number | null
   cantidad: number | null
   costoAnterior: number | null
+  costoBase: number | null
   costoUnitario: number | null
   precioVentaAnterior: number | null
   precioVentaSugerido: number | null
@@ -43,6 +44,7 @@ export type FacturaProveedorItemSumAggregateOutputType = {
   productoId: number | null
   cantidad: number | null
   costoAnterior: number | null
+  costoBase: number | null
   costoUnitario: number | null
   precioVentaAnterior: number | null
   precioVentaSugerido: number | null
@@ -55,6 +57,7 @@ export type FacturaProveedorItemMinAggregateOutputType = {
   productoNombre: string | null
   cantidad: number | null
   costoAnterior: number | null
+  costoBase: number | null
   costoUnitario: number | null
   precioVentaAnterior: number | null
   precioVentaSugerido: number | null
@@ -69,6 +72,7 @@ export type FacturaProveedorItemMaxAggregateOutputType = {
   productoNombre: string | null
   cantidad: number | null
   costoAnterior: number | null
+  costoBase: number | null
   costoUnitario: number | null
   precioVentaAnterior: number | null
   precioVentaSugerido: number | null
@@ -83,6 +87,8 @@ export type FacturaProveedorItemCountAggregateOutputType = {
   productoNombre: number
   cantidad: number
   costoAnterior: number
+  costoBase: number
+  impuestos: number
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido: number
@@ -98,6 +104,7 @@ export type FacturaProveedorItemAvgAggregateInputType = {
   productoId?: true
   cantidad?: true
   costoAnterior?: true
+  costoBase?: true
   costoUnitario?: true
   precioVentaAnterior?: true
   precioVentaSugerido?: true
@@ -109,6 +116,7 @@ export type FacturaProveedorItemSumAggregateInputType = {
   productoId?: true
   cantidad?: true
   costoAnterior?: true
+  costoBase?: true
   costoUnitario?: true
   precioVentaAnterior?: true
   precioVentaSugerido?: true
@@ -121,6 +129,7 @@ export type FacturaProveedorItemMinAggregateInputType = {
   productoNombre?: true
   cantidad?: true
   costoAnterior?: true
+  costoBase?: true
   costoUnitario?: true
   precioVentaAnterior?: true
   precioVentaSugerido?: true
@@ -135,6 +144,7 @@ export type FacturaProveedorItemMaxAggregateInputType = {
   productoNombre?: true
   cantidad?: true
   costoAnterior?: true
+  costoBase?: true
   costoUnitario?: true
   precioVentaAnterior?: true
   precioVentaSugerido?: true
@@ -149,6 +159,8 @@ export type FacturaProveedorItemCountAggregateInputType = {
   productoNombre?: true
   cantidad?: true
   costoAnterior?: true
+  costoBase?: true
+  impuestos?: true
   costoUnitario?: true
   precioVentaAnterior?: true
   precioVentaSugerido?: true
@@ -250,6 +262,8 @@ export type FacturaProveedorItemGroupByOutputType = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase: number
+  impuestos: runtime.JsonValue | null
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido: number | null
@@ -287,6 +301,8 @@ export type FacturaProveedorItemWhereInput = {
   productoNombre?: Prisma.StringFilter<"FacturaProveedorItem"> | string
   cantidad?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   costoAnterior?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
+  costoBase?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
+  impuestos?: Prisma.JsonNullableFilter<"FacturaProveedorItem">
   costoUnitario?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   precioVentaAnterior?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   precioVentaSugerido?: Prisma.FloatNullableFilter<"FacturaProveedorItem"> | number | null
@@ -303,6 +319,8 @@ export type FacturaProveedorItemOrderByWithRelationInput = {
   productoNombre?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
+  impuestos?: Prisma.SortOrderInput | Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -322,6 +340,8 @@ export type FacturaProveedorItemWhereUniqueInput = Prisma.AtLeast<{
   productoNombre?: Prisma.StringFilter<"FacturaProveedorItem"> | string
   cantidad?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   costoAnterior?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
+  costoBase?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
+  impuestos?: Prisma.JsonNullableFilter<"FacturaProveedorItem">
   costoUnitario?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   precioVentaAnterior?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   precioVentaSugerido?: Prisma.FloatNullableFilter<"FacturaProveedorItem"> | number | null
@@ -338,6 +358,8 @@ export type FacturaProveedorItemOrderByWithAggregationInput = {
   productoNombre?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
+  impuestos?: Prisma.SortOrderInput | Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -360,6 +382,8 @@ export type FacturaProveedorItemScalarWhereWithAggregatesInput = {
   productoNombre?: Prisma.StringWithAggregatesFilter<"FacturaProveedorItem"> | string
   cantidad?: Prisma.FloatWithAggregatesFilter<"FacturaProveedorItem"> | number
   costoAnterior?: Prisma.FloatWithAggregatesFilter<"FacturaProveedorItem"> | number
+  costoBase?: Prisma.FloatWithAggregatesFilter<"FacturaProveedorItem"> | number
+  impuestos?: Prisma.JsonNullableWithAggregatesFilter<"FacturaProveedorItem">
   costoUnitario?: Prisma.FloatWithAggregatesFilter<"FacturaProveedorItem"> | number
   precioVentaAnterior?: Prisma.FloatWithAggregatesFilter<"FacturaProveedorItem"> | number
   precioVentaSugerido?: Prisma.FloatNullableWithAggregatesFilter<"FacturaProveedorItem"> | number | null
@@ -371,6 +395,8 @@ export type FacturaProveedorItemCreateInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -387,6 +413,8 @@ export type FacturaProveedorItemUncheckedCreateInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -398,6 +426,8 @@ export type FacturaProveedorItemUpdateInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -414,6 +444,8 @@ export type FacturaProveedorItemUncheckedUpdateInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -428,6 +460,8 @@ export type FacturaProveedorItemCreateManyInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -439,6 +473,8 @@ export type FacturaProveedorItemUpdateManyMutationInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -453,6 +489,8 @@ export type FacturaProveedorItemUncheckedUpdateManyInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -477,6 +515,8 @@ export type FacturaProveedorItemCountOrderByAggregateInput = {
   productoNombre?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
+  impuestos?: Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrder
@@ -490,6 +530,7 @@ export type FacturaProveedorItemAvgOrderByAggregateInput = {
   productoId?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrder
@@ -502,6 +543,7 @@ export type FacturaProveedorItemMaxOrderByAggregateInput = {
   productoNombre?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrder
@@ -516,6 +558,7 @@ export type FacturaProveedorItemMinOrderByAggregateInput = {
   productoNombre?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrder
@@ -529,6 +572,7 @@ export type FacturaProveedorItemSumOrderByAggregateInput = {
   productoId?: Prisma.SortOrder
   cantidad?: Prisma.SortOrder
   costoAnterior?: Prisma.SortOrder
+  costoBase?: Prisma.SortOrder
   costoUnitario?: Prisma.SortOrder
   precioVentaAnterior?: Prisma.SortOrder
   precioVentaSugerido?: Prisma.SortOrder
@@ -630,6 +674,8 @@ export type FacturaProveedorItemCreateWithoutFacturaInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -644,6 +690,8 @@ export type FacturaProveedorItemUncheckedCreateWithoutFacturaInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -687,6 +735,8 @@ export type FacturaProveedorItemScalarWhereInput = {
   productoNombre?: Prisma.StringFilter<"FacturaProveedorItem"> | string
   cantidad?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   costoAnterior?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
+  costoBase?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
+  impuestos?: Prisma.JsonNullableFilter<"FacturaProveedorItem">
   costoUnitario?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   precioVentaAnterior?: Prisma.FloatFilter<"FacturaProveedorItem"> | number
   precioVentaSugerido?: Prisma.FloatNullableFilter<"FacturaProveedorItem"> | number | null
@@ -698,6 +748,8 @@ export type FacturaProveedorItemCreateWithoutProductoInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -712,6 +764,8 @@ export type FacturaProveedorItemUncheckedCreateWithoutProductoInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -751,6 +805,8 @@ export type FacturaProveedorItemCreateManyFacturaInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -762,6 +818,8 @@ export type FacturaProveedorItemUpdateWithoutFacturaInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -776,6 +834,8 @@ export type FacturaProveedorItemUncheckedUpdateWithoutFacturaInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -789,6 +849,8 @@ export type FacturaProveedorItemUncheckedUpdateManyWithoutFacturaInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -802,6 +864,8 @@ export type FacturaProveedorItemCreateManyProductoInput = {
   productoNombre: string
   cantidad: number
   costoAnterior: number
+  costoBase?: number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario: number
   precioVentaAnterior: number
   precioVentaSugerido?: number | null
@@ -813,6 +877,8 @@ export type FacturaProveedorItemUpdateWithoutProductoInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -827,6 +893,8 @@ export type FacturaProveedorItemUncheckedUpdateWithoutProductoInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -840,6 +908,8 @@ export type FacturaProveedorItemUncheckedUpdateManyWithoutProductoInput = {
   productoNombre?: Prisma.StringFieldUpdateOperationsInput | string
   cantidad?: Prisma.FloatFieldUpdateOperationsInput | number
   costoAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
+  costoBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  impuestos?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   costoUnitario?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaAnterior?: Prisma.FloatFieldUpdateOperationsInput | number
   precioVentaSugerido?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -856,6 +926,8 @@ export type FacturaProveedorItemSelect<ExtArgs extends runtime.Types.Extensions.
   productoNombre?: boolean
   cantidad?: boolean
   costoAnterior?: boolean
+  costoBase?: boolean
+  impuestos?: boolean
   costoUnitario?: boolean
   precioVentaAnterior?: boolean
   precioVentaSugerido?: boolean
@@ -872,6 +944,8 @@ export type FacturaProveedorItemSelectCreateManyAndReturn<ExtArgs extends runtim
   productoNombre?: boolean
   cantidad?: boolean
   costoAnterior?: boolean
+  costoBase?: boolean
+  impuestos?: boolean
   costoUnitario?: boolean
   precioVentaAnterior?: boolean
   precioVentaSugerido?: boolean
@@ -888,6 +962,8 @@ export type FacturaProveedorItemSelectUpdateManyAndReturn<ExtArgs extends runtim
   productoNombre?: boolean
   cantidad?: boolean
   costoAnterior?: boolean
+  costoBase?: boolean
+  impuestos?: boolean
   costoUnitario?: boolean
   precioVentaAnterior?: boolean
   precioVentaSugerido?: boolean
@@ -904,6 +980,8 @@ export type FacturaProveedorItemSelectScalar = {
   productoNombre?: boolean
   cantidad?: boolean
   costoAnterior?: boolean
+  costoBase?: boolean
+  impuestos?: boolean
   costoUnitario?: boolean
   precioVentaAnterior?: boolean
   precioVentaSugerido?: boolean
@@ -911,7 +989,7 @@ export type FacturaProveedorItemSelectScalar = {
   precioActualizado?: boolean
 }
 
-export type FacturaProveedorItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "facturaId" | "productoId" | "productoNombre" | "cantidad" | "costoAnterior" | "costoUnitario" | "precioVentaAnterior" | "precioVentaSugerido" | "requiereAumento" | "precioActualizado", ExtArgs["result"]["facturaProveedorItem"]>
+export type FacturaProveedorItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "facturaId" | "productoId" | "productoNombre" | "cantidad" | "costoAnterior" | "costoBase" | "impuestos" | "costoUnitario" | "precioVentaAnterior" | "precioVentaSugerido" | "requiereAumento" | "precioActualizado", ExtArgs["result"]["facturaProveedorItem"]>
 export type FacturaProveedorItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   factura?: boolean | Prisma.FacturaProveedorDefaultArgs<ExtArgs>
   producto?: boolean | Prisma.ProductoDefaultArgs<ExtArgs>
@@ -938,6 +1016,8 @@ export type $FacturaProveedorItemPayload<ExtArgs extends runtime.Types.Extension
     productoNombre: string
     cantidad: number
     costoAnterior: number
+    costoBase: number
+    impuestos: runtime.JsonValue | null
     costoUnitario: number
     precioVentaAnterior: number
     precioVentaSugerido: number | null
@@ -1374,6 +1454,8 @@ export interface FacturaProveedorItemFieldRefs {
   readonly productoNombre: Prisma.FieldRef<"FacturaProveedorItem", 'String'>
   readonly cantidad: Prisma.FieldRef<"FacturaProveedorItem", 'Float'>
   readonly costoAnterior: Prisma.FieldRef<"FacturaProveedorItem", 'Float'>
+  readonly costoBase: Prisma.FieldRef<"FacturaProveedorItem", 'Float'>
+  readonly impuestos: Prisma.FieldRef<"FacturaProveedorItem", 'Json'>
   readonly costoUnitario: Prisma.FieldRef<"FacturaProveedorItem", 'Float'>
   readonly precioVentaAnterior: Prisma.FieldRef<"FacturaProveedorItem", 'Float'>
   readonly precioVentaSugerido: Prisma.FieldRef<"FacturaProveedorItem", 'Float'>

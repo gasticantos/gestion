@@ -226,6 +226,8 @@ export const FacturaProveedorItemScalarFieldEnum = {
   productoNombre: 'productoNombre',
   cantidad: 'cantidad',
   costoAnterior: 'costoAnterior',
+  costoBase: 'costoBase',
+  impuestos: 'impuestos',
   costoUnitario: 'costoUnitario',
   precioVentaAnterior: 'precioVentaAnterior',
   precioVentaSugerido: 'precioVentaSugerido',

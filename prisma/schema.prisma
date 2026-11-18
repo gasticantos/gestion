@@ -240,6 +240,8 @@ model FacturaProveedorItem {
   productoNombre       String
   cantidad             Float
   costoAnterior        Float
+  costoBase            Float            @default(0)
+  impuestos            Json?
   costoUnitario        Float
   precioVentaAnterior  Float
   precioVentaSugerido  Float?

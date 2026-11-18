@@ -2597,6 +2597,8 @@ export const FacturaProveedorItemScalarFieldEnum = {
   productoNombre: 'productoNombre',
   cantidad: 'cantidad',
   costoAnterior: 'costoAnterior',
+  costoBase: 'costoBase',
+  impuestos: 'impuestos',
   costoUnitario: 'costoUnitario',
   precioVentaAnterior: 'precioVentaAnterior',
   precioVentaSugerido: 'precioVentaSugerido',
@@ -3034,6 +3036,20 @@ export type ListEnumEstadoFacturaProveedorFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+
+
+
+/**
  * Reference to a field of type 'EstadoPresupuesto'
  */
 export type EnumEstadoPresupuestoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EstadoPresupuesto'>
@@ -3128,20 +3144,6 @@ export type EnumTarifaPrecioFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'TarifaPrecio[]'
  */
 export type ListEnumTarifaPrecioFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TarifaPrecio[]'>
-
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
 
 
 
