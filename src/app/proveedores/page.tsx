@@ -74,6 +74,21 @@ export default function ProveedoresPage() {
   const totalFactura = useMemo(() => items.reduce((s, i) => s + (Number(i.cantidad) || 0) * costoFinalItem(i), 0), [items]);
   const deudaTotal = deudas.reduce((s, p) => s + p.deuda, 0);
   const alertas = facturas.flatMap((f) => f.items.filter((i) => i.requiereAumento && !i.precioActualizado).map((i) => ({ ...i, facturaId: f.id })));
+  const conceptosImpuesto = useMemo(() => {
+    const conceptos = ["IVA", "Impuesto interno", "Percepción", "Ingresos brutos"];
+    for (const factura of facturas) for (const item of factura.items) {
+      if (Array.isArray(item.impuestos)) for (const impuesto of item.impuestos) conceptos.push(impuesto.nombre);
+    }
+    for (const item of items) for (const impuesto of item.impuestos) conceptos.push(impuesto.nombre);
+    const vistos = new Set<string>();
+    return conceptos.filter((concepto) => {
+      const limpio = concepto.trim();
+      const clave = limpio.toLocaleLowerCase("es");
+      if (!limpio || vistos.has(clave)) return false;
+      vistos.add(clave);
+      return true;
+    });
+  }, [facturas, items]);
 
   function agregarItem(p: ProductoBusqueda) {
     const producto = productos.find((x) => x.id === p.id); if (!producto) return;
@@ -166,7 +181,7 @@ export default function ProveedoresPage() {
             </div>
             <div className="mt-2 text-right text-sm text-neutral-500">Subtotal: <strong className="text-neutral-900 dark:text-neutral-100">${formatearMoneda((Number(item.cantidad) || 0) * costoFinal)}</strong></div>
           </div>;
-        })}<datalist id="conceptos-impuesto"><option value="IVA" /><option value="Impuesto interno" /><option value="Percepción" /><option value="Ingresos brutos" /></datalist></div>}
+        })}<datalist id="conceptos-impuesto">{conceptosImpuesto.map((concepto) => <option key={concepto.toLocaleLowerCase("es")} value={concepto} />)}</datalist></div>}
         <div className="grid sm:grid-cols-2 gap-3 items-start"><div><label className={label}>Foto de la factura</label><div className="flex items-center gap-3"><label className="cursor-pointer inline-flex rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-800"><input type="file" accept="image/*" capture="environment" className="hidden" onChange={elegirFoto} />{procesandoFoto ? "Procesando..." : comprobante ? "Cambiar foto" : "Sacar o elegir foto"}</label>{comprobante && <><button onClick={() => setComprobante(null)} className="text-xs text-red-500">Quitar</button><button onClick={() => window.open(comprobante, "_blank")} className="text-xs text-blue-600">Ver foto</button></>}</div></div><div><label className={label}>Notas</label><input className={input} value={formFactura.notas} onChange={(e) => setFormFactura({ ...formFactura, notas: e.target.value })} /></div></div>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neutral-200 dark:border-neutral-800"><div><span className="text-sm text-neutral-500">Total de factura</span><div className="text-2xl font-semibold">${formatearMoneda(totalFactura)}</div></div><Button variant="primary" onClick={guardarFactura} disabled={guardando || procesandoFoto || items.length === 0}>{guardando ? "Guardando..." : facturaEditandoId ? "Guardar cambios" : "Guardar factura y actualizar stock"}</Button></div>
       </Card></div><Historial facturas={facturas} loading={loading} aplicarPrecios={aplicarPrecios} editarFactura={editarFactura} />
