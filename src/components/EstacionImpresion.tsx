@@ -240,20 +240,32 @@ export default function EstacionImpresion() {
 
   if (esEstacionPrincipal === false) {
     return (
-      <div className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
-        <span>
-          <strong>Esta computadora no es la caja principal.</strong>{" "}
-          {hayOtraCajaConfigurada
-            ? "Ya hay otra caja fijada; solo cambiala acá si es a propósito."
-            : "Activala para que todas las comandas y tickets se impriman únicamente acá."}
-        </span>
+      <div className="group fixed bottom-3 right-3 z-[100] flex max-w-[calc(100vw-1.5rem)] items-center justify-end rounded-full border border-amber-300 bg-amber-50 text-sm text-amber-950 shadow-lg transition-all duration-200 hover:rounded-xl focus-within:rounded-xl dark:border-amber-800 dark:bg-amber-950 dark:text-amber-50">
+        <div className="max-w-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-w-[34rem] group-hover:opacity-100 group-focus-within:max-w-[34rem] group-focus-within:opacity-100">
+          <div className="flex min-w-[min(34rem,calc(100vw-5rem))] items-center gap-3 py-2 pl-3">
+            <span className="leading-snug">
+              <strong>Esta computadora no es la caja principal.</strong>{" "}
+              {hayOtraCajaConfigurada
+                ? "Ya hay otra caja fijada; cambiala solo si es a propósito."
+                : "Podés activarla para imprimir comandas y tickets acá."}
+            </span>
+            <button
+              type="button"
+              onClick={establecerComoPrincipal}
+              disabled={guardandoEstacion}
+              className="shrink-0 rounded-lg bg-amber-700 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-800 disabled:opacity-60"
+            >
+              {guardandoEstacion ? "Activando..." : "Usar para imprimir"}
+            </button>
+          </div>
+        </div>
         <button
           type="button"
-          onClick={establecerComoPrincipal}
-          disabled={guardandoEstacion}
-          className="shrink-0 rounded-lg bg-amber-700 px-3 py-2 font-semibold text-white hover:bg-amber-800 disabled:opacity-60"
+          aria-label="Esta computadora es una caja secundaria"
+          title="Caja secundaria · acercá el mouse para ver opciones"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-100 text-base font-bold text-amber-800 transition-colors group-hover:bg-transparent group-focus-within:bg-transparent dark:bg-amber-900 dark:text-amber-200"
         >
-          {guardandoEstacion ? "Activando..." : "Usar esta computadora para imprimir"}
+          i
         </button>
       </div>
     );
