@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 import { sesionActual } from "@/lib/sesionServidor";
+import { descontarStock } from "@/lib/stockCombo";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ itemId: string }> }) {
   const sesion = await sesionActual();
@@ -60,20 +61,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
     const deltaSubtotal = nuevoSubtotal - item.subtotal;
     const deltaCantidad = cantidadFinal - item.cantidad;
 
-    const [updated] = await prisma.$transaction([
-      prisma.pedidoItem.update({
+    const updated = await prisma.$transaction(async (tx) => {
+      const actualizado = await tx.pedidoItem.update({
         where: { id: Number(itemId) },
         data: { cantidad: cantidadFinal, precioUnitario: precioFinal, subtotal: nuevoSubtotal },
-      }),
-      prisma.venta.update({
+      });
+      await tx.venta.update({
         where: { id: item.pedido.ventaId },
         data: { total: { increment: deltaSubtotal } },
-      }),
-      prisma.producto.update({
-        where: { id: item.productoId },
-        data: { stock: { decrement: deltaCantidad } },
-      }),
-    ]);
+      });
+      await descontarStock(tx, item.productoId, deltaCantidad);
+      return actualizado;
+    });
 
     return NextResponse.json(updated);
   } catch {
@@ -144,10 +143,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
           },
         });
       }
-      await tx.producto.update({
-        where: { id: item.productoId },
-        data: { stock: { increment: cantidadEliminada } },
-      });
+      await descontarStock(tx, item.productoId, -cantidadEliminada);
       await tx.venta.update({
         where: { id: item.pedido.ventaId },
         data: { total: { decrement: subtotalEliminado } },

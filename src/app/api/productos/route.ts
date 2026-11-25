@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redondearPrecio } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { ErrorCombo, guardarComponentes, leerComponentes } from "@/lib/stockCombo";
 
 export async function GET(req: NextRequest) {
   const sesion = await sesionActual();
@@ -51,6 +52,10 @@ export async function GET(req: NextRequest) {
       updatedAt: true,
       proveedor: { select: { id: true, nombre: true } },
       categoria: { select: { id: true, nombre: true } },
+      componentesCombo: {
+        select: { productoId: true, cantidad: true, producto: { select: { nombre: true, stock: true } } },
+        orderBy: { id: "asc" },
+      },
     },
     orderBy: { nombre: "asc" },
   });
@@ -77,6 +82,10 @@ export async function POST(req: NextRequest) {
     requiereConfirmacion,
     proveedorId,
   } = body;
+  const componentes = leerComponentes(body.combo);
+  if (typeof componentes === "string") {
+    return NextResponse.json({ error: componentes }, { status: 400 });
+  }
 
   if (!nombre || typeof nombre !== "string") {
     return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
@@ -89,7 +98,8 @@ export async function POST(req: NextRequest) {
     const configuracion = await prisma.configuracion.findFirst();
     const precioMesaHabilitado = configuracion?.precioMesaActivo !== false;
     const precioVentaRedondeado = redondearPrecio(Number(precioVenta));
-    const producto = await prisma.producto.create({
+    const producto = await prisma.$transaction(async (tx) => {
+      const creado = await tx.producto.create({
       data: {
         nombre,
         codigoBarras: codigoBarras || null,
@@ -100,15 +110,22 @@ export async function POST(req: NextRequest) {
           : precioVentaRedondeado,
         precioVentaMesaManual: precioMesaHabilitado && Boolean(precioVentaMesaManual),
         precioCosto: precioCosto ? Number(precioCosto) : 0,
-        stock: stock ? Number(stock) : 0,
+        stock: componentes.length > 0 ? 0 : stock ? Number(stock) : 0,
         unidad: unidad || "unidad",
         impresora: impresora ? String(impresora).trim() : null,
         requiereConfirmacion: Boolean(requiereConfirmacion),
         proveedorId: proveedorId ? Number(proveedorId) : null,
       },
+      });
+      const errorCombo = await guardarComponentes(tx, creado.id, componentes);
+      if (errorCombo) throw new ErrorCombo(errorCombo);
+      return creado;
     });
     return NextResponse.json(producto, { status: 201 });
   } catch (err: unknown) {
+    if (err instanceof ErrorCombo) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
     if (typeof err === "object" && err !== null && "code" in err && err.code === "P2002") {
       return NextResponse.json({ error: "Ya existe un producto con ese código de barras" }, { status: 409 });
     }

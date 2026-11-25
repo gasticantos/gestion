@@ -22,6 +22,7 @@ const MODELOS_NEGOCIO = new Set([
 ]);
 const FILTROS_RELACIONALES: Record<string, (negocioId: number) => object> = {
   StockEntryItem: (negocioId) => ({ stockEntry: { negocioId } }),
+  ComboItem: (negocioId) => ({ combo: { negocioId } }),
   Pedido: (negocioId) => ({ venta: { negocioId } }),
   PedidoItem: (negocioId) => ({ pedido: { venta: { negocioId } } }),
   Pago: (negocioId) => ({ venta: { negocioId } }),

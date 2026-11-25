@@ -386,6 +386,8 @@ export type ProductoWhereInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemListRelationFilter
   pedidoItems?: Prisma.PedidoItemListRelationFilter
   presupuestoItems?: Prisma.PresupuestoItemListRelationFilter
+  componentesCombo?: Prisma.ComboItemListRelationFilter
+  enCombos?: Prisma.ComboItemListRelationFilter
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }
 
@@ -418,6 +420,8 @@ export type ProductoOrderByWithRelationInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemOrderByRelationAggregateInput
   pedidoItems?: Prisma.PedidoItemOrderByRelationAggregateInput
   presupuestoItems?: Prisma.PresupuestoItemOrderByRelationAggregateInput
+  componentesCombo?: Prisma.ComboItemOrderByRelationAggregateInput
+  enCombos?: Prisma.ComboItemOrderByRelationAggregateInput
   negocio?: Prisma.NegocioOrderByWithRelationInput
 }
 
@@ -455,6 +459,8 @@ export type ProductoWhereUniqueInput = Prisma.AtLeast<{
   facturaProveedorItems?: Prisma.FacturaProveedorItemListRelationFilter
   pedidoItems?: Prisma.PedidoItemListRelationFilter
   presupuestoItems?: Prisma.PresupuestoItemListRelationFilter
+  componentesCombo?: Prisma.ComboItemListRelationFilter
+  enCombos?: Prisma.ComboItemListRelationFilter
   negocio?: Prisma.XOR<Prisma.NegocioScalarRelationFilter, Prisma.NegocioWhereInput>
 }, "id" | "negocioId_codigoInterno" | "negocioId_codigoBarras">
 
@@ -541,6 +547,8 @@ export type ProductoCreateInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -571,6 +579,8 @@ export type ProductoUncheckedCreateInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoUpdateInput = {
@@ -598,6 +608,8 @@ export type ProductoUpdateInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -628,6 +640,8 @@ export type ProductoUncheckedUpdateInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateManyInput = {
@@ -968,6 +982,34 @@ export type ProductoUpdateOneRequiredWithoutFacturaProveedorItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductoUpdateToOneWithWhereWithoutFacturaProveedorItemsInput, Prisma.ProductoUpdateWithoutFacturaProveedorItemsInput>, Prisma.ProductoUncheckedUpdateWithoutFacturaProveedorItemsInput>
 }
 
+export type ProductoCreateNestedOneWithoutComponentesComboInput = {
+  create?: Prisma.XOR<Prisma.ProductoCreateWithoutComponentesComboInput, Prisma.ProductoUncheckedCreateWithoutComponentesComboInput>
+  connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutComponentesComboInput
+  connect?: Prisma.ProductoWhereUniqueInput
+}
+
+export type ProductoCreateNestedOneWithoutEnCombosInput = {
+  create?: Prisma.XOR<Prisma.ProductoCreateWithoutEnCombosInput, Prisma.ProductoUncheckedCreateWithoutEnCombosInput>
+  connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutEnCombosInput
+  connect?: Prisma.ProductoWhereUniqueInput
+}
+
+export type ProductoUpdateOneRequiredWithoutComponentesComboNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductoCreateWithoutComponentesComboInput, Prisma.ProductoUncheckedCreateWithoutComponentesComboInput>
+  connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutComponentesComboInput
+  upsert?: Prisma.ProductoUpsertWithoutComponentesComboInput
+  connect?: Prisma.ProductoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductoUpdateToOneWithWhereWithoutComponentesComboInput, Prisma.ProductoUpdateWithoutComponentesComboInput>, Prisma.ProductoUncheckedUpdateWithoutComponentesComboInput>
+}
+
+export type ProductoUpdateOneRequiredWithoutEnCombosNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductoCreateWithoutEnCombosInput, Prisma.ProductoUncheckedCreateWithoutEnCombosInput>
+  connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutEnCombosInput
+  upsert?: Prisma.ProductoUpsertWithoutEnCombosInput
+  connect?: Prisma.ProductoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductoUpdateToOneWithWhereWithoutEnCombosInput, Prisma.ProductoUpdateWithoutEnCombosInput>, Prisma.ProductoUncheckedUpdateWithoutEnCombosInput>
+}
+
 export type ProductoCreateNestedOneWithoutPresupuestoItemsInput = {
   create?: Prisma.XOR<Prisma.ProductoCreateWithoutPresupuestoItemsInput, Prisma.ProductoUncheckedCreateWithoutPresupuestoItemsInput>
   connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutPresupuestoItemsInput
@@ -1037,6 +1079,8 @@ export type ProductoCreateWithoutNegocioInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoUncheckedCreateWithoutNegocioInput = {
@@ -1065,6 +1109,8 @@ export type ProductoUncheckedCreateWithoutNegocioInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutNegocioInput = {
@@ -1145,6 +1191,8 @@ export type ProductoCreateWithoutCategoriaInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -1174,6 +1222,8 @@ export type ProductoUncheckedCreateWithoutCategoriaInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutCategoriaInput = {
@@ -1226,6 +1276,8 @@ export type ProductoCreateWithoutProveedorInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -1255,6 +1307,8 @@ export type ProductoUncheckedCreateWithoutProveedorInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutProveedorInput = {
@@ -1307,6 +1361,8 @@ export type ProductoCreateWithoutFacturaProveedorItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -1336,6 +1392,8 @@ export type ProductoUncheckedCreateWithoutFacturaProveedorItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutFacturaProveedorItemsInput = {
@@ -1378,6 +1436,8 @@ export type ProductoUpdateWithoutFacturaProveedorItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -1407,6 +1467,276 @@ export type ProductoUncheckedUpdateWithoutFacturaProveedorItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
+}
+
+export type ProductoCreateWithoutComponentesComboInput = {
+  nombre: string
+  codigoInterno?: string | null
+  codigoBarras?: string | null
+  marca?: string | null
+  precioVenta: number
+  precioVentaMesa?: number
+  precioVentaMesaManual?: boolean
+  precioCosto?: number
+  stock?: number
+  unidad?: string
+  impresora?: string | null
+  requiereConfirmacion?: boolean
+  activo?: boolean
+  esPromo?: boolean
+  promoDesde?: Date | string | null
+  promoHasta?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  categoria?: Prisma.CategoriaCreateNestedOneWithoutProductosInput
+  proveedor?: Prisma.ProveedorCreateNestedOneWithoutProductosInput
+  stockEntryItems?: Prisma.StockEntryItemCreateNestedManyWithoutProductoInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
+  pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
+  presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
+}
+
+export type ProductoUncheckedCreateWithoutComponentesComboInput = {
+  id?: number
+  nombre: string
+  codigoInterno?: string | null
+  codigoBarras?: string | null
+  marca?: string | null
+  categoriaId?: number | null
+  precioVenta: number
+  precioVentaMesa?: number
+  precioVentaMesaManual?: boolean
+  precioCosto?: number
+  stock?: number
+  unidad?: string
+  impresora?: string | null
+  requiereConfirmacion?: boolean
+  activo?: boolean
+  esPromo?: boolean
+  promoDesde?: Date | string | null
+  promoHasta?: Date | string | null
+  proveedorId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  negocioId?: number
+  stockEntryItems?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutProductoInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
+  pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
+  presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
+}
+
+export type ProductoCreateOrConnectWithoutComponentesComboInput = {
+  where: Prisma.ProductoWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductoCreateWithoutComponentesComboInput, Prisma.ProductoUncheckedCreateWithoutComponentesComboInput>
+}
+
+export type ProductoCreateWithoutEnCombosInput = {
+  nombre: string
+  codigoInterno?: string | null
+  codigoBarras?: string | null
+  marca?: string | null
+  precioVenta: number
+  precioVentaMesa?: number
+  precioVentaMesaManual?: boolean
+  precioCosto?: number
+  stock?: number
+  unidad?: string
+  impresora?: string | null
+  requiereConfirmacion?: boolean
+  activo?: boolean
+  esPromo?: boolean
+  promoDesde?: Date | string | null
+  promoHasta?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  categoria?: Prisma.CategoriaCreateNestedOneWithoutProductosInput
+  proveedor?: Prisma.ProveedorCreateNestedOneWithoutProductosInput
+  stockEntryItems?: Prisma.StockEntryItemCreateNestedManyWithoutProductoInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
+  pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
+  presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
+}
+
+export type ProductoUncheckedCreateWithoutEnCombosInput = {
+  id?: number
+  nombre: string
+  codigoInterno?: string | null
+  codigoBarras?: string | null
+  marca?: string | null
+  categoriaId?: number | null
+  precioVenta: number
+  precioVentaMesa?: number
+  precioVentaMesaManual?: boolean
+  precioCosto?: number
+  stock?: number
+  unidad?: string
+  impresora?: string | null
+  requiereConfirmacion?: boolean
+  activo?: boolean
+  esPromo?: boolean
+  promoDesde?: Date | string | null
+  promoHasta?: Date | string | null
+  proveedorId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  negocioId?: number
+  stockEntryItems?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutProductoInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
+  pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
+  presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+}
+
+export type ProductoCreateOrConnectWithoutEnCombosInput = {
+  where: Prisma.ProductoWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductoCreateWithoutEnCombosInput, Prisma.ProductoUncheckedCreateWithoutEnCombosInput>
+}
+
+export type ProductoUpsertWithoutComponentesComboInput = {
+  update: Prisma.XOR<Prisma.ProductoUpdateWithoutComponentesComboInput, Prisma.ProductoUncheckedUpdateWithoutComponentesComboInput>
+  create: Prisma.XOR<Prisma.ProductoCreateWithoutComponentesComboInput, Prisma.ProductoUncheckedCreateWithoutComponentesComboInput>
+  where?: Prisma.ProductoWhereInput
+}
+
+export type ProductoUpdateToOneWithWhereWithoutComponentesComboInput = {
+  where?: Prisma.ProductoWhereInput
+  data: Prisma.XOR<Prisma.ProductoUpdateWithoutComponentesComboInput, Prisma.ProductoUncheckedUpdateWithoutComponentesComboInput>
+}
+
+export type ProductoUpdateWithoutComponentesComboInput = {
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoInterno?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigoBarras?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marca?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  precioVenta?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesaManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  precioCosto?: Prisma.FloatFieldUpdateOperationsInput | number
+  stock?: Prisma.FloatFieldUpdateOperationsInput | number
+  unidad?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esPromo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  promoDesde?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  promoHasta?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoria?: Prisma.CategoriaUpdateOneWithoutProductosNestedInput
+  proveedor?: Prisma.ProveedorUpdateOneWithoutProductosNestedInput
+  stockEntryItems?: Prisma.StockEntryItemUpdateManyWithoutProductoNestedInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
+  pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
+  presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
+}
+
+export type ProductoUncheckedUpdateWithoutComponentesComboInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoInterno?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigoBarras?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marca?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categoriaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  precioVenta?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesaManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  precioCosto?: Prisma.FloatFieldUpdateOperationsInput | number
+  stock?: Prisma.FloatFieldUpdateOperationsInput | number
+  unidad?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esPromo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  promoDesde?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  promoHasta?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+  stockEntryItems?: Prisma.StockEntryItemUncheckedUpdateManyWithoutProductoNestedInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
+  pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
+  presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
+}
+
+export type ProductoUpsertWithoutEnCombosInput = {
+  update: Prisma.XOR<Prisma.ProductoUpdateWithoutEnCombosInput, Prisma.ProductoUncheckedUpdateWithoutEnCombosInput>
+  create: Prisma.XOR<Prisma.ProductoCreateWithoutEnCombosInput, Prisma.ProductoUncheckedCreateWithoutEnCombosInput>
+  where?: Prisma.ProductoWhereInput
+}
+
+export type ProductoUpdateToOneWithWhereWithoutEnCombosInput = {
+  where?: Prisma.ProductoWhereInput
+  data: Prisma.XOR<Prisma.ProductoUpdateWithoutEnCombosInput, Prisma.ProductoUncheckedUpdateWithoutEnCombosInput>
+}
+
+export type ProductoUpdateWithoutEnCombosInput = {
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoInterno?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigoBarras?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marca?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  precioVenta?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesaManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  precioCosto?: Prisma.FloatFieldUpdateOperationsInput | number
+  stock?: Prisma.FloatFieldUpdateOperationsInput | number
+  unidad?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esPromo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  promoDesde?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  promoHasta?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoria?: Prisma.CategoriaUpdateOneWithoutProductosNestedInput
+  proveedor?: Prisma.ProveedorUpdateOneWithoutProductosNestedInput
+  stockEntryItems?: Prisma.StockEntryItemUpdateManyWithoutProductoNestedInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
+  pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
+  presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
+}
+
+export type ProductoUncheckedUpdateWithoutEnCombosInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoInterno?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigoBarras?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marca?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categoriaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  precioVenta?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesa?: Prisma.FloatFieldUpdateOperationsInput | number
+  precioVentaMesaManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  precioCosto?: Prisma.FloatFieldUpdateOperationsInput | number
+  stock?: Prisma.FloatFieldUpdateOperationsInput | number
+  unidad?: Prisma.StringFieldUpdateOperationsInput | string
+  impresora?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiereConfirmacion?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  activo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  esPromo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  promoDesde?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  promoHasta?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  proveedorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  negocioId?: Prisma.IntFieldUpdateOperationsInput | number
+  stockEntryItems?: Prisma.StockEntryItemUncheckedUpdateManyWithoutProductoNestedInput
+  facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
+  pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
+  presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
 }
 
 export type ProductoCreateWithoutPresupuestoItemsInput = {
@@ -1433,6 +1763,8 @@ export type ProductoCreateWithoutPresupuestoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemCreateNestedManyWithoutProductoInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -1462,6 +1794,8 @@ export type ProductoUncheckedCreateWithoutPresupuestoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutProductoInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutPresupuestoItemsInput = {
@@ -1504,6 +1838,8 @@ export type ProductoUpdateWithoutPresupuestoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUpdateManyWithoutProductoNestedInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -1533,6 +1869,8 @@ export type ProductoUncheckedUpdateWithoutPresupuestoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUncheckedUpdateManyWithoutProductoNestedInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateWithoutStockEntryItemsInput = {
@@ -1559,6 +1897,8 @@ export type ProductoCreateWithoutStockEntryItemsInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -1588,6 +1928,8 @@ export type ProductoUncheckedCreateWithoutStockEntryItemsInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   pedidoItems?: Prisma.PedidoItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutStockEntryItemsInput = {
@@ -1630,6 +1972,8 @@ export type ProductoUpdateWithoutStockEntryItemsInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -1659,6 +2003,8 @@ export type ProductoUncheckedUpdateWithoutStockEntryItemsInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateWithoutPedidoItemsInput = {
@@ -1685,6 +2031,8 @@ export type ProductoCreateWithoutPedidoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemCreateNestedManyWithoutProductoInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemCreateNestedManyWithoutProductoInput
   negocio?: Prisma.NegocioCreateNestedOneWithoutProductosInput
 }
 
@@ -1714,6 +2062,8 @@ export type ProductoUncheckedCreateWithoutPedidoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUncheckedCreateNestedManyWithoutProductoInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedCreateNestedManyWithoutProductoInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedCreateNestedManyWithoutProductoInput
+  componentesCombo?: Prisma.ComboItemUncheckedCreateNestedManyWithoutComboInput
+  enCombos?: Prisma.ComboItemUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutPedidoItemsInput = {
@@ -1756,6 +2106,8 @@ export type ProductoUpdateWithoutPedidoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUpdateManyWithoutProductoNestedInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -1785,6 +2137,8 @@ export type ProductoUncheckedUpdateWithoutPedidoItemsInput = {
   stockEntryItems?: Prisma.StockEntryItemUncheckedUpdateManyWithoutProductoNestedInput
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateManyNegocioInput = {
@@ -1836,6 +2190,8 @@ export type ProductoUpdateWithoutNegocioInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateWithoutNegocioInput = {
@@ -1864,6 +2220,8 @@ export type ProductoUncheckedUpdateWithoutNegocioInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutNegocioInput = {
@@ -1938,6 +2296,8 @@ export type ProductoUpdateWithoutCategoriaInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -1967,6 +2327,8 @@ export type ProductoUncheckedUpdateWithoutCategoriaInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutCategoriaInput = {
@@ -2041,6 +2403,8 @@ export type ProductoUpdateWithoutProveedorInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUpdateManyWithoutProductoNestedInput
   negocio?: Prisma.NegocioUpdateOneRequiredWithoutProductosNestedInput
 }
 
@@ -2070,6 +2434,8 @@ export type ProductoUncheckedUpdateWithoutProveedorInput = {
   facturaProveedorItems?: Prisma.FacturaProveedorItemUncheckedUpdateManyWithoutProductoNestedInput
   pedidoItems?: Prisma.PedidoItemUncheckedUpdateManyWithoutProductoNestedInput
   presupuestoItems?: Prisma.PresupuestoItemUncheckedUpdateManyWithoutProductoNestedInput
+  componentesCombo?: Prisma.ComboItemUncheckedUpdateManyWithoutComboNestedInput
+  enCombos?: Prisma.ComboItemUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutProveedorInput = {
@@ -2106,6 +2472,8 @@ export type ProductoCountOutputType = {
   facturaProveedorItems: number
   pedidoItems: number
   presupuestoItems: number
+  componentesCombo: number
+  enCombos: number
 }
 
 export type ProductoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2113,6 +2481,8 @@ export type ProductoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   facturaProveedorItems?: boolean | ProductoCountOutputTypeCountFacturaProveedorItemsArgs
   pedidoItems?: boolean | ProductoCountOutputTypeCountPedidoItemsArgs
   presupuestoItems?: boolean | ProductoCountOutputTypeCountPresupuestoItemsArgs
+  componentesCombo?: boolean | ProductoCountOutputTypeCountComponentesComboArgs
+  enCombos?: boolean | ProductoCountOutputTypeCountEnCombosArgs
 }
 
 /**
@@ -2153,6 +2523,20 @@ export type ProductoCountOutputTypeCountPresupuestoItemsArgs<ExtArgs extends run
   where?: Prisma.PresupuestoItemWhereInput
 }
 
+/**
+ * ProductoCountOutputType without action
+ */
+export type ProductoCountOutputTypeCountComponentesComboArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComboItemWhereInput
+}
+
+/**
+ * ProductoCountOutputType without action
+ */
+export type ProductoCountOutputTypeCountEnCombosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComboItemWhereInput
+}
+
 
 export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2183,6 +2567,8 @@ export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   facturaProveedorItems?: boolean | Prisma.Producto$facturaProveedorItemsArgs<ExtArgs>
   pedidoItems?: boolean | Prisma.Producto$pedidoItemsArgs<ExtArgs>
   presupuestoItems?: boolean | Prisma.Producto$presupuestoItemsArgs<ExtArgs>
+  componentesCombo?: boolean | Prisma.Producto$componentesComboArgs<ExtArgs>
+  enCombos?: boolean | Prisma.Producto$enCombosArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ProductoCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["producto"]>
@@ -2276,6 +2662,8 @@ export type ProductoInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   facturaProveedorItems?: boolean | Prisma.Producto$facturaProveedorItemsArgs<ExtArgs>
   pedidoItems?: boolean | Prisma.Producto$pedidoItemsArgs<ExtArgs>
   presupuestoItems?: boolean | Prisma.Producto$presupuestoItemsArgs<ExtArgs>
+  componentesCombo?: boolean | Prisma.Producto$componentesComboArgs<ExtArgs>
+  enCombos?: boolean | Prisma.Producto$enCombosArgs<ExtArgs>
   negocio?: boolean | Prisma.NegocioDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ProductoCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2299,6 +2687,8 @@ export type $ProductoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     facturaProveedorItems: Prisma.$FacturaProveedorItemPayload<ExtArgs>[]
     pedidoItems: Prisma.$PedidoItemPayload<ExtArgs>[]
     presupuestoItems: Prisma.$PresupuestoItemPayload<ExtArgs>[]
+    componentesCombo: Prisma.$ComboItemPayload<ExtArgs>[]
+    enCombos: Prisma.$ComboItemPayload<ExtArgs>[]
     negocio: Prisma.$NegocioPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2724,6 +3114,8 @@ export interface Prisma__ProductoClient<T, Null = never, ExtArgs extends runtime
   facturaProveedorItems<T extends Prisma.Producto$facturaProveedorItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$facturaProveedorItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FacturaProveedorItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pedidoItems<T extends Prisma.Producto$pedidoItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$pedidoItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PedidoItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   presupuestoItems<T extends Prisma.Producto$presupuestoItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$presupuestoItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PresupuestoItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  componentesCombo<T extends Prisma.Producto$componentesComboArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$componentesComboArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComboItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  enCombos<T extends Prisma.Producto$enCombosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$enCombosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComboItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   negocio<T extends Prisma.NegocioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NegocioDefaultArgs<ExtArgs>>): Prisma.Prisma__NegocioClient<runtime.Types.Result.GetResult<Prisma.$NegocioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3308,6 +3700,54 @@ export type Producto$presupuestoItemsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.PresupuestoItemScalarFieldEnum | Prisma.PresupuestoItemScalarFieldEnum[]
+}
+
+/**
+ * Producto.componentesCombo
+ */
+export type Producto$componentesComboArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ComboItem
+   */
+  select?: Prisma.ComboItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ComboItem
+   */
+  omit?: Prisma.ComboItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComboItemInclude<ExtArgs> | null
+  where?: Prisma.ComboItemWhereInput
+  orderBy?: Prisma.ComboItemOrderByWithRelationInput | Prisma.ComboItemOrderByWithRelationInput[]
+  cursor?: Prisma.ComboItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComboItemScalarFieldEnum | Prisma.ComboItemScalarFieldEnum[]
+}
+
+/**
+ * Producto.enCombos
+ */
+export type Producto$enCombosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ComboItem
+   */
+  select?: Prisma.ComboItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ComboItem
+   */
+  omit?: Prisma.ComboItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComboItemInclude<ExtArgs> | null
+  where?: Prisma.ComboItemWhereInput
+  orderBy?: Prisma.ComboItemOrderByWithRelationInput | Prisma.ComboItemOrderByWithRelationInput[]
+  cursor?: Prisma.ComboItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComboItemScalarFieldEnum | Prisma.ComboItemScalarFieldEnum[]
 }
 
 /**

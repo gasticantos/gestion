@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sesionActual } from "@/lib/sesionServidor";
+import { descontarStock } from "@/lib/stockCombo";
 import { obtenerUsuarioIdDesdeRequest, registrarAuditoria } from "@/lib/auditoria";
 
 const METODOS = ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"] as const;
@@ -133,10 +134,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   await prisma.$transaction(async (tx) => {
     for (const item of venta.pedidos.flatMap((pedido) => pedido.items)) {
-      await tx.producto.update({
-        where: { id: item.productoId },
-        data: { stock: { increment: item.cantidad } },
-      });
+      await descontarStock(tx, item.productoId, -item.cantidad);
     }
     if (venta.clienteId && cargoCuentaCorriente > 0) {
       await tx.cliente.update({

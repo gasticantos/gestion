@@ -10,6 +10,7 @@ import { input, label, trHover } from "@/components/ui/styles";
 import { formatearMoneda } from "@/lib/formato";
 import { redondearPrecio } from "@/lib/precio";
 import { listarImpresorasLocales } from "@/lib/imprimir";
+import BuscadorProducto, { ProductoBusqueda } from "@/components/BuscadorProducto";
 
 // Versiones más angostas de th/td, solo para esta tabla: tiene muchas columnas y el
 // objetivo es que entre la fila completa en pantalla sin scroll horizontal.
@@ -47,7 +48,116 @@ type Producto = {
   proveedorId: number | null;
   proveedor: Proveedor | null;
   updatedAt: string;
+  componentesCombo: { productoId: number; cantidad: number; producto: { nombre: string; stock: number } }[];
 };
+
+type ComponenteForm = { productoId: number; nombre: string; cantidad: string };
+
+// Cuántos combos se pueden armar con el stock actual de sus artículos.
+function stockCombo(p: Producto) {
+  return Math.max(
+    0,
+    Math.min(...p.componentesCombo.map((c) => Math.floor(c.producto.stock / c.cantidad)))
+  );
+}
+
+function componentesAForm(p: Producto): ComponenteForm[] {
+  return p.componentesCombo.map((c) => ({
+    productoId: c.productoId,
+    nombre: c.producto.nombre,
+    cantidad: String(c.cantidad),
+  }));
+}
+
+function componentesAEnviar(lista: ComponenteForm[]) {
+  return lista.map((c) => ({ productoId: c.productoId, cantidad: Number(c.cantidad) }));
+}
+
+function componentesValidos(lista: ComponenteForm[]) {
+  return lista.length > 0 && lista.every((c) => Number(c.cantidad) > 0);
+}
+
+// Elegir los artículos que forman un combo y cuántas unidades de cada uno lleva.
+function EditorCombo({
+  productos,
+  value,
+  onChange,
+  excluirId,
+}: {
+  productos: Producto[];
+  value: ComponenteForm[];
+  onChange: (v: ComponenteForm[]) => void;
+  excluirId?: number;
+}) {
+  const disponibles = productos.filter(
+    (p) => p.activo && p.componentesCombo.length === 0 && p.id !== excluirId
+  );
+
+  function agregar(p: ProductoBusqueda) {
+    const existe = value.find((c) => c.productoId === p.id);
+    if (existe) {
+      onChange(
+        value.map((c) => (c === existe ? { ...c, cantidad: String((Number(c.cantidad) || 0) + 1) } : c))
+      );
+      return;
+    }
+    onChange([...value, { productoId: p.id, nombre: p.nombre, cantidad: "1" }]);
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <BuscadorProducto
+        productos={disponibles}
+        onSeleccionar={agregar}
+        elegirPrecio={false}
+        placeholder="Buscá un artículo para sumar al combo..."
+      />
+      {value.length === 0 ? (
+        <p className="text-xs text-neutral-500">Todavía no agregaste artículos al combo.</p>
+      ) : (
+        <table className="w-full max-w-xl">
+          <thead>
+            <tr>
+              <th className={thC}>Artículo</th>
+              <th className={`${thC} w-32`}>Cantidad por combo</th>
+              <th className={`${thC} w-10`}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {value.map((c) => (
+              <tr key={c.productoId} className="border-t border-neutral-200 dark:border-neutral-800">
+                <td className={tdC}>{c.nombre}</td>
+                <td className={tdC}>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className={input}
+                    value={c.cantidad}
+                    onChange={(e) =>
+                      onChange(value.map((x) => (x === c ? { ...x, cantidad: e.target.value } : x)))
+                    }
+                    aria-label={`Cantidad de ${c.nombre} por combo`}
+                  />
+                </td>
+                <td className={`${tdC} text-right`}>
+                  <button
+                    type="button"
+                    title="Quitar del combo"
+                    className="text-red-400 hover:text-red-300"
+                    onClick={() => onChange(value.filter((x) => x !== c))}
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
 
 const emptyForm = {
   nombre: "",
@@ -205,7 +315,13 @@ export default function ProductosPage() {
   const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
   const [guardandoEdiciones, setGuardandoEdiciones] = useState(false);
   const [impresoraMasiva, setImpresoraMasiva] = useState("");
+  const [esCombo, setEsCombo] = useState(false);
+  const [componentesNuevo, setComponentesNuevo] = useState<ComponenteForm[]>([]);
+  const [comboEditando, setComboEditando] = useState<{ producto: Producto; componentes: ComponenteForm[] } | null>(null);
+  const [errorCombo, setErrorCombo] = useState("");
+  const [guardandoCombo, setGuardandoCombo] = useState(false);
   const seleccionarTodosRef = useRef<HTMLInputElement>(null);
+  const editorComboRef = useRef<HTMLDivElement>(null);
 
   async function cargar() {
     setLoading(true);
@@ -236,6 +352,10 @@ export default function ProductosPage() {
   async function agregar(e: FormEvent) {
     e.preventDefault();
     setError("");
+    if (esCombo && !componentesValidos(componentesNuevo)) {
+      setError("Agregá al menos un artículo al combo, con cantidad mayor a 0");
+      return;
+    }
 
     const res = await fetch("/api/productos", {
       method: "POST",
@@ -253,6 +373,7 @@ export default function ProductosPage() {
         impresora: form.impresora || null,
         requiereConfirmacion: form.requiereConfirmacion,
         proveedorId: form.proveedorId || null,
+        combo: esCombo ? componentesAEnviar(componentesNuevo) : [],
       }),
     });
 
@@ -265,6 +386,37 @@ export default function ProductosPage() {
     setForm(emptyForm);
     setVentaManual(false);
     setVentaMesaManual(false);
+    setEsCombo(false);
+    setComponentesNuevo([]);
+    await cargar();
+  }
+
+  function abrirEditorCombo(p: Producto) {
+    setErrorCombo("");
+    setComboEditando({ producto: p, componentes: componentesAForm(p) });
+    setTimeout(() => editorComboRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
+  }
+
+  async function guardarCombo(componentes: ComponenteForm[]) {
+    if (!comboEditando) return;
+    setErrorCombo("");
+    if (componentes.some((c) => !(Number(c.cantidad) > 0))) {
+      setErrorCombo("Todas las cantidades tienen que ser mayores a 0");
+      return;
+    }
+    setGuardandoCombo(true);
+    const res = await fetch(`/api/productos/${comboEditando.producto.id}/combo`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ combo: componentesAEnviar(componentes) }),
+    });
+    setGuardandoCombo(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setErrorCombo(data.error || "No se pudo guardar el combo");
+      return;
+    }
+    setComboEditando(null);
     await cargar();
   }
 
@@ -590,16 +742,18 @@ export default function ProductosPage() {
               />
             </div>
           )}
-          <div>
-            <label className={label}>Stock</label>
-            <input
-              type="number"
-              step="0.01"
-              className={input}
-              value={form.stock}
-              onChange={(e) => setForm({ ...form, stock: e.target.value })}
-            />
-          </div>
+          {!esCombo && (
+            <div>
+              <label className={label}>Stock</label>
+              <input
+                type="number"
+                step="0.01"
+                className={input}
+                value={form.stock}
+                onChange={(e) => setForm({ ...form, stock: e.target.value })}
+              />
+            </div>
+          )}
           <div>
             <label className={label}>Unidad</label>
             <input
@@ -646,6 +800,19 @@ export default function ProductosPage() {
             </label>
           </div>
 
+          <div className="col-span-2 md:col-span-4 flex flex-col gap-2 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-neutral-800 dark:text-neutral-200">
+              <input type="checkbox" checked={esCombo} onChange={(e) => setEsCombo(e.target.checked)} />
+              Es un combo
+            </label>
+            <p className="text-xs text-neutral-500">
+              Al vender el combo se descuenta del stock cada artículo que lo forma, según la cantidad que pongas.
+            </p>
+            {esCombo && (
+              <EditorCombo productos={productos} value={componentesNuevo} onChange={setComponentesNuevo} />
+            )}
+          </div>
+
           <div className="col-span-2 md:col-span-4 flex items-center gap-3 pt-1">
             <Button type="submit" variant="primary">
               Agregar producto
@@ -654,6 +821,55 @@ export default function ProductosPage() {
           </div>
         </form>
       </Plegable>
+
+      {comboEditando && (
+        <div ref={editorComboRef}>
+          <Card>
+            <div className="flex flex-col gap-3 p-4">
+              <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-50">
+                Artículos del combo: {comboEditando.producto.nombre}
+              </h2>
+              <p className="text-xs text-neutral-500">
+                Cada vez que se venda 1 de este producto se descuenta del stock la cantidad indicada de cada artículo.
+              </p>
+              <EditorCombo
+                productos={productos}
+                value={comboEditando.componentes}
+                onChange={(componentes) => setComboEditando({ ...comboEditando, componentes })}
+                excluirId={comboEditando.producto.id}
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="primary"
+                  disabled={guardandoCombo || comboEditando.componentes.length === 0}
+                  onClick={() => guardarCombo(comboEditando.componentes)}
+                >
+                  {guardandoCombo ? "Guardando..." : "Guardar combo"}
+                </Button>
+                {comboEditando.producto.componentesCombo.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={guardandoCombo}
+                    onClick={() => {
+                      if (confirm("¿Dejar de usar este producto como combo? Va a descontar su propio stock otra vez.")) {
+                        guardarCombo([]);
+                      }
+                    }}
+                  >
+                    Dejar de ser combo
+                  </Button>
+                )}
+                <Button type="button" variant="ghost" disabled={guardandoCombo} onClick={() => setComboEditando(null)}>
+                  Cancelar
+                </Button>
+                {errorCombo && <span className="text-sm text-red-400">{errorCombo}</span>}
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <Card>
         <div className="flex flex-col gap-3 p-3 border-b border-neutral-200 dark:border-neutral-800">
@@ -888,6 +1104,15 @@ export default function ProductosPage() {
                         title={p.nombre}
                       >
                         {p.nombre}
+                        {p.componentesCombo.length > 0 && (
+                          <div
+                            className="text-xs font-normal text-neutral-500 truncate"
+                            title={p.componentesCombo.map((c) => `${c.cantidad} × ${c.producto.nombre}`).join(", ")}
+                          >
+                            <Badge variant="accent" className="mr-1">Combo</Badge>
+                            {p.componentesCombo.map((c) => `${c.cantidad} × ${c.producto.nombre}`).join(", ")}
+                          </div>
+                        )}
                       </td>
                       <td className={`${tdC} text-neutral-500 dark:text-neutral-400`}>${formatearMoneda(p.precioCosto)}</td>
                       <td className={`${tdC} text-emerald-400 font-medium`}>
@@ -900,13 +1125,22 @@ export default function ProductosPage() {
                           <MargenBadge costo={p.precioCosto} venta={p.precioVentaMesa} compacto small />
                         </td>
                       )}
-                      <td
-                        className={`${tdC} font-medium ${
-                          p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-700 dark:text-neutral-200"
-                        }`}
-                      >
-                        {p.stock}
-                      </td>
+                      {p.componentesCombo.length > 0 ? (
+                        <td
+                          className={`${tdC} font-medium ${stockCombo(p) <= 0 ? "text-red-400" : "text-neutral-700 dark:text-neutral-200"}`}
+                          title="Combos que se pueden armar con el stock de sus artículos"
+                        >
+                          {stockCombo(p)}
+                        </td>
+                      ) : (
+                        <td
+                          className={`${tdC} font-medium ${
+                            p.stock <= 0 ? "text-red-400" : p.stock <= 5 ? "text-blue-500" : "text-neutral-700 dark:text-neutral-200"
+                          }`}
+                        >
+                          {p.stock}
+                        </td>
+                      )}
                       <td className={`${tdC} font-mono text-xs text-neutral-500`}>{p.codigoBarras || "-"}</td>
                       <td className={`${tdC} text-neutral-500 dark:text-neutral-400`}>{p.proveedor?.nombre || "-"}</td>
                       <td className={`${tdC} text-center`}>
@@ -932,6 +1166,13 @@ export default function ProductosPage() {
                           onClick={() => iniciarEdicion(p)}
                         >
                           Editar
+                        </button>
+                        <button
+                          className="text-blue-500 hover:text-blue-400 mr-3"
+                          onClick={() => abrirEditorCombo(p)}
+                          title="Elegir qué artículos forman este combo"
+                        >
+                          Combo
                         </button>
                         {p.activo ? (
                           <button className="text-red-400 hover:text-red-300" onClick={() => darDeBaja(p.id)}>

@@ -63,6 +63,7 @@ export const ModelName = {
   FacturaProveedorItem: 'FacturaProveedorItem',
   PagoProveedor: 'PagoProveedor',
   Producto: 'Producto',
+  ComboItem: 'ComboItem',
   Presupuesto: 'Presupuesto',
   PresupuestoItem: 'PresupuestoItem',
   StockEntry: 'StockEntry',
@@ -277,6 +278,16 @@ export const ProductoScalarFieldEnum = {
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
+
+
+export const ComboItemScalarFieldEnum = {
+  id: 'id',
+  comboId: 'comboId',
+  productoId: 'productoId',
+  cantidad: 'cantidad'
+} as const
+
+export type ComboItemScalarFieldEnum = (typeof ComboItemScalarFieldEnum)[keyof typeof ComboItemScalarFieldEnum]
 
 
 export const PresupuestoScalarFieldEnum = {

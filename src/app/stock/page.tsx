@@ -43,7 +43,9 @@ export default function StockPage() {
       fetch("/api/productos"),
       fetch("/api/proveedores"),
     ]);
-    setProductos(await prodRes.json());
+    // Los combos no tienen stock propio (se descuenta de sus artículos), así que no se cargan acá.
+    const lista: (Producto & { componentesCombo?: unknown[] })[] = await prodRes.json();
+    setProductos(lista.filter((p) => !p.componentesCombo?.length));
     setProveedores(await provRes.json());
     setLoading(false);
   }

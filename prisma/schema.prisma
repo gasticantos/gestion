@@ -300,6 +300,10 @@ model Producto {
   facturaProveedorItems FacturaProveedorItem[]
   pedidoItems           PedidoItem[]
   presupuestoItems      PresupuestoItem[]
+  // Si tiene componentes es un combo: al venderlo se descuenta el stock de cada
+  // componente (cantidad del combo × cantidad del componente) y no el del combo.
+  componentesCombo      ComboItem[]       @relation("ComboComponentes")
+  enCombos              ComboItem[]       @relation("ComboProductoComponente")
   negocioId             Int               @default(1)
   negocio               Negocio           @relation(fields: [negocioId], references: [id])
 
@@ -310,6 +314,18 @@ model Producto {
   @@index([negocioId, impresora])
   @@index([proveedorId])
   @@index([categoriaId])
+}
+
+model ComboItem {
+  id         Int      @id @default(autoincrement())
+  comboId    Int
+  combo      Producto @relation("ComboComponentes", fields: [comboId], references: [id], onDelete: Cascade)
+  productoId Int
+  producto   Producto @relation("ComboProductoComponente", fields: [productoId], references: [id])
+  cantidad   Float
+
+  @@unique([comboId, productoId])
+  @@index([productoId])
 }
 
 enum EstadoPresupuesto {

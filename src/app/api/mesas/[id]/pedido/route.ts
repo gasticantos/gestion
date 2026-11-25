@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { precioSegunTarifa, Tarifa } from "@/lib/precio";
 import { sesionActual } from "@/lib/sesionServidor";
+import { descontarStock } from "@/lib/stockCombo";
 import { ROL_LABEL } from "@/lib/permisos";
 import { formatearFechaHora } from "@/lib/formato";
 
@@ -98,10 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
 
     for (const item of items) {
-      await tx.producto.update({
-        where: { id: Number(item.productoId) },
-        data: { stock: { decrement: Number(item.cantidad) } },
-      });
+      await descontarStock(tx, Number(item.productoId), Number(item.cantidad));
     }
 
     await tx.venta.update({

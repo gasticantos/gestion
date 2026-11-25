@@ -5,6 +5,7 @@ import { sesionActual } from "@/lib/sesionServidor";
 import { formatearMoneda } from "@/lib/formato";
 import { filtroVentasCajaActual, conBloqueoCaja } from "@/lib/cajaManual";
 import { enviarAlertaTelegram } from "@/lib/telegram";
+import { descontarStock } from "@/lib/stockCombo";
 
 type ItemInput = {
   productoId: number;
@@ -179,10 +180,7 @@ export async function POST(req: NextRequest) {
     });
 
     for (const item of items) {
-      await tx.producto.update({
-        where: { id: Number(item.productoId) },
-        data: { stock: { decrement: Number(item.cantidad) } },
-      });
+      await descontarStock(tx, Number(item.productoId), Number(item.cantidad));
     }
 
     const montoFiado = pagos.filter((p) => p.metodo === "FIADO").reduce((acc, p) => acc + Number(p.monto), 0);
