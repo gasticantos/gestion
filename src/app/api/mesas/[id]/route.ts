@@ -66,6 +66,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       prisma.producto.findMany({
         where: {
           activo: true,
+          // Los combos solo se venden en mostrador, no en mesas.
+          componentesCombo: { none: {} },
           OR: [
             { esPromo: false },
             { esPromo: true, promoDesde: { lte: ahora }, promoHasta: { gte: ahora } },

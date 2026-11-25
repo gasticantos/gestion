@@ -44,6 +44,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const productos = await prisma.producto.findMany({
     where: { id: { in: items.map((i) => Number(i.productoId)) } },
+    include: { _count: { select: { componentesCombo: true } } },
   });
   const porId = new Map(productos.map((p) => [p.id, p]));
   const configuracion = await prisma.configuracion.findFirst();
@@ -57,6 +58,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const ahora = new Date();
     if (!producto.activo || (producto.esPromo && (!producto.promoDesde || !producto.promoHasta || producto.promoDesde > ahora || producto.promoHasta < ahora))) {
       return NextResponse.json({ error: producto.esPromo ? `La promoción "${producto.nombre}" ya no está vigente` : `El producto "${producto.nombre}" no está activo` }, { status: 409 });
+    }
+    if (producto._count.componentesCombo > 0) {
+      return NextResponse.json({ error: `"${producto.nombre}" es un combo: los combos solo se venden en la sección Venta, no en mesas` }, { status: 409 });
     }
   }
 
