@@ -120,6 +120,8 @@ export default function ReportesPage() {
   const [enviandoCierreId, setEnviandoCierreId] = useState<number | null>(null);
   const [reimprimiendoCierreId, setReimprimiendoCierreId] = useState<number | null>(null);
   const [estadoHistorial, setEstadoHistorial] = useState("");
+  // null mientras carga: así el cajero nunca ve por un instante las opciones de admin.
+  const [esAdmin, setEsAdmin] = useState<boolean | null>(null);
 
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
@@ -153,8 +155,15 @@ export default function ReportesPage() {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial del historial remoto
-    cargarCierres();
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((usuario) => {
+        const admin = usuario?.rol === "ADMIN";
+        setEsAdmin(admin);
+        // El historial de cierres es solo para ADMIN.
+        if (admin) cargarCierres();
+      })
+      .catch(() => setEsAdmin(false));
   }, []);
 
   function elegirPreset(p: Preset) {
@@ -230,7 +239,7 @@ export default function ReportesPage() {
             : "Cada día va de las 07:00 hasta las 07:00 del día siguiente (hora Argentina). Las ventas de madrugada pertenecen al día anterior. Incluye cajas cerradas."}
         </p>
         <div className="flex flex-wrap gap-2">
-          {PRESETS.map((p) => (
+          {PRESETS.filter((p) => esAdmin || p.value === "caja").map((p) => (
             <button
               key={p.value}
               onClick={() => elegirPreset(p.value)}
@@ -272,6 +281,7 @@ export default function ReportesPage() {
         )}
       </Card>
 
+      {esAdmin && (
       <Plegable titulo={`Historial de cierres de caja (${cierres.length})`}>
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-neutral-500">Cierres registrados, impresión y copias en PDF.</p>
@@ -363,6 +373,7 @@ export default function ReportesPage() {
           </div>
         )}
       </Plegable>
+      )}
 
       {error ? null : loading || !reporte ? (
         <div className="text-sm text-neutral-500">Cargando...</div>

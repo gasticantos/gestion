@@ -17,7 +17,12 @@ export const REGLAS_RUTA: { prefix: string; roles: Rol[] }[] = [
   { prefix: "/cierre-caja", roles: ["ADMIN", "CAJERO"] },
   { prefix: "/control-caja", roles: ["ADMIN", "CAJERO"] },
   { prefix: "/api/control-caja", roles: ["ADMIN", "CAJERO"] },
-  // El cajero puede cerrar la jornada, pero no acceder al resto de los reportes.
+  // El historial de cierres es solo para ADMIN. Va antes de "/api/reportes/cierre"
+  // porque ese prefijo también matchea "/api/reportes/cierres".
+  { prefix: "/api/reportes/cierres", roles: ["ADMIN"] },
+  { prefix: "/reportes/cierres", roles: ["ADMIN"] },
+  { prefix: "/reportes/ticket", roles: ["ADMIN"] },
+  // El cajero puede cerrar la jornada.
   { prefix: "/api/reportes/cierre", roles: ["ADMIN", "CAJERO"] },
   { prefix: "/flyers", roles: ["ADMIN", "CAJERO", "MOZO"] },
   { prefix: "/api/flyers", roles: ["ADMIN", "CAJERO", "MOZO"] },
@@ -26,8 +31,9 @@ export const REGLAS_RUTA: { prefix: string; roles: Rol[] }[] = [
   // Antes cualquier rol (incluida una moza) podía pisarla sin querer con un solo clic.
   { prefix: "/api/impresion", roles: ["ADMIN", "CAJERO"] },
   { prefix: "/api/admin", roles: ["ADMIN"] },
-  { prefix: "/reportes", roles: ["ADMIN"] },
-  { prefix: "/api/reportes", roles: ["ADMIN"] },
+  // El cajero ve el reporte, pero solo de la caja abierta (lo fuerza la API con reporteSoloCaja).
+  { prefix: "/reportes", roles: ["ADMIN", "CAJERO"] },
+  { prefix: "/api/reportes", roles: ["ADMIN", "CAJERO"] },
   { prefix: "/mesas", roles: ["ADMIN", "CAJERO", "MOZO"] },
   { prefix: "/api/mesas", roles: ["ADMIN", "CAJERO", "MOZO"] },
   { prefix: "/pedidos", roles: ["ADMIN", "CAJERO", "MOZO"] },
@@ -61,6 +67,11 @@ export function puedeAcceder(pathname: string, rol: Rol): boolean {
   const roles = rolesPermitidos(pathname);
   if (!roles) return true;
   return roles.includes(rol);
+}
+
+/** El cajero solo puede ver el reporte de la caja abierta, no otros períodos ni cierres. */
+export function reporteSoloCaja(rol: Rol): boolean {
+  return rol !== "ADMIN";
 }
 
 // Primera sección a la que redirigir a cada rol después de loguearse.
