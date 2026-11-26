@@ -20,6 +20,7 @@ type EstadoCaja = {
   iniciado: boolean;
   saldoInicial: number;
   saldoSugerido: number;
+  saldoInicialFijo: boolean;
   ventasEfectivo: number;
   cobrosCuentaCorrienteEfectivo: number;
   ingresos: number;
@@ -169,12 +170,25 @@ export default function ControlCajaPage() {
         <Card className="flex max-w-xl flex-col gap-3 p-5">
           <div>
             <h2 className="font-semibold text-neutral-900 dark:text-neutral-50">Abrir caja</h2>
-            <p className="text-sm text-neutral-500">Indicá cuánto efectivo hay en caja antes de comenzar.</p>
+            <p className="text-sm text-neutral-500">
+              {estado.saldoInicialFijo
+                ? "La caja arranca con el efectivo que se dejó al cerrar el turno anterior."
+                : "Es la primera caja: indicá cuánto efectivo hay antes de comenzar."}
+            </p>
           </div>
-          <label className="text-sm text-neutral-600 dark:text-neutral-300">
-            Efectivo inicial
-            <input className={`${input} mt-1`} type="number" min="0" step="0.01" value={saldoInicial} onChange={(e) => setSaldoInicial(e.target.value)} />
-          </label>
+          {estado.saldoInicialFijo ? (
+            <div className="text-sm text-neutral-600 dark:text-neutral-300">
+              Efectivo inicial
+              <div className="mt-1 rounded-lg bg-neutral-100 px-3 py-2 text-lg font-semibold text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50">
+                ${formatearMoneda(estado.saldoSugerido)}
+              </div>
+            </div>
+          ) : (
+            <label className="text-sm text-neutral-600 dark:text-neutral-300">
+              Efectivo inicial
+              <input className={`${input} mt-1`} type="number" min="0" step="0.01" value={saldoInicial} onChange={(e) => setSaldoInicial(e.target.value)} />
+            </label>
+          )}
           <Button disabled={procesando} onClick={() => guardar({ accion: "iniciar", saldoInicial }, "Caja iniciada correctamente")}>Iniciar caja</Button>
         </Card>
       ) : (

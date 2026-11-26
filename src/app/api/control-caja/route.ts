@@ -61,6 +61,8 @@ async function obtenerEstado(negocioId: number) {
     control,
     saldoInicial,
     saldoSugerido: anterior?.saldoSiguiente ?? 0,
+    // Si hubo un turno cerrado, la caja nueva arranca sí o sí con lo que dejó ese turno.
+    saldoInicialFijo: Boolean(anterior),
     ventasEfectivo: redondear(ventasEfectivo),
     cobrosCuentaCorrienteEfectivo: redondear(cobrosCuentaCorrienteEfectivo),
     ingresos: redondear(ingresos),
@@ -96,8 +98,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "La caja cambió. Actualizá la pantalla antes de continuar." }, { status: 409 });
     }
     if (body.accion === "iniciar") {
-      const saldoInicial = Number(body.saldoInicial);
-      if (body.saldoInicial == null || String(body.saldoInicial).trim() === "" || !Number.isFinite(saldoInicial) || saldoInicial < 0) {
+      // El efectivo inicial es el que se dejó para el próximo turno al cerrar el anterior; no
+      // se puede cambiar al abrir. Solo la primera caja (sin cierres previos) se carga a mano.
+      const anterior = await tx.controlCaja.findFirst({
+        where: { negocioId: sesion.negocioId, cerradoAt: { not: null }, saldoSiguiente: { not: null } },
+        orderBy: { cerradoAt: "desc" },
+        select: { saldoSiguiente: true },
+      });
+      const saldoInicial = anterior ? anterior.saldoSiguiente! : Number(body.saldoInicial);
+      if (!anterior && (body.saldoInicial == null || String(body.saldoInicial).trim() === "" || !Number.isFinite(saldoInicial) || saldoInicial < 0)) {
         return NextResponse.json({ error: "El efectivo inicial no es válido" }, { status: 400 });
       }
       if (existente) {
