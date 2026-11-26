@@ -12,7 +12,7 @@ import { calcularCostoConImpuestos, type ImpuestoFactura } from "@/lib/impuestos
 type Proveedor = { id: number; nombre: string; telefono: string | null; contacto: string | null; notas: string | null; activo: boolean };
 type Producto = ProductoBusqueda & { precioCosto: number; activo: boolean };
 type ImpuestoCarga = { nombre: string; porcentaje: string };
-type ItemCarga = { productoId: number; nombre: string; cantidad: string; costoBase: string; impuestos: ImpuestoCarga[]; costoAnterior: number };
+type ItemCarga = { productoId: number; nombre: string; cantidad: string; costoBase: string; costoAnterior: number };
 type ItemFactura = { id: number; productoId: number; productoNombre: string; cantidad: number; costoAnterior: number; costoBase: number; impuestos: ImpuestoFactura[] | null; costoUnitario: number; precioVentaAnterior: number; precioVentaSugerido: number | null; requiereAumento: boolean; precioActualizado: boolean };
 type Factura = { id: number; numero: string | null; fecha: string; total: number; saldo: number; estado: "PAGADA" | "CUENTA_CORRIENTE"; comprobante: string | null; notas: string | null; proveedor: { id: number; nombre: string }; items: ItemFactura[] };
 type Deuda = { id: number; nombre: string; deuda: number };
@@ -45,6 +45,8 @@ export default function ProveedoresPage() {
   const [formFactura, setFormFactura] = useState(emptyFactura);
   const [facturaEditandoId, setFacturaEditandoId] = useState<number | null>(null);
   const [items, setItems] = useState<ItemCarga[]>([]);
+  // Los impuestos se cargan una sola vez y se aplican a todos los productos de la factura.
+  const [impuestos, setImpuestos] = useState<ImpuestoCarga[]>([]);
   const [comprobante, setComprobante] = useState<string | null>(null);
   const [procesandoFoto, setProcesandoFoto] = useState(false);
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
@@ -68,10 +70,14 @@ export default function ProveedoresPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial desde las APIs del módulo
     void cargar();
   }, []);
+  const impuestosNumericos = useMemo(
+    () => impuestos.map((impuesto) => ({ nombre: impuesto.nombre, porcentaje: Number(impuesto.porcentaje) || 0 })),
+    [impuestos]
+  );
   function costoFinalItem(item: ItemCarga) {
-    return calcularCostoConImpuestos(Number(item.costoBase) || 0, item.impuestos.map((impuesto) => ({ nombre: impuesto.nombre, porcentaje: Number(impuesto.porcentaje) || 0 })));
+    return calcularCostoConImpuestos(Number(item.costoBase) || 0, impuestosNumericos);
   }
-  const totalFactura = useMemo(() => items.reduce((s, i) => s + (Number(i.cantidad) || 0) * costoFinalItem(i), 0), [items]);
+  const totalFactura = items.reduce((s, i) => s + (Number(i.cantidad) || 0) * costoFinalItem(i), 0);
   const deudaTotal = deudas.reduce((s, p) => s + p.deuda, 0);
   const alertas = facturas.flatMap((f) => f.items.filter((i) => i.requiereAumento && !i.precioActualizado).map((i) => ({ ...i, facturaId: f.id })));
   const conceptosImpuesto = useMemo(() => {
@@ -79,7 +85,7 @@ export default function ProveedoresPage() {
     for (const factura of facturas) for (const item of factura.items) {
       if (Array.isArray(item.impuestos)) for (const impuesto of item.impuestos) conceptos.push(impuesto.nombre);
     }
-    for (const item of items) for (const impuesto of item.impuestos) conceptos.push(impuesto.nombre);
+    for (const impuesto of impuestos) conceptos.push(impuesto.nombre);
     const vistos = new Set<string>();
     return conceptos.filter((concepto) => {
       const limpio = concepto.trim();
@@ -88,21 +94,21 @@ export default function ProveedoresPage() {
       vistos.add(clave);
       return true;
     });
-  }, [facturas, items]);
+  }, [facturas, impuestos]);
 
   function agregarItem(p: ProductoBusqueda) {
     const producto = productos.find((x) => x.id === p.id); if (!producto) return;
-    setItems((actuales) => actuales.some((i) => i.productoId === p.id) ? actuales : [...actuales, { productoId: p.id, nombre: p.nombre, cantidad: "1", costoBase: String(producto.precioCosto), impuestos: [], costoAnterior: producto.precioCosto }]);
+    setItems((actuales) => actuales.some((i) => i.productoId === p.id) ? actuales : [...actuales, { productoId: p.id, nombre: p.nombre, cantidad: "1", costoBase: String(producto.precioCosto), costoAnterior: producto.precioCosto }]);
   }
   function cambiarItem(id: number, campo: "cantidad" | "costoBase", valor: string) { setItems((actuales) => actuales.map((i) => i.productoId === id ? { ...i, [campo]: valor } : i)); }
-  function agregarImpuesto(productoId: number) {
-    setItems((actuales) => actuales.map((item) => item.productoId === productoId && item.impuestos.length < 3 ? { ...item, impuestos: [...item.impuestos, { nombre: "IVA", porcentaje: "" }] } : item));
+  function agregarImpuesto() {
+    setImpuestos((actuales) => actuales.length < 3 ? [...actuales, { nombre: "IVA", porcentaje: "" }] : actuales);
   }
-  function cambiarImpuesto(productoId: number, indice: number, campo: keyof ImpuestoCarga, valor: string) {
-    setItems((actuales) => actuales.map((item) => item.productoId === productoId ? { ...item, impuestos: item.impuestos.map((impuesto, i) => i === indice ? { ...impuesto, [campo]: valor } : impuesto) } : item));
+  function cambiarImpuesto(indice: number, campo: keyof ImpuestoCarga, valor: string) {
+    setImpuestos((actuales) => actuales.map((impuesto, i) => i === indice ? { ...impuesto, [campo]: valor } : impuesto));
   }
-  function quitarImpuesto(productoId: number, indice: number) {
-    setItems((actuales) => actuales.map((item) => item.productoId === productoId ? { ...item, impuestos: item.impuestos.filter((_, i) => i !== indice) } : item));
+  function quitarImpuesto(indice: number) {
+    setImpuestos((actuales) => actuales.filter((_, i) => i !== indice));
   }
   async function elegirFoto(e: ChangeEvent<HTMLInputElement>) {
     const archivo = e.target.files?.[0]; if (!archivo) return; setError(""); setProcesandoFoto(true);
@@ -113,12 +119,12 @@ export default function ProveedoresPage() {
     setError(""); setOk("");
     if (!formFactura.proveedorId || items.length === 0) { setError("Elegí un proveedor y agregá al menos un producto"); return; }
     setGuardando(true);
-    const res = await fetch(facturaEditandoId ? `/api/proveedores/facturas/${facturaEditandoId}` : "/api/proveedores/facturas", { method: facturaEditandoId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...formFactura, comprobante, items: items.map((i) => ({ productoId: i.productoId, cantidad: Number(i.cantidad), costoBase: Number(i.costoBase), impuestos: i.impuestos.map((impuesto) => ({ nombre: impuesto.nombre.trim(), porcentaje: Number(impuesto.porcentaje) })) })) }) });
+    const res = await fetch(facturaEditandoId ? `/api/proveedores/facturas/${facturaEditandoId}` : "/api/proveedores/facturas", { method: facturaEditandoId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...formFactura, comprobante, impuestos: impuestos.map((impuesto) => ({ nombre: impuesto.nombre.trim(), porcentaje: Number(impuesto.porcentaje) })), items: items.map((i) => ({ productoId: i.productoId, cantidad: Number(i.cantidad), costoBase: Number(i.costoBase) })) }) });
     const data = await res.json(); setGuardando(false);
     if (!res.ok) { setError(data.error || "No se pudo guardar la factura"); return; }
     const aumentos = data.items.filter((i: ItemFactura) => i.requiereAumento).length;
     const eraEdicion = Boolean(facturaEditandoId);
-    setFormFactura(emptyFactura); setItems([]); setComprobante(null); setFacturaEditandoId(null);
+    setFormFactura(emptyFactura); setItems([]); setImpuestos([]); setComprobante(null); setFacturaEditandoId(null);
     setOk(`${eraEdicion ? "Factura modificada" : "Factura cargada"}. Stock, costos y saldo actualizados${aumentos ? `. Hay ${aumentos} precio(s) de venta para revisar.` : "."}`); await cargar();
   }
   function editarFactura(factura: Factura) {
@@ -128,12 +134,15 @@ export default function ProveedoresPage() {
       fecha: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Cordoba", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(factura.fecha)),
       estado: factura.saldo === 0 ? "PAGADA" : "CUENTA_CORRIENTE", notas: factura.notas || "",
     });
-    setItems(factura.items.map((item) => ({ productoId: item.productoId, nombre: item.productoNombre, cantidad: String(item.cantidad), costoBase: String(item.costoBase ?? item.costoUnitario), impuestos: Array.isArray(item.impuestos) ? item.impuestos.map((impuesto) => ({ nombre: impuesto.nombre, porcentaje: String(impuesto.porcentaje) })) : [], costoAnterior: item.costoAnterior })));
+    setItems(factura.items.map((item) => ({ productoId: item.productoId, nombre: item.productoNombre, cantidad: String(item.cantidad), costoBase: String(item.costoBase ?? item.costoUnitario), costoAnterior: item.costoAnterior })));
+    // Las facturas viejas podían tener impuestos distintos por producto: se toman los del primero.
+    const primerosImpuestos = factura.items.find((item) => Array.isArray(item.impuestos) && item.impuestos.length > 0)?.impuestos ?? [];
+    setImpuestos(primerosImpuestos.map((impuesto) => ({ nombre: impuesto.nombre, porcentaje: String(impuesto.porcentaje) })));
     setComprobante(factura.comprobante);
     window.requestAnimationFrame(() => document.getElementById("formulario-factura")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
   function cancelarEdicionFactura() {
-    setFacturaEditandoId(null); setFormFactura(emptyFactura); setItems([]); setComprobante(null); setError("");
+    setFacturaEditandoId(null); setFormFactura(emptyFactura); setItems([]); setImpuestos([]); setComprobante(null); setError("");
   }
   async function aplicarPrecios(facturaId: number) {
     if (!confirm("¿Actualizar los precios de venta sugeridos de esta factura?")) return;
@@ -165,23 +174,34 @@ export default function ProveedoresPage() {
       <div id="formulario-factura" className="scroll-mt-24"><Card className={`p-4 sm:p-5 flex flex-col gap-4 ${facturaEditandoId ? "ring-2 ring-blue-500/40" : ""}`}><div className="flex items-start justify-between gap-3"><div><h2 className="font-semibold">{facturaEditandoId ? `Modificar factura #${facturaEditandoId}` : "Nueva factura"}</h2><p className="text-xs text-neutral-500 mt-1">{facturaEditandoId ? "Los cambios corregirán el stock, los costos y el saldo por la diferencia." : "Al guardarla se sumará el stock, se actualizarán los costos y se registrará la deuda."}</p></div>{facturaEditandoId && <Button size="sm" variant="ghost" onClick={cancelarEdicionFactura}>Cancelar edición</Button>}</div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><div><label className={label}>Proveedor *</label><select className={input} value={formFactura.proveedorId} onChange={(e) => setFormFactura({ ...formFactura, proveedorId: e.target.value })}><option value="">Elegir...</option>{proveedores.filter((p) => p.activo).map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}</select></div><div><label className={label}>N.º de factura</label><input className={input} placeholder="Ej. 0001-000123" value={formFactura.numero} onChange={(e) => setFormFactura({ ...formFactura, numero: e.target.value })} /></div><div><label className={label}>Fecha *</label><input type="date" className={input} value={formFactura.fecha} onChange={(e) => setFormFactura({ ...formFactura, fecha: e.target.value })} /></div><div><label className={label}>Condición *</label><select className={input} value={formFactura.estado} onChange={(e) => setFormFactura({ ...formFactura, estado: e.target.value as "PAGADA" | "CUENTA_CORRIENTE" })}><option value="CUENTA_CORRIENTE">A cuenta corriente</option><option value="PAGADA">Pagada</option></select></div></div>
         <BuscadorProducto productos={productos.filter((p) => p.activo)} onSeleccionar={agregarItem} elegirPrecio={false} placeholder="Buscar producto para agregar..." />
-        {items.length > 0 && <div className="flex flex-col gap-3">{items.map((item) => {
-          const costoFinal = costoFinalItem(item);
-          return <div key={item.productoId} className="rounded-xl border border-neutral-200 p-3 dark:border-neutral-800">
-            <div className="grid gap-3 sm:grid-cols-[minmax(180px,1fr)_100px_140px_140px_auto] sm:items-end">
-              <div><div className="font-medium">{item.nombre}</div><div className="mt-1 text-xs text-neutral-500">Costo anterior: ${formatearMoneda(item.costoAnterior)}</div></div>
-              <div><label className={label}>Cantidad</label><input type="number" min="0.01" step="0.01" className={input} value={item.cantidad} onChange={(e) => cambiarItem(item.productoId, "cantidad", e.target.value)} /></div>
-              <div><label className={label}>Costo base</label><input type="number" min="0" step="0.01" className={input} value={item.costoBase} onChange={(e) => cambiarItem(item.productoId, "costoBase", e.target.value)} /></div>
-              <div><span className={label}>Costo final</span><div className="rounded-lg bg-neutral-100 px-3 py-2 font-semibold dark:bg-neutral-800">${formatearMoneda(costoFinal)}</div></div>
-              <button className="pb-2 text-sm text-red-500" onClick={() => setItems((actuales) => actuales.filter((i) => i.productoId !== item.productoId))}>Quitar</button>
-            </div>
-            <div className="mt-3 rounded-lg bg-neutral-50 p-3 dark:bg-neutral-950/50">
-              <div className="mb-2 flex items-center justify-between gap-3"><div><div className="text-sm font-medium">Impuestos del producto</div><div className="text-xs text-neutral-500">Se calculan sobre el costo base.</div></div><Button size="sm" onClick={() => agregarImpuesto(item.productoId)} disabled={item.impuestos.length >= 3}>+ Agregar impuesto</Button></div>
-              {item.impuestos.length === 0 ? <div className="text-xs text-neutral-400">Sin impuestos agregados.</div> : <div className="grid gap-2 sm:grid-cols-3">{item.impuestos.map((impuesto, indice) => <div key={indice} className="flex items-end gap-2 rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-900"><div className="min-w-0 flex-1"><label className={label}>Concepto</label><input list="conceptos-impuesto" className={input} value={impuesto.nombre} onChange={(e) => cambiarImpuesto(item.productoId, indice, "nombre", e.target.value)} placeholder="IVA" /></div><div className="w-24"><label className={label}>%</label><input type="number" min="0" max="1000" step="0.01" className={input} value={impuesto.porcentaje} onChange={(e) => cambiarImpuesto(item.productoId, indice, "porcentaje", e.target.value)} /></div><button className="pb-2 text-red-500" onClick={() => quitarImpuesto(item.productoId, indice)} aria-label="Quitar impuesto">×</button></div>)}</div>}
-            </div>
-            <div className="mt-2 text-right text-sm text-neutral-500">Subtotal: <strong className="text-neutral-900 dark:text-neutral-100">${formatearMoneda((Number(item.cantidad) || 0) * costoFinal)}</strong></div>
-          </div>;
-        })}<datalist id="conceptos-impuesto">{conceptosImpuesto.map((concepto) => <option key={concepto.toLocaleLowerCase("es")} value={concepto} />)}</datalist></div>}
+        {items.length > 0 && <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800">
+          <table className="w-full">
+            <thead><tr>
+              <th className={th}>Producto</th>
+              <th className={`${th} w-28`}>Cantidad</th>
+              <th className={`${th} w-36`}>Costo base</th>
+              <th className={`${th} whitespace-nowrap`}>Costo final</th>
+              <th className={th}>Subtotal</th>
+              <th className={`${th} w-10`}></th>
+            </tr></thead>
+            <tbody>{items.map((item) => {
+              const costoFinal = costoFinalItem(item);
+              return <tr key={item.productoId} className="border-t border-neutral-200 dark:border-neutral-800">
+                <td className={`${td} py-1.5`}><div className="font-medium whitespace-nowrap">{item.nombre}</div><div className="text-xs text-neutral-500 whitespace-nowrap">Costo anterior: ${formatearMoneda(item.costoAnterior)}</div></td>
+                <td className={`${td} py-1.5`}><input type="number" min="0.01" step="0.01" className={`${input} min-w-[80px]`} value={item.cantidad} onChange={(e) => cambiarItem(item.productoId, "cantidad", e.target.value)} aria-label={`Cantidad de ${item.nombre}`} /></td>
+                <td className={`${td} py-1.5`}><input type="number" min="0" step="0.01" className={`${input} min-w-[100px]`} value={item.costoBase} onChange={(e) => cambiarItem(item.productoId, "costoBase", e.target.value)} aria-label={`Costo base de ${item.nombre}`} /></td>
+                <td className={`${td} py-1.5 font-semibold whitespace-nowrap`}>${formatearMoneda(costoFinal)}</td>
+                <td className={`${td} py-1.5 font-semibold whitespace-nowrap`}>${formatearMoneda((Number(item.cantidad) || 0) * costoFinal)}</td>
+                <td className={`${td} py-1.5 text-right`}><button className="text-red-500 text-lg leading-none" title="Quitar producto" aria-label={`Quitar ${item.nombre}`} onClick={() => setItems((actuales) => actuales.filter((i) => i.productoId !== item.productoId))}>×</button></td>
+              </tr>;
+            })}</tbody>
+          </table>
+        </div>}
+        <div className="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-950/50">
+          <div className="mb-2 flex items-center justify-between gap-3"><div><div className="text-sm font-medium">Impuestos de la factura</div><div className="text-xs text-neutral-500">Se aplican a todos los productos, sobre el costo base.</div></div><Button size="sm" onClick={agregarImpuesto} disabled={impuestos.length >= 3}>+ Agregar impuesto</Button></div>
+          {impuestos.length === 0 ? <div className="text-xs text-neutral-400">Sin impuestos agregados.</div> : <div className="grid gap-2 sm:grid-cols-3">{impuestos.map((impuesto, indice) => <div key={indice} className="flex items-end gap-2 rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-900"><div className="min-w-0 flex-1"><label className={label}>Concepto</label><input list="conceptos-impuesto" className={input} value={impuesto.nombre} onChange={(e) => cambiarImpuesto(indice, "nombre", e.target.value)} placeholder="IVA" /></div><div className="w-24"><label className={label}>%</label><input type="number" min="0" max="1000" step="0.01" className={input} value={impuesto.porcentaje} onChange={(e) => cambiarImpuesto(indice, "porcentaje", e.target.value)} /></div><button className="pb-2 text-red-500" onClick={() => quitarImpuesto(indice)} aria-label="Quitar impuesto">×</button></div>)}</div>}
+          <datalist id="conceptos-impuesto">{conceptosImpuesto.map((concepto) => <option key={concepto.toLocaleLowerCase("es")} value={concepto} />)}</datalist>
+        </div>
         <div className="grid sm:grid-cols-2 gap-3 items-start"><div><label className={label}>Foto de la factura</label><div className="flex items-center gap-3"><label className="cursor-pointer inline-flex rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-800"><input type="file" accept="image/*" capture="environment" className="hidden" onChange={elegirFoto} />{procesandoFoto ? "Procesando..." : comprobante ? "Cambiar foto" : "Sacar o elegir foto"}</label>{comprobante && <><button onClick={() => setComprobante(null)} className="text-xs text-red-500">Quitar</button><button onClick={() => window.open(comprobante, "_blank")} className="text-xs text-blue-600">Ver foto</button></>}</div></div><div><label className={label}>Notas</label><input className={input} value={formFactura.notas} onChange={(e) => setFormFactura({ ...formFactura, notas: e.target.value })} /></div></div>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neutral-200 dark:border-neutral-800"><div><span className="text-sm text-neutral-500">Total de factura</span><div className="text-2xl font-semibold">${formatearMoneda(totalFactura)}</div></div><Button variant="primary" onClick={guardarFactura} disabled={guardando || procesandoFoto || items.length === 0}>{guardando ? "Guardando..." : facturaEditandoId ? "Guardar cambios" : "Guardar factura y actualizar stock"}</Button></div>
       </Card></div><Historial facturas={facturas} loading={loading} aplicarPrecios={aplicarPrecios} editarFactura={editarFactura} />

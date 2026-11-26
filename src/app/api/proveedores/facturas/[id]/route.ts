@@ -27,7 +27,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const normalizados = items.map((item) => {
     const costoBase = Number(item.costoBase ?? item.costoUnitario);
-    const impuestos = normalizarImpuestos(item.impuestos);
+    // Los impuestos se cargan para toda la factura; si no vienen, se usan los de cada producto (versión anterior).
+    const impuestos = normalizarImpuestos(body?.impuestos !== undefined ? body.impuestos : item.impuestos);
     return { productoId: Number(item.productoId), cantidad: Number(item.cantidad), costoBase, impuestos, costoUnitario: impuestos ? calcularCostoConImpuestos(costoBase, impuestos) : NaN };
   });
   const ids = normalizados.map((item) => item.productoId);
