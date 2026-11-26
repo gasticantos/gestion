@@ -67,10 +67,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const itemTarifa = (item: ItemInput): Tarifa =>
     precioMesaActivo && item.tarifa !== "PARTICULAR" ? "MESA" : "PARTICULAR";
 
-  // Si el mozo/cajero eligió un precio a mano al agregar el producto, respetarlo
-  // en lugar de recalcularlo por tarifa.
+  // Si el cajero/admin eligió un precio a mano al agregar el producto, respetarlo en lugar
+  // de recalcularlo por tarifa. El mozo solo puede elegir precio de mesa o de venta.
+  const puedePrecioLibre = sesion?.rol === "ADMIN" || sesion?.rol === "CAJERO";
   const precioItem = (item: ItemInput, producto: (typeof productos)[number]) =>
-    typeof item.precioUnitario === "number" && Number.isFinite(item.precioUnitario) && item.precioUnitario >= 0
+    puedePrecioLibre && typeof item.precioUnitario === "number" && Number.isFinite(item.precioUnitario) && item.precioUnitario >= 0
       ? item.precioUnitario
       : precioSegunTarifa(producto, itemTarifa(item));
 

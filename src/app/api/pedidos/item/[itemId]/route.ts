@@ -33,17 +33,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ item
       );
     }
 
-    // El mozo puede seguir corrigiendo el precio, pero no la cantidad de un producto ya
-    // cargado en la mesa: evita que la "corrija" a un número que no es el real. Se compara
-    // contra el valor guardado (no solo si vino en el body) para no bloquear un cambio de
-    // precio que reenvía la misma cantidad sin tocarla.
-    if (cantidad !== undefined && cantidad !== item.cantidad) {
-      if (sesion?.rol === "MOZO") {
-        return NextResponse.json(
-          { error: "No tenés permiso para cambiar la cantidad de un producto ya cargado" },
-          { status: 403 }
-        );
-      }
+    // El mozo no puede corregir ni la cantidad ni el precio de un producto ya cargado en
+    // la mesa. Se compara contra lo guardado (no solo si vino en el body) para no rechazar
+    // un pedido que reenvía los mismos valores sin tocarlos.
+    const cambiaCantidad = cantidad !== undefined && cantidad !== item.cantidad;
+    const cambiaPrecio = precioUnitario !== undefined && precioUnitario !== item.precioUnitario;
+    if ((cambiaCantidad || cambiaPrecio) && (!sesion || sesion.rol === "MOZO")) {
+      return NextResponse.json(
+        { error: "No tenés permiso para cambiar la cantidad o el precio de un producto ya cargado" },
+        { status: 403 }
+      );
     }
 
     const cantidadFinal = cantidad ?? item.cantidad;

@@ -100,6 +100,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [rol, setRol] = useState<string | null>(null);
+  // El mozo elige cantidad y precio (mesa o venta) al cargar, pero no puede escribir otro
+  // precio ni corregir cantidades o precios después. Mientras no se sabe el rol, se bloquea.
+  const puedeCorregir = rol !== null && rol !== "MOZO";
   const [ticketImpreso, setTicketImpreso] = useState(false);
   // Los productos cargados se agrupan por producto+precio (ver itemsAgrupados): agregar el
   // mismo producto varias veces suma a un solo renglón en vez de listarlo duplicado. La edición
@@ -787,7 +790,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         </td>
         <td className={tdM}>${formatearMoneda(precioActual * cantidadActual)}</td>
         <td className={`${tdM} text-right whitespace-nowrap`}>
-          {(!ticketImpreso || grupo.postPreticket) && !editando && (
+          {puedeCorregir && (!ticketImpreso || grupo.postPreticket) && !editando && (
             <button
               className="text-xs px-1.5 py-0.5 rounded border border-blue-600/50 text-blue-400 hover:bg-blue-600/10 mr-1"
               onClick={() => {
@@ -1010,6 +1013,9 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                             )}
                           </td>
                           <td className={`${tdM} text-center`}>
+                            {!puedeCorregir ? (
+                              <span className="text-sm font-medium">{i.cantidad}x</span>
+                            ) : (
                             <div className="flex items-center justify-center gap-0.5">
                               <button
                                 className="w-5 h-5 text-xs rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -1031,6 +1037,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                                 +
                               </button>
                             </div>
+                            )}
                           </td>
                           <td className={tdM}>${formatearMoneda(i.precioUnitario)}</td>
                           <td className={tdM}>${formatearMoneda(i.precioUnitario * i.cantidad)}</td>
@@ -1083,7 +1090,7 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 productos={productos}
                 onSeleccionar={agregarARonda}
                 precioMesaActivo={precioMesaActivo}
-                permitirPrecioLibre
+                permitirPrecioLibre={puedeCorregir}
                 permitirNotas
                 soloConfirmacionPendiente={ronda.length > 0}
               />
