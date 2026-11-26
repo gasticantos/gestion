@@ -455,6 +455,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   }
 
   function quitarDeRonda(productoId: number, tarifa: Tarifa) {
+    const item = ronda.find((i) => i.productoId === productoId && i.tarifa === tarifa);
+    if (item && !confirm(`¿Quitar ${item.cantidad} x ${item.nombre} del pedido?`)) return;
     ultimoCambioLocalRef.current = Date.now();
     setRonda((prev) => prev.filter((i) => !(i.productoId === productoId && i.tarifa === tarifa)));
   }
@@ -522,6 +524,8 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
         setError(`Ingresá una cantidad entre 1 y ${grupo.cantidad}`);
         return;
       }
+    } else if (!confirm(`¿Quitar ${grupo.cantidad} x ${grupo.nombre} de la mesa?`)) {
+      return;
     }
     setError("");
     let cantidadRestante = cantidadAEliminar;
