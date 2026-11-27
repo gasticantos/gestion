@@ -22,7 +22,6 @@ export default function ClientesPage() {
   const [telefono, setTelefono] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [editNombre, setEditNombre] = useState("");
   const [editTelefono, setEditTelefono] = useState("");
@@ -89,10 +88,14 @@ export default function ClientesPage() {
     await cargar();
   }
 
-  async function eliminarCliente(clienteId: number) {
-    if (!confirm("¿Eliminar este cliente? Se marcará como inactivo.")) return;
+  // Los clientes ya no se pueden dar de baja; los que quedaron de baja se pueden reactivar.
+  async function darDeAlta(cliente: Cliente) {
     setError("");
-    const res = await fetch(`/api/clientes/${clienteId}`, { method: "DELETE" });
+    const res = await fetch(`/api/clientes/${cliente.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre: cliente.nombre, telefono: cliente.telefono, activo: true }),
+    });
     if (!res.ok) {
       const data = await res.json();
       setError(data.error || "Ocurrió un error");
@@ -101,7 +104,7 @@ export default function ClientesPage() {
     await cargar();
   }
 
-  const listado = clientes.filter((c) => mostrarInactivos || c.activo);
+  const listado = clientes;
 
   return (
     <div className="max-w-3xl mx-auto flex flex-col gap-6">
@@ -127,14 +130,6 @@ export default function ClientesPage() {
       <Card>
         <div className="flex items-center justify-between p-3 border-b border-neutral-200 dark:border-neutral-800">
           <span className="text-sm text-neutral-500 dark:text-neutral-400">{listado.length} cliente(s)</span>
-          <label className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-            <input
-              type="checkbox"
-              checked={mostrarInactivos}
-              onChange={(e) => setMostrarInactivos(e.target.checked)}
-            />
-            Mostrar dados de baja
-          </label>
         </div>
         {loading ? (
           <div className="p-4 text-sm text-neutral-500">Cargando...</div>
@@ -178,8 +173,11 @@ export default function ClientesPage() {
                       </td>
                     </tr>
                   ) : (
-                    <tr key={c.id} className={`${trHover} ${!c.activo ? "opacity-40" : ""}`}>
-                      <td className={td}>{c.nombre}</td>
+                    <tr key={c.id} className={trHover}>
+                      <td className={td}>
+                        {c.nombre}
+                        {!c.activo && <Badge variant="warning" className="ml-2">Dado de baja</Badge>}
+                      </td>
                       <td className={td}>{c.telefono || "-"}</td>
                       <td className={td}>
                         {c.saldo > 0 ? (
@@ -201,12 +199,14 @@ export default function ClientesPage() {
                         >
                           Editar
                         </button>
-                        <button
-                          className="text-red-400 hover:text-red-300"
-                          onClick={() => eliminarCliente(c.id)}
-                        >
-                          Eliminar
-                        </button>
+                        {!c.activo && (
+                          <button
+                            className="text-emerald-500 hover:text-emerald-400"
+                            onClick={() => darDeAlta(c)}
+                          >
+                            Dar de alta
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )

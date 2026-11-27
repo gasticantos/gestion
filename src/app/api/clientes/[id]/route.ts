@@ -20,16 +20,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const cliente = await prisma.cliente.update({
     where: { id: Number(id) },
-    data: { nombre, telefono: telefono || null, activo },
+    // Solo se permite dar de alta; dar de baja no está permitido.
+    data: { nombre, telefono: telefono || null, ...(activo === true ? { activo: true } : {}) },
   });
   return NextResponse.json(cliente);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const cliente = await prisma.cliente.update({
-    where: { id: Number(id) },
-    data: { activo: false },
-  });
-  return NextResponse.json(cliente);
+// Los clientes no se dan de baja: pueden tener cuenta corriente con saldo o historial.
+export async function DELETE() {
+  return NextResponse.json({ error: "Los clientes no se pueden dar de baja" }, { status: 409 });
 }
