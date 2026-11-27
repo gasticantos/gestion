@@ -97,6 +97,11 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const [montoParcial, setMontoParcial] = useState("");
   const [metodoParcial, setMetodoParcial] = useState<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA">("EFECTIVO");
   const [tipoTarjetaParcial, setTipoTarjetaParcial] = useState<"QR" | "DEBITO" | "CREDITO">("QR");
+  // Cobro de productos sueltos (ej. 2 de 4 cocas) sin cerrar la mesa.
+  const [mostrarCobroItems, setMostrarCobroItems] = useState(false);
+  const [cantidadesCobro, setCantidadesCobro] = useState<Map<string, number>>(new Map());
+  const [metodoItems, setMetodoItems] = useState<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA">("EFECTIVO");
+  const [tipoTarjetaItems, setTipoTarjetaItems] = useState<"QR" | "DEBITO" | "CREDITO">("QR");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [rol, setRol] = useState<string | null>(null);
@@ -262,6 +267,10 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
   const itemsPostPreticket = useMemo(
     () => itemsAgrupados.filter((grupo) => grupo.postPreticket),
     [itemsAgrupados]
+  );
+  const totalCobroItems = useMemo(
+    () => Math.round(itemsAgrupados.reduce((suma, grupo) => suma + (cantidadesCobro.get(grupo.clave) ?? 0) * grupo.precioUnitario, 0) * 100) / 100,
+    [itemsAgrupados, cantidadesCobro]
   );
   const subtotalComun = useMemo(
     () => itemsComunes.reduce((suma, grupo) => suma + grupo.subtotal, 0),
@@ -741,6 +750,40 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  async function cobrarItemsSueltos() {
+    const grupos = itemsAgrupados
+      .map((grupo) => ({ itemIds: grupo.itemIds, cantidad: cantidadesCobro.get(grupo.clave) ?? 0 }))
+      .filter((grupo) => grupo.cantidad > 0);
+    if (grupos.length === 0) {
+      setError("Elegí al menos un producto para cobrar");
+      return;
+    }
+    if (!confirm(`¿Cobrar $${formatearMoneda(totalCobroItems)} de productos sueltos? La mesa sigue abierta con el resto.`)) return;
+    setError("");
+    setEnviando(true);
+    try {
+      const res = await fetch(`/api/mesas/${id}/cobrar-items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grupos, metodo: metodoItems, tipoTarjeta: metodoItems === "TARJETA" ? tipoTarjetaItems : null }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.error || "No se pudieron cobrar los productos");
+        return;
+      }
+      setMostrarCobroItems(false);
+      setCantidadesCobro(new Map());
+      await cargar();
+      const resImp = await fetch(`/api/ventas/${data.id}/imprimir`, { method: "POST" }).catch(() => null);
+      if (!resImp?.ok) setError("Se cobró, pero no se pudo enviar el ticket a la estación de impresión.");
+    } catch {
+      setError("No se pudo conectar para cobrar los productos");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   function filaGrupo(grupo: GrupoItem) {
     const editando = editandoGrupos.has(grupo.clave);
     const cantidadActual = edicionCantidad.get(grupo.clave) ?? grupo.cantidad;
@@ -1148,6 +1191,77 @@ export default function MesaDetallePage({ params }: { params: Promise<{ id: stri
                 <span className="text-neutral-500 dark:text-neutral-400">Total final</span>
                 <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">${formatearMoneda(totalFinal + (Number(propina) || 0))}</span>
               </div>
+              {itemsAgrupados.length > 0 && !mostrarCobroItems && (
+                <Button type="button" size="sm" variant="secondary" onClick={() => { setCantidadesCobro(new Map()); setMostrarCobroItems(true); }} disabled={enviando}>
+                  Cobrar productos sueltos
+                </Button>
+              )}
+              {mostrarCobroItems && (
+                <div className="flex flex-col gap-2 rounded-lg border border-blue-600/30 bg-blue-600/5 p-3">
+                  <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                    Cobrar productos sueltos
+                  </div>
+                  <p className="text-xs text-neutral-500">
+                    Elegí cuántos de cada producto se pagan ahora. La mesa sigue abierta con el resto.
+                  </p>
+                  <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800">
+                    {itemsAgrupados.map((grupo) => {
+                      const elegidos = cantidadesCobro.get(grupo.clave) ?? 0;
+                      const cambiar = (valor: number) =>
+                        setCantidadesCobro((prev) => {
+                          const nuevo = new Map(prev);
+                          nuevo.set(grupo.clave, Math.min(grupo.cantidad, Math.max(0, valor)));
+                          return nuevo;
+                        });
+                      return (
+                        <div key={grupo.clave} className="flex items-center gap-2 py-1.5 text-sm">
+                          <span className="flex-1 truncate" title={grupo.nombre}>
+                            {grupo.nombre}
+                            <span className="text-xs text-neutral-500"> · hay {grupo.cantidad} · ${formatearMoneda(grupo.precioUnitario)} c/u</span>
+                          </span>
+                          <button type="button" className="h-7 w-7 rounded border border-neutral-300 dark:border-neutral-700" onClick={() => cambiar(elegidos - 1)} disabled={elegidos <= 0}>−</button>
+                          <span className="w-6 text-center font-medium">{elegidos}</span>
+                          <button type="button" className="h-7 w-7 rounded border border-neutral-300 dark:border-neutral-700" onClick={() => cambiar(elegidos + 1)} disabled={elegidos >= grupo.cantidad}>+</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex justify-between border-t border-neutral-200 pt-2 font-semibold dark:border-neutral-800">
+                    <span>A cobrar</span>
+                    <span>${formatearMoneda(totalCobroItems)}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <select
+                      className="flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+                      value={metodoItems}
+                      onChange={(e) => setMetodoItems(e.target.value as typeof metodoItems)}
+                    >
+                      <option value="EFECTIVO">Efectivo</option>
+                      <option value="TARJETA">Tarjeta</option>
+                      <option value="TRANSFERENCIA">Transferencia</option>
+                    </select>
+                    {metodoItems === "TARJETA" && (
+                      <select
+                        className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+                        value={tipoTarjetaItems}
+                        onChange={(e) => setTipoTarjetaItems(e.target.value as typeof tipoTarjetaItems)}
+                      >
+                        <option value="QR">QR</option>
+                        <option value="DEBITO">Débito</option>
+                        <option value="CREDITO">Crédito</option>
+                      </select>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="button" size="sm" className="flex-1" onClick={cobrarItemsSueltos} disabled={enviando || totalCobroItems <= 0}>
+                      Cobrar ${formatearMoneda(totalCobroItems)}
+                    </Button>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => setMostrarCobroItems(false)} disabled={enviando}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
               {!ticketImpreso ? (
                 <Button
                   onClick={imprimirTicket}
