@@ -160,6 +160,25 @@ export default function VentasPage() {
     }
   }
 
+  async function volverAMesa(venta: Venta) {
+    const confirmado = window.confirm(
+      `¿Volver la venta #${venta.id} a ${venta.mesa?.nombre || "la mesa"}?\n\nSe anula el cobro (y el cargo en cuenta corriente si hubo) y los productos vuelven a la mesa para cobrarlos de nuevo. Si la mesa ya tiene otra cuenta abierta, se suman a esa.`
+    );
+    if (!confirmado) return;
+
+    setEliminandoId(venta.id);
+    setMensaje(null);
+    try {
+      const res = await fetch(`/api/ventas/${venta.id}/reabrir`, { method: "POST" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "No se pudo volver la venta a la mesa");
+      window.location.href = `/mesas/${data.mesaId}`;
+    } catch (err) {
+      setMensaje({ tipo: "error", texto: err instanceof Error ? err.message : "No se pudo volver la venta a la mesa" });
+      setEliminandoId(null);
+    }
+  }
+
   function ControlesVenta({ venta }: { venta: Venta }) {
     const pagos = pagosEditados[venta.id] || venta.pagos;
     const modificado = Boolean(pagosEditados[venta.id]);
@@ -223,6 +242,16 @@ export default function VentasPage() {
             <Button size="sm" variant="primary" onClick={() => guardarPagos(venta)} disabled={!modificado || guardandoId === venta.id}>
               {guardandoId === venta.id ? "Guardando..." : "Guardar"}
             </Button>
+            {venta.tipo === "MESA" && venta.mesa && (
+              <button
+                type="button"
+                className="px-2 py-1.5 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-500 disabled:opacity-40"
+                onClick={() => volverAMesa(venta)}
+                disabled={eliminandoId === venta.id}
+              >
+                Volver a la mesa
+              </button>
+            )}
             <button
               type="button"
               className="px-2 py-1.5 text-sm font-semibold text-red-600 transition-colors hover:text-red-500 disabled:opacity-40"
